@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<OrleansConfiguration xmlns="urn:orleans">
+  <Globals>
+    <SeedNode Address="localhost" Port="11111" />
+    <SystemStore SystemStoreType ="SqlServer"
+           DeploymentId="Conreign"
+           DataConnectionString="Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=ConreignSystem;Integrated Security=True;Pooling=False;Max Pool Size=200;Asynchronous Processing=True;MultipleActiveResultSets=True" 
+           AdoInvariant="System.Data.SqlClient" />
+    <StorageProviders>
+      <Provider Type="Microsoft.Orleans.Storage.MongoStorage" 
+                Name="Default"/>
+    </StorageProviders>
+  </Globals>
+  <Defaults>
+    <Networking Address="localhost" Port="11111" />
+    <ProxyingGateway Address="localhost" Port="30000" />
+  </Defaults>
+</OrleansConfiguration>

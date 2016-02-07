@@ -1,0 +1,77 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Core.Contracts", "src\Conreign.Core.Contracts\Conreign.Core.Contracts.csproj", "{00409622-346B-4926-B745-E5F595BD3BB7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Core", "src\Conreign.Core\Conreign.Core.csproj", "{DFDBF49B-30FA-424E-9AD2-85B35F39A053}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Host", "src\Conreign.Host\Conreign.Host.csproj", "{F7DCD733-0513-474E-8D35-7615D7F9EDA3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Api", "src\Conreign.Api\Conreign.Api.csproj", "{6E0862DD-D0DE-46FB-8231-E5A150808CF5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Api.Host", "src\Conreign.Api.Host\Conreign.Api.Host.csproj", "{3B96DD78-2990-4EC2-BD1D-55D1A36884A3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Api", "Api", "{81EE45FF-6CA3-4519-834E-31023643E4F0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{420E0885-10E8-44C7-899B-FF39004DEADE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{B075363C-E3AD-45C0-9387-1735127D03DE}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		build.bat = build.bat
+		build.fsx = build.fsx
+		config.json = config.json
+		paket.dependencies = paket.dependencies
+		paket.lock = paket.lock
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Orleans.MongoStorage", "src\Microsoft.Orleans.MongoStorage\Microsoft.Orleans.MongoStorage.csproj", "{BA953785-1EFC-461E-9227-AD3E4C07EE7C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{00409622-346B-4926-B745-E5F595BD3BB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00409622-346B-4926-B745-E5F595BD3BB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00409622-346B-4926-B745-E5F595BD3BB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00409622-346B-4926-B745-E5F595BD3BB7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFDBF49B-30FA-424E-9AD2-85B35F39A053}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFDBF49B-30FA-424E-9AD2-85B35F39A053}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFDBF49B-30FA-424E-9AD2-85B35F39A053}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFDBF49B-30FA-424E-9AD2-85B35F39A053}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7DCD733-0513-474E-8D35-7615D7F9EDA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7DCD733-0513-474E-8D35-7615D7F9EDA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7DCD733-0513-474E-8D35-7615D7F9EDA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7DCD733-0513-474E-8D35-7615D7F9EDA3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E0862DD-D0DE-46FB-8231-E5A150808CF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E0862DD-D0DE-46FB-8231-E5A150808CF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E0862DD-D0DE-46FB-8231-E5A150808CF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E0862DD-D0DE-46FB-8231-E5A150808CF5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B96DD78-2990-4EC2-BD1D-55D1A36884A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B96DD78-2990-4EC2-BD1D-55D1A36884A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B96DD78-2990-4EC2-BD1D-55D1A36884A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B96DD78-2990-4EC2-BD1D-55D1A36884A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA953785-1EFC-461E-9227-AD3E4C07EE7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA953785-1EFC-461E-9227-AD3E4C07EE7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA953785-1EFC-461E-9227-AD3E4C07EE7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA953785-1EFC-461E-9227-AD3E4C07EE7C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{00409622-346B-4926-B745-E5F595BD3BB7} = {420E0885-10E8-44C7-899B-FF39004DEADE}
+		{DFDBF49B-30FA-424E-9AD2-85B35F39A053} = {420E0885-10E8-44C7-899B-FF39004DEADE}
+		{F7DCD733-0513-474E-8D35-7615D7F9EDA3} = {420E0885-10E8-44C7-899B-FF39004DEADE}
+		{6E0862DD-D0DE-46FB-8231-E5A150808CF5} = {81EE45FF-6CA3-4519-834E-31023643E4F0}
+		{3B96DD78-2990-4EC2-BD1D-55D1A36884A3} = {81EE45FF-6CA3-4519-834E-31023643E4F0}
+		{BA953785-1EFC-461E-9227-AD3E4C07EE7C} = {420E0885-10E8-44C7-899B-FF39004DEADE}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8
+	EndGlobalSection
+EndGlobal

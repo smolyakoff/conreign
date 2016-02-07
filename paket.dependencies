@@ -1,0 +1,16 @@
+source https://nuget.org/api/v2
+
+nuget FAKE
+nuget FAKE.SQL.X64
+nuget FSharp.Data
+
+nuget Microsoft.Orleans.Core
+nuget Microsoft.Orleans.Templates.Interfaces
+nuget Microsoft.Orleans.Templates.Grains
+nuget Microsoft.Orleans.OrleansRuntime
+nuget Microsoft.Orleans.OrleansSQLUtils
+nuget Microsoft.Orleans.Client
+nuget Microsoft.Extensions.DependencyInjection.Abstractions prerelease
+nuget Microsoft.AspNet.WebApi.OwinSelfHost
+nuget Polly
+nuget MongoDB.Driver
