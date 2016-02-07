@@ -117,7 +117,7 @@ namespace Microsoft.Orleans.Storage
                     }
                     grainState.Etag = updatedGrain.Meta.ETag;
                 }
-                LogVerbose3($"Written data: {meta}", MongoStorageCode.TraceWrite);
+                LogVerbose3($"Wrote data: {meta}", MongoStorageCode.TraceWrite);
             }
             catch (Exception ex)
             {

@@ -1,0 +1,11 @@
+{
+  "name": "conreign-web-client",
+  "version": "0.0.1",
+  "description": "Conreign game client for the web",
+  "main": "server.js",
+  "author": {
+    "name": "Konstantin Smolyakov",
+    "email": "smolyakoff.ko@gmail.com"
+  },
+  "license": "UNLICENSED"
+}
