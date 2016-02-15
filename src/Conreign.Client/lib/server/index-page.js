@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const serializeJs = require('serialize-javascript');
 
-const index = fs.readFileSync(path.join(__dirname, './../client/dist/index.html'), 'utf8');
+const index = fs.readFileSync(path.join(__dirname, './static/index.html'), 'utf8');
 
 function render(store, content) {
     const state = store.getState();

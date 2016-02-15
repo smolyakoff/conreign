@@ -2,7 +2,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { Router } from 'react-router';
 
-export class App extends React.Component {
+export class Layout extends React.Component {
     render() {
         return (
             <div>
@@ -13,4 +13,4 @@ export class App extends React.Component {
     }
 }
 
-export default App;
+export default Layout;

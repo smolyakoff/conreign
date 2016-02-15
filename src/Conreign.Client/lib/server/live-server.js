@@ -1,45 +1,57 @@
 'use strict';
 const path = require('path');
 
-const React = require('React');
+const React = require('react');
 const historyLib = require('history');
 const express = require('express');
 const reactRouter = require('react-router');
 const dom = require('react-dom/server');
 
-const boot = require('./../client/src/boot');
-const routesFactory = require('./../client/src/ui/routes');
-const htmlTemplate = require('./html');
+const init = require('./../app/app').init;
+const indexPage = require('./index-page');
+const load = require('./load');
+const Root = require('./root');
 
 const match = reactRouter.match;
-const RouterContext = reactRouter.RouterContext;
 
-const app = express();
-
-const dist = path.join(__dirname, './../client/dist');
+const staticPath = path.join(__dirname, './static');
 const history = historyLib.createMemoryHistory();
-const store = boot.createReduxStore(history, {});
-const routes = routesFactory.createRoutes(store);
+const app = init(history);
+const store = app.store;
+const routes = app.routes;
 
-app.use(express.static(dist, {index: false}));
+const server = express();
 
-app.use((req, res) => {
+server.use(express.static(staticPath, {index: false}));
+
+server.use((req, res, next) => {
     match({ routes, location: req.url }, (error, redirectLocation, renderProps) => {
         if (error) {
-            res.status(500).send(error.message)
+            next(error);
         } else if (redirectLocation) {
             res.redirect(302, redirectLocation.pathname + redirectLocation.search)
         } else if (renderProps) {
             // You can also check renderProps.components or renderProps.routes for
             // your "not found" component or route respectively, and send a 404 as
             // below, if you're using a catch-all route.
-            const content = dom.renderToString(<RouterContext {...renderProps} />);
-            const html = htmlTemplate(store, content);
-            res.status(200).send(html);
+
+            load(renderProps, store)
+                .then(() => {
+                    const content = dom.renderToString(<Root store={store} renderProps={renderProps}/>);
+                    const html = indexPage(store, content);
+                    res.status(200).send(html);
+                })
+                .catch(next)
+                .done();
         } else {
             res.status(404).send('Not found')
         }
     });
 });
 
-module.exports = app;
+server.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Unexpected server error.');
+});
+
+module.exports = server;

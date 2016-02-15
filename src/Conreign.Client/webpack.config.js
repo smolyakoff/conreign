@@ -6,7 +6,7 @@ const _ = require('lodash');
 const autoprefixer = require('autoprefixer');
 const AssetsPlugin = require('assets-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const OccurenceOrderPlugin = webpack.optimize.OccurenceOrderPlugin;
 const HotModuleReplacementPlugin = webpack.HotModuleReplacementPlugin;
 const NoErrorsPlugin = webpack.NoErrorsPlugin;
@@ -20,16 +20,23 @@ const libs = require('./vendor-libs');
 const root = __dirname;
 const DIRS = {
     root: root,
-    src: path.join(root, 'lib', 'client', 'src'),
-    dist: path.join(root, 'lib', 'client', 'dist')
+    client: path.join(root, 'lib', 'client'),
+    app: path.join(root, 'lib', 'app'),
+    dist: path.join(root, 'lib', 'server', 'static')
 };
 const ENV = params.get('ENV');
 process.env.NODE_ENV = ENV;
 const DEBUG = params.get('DEBUG');
 
+const styleLoaders = [
+    'style?sourceMap',
+    'css?modules&importLoaders=1&localIdentName=[path]___[name]__[local]___[hash:base64:5]',
+    'sass?sourceMap'
+];
+
 const config = {
     entry: {
-        app: ['babel-polyfill', path.join(DIRS.src, 'client.js')],
+        app: ['babel-polyfill', path.join(DIRS.client, 'entry.js')],
         vendor: libs
     },
     output: {
@@ -38,28 +45,35 @@ const config = {
     },
     devtool: 'source-map',
     resolve: {
-        root: DIRS.src
+        root: DIRS.app
     },
     module: {
+        // TODO: babel-transform-runtime https://phabricator.babeljs.io/T6922
         loaders: [{
             test: /\.js$/,
             loader: 'babel',
-            exclude: /node_modules/
+            exclude: /node_modules/,
+            query: {cacheDirectory: true}
+        }, {
+            key: 'sass',
+            test: /\.scss$/,
+            loader: ExtractTextPlugin.extract('styles', styleLoaders.join('!'))
         }]
     },
     plugins: [
         new DefinePlugin({
             CONFIG: JSON.stringify(params.get('')),
-            DEBUG: params.get('DEBUG')
+            DEBUG: params.get('DEBUG'),
+            ENV: JSON.stringify(params.get('ENV'))
         }),
         new HtmlWebpackPlugin({
-            template: path.join(DIRS.src, 'index.html')
+            template: path.join(DIRS.app, 'index.html')
         }),
         new CommonsChunkPlugin({
             name: 'vendor',
             filename: '[name]-[hash].js'
         }),
-        new ExtractTextPlugin("styles.css"),
+        new ExtractTextPlugin('styles.css'),
         new AssetsPlugin({
             path: DIRS.dist,
             filename: 'assets.json',
@@ -85,6 +99,10 @@ if (ENV === 'development') {
         noInfo: true,
         historyApiFallback: true
     };
+
+    const sassLoader = _.find(config.module.loaders, {key: 'sass'});
+    sassLoader.loader = styleLoaders.join('!');
+
     removePlugins(ExtractTextPlugin, AssetsPlugin);
     config.plugins = config.plugins.concat([
         new OccurenceOrderPlugin(),

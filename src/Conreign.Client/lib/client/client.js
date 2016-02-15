@@ -3,16 +3,20 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {browserHistory} from 'react-router';
 
-import {createReduxStore} from './boot';
-import {createRoutes, Window} from './ui/ui';
+import {init} from './../app/app';
+import {Root} from './root';
 
 const history = browserHistory;
 const initialState = window.__INITIAL_STATE__;
-const store = createReduxStore(history, initialState);
-const routes = createRoutes(store);
+const app = init(history, initialState);
 
 // Render the React application to the DOM
+const props = {
+    ...app,
+    history
+};
+
 ReactDOM.render(
-    <Window history={history} routes={routes} store={store}/>,
+    <Root {...props}/>,
     document.getElementById('root')
 );

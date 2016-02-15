@@ -1,7 +1,7 @@
 'use strict';
 const convict = require('convict');
 
-const utility = require('./../config-utility');
+const utility = require('./../config/config-utility');
 
 const container = convict({
     ENV: {
