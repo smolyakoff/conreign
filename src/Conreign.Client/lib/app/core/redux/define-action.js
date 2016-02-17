@@ -7,6 +7,8 @@ import isObject from 'lodash/isObject';
 import isFunction from 'lodash/isFunction';
 import extend from 'lodash/extend';
 
+import {notifyError} from './../errors/default-error-policies';
+
 export const PROMISE_STATUSES = {
     PENDING: 'PENDING',
     RESOLVED: 'RESOLVED',
@@ -47,16 +49,26 @@ export function defineAction(definition = {}) {
         mapMeta: identity
     });
 
-    function create(payload, meta) {
-        payload = definition.mapPayload(payload);
+    function create(payload, errorPolicy = identity, meta) {
+        meta = definition.mapMeta(meta);
         const isError = payload instanceof Error;
-        const action = {
-            type: isError ? definition.errorType : definition.successType,
+        if (!isError) {
+            payload = definition.mapPayload(payload);
+            return {
+                type: definition.successType,
+                payload: payload,
+                meta: meta,
+                error: false
+            };
+        }
+        const handleError = notifyError.join(errorPolicy).build();
+        handleError(payload);
+        return dispatch({
+            type: definition.errorType,
             payload: payload,
-            error: isError,
-            meta: definition.mapMeta(meta)
-        };
-        return action;
+            meta: meta,
+            error: true
+        });
     }
 
     create.error = function(err) {
@@ -91,7 +103,7 @@ export function definePromiseAction(definition = {}) {
         $async: {method: 'promise', status: status}
     });
 
-    function create(payload, meta) {
+    function create(payload, errorPolicy = identity, meta) {
         // Passing to the thunk middleware
         return (dispatch, getState) => {
             const payloadPromise = definition.mapPayload(payload, getState());
@@ -116,7 +128,8 @@ export function definePromiseAction(definition = {}) {
             }
 
             function onError(error) {
-
+                const handleError = notifyError.join(errorPolicy).build();
+                handleError(error);
                 return dispatch({
                     type: definition.errorType,
                     payload: error,

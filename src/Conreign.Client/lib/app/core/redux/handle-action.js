@@ -49,7 +49,7 @@ export function handleAction(action, reducers) {
 }
 
 export function handleActions(reducerPairs, defaultState = {}) {
-    const reducers = reducerPairs.map(p => handleAction(p[0], p[1]));
+    const reducers = reducerPairs.map(([key, handler]) => handleAction(key, handler));
     const reducer = reduceReducers(...reducers);
 
     return isUndefined(defaultState)

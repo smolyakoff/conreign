@@ -5,6 +5,7 @@ const ENV = config.get('ENV');
 global.ENV = ENV;
 global.CONFIG = config.get();
 global.DEBUG = false;
+global.BROWSER = false;
 
 const app = ENV === 'development'
     ? require('./development-server')

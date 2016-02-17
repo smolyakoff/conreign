@@ -21,6 +21,12 @@ export function init(history, data = {}) {
         app.devTools = <DevTools/>;
     }
 
+    if (BROWSER) {
+        const toastr = require('toastr');
+        const position = ENV === 'development' ? 'toast-bottom-left' : 'toast-bottom-right';
+        toastr.options.positionClass = position;
+    }
+
     return app;
 }
 

@@ -1,2 +1,3 @@
 'use strict';
-export * from './error-reporter-middleware';
+export * from './error-policy';
+export * from './default-error-policies';

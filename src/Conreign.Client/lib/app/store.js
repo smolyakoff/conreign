@@ -3,14 +3,12 @@ import {createStore, applyMiddleware, compose} from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import {syncHistory} from 'react-router-redux';
 
-import {errorReporter} from './core/core';
 import {rootReducer} from './reducer';
 
 export function createAppStore(history, data) {
     const middleware = [
         syncHistory(history),
-        thunkMiddleware,
-        errorReporter
+        thunkMiddleware
     ];
     const compositions = [
         applyMiddleware(...middleware)

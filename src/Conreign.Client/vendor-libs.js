@@ -1,6 +1,8 @@
 'use strict';
 
 module.exports = [
+    "jquery",
+    "toastr",
     'react',
     'react-router',
     'redux',

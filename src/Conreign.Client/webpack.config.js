@@ -64,7 +64,8 @@ const config = {
         new DefinePlugin({
             CONFIG: JSON.stringify(params.get('')),
             DEBUG: params.get('DEBUG'),
-            ENV: JSON.stringify(params.get('ENV'))
+            ENV: JSON.stringify(params.get('ENV')),
+            BROWSER: true
         }),
         new HtmlWebpackPlugin({
             template: path.join(DIRS.app, 'index.html')
