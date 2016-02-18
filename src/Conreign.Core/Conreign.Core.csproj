@@ -80,7 +80,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GameGrain.cs" />
+    <Compile Include="Auth\AuthGrain.cs" />
+    <Compile Include="Game\GameGrain.cs" />
+    <Compile Include="Game\WorldGrain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\orleans.codegen.cs" />
   </ItemGroup>

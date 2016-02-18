@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Web.Http;
 using Conreign.Core.Contracts;
+using Conreign.Core.Contracts.Game;
 using Orleans;
 
 namespace Conreign.Api.Controllers
