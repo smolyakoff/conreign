@@ -1,2 +1,5 @@
-﻿Microsoft.Orleans.Client
-Microsoft.AspNet.WebApi.Core
+﻿Microsoft.Orleans.Client content: none
+Microsoft.AspNet.SignalR.Core
+MediatR
+Autofac.SignalR
+Serilog

@@ -29,10 +29,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{B07536
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Orleans.MongoStorage", "src\Microsoft.Orleans.MongoStorage\Microsoft.Orleans.MongoStorage.csproj", "{BA953785-1EFC-461E-9227-AD3E4C07EE7C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{7CCBD362-A459-48AD-A3CA-C74319EE5EC4}"
-EndProject
-Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Conreign.Client", "src\Conreign.Client\Conreign.Client.njsproj", "{A10C4B96-8432-4A10-B8D5-8E35DA9161A4}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,10 +59,6 @@ Global
 		{BA953785-1EFC-461E-9227-AD3E4C07EE7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA953785-1EFC-461E-9227-AD3E4C07EE7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA953785-1EFC-461E-9227-AD3E4C07EE7C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A10C4B96-8432-4A10-B8D5-8E35DA9161A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A10C4B96-8432-4A10-B8D5-8E35DA9161A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A10C4B96-8432-4A10-B8D5-8E35DA9161A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A10C4B96-8432-4A10-B8D5-8E35DA9161A4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -78,7 +70,6 @@ Global
 		{6E0862DD-D0DE-46FB-8231-E5A150808CF5} = {81EE45FF-6CA3-4519-834E-31023643E4F0}
 		{3B96DD78-2990-4EC2-BD1D-55D1A36884A3} = {81EE45FF-6CA3-4519-834E-31023643E4F0}
 		{BA953785-1EFC-461E-9227-AD3E4C07EE7C} = {420E0885-10E8-44C7-899B-FF39004DEADE}
-		{A10C4B96-8432-4A10-B8D5-8E35DA9161A4} = {7CCBD362-A459-48AD-A3CA-C74319EE5EC4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8

@@ -3,8 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Owin.Hosting;
 using Orleans;
-using Orleans.Runtime;
 using Polly;
+using Serilog;
 
 namespace Conreign.Api.Host
 {
@@ -12,8 +12,14 @@ namespace Conreign.Api.Host
     {
         private const string Url = "http://localhost:9000/";
 
+        private const string ConfigFileName = "OrleansClientConfiguration.xml";
+
         public static void Main(string[] args)
         {
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.ColoredConsole()
+                .MinimumLevel.Debug()
+                .CreateLogger();
             var tasks = new []
             {
                 Task.Run(() => RunOwin()),
@@ -56,13 +62,13 @@ namespace Conreign.Api.Host
         {
 #if DEBUG
             //Wait for orleans silo to start
-            Thread.Sleep(3000);
+            Thread.Sleep(5000);
 #endif
             var policy = Policy
                 .Handle<Exception>()
                 .WaitAndRetry(5, attempt => TimeSpan.FromSeconds(attempt*3));
             Console.WriteLine("Trying to initialize Orleans client...");
-            policy.Execute(GrainClient.Initialize);
+            policy.Execute(() => GrainClient.Initialize(ConfigFileName));
             return new OrleansClientDisposer();
         }
 

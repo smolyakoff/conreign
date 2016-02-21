@@ -4,7 +4,7 @@ using Orleans;
 
 namespace Conreign.Core.Contracts.Auth
 {
-    public interface IAuthGrain : IGrain
+    public interface IAuthGrain : IGrainWithIntegerKey
     {
         Task<AuthenticationResultPayload> AuthenticateAnonymousUser();
     }

@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using Conreign.Core.Contracts.Auth;
 using Conreign.Core.Contracts.Game;
 using Conreign.Core.Contracts.Game.Actions;
 using Conreign.Core.Contracts.Game.Data;
@@ -10,10 +12,11 @@ namespace Conreign.Core.Game
     [StatelessWorker]
     public class WorldGrain : Grain, IWorldGrain
     {
-        public Task<PlayerPayload> Arrive()
+        public Task<PlayerPayload> Arrive(ArriveAction action)
         {
-            
-            throw new System.NotImplementedException();
+            var auth = GrainFactory.GetGrain<IAuthGrain>(0);
+            //var abc = auth.AuthenticateAnonymousUser();
+            return Task.FromResult(new PlayerPayload {Token = "abc"});
         }
 
         public Task<GameStatusPayload> CheckGameStatus(CheckGameStatusAction action)

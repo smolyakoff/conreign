@@ -49,7 +49,6 @@ namespace Microsoft.Orleans.Storage
             if (string.IsNullOrEmpty(url.Password))
             {
                 return connectionString;
-                ;
             }
             var secret = $"{url.Username}:{url.Password}";
             return connectionString.Replace(secret, "**AUTH**");

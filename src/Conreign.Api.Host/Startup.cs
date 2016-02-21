@@ -1,4 +1,5 @@
-﻿using Conreign.Api.Configuration;
+﻿using Conreign.Api.Framework.Owin;
+using Microsoft.Owin.Cors;
 using Owin;
 
 namespace Conreign.Api.Host
@@ -7,9 +8,16 @@ namespace Conreign.Api.Host
     {
         public void Configuration(IAppBuilder builder)
         {
-            var config = ApiConfiguration.CreateHttpConfiguration();
+            var container = Api.Configuration.Container;
+            var hubConfiguration = Api.Configuration.CreateHubConfiguration();
+            var frameworkOptions = Api.Configuration.CreateFrameworkOptions();
 
-            builder.UseWebApi(config);
+            builder.SetFrameworkLoggerFactory();
+            builder.UseCors(CorsOptions.AllowAll);
+            builder.UseAutofacMiddleware(container);
+            builder.UseFrameworkErrorHandler(frameworkOptions);
+            builder.MapSignalR(hubConfiguration);
+            builder.MapFrameworkDispatcher(frameworkOptions);
         }
     }
 }

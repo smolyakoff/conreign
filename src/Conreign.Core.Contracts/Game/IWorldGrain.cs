@@ -7,7 +7,7 @@ namespace Conreign.Core.Contracts.Game
 {
     public interface IWorldGrain : IGrainWithIntegerKey
     {
-        Task<PlayerPayload> Arrive();
+        Task<PlayerPayload> Arrive(ArriveAction action);
 
         Task<GameStatusPayload> CheckGameStatus(CheckGameStatusAction action);
 

@@ -7,6 +7,7 @@ namespace Conreign.Core.Contracts.Game.Actions
     public class ChangePlayerSettingsAction : IPayloadContainer<PlayerSettingsPayload>, IMetadataContainer<IUserMeta>
     {
         public IUserMeta Meta { get; set; }
+
         public PlayerSettingsPayload Payload { get; set; }
     }
 }

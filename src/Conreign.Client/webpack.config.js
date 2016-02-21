@@ -12,6 +12,7 @@ const HotModuleReplacementPlugin = webpack.HotModuleReplacementPlugin;
 const NoErrorsPlugin = webpack.NoErrorsPlugin;
 const CommonsChunkPlugin = webpack.optimize.CommonsChunkPlugin;
 const UglifyJsPlugin =  webpack.optimize.UglifyJsPlugin;
+const ProvidePlugin = webpack.ProvidePlugin;
 const DefinePlugin = webpack.DefinePlugin;
 
 const params = require('./lib/client/client.config.js');
@@ -22,7 +23,8 @@ const DIRS = {
     root: root,
     client: path.join(root, 'lib', 'client'),
     app: path.join(root, 'lib', 'app'),
-    dist: path.join(root, 'lib', 'server', 'static')
+    dist: path.join(root, 'lib', 'server', 'static'),
+    nodeModules: path.join(root, 'node_modules')
 };
 const ENV = params.get('ENV');
 process.env.NODE_ENV = ENV;
@@ -52,12 +54,15 @@ const config = {
         loaders: [{
             test: /\.js$/,
             loader: 'babel',
-            exclude: /node_modules/,
+            include: [
+                DIRS.app,
+                DIRS.client
+            ],
             query: {cacheDirectory: true}
         }, {
             key: 'sass',
             test: /\.scss$/,
-            loader: ExtractTextPlugin.extract('styles', styleLoaders.join('!'))
+            loader: ExtractTextPlugin.extract('style', _.drop(styleLoaders, 1).join('!'))
         }]
     },
     plugins: [
@@ -79,6 +84,9 @@ const config = {
             path: DIRS.dist,
             filename: 'assets.json',
             prettyPrint: true
+        }),
+        new ProvidePlugin({
+            'window.jQuery': 'jquery'
         })
     ]
 };

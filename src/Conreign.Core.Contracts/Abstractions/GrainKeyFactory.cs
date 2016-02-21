@@ -12,7 +12,12 @@ namespace Conreign.Core.Contracts.Abstractions
 
         public static GrainKey<TGrain> KeyOrNullFor<TGrain>(Guid? key) where TGrain : IGrainWithGuidKey
         {
-            return key.HasValue ? new GrainKey<TGrain>(key) : null;
+            return key.HasValue ? new GrainKey<TGrain>(key.Value) : null;
+        }
+
+        public static GrainKey<TGrain> KeyOrNullFor<TGrain>(long? key) where TGrain : IGrainWithIntegerKey
+        {
+            return key.HasValue ? new GrainKey<TGrain>(key.Value) : null;
         }
     }
 }

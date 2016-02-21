@@ -2,6 +2,8 @@
 using System.Net;
 using Conreign.Core;
 using Conreign.Core.Game;
+using Orleans;
+using Orleans.Runtime.Configuration;
 using Orleans.Runtime.Host;
 
 namespace Conreign.Host
@@ -9,7 +11,7 @@ namespace Conreign.Host
     internal class Program
     {
         private const string AppDomainName = "OrleansHost";
-        private const string ConfigFileName = "ServerConfiguration.xml";
+        private const string ConfigFileName = "OrleansServerConfiguration.xml";
         private static SiloHost _host;
 
         public static void Main(string[] args)
@@ -17,9 +19,9 @@ namespace Conreign.Host
             var domain = AppDomain.CreateDomain(AppDomainName,
                 null,
                 new AppDomainSetup { AppDomainInitializer = InitializeSilo });
-
             Console.WriteLine("Orleans silo is running... Press any key to terminate.");
             Console.ReadLine();
+
             domain.DoCallBack(ShutdownSilo);
         }
 

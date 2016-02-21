@@ -11,4 +11,4 @@ const app = ENV === 'development'
     ? require('./development-server')
     : require('./live-server');
 
-app.listen(3003);
+app.listen(3000);

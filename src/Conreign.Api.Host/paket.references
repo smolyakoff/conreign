@@ -1,4 +1,7 @@
-﻿Microsoft.Orleans.Client
+﻿Microsoft.Orleans.Client content: none
 Microsoft.Orleans.OrleansSQLUtils
 Polly
-Microsoft.AspNet.WebApi.OwinSelfHost
+Serilog
+Autofac.Owin
+Microsoft.Owin.Cors
+Microsoft.AspNet.SignalR.SelfHost
