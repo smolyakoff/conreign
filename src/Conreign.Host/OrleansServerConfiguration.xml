@@ -21,5 +21,6 @@
   <Defaults>
     <Networking Address="localhost" Port="11111" />
     <ProxyingGateway Address="localhost" Port="30000" />
+    <Startup Type="Conreign.Host.Startup,Conreign.Host"/>
   </Defaults>
 </OrleansConfiguration>

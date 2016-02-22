@@ -44,12 +44,7 @@ namespace Conreign.Api
         private static IContainer ConfigureContainer()
         {
             var builder = new ContainerBuilder();
-            // SignalR
-            builder.RegisterHubs(Assembly.GetExecutingAssembly());
-
-            // Api
             builder.RegisterModule(new ApiModule());
-
             return builder.Build();
         }
     }

@@ -35,12 +35,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Auth\AuthGrain.cs" />
+    <Compile Include="Auth\AuthOptions.cs" />
+    <Compile Include="Auth\JsonNetSerializer.cs" />
+    <Compile Include="Auth\JwtTokenPayload.cs" />
     <Compile Include="Game\GameGrain.cs" />
     <Compile Include="Game\WorldGrain.cs" />
     <Compile Include="Properties\orleans.codegen.cs">
       <Paket>True</Paket>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utility\SecondsSinceEpochConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Conreign.Core.Contracts\Conreign.Core.Contracts.csproj">
@@ -64,6 +68,17 @@
   <ItemGroup>
     <None Include="paket.references" />
   </ItemGroup>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v3.5' Or $(TargetFrameworkVersion) == 'v4.0' Or $(TargetFrameworkVersion) == 'v4.5' Or $(TargetFrameworkVersion) == 'v4.5.1' Or $(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3' Or $(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1')">
+      <ItemGroup>
+        <Reference Include="JWT">
+          <HintPath>..\..\packages\JWT\lib\3.5\JWT.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
   <ItemGroup>
     <Reference Include="System">
       <Paket>True</Paket>
@@ -77,6 +92,7 @@
       <Paket>True</Paket>
     </Analyzer>
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.5' Or $(TargetFrameworkVersion) == 'v4.5.1' Or $(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3' Or $(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1')">
       <ItemGroup>

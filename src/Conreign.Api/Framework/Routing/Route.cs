@@ -22,5 +22,10 @@ namespace Conreign.Api.Framework.Routing
         public Type ActionType { get; private set; }
 
         public MethodInfo Method { get; private set; }
+
+        public override string ToString()
+        {
+            return $"{Method.Name}({ActionType.Name})";
+        }
     }
 }

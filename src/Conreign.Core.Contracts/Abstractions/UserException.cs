@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
+using System.Security.Permissions;
 
 namespace Conreign.Core.Contracts.Abstractions
 {
@@ -86,6 +88,18 @@ namespace Conreign.Core.Contracts.Abstractions
             Type = info.GetString("Type");
         }
 
+        [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            if (info == null)
+            {
+                throw new ArgumentNullException(nameof(info));
+            }
+            info.AddValue("Type", Type);
+            info.AddValue("Title", Title);
+            base.GetObjectData(info, context);
+        }
+
         private UserMessage GetUserMessage()
         {
             return new UserMessage(Message, Type, Title);
@@ -133,6 +147,17 @@ namespace Conreign.Core.Contracts.Abstractions
         }
 
         public T Info { get; }
+
+        [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            if (info == null)
+            {
+                throw new ArgumentNullException(nameof(info));
+            }
+            info.AddValue("Info", Info);
+            base.GetObjectData(info, context);
+        }
 
         protected UserException(
             SerializationInfo info,

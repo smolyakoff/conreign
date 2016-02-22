@@ -1,12 +1,25 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using Conreign.Core.Contracts.Abstractions;
+using Conreign.Core.Contracts.Auth;
 
 namespace Conreign.Api.Framework.ErrorHandling
 {
     public class ErrorFactory
     {
         private readonly ErrorFactorySettings _settings;
+
+        private static readonly Dictionary<string, HttpStatusCode> Codes;
+
+        static ErrorFactory()
+        {
+            Codes = new Dictionary<string, HttpStatusCode>
+            {
+                [AuthErrors.TokenExpired.Type] = HttpStatusCode.Unauthorized
+            };
+        }
 
         public ErrorFactory() : this(new ErrorFactorySettings())
         {
@@ -30,9 +43,15 @@ namespace Conreign.Api.Framework.ErrorHandling
             return SerializeInternal((dynamic)exception);
         }
 
+        private IError SerializeInternal(AggregateException exception)
+        {
+            return SerializeInternal((dynamic)exception.InnerException);
+        }
+
         private static UserError SerializeInternal(UserException exception)
         {
-            return new UserError(exception);
+            var code = Codes.ContainsKey(exception.Type) ? Codes[exception.Type] : HttpStatusCode.BadRequest;
+            return new UserError(exception, code);
         }
 
         private SystemError SerializeInternal(Exception exception)

@@ -4,12 +4,15 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Conreign.Core.Contracts.Abstractions;
+using Serilog;
 
 namespace Conreign.Api.Framework.Routing
 {
     public class RoutingTable
     {
         private readonly Assembly _grainInterfacesAssembly;
+
+        private readonly ILogger _logger;
 
         private Dictionary<string, Route> _routes;
 
@@ -21,6 +24,7 @@ namespace Conreign.Api.Framework.Routing
             {
                 throw new ArgumentNullException(nameof(grainInterfacesAssembly));
             }
+            _logger = Log.ForContext(typeof (RoutingTable));
             _grainInterfacesAssembly = grainInterfacesAssembly;
             _routes = null;
         }
@@ -46,18 +50,28 @@ namespace Conreign.Api.Framework.Routing
             lock (_locker)
             {
                 var types = _grainInterfacesAssembly.DefinedTypes;
-                var actionTypes = types.Where(IsGrainAction);
+                var actionTypes = types.Where(IsPublicGrainAction);
                 _routes = actionTypes
                     .Select(t => new { Key = GetActionKey(t), ActionType = t, Method = GetMethod(t) })
                     .Where(x => x.Method != null)
                     .ToDictionary(x => x.Key, x => new Route(x.ActionType, x.Method), StringComparer.OrdinalIgnoreCase);
+                _logger.Information("Registered routes: {Routes}", _routes);
                 return _routes;
             }
         }
 
-        private static bool IsGrainAction(Type type)
+        private static bool IsPublicGrainAction(Type type)
         {
-            return type.IsClass && !type.IsAbstract && GetGrainActionInterface(type) != null;
+            return type.IsClass && 
+                !type.IsAbstract && 
+                GetGrainActionInterface(type) != null &&
+                !IsInternalAction(type);
+        }
+
+        private static bool IsInternalAction(Type type)
+        {
+            var action = type.GetCustomAttribute<ActionAttribute>();
+            return action != null && action.Internal;
         }
 
         private static string GetActionKey(Type type)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Conreign.Core.Contracts.Abstractions;
+using Conreign.Core.Contracts.Auth.Data;
 
 namespace Conreign.Api.Framework.Utility
 {
@@ -28,8 +29,10 @@ namespace Conreign.Api.Framework.Utility
             }
             if (actionInfo.MetaType != null)
             {
-                result.Meta = action.Meta.ToObject(actionInfo.MetaType);
+                dynamic meta = action.Meta.ToObject(actionInfo.MetaType);
+                result.Meta = meta;
             }
+            
             return result;
         }
 
@@ -42,11 +45,15 @@ namespace Conreign.Api.Framework.Utility
             }
             
             var payloadType = actionType.GetInterfaces()
-                .Where(t => t.IsGenericTypeDefinition)
-                .FirstOrDefault(t => t == typeof (IPayloadContainer<>))?.GenericTypeArguments.First();
+                .Where(t => t.IsConstructedGenericType)
+                .FirstOrDefault(t => t.GetGenericTypeDefinition() == typeof(IPayloadContainer<>))?.GetGenericArguments().First();
             var metaType = actionType.GetInterfaces()
-                .Where(t => t.IsGenericTypeDefinition)
-                .FirstOrDefault(t => t == typeof(IMetadataContainer<>))?.GenericTypeArguments.First();
+                .Where(t => t.IsConstructedGenericType)
+                .FirstOrDefault(t => t.GetGenericTypeDefinition() == typeof(IMetadataContainer<>))?.GetGenericArguments().First();
+            if (metaType?.IsInterface == true)
+            {
+                metaType = typeof (Meta);
+            }
             return new ActionInfo
             {
                 Constructor = constructor,

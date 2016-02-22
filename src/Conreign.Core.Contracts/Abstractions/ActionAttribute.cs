@@ -2,6 +2,7 @@
 
 namespace Conreign.Core.Contracts.Abstractions
 {
+    [AttributeUsage(AttributeTargets.Class)]
     public class ActionAttribute : Attribute
     {
         public ActionAttribute()
@@ -16,6 +17,8 @@ namespace Conreign.Core.Contracts.Abstractions
             }
             Type = type;
         }
+
+        public bool Internal { get; set; }
 
         public string Type { get; private set; }
     }
