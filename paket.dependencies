@@ -25,3 +25,6 @@ nuget Autofac.SignalR
 nuget Microsoft.Owin.Cors
 nuget Microsoft.AspNet.SignalR.SelfHost
 nuget JWT
+nuget AutoMapper
+nuget Microsoft.Net.Http
+nuget Microsoft.AspNet.WebApi.Client

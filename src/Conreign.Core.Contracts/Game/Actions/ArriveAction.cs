@@ -1,13 +1,11 @@
-﻿using System;
-using Conreign.Core.Contracts.Abstractions;
-using Conreign.Core.Contracts.Auth.Data;
+﻿using Conreign.Core.Contracts.Abstractions;
 
 namespace Conreign.Core.Contracts.Game.Actions
 {
-    public class ArriveAction : IGrainAction<IWorldGrain>, IMetadataContainer<IUserMeta>
+    public class ArriveAction : IGrainAction<IWorldGrain>, IMetadataContainer<Meta>
     {
         public GrainKey<IWorldGrain> GrainKey => GrainKeyFactory.KeyOrNullFor<IWorldGrain>(default(long));
 
-        public IUserMeta Meta { get; set; }
+        public Meta Meta { get; set; }
     }
 }

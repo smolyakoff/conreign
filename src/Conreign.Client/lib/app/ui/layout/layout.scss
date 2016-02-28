@@ -1,0 +1,22 @@
+@import "~core/theme/base";
+
+.layout {
+  height: 100%;
+}
+
+.layout-container {
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  margin: 0 auto -4em;
+}
+
+.layout-container:after {
+  content: "";
+  display: block;
+
+  height: 12em;
+  @include media($large-screen) {
+    height: 4em;
+  }
+}

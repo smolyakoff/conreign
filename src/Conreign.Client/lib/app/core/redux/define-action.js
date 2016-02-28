@@ -8,6 +8,7 @@ import isFunction from 'lodash/isFunction';
 import extend from 'lodash/extend';
 
 import {notifyError} from './../errors/default-error-policies';
+import {defaultServiceRegistry} from './service-registry';
 
 export const PROMISE_STATUSES = {
     PENDING: 'PENDING',
@@ -45,15 +46,17 @@ export function defineAction(definition = {}) {
     definition = defaults(definition, {
         successType: `${definition.type}${TYPE_SUFFIXES.SUCCESS}`,
         errorType: `${definition.type}${TYPE_SUFFIXES.ERROR}`,
+        dependencies: [],
         mapPayload: identity,
         mapMeta: identity
     });
 
     function create(payload, errorPolicy = identity, meta) {
-        meta = definition.mapMeta(meta);
+        const dependencies = definition.dependencies.map(tag => defaultServiceRegistry.resolve(tag));
+        meta = definition.mapMeta(...dependencies, meta);
         const isError = payload instanceof Error;
         if (!isError) {
-            payload = definition.mapPayload(payload);
+            payload = definition.mapPayload(...dependencies, payload);
             return {
                 type: definition.successType,
                 payload: payload,
@@ -63,12 +66,12 @@ export function defineAction(definition = {}) {
         }
         const handleError = notifyError.join(errorPolicy).build();
         handleError(payload);
-        return dispatch({
+        return {
             type: definition.errorType,
             payload: payload,
             meta: meta,
             error: true
-        });
+        };
     }
 
     create.error = function(err) {
@@ -94,19 +97,21 @@ export function definePromiseAction(definition = {}) {
         pendingType: `${definition.type}${TYPE_SUFFIXES.PROMISE_PENDING}`,
         successType: `${definition.type}${TYPE_SUFFIXES.PROMISE_SUCCESS}`,
         errorType: `${definition.type}${TYPE_SUFFIXES.PROMISE_ERROR}`,
+        dependencies: [],
         mapPayload: promiseIdentity,
         mapMeta: identity
     });
 
     // Mark all actions as async promise actions
-    const mapMeta = (meta, status, state) => extend({}, definition.mapMeta(meta, state), {
+    const mapMeta = (meta, status, state, dependencies) => extend({}, definition.mapMeta(...dependencies, meta, state), {
         $async: {method: 'promise', status: status}
     });
 
     function create(payload, errorPolicy = identity, meta) {
+        const dependencies = definition.dependencies.map(tag => defaultServiceRegistry.resolve(tag));
         // Passing to the thunk middleware
         return (dispatch, getState) => {
-            const payloadPromise = definition.mapPayload(payload, getState());
+            const payloadPromise = definition.mapPayload(...dependencies, payload, getState());
             if (!isPromiseLike(payloadPromise)) {
                 throw new Error('Promise actions should create promises for a payload!');
             }
@@ -115,7 +120,7 @@ export function definePromiseAction(definition = {}) {
                 // We should only pass serializable values in actions
                 payload: isPromiseLike(payload) ? {} : payload,
                 error: false,
-                meta: mapMeta(meta, PROMISE_STATUSES.PENDING, getState())
+                meta: mapMeta(meta, PROMISE_STATUSES.PENDING, getState(), dependencies)
             });
 
             function onSuccess(result) {
@@ -123,7 +128,7 @@ export function definePromiseAction(definition = {}) {
                     type: definition.successType,
                     payload: result,
                     error: false,
-                    meta: mapMeta(meta, PROMISE_STATUSES.RESOLVED, getState())
+                    meta: mapMeta(meta, PROMISE_STATUSES.RESOLVED, getState(), dependencies)
                 });
             }
 
@@ -134,7 +139,7 @@ export function definePromiseAction(definition = {}) {
                     type: definition.errorType,
                     payload: error,
                     error: true,
-                    meta: mapMeta(meta, PROMISE_STATUSES.REJECTED, getState())
+                    meta: mapMeta(meta, PROMISE_STATUSES.REJECTED, getState(), dependencies)
                 });
             }
 

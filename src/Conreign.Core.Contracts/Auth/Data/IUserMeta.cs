@@ -1,7 +1,9 @@
-﻿namespace Conreign.Core.Contracts.Auth.Data
+﻿using Conreign.Core.Contracts.Game;
+
+namespace Conreign.Core.Contracts.Auth.Data
 {
     public interface IUserMeta
     {
-        AuthenticationStatusPayload User { get; }
+        UserMeta User { get; }
     }
 }

@@ -1,8 +1,8 @@
-const React = require('react');
-const Provider = require('react-redux').Provider;
-const RouterContext = require('react-router').RouterContext;
+import React from 'react';
+import {Provider} from 'react-redux';
+import {RouterContext} from 'react-router';
 
-class Root extends React.Component {
+export class Root extends React.Component {
     static propTypes = {
         renderProps: React.PropTypes.object.isRequired,
         store: React.PropTypes.object.isRequired
@@ -18,4 +18,4 @@ class Root extends React.Component {
     }
 }
 
-module.exports = Root;
+export default Root;

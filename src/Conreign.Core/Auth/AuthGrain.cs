@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Conreign.Core.Contracts.Abstractions;
 using Conreign.Core.Contracts.Auth;
 using Conreign.Core.Contracts.Auth.Actions;
 using Conreign.Core.Contracts.Auth.Data;
@@ -40,7 +39,7 @@ namespace Conreign.Core.Auth
 
         public Task<AccessTokenPayload> LoginAnonymous(LoginAnonymousAction action)
         {
-            var userId = Guid.NewGuid().ToString();
+            var userId = action.Payload.ToString();
             var lifetime = TimeSpan.FromSeconds(_options.TokenLifetimeInSeconds);
             var payload = JwtTokenPayload.Create(userId, lifetime);
             var token = JsonWebToken.Encode(payload, _options.JwtSecret, HashAlgorithm);
@@ -50,7 +49,7 @@ namespace Conreign.Core.Auth
 
         public Task<AuthenticationStatusPayload> Authenticate(AuthenticateAction action)
         {
-            var accessToken = action?.Meta?.Auth?.AccessToken;
+            var accessToken = action?.Payload?.AccessToken;
             if (string.IsNullOrEmpty(accessToken))
             {
                 throw new ArgumentException("Access token is required to authenticate.");
@@ -63,26 +62,14 @@ namespace Conreign.Core.Auth
             catch (Exception ex)
             {
                 _logger.Verbose($"Error parsing access token: {ex.Message}.");
-                return Task.FromResult(new AuthenticationStatusPayload
-                {
-                    IsAuthenticated = false,
-                    ErrorMessage = AuthErrors.BadToken
-                });
+                return Task.FromResult(new AuthenticationStatusPayload {ErrorMessage = AuthErrors.BadToken});
             }
             
             if (payload.ExpiresAt < DateTime.UtcNow)
             {
-                return Task.FromResult(new AuthenticationStatusPayload
-                {
-                    IsAuthenticated = false,
-                    ErrorMessage = AuthErrors.TokenExpired
-                });
+                return Task.FromResult(new AuthenticationStatusPayload {ErrorMessage = AuthErrors.TokenExpired});
             }
-            var result = new AuthenticationStatusPayload
-            {
-                IsAuthenticated = true,
-                UserKey = Guid.Parse(payload.Subject)
-            };
+            var result = new AuthenticationStatusPayload { UserKey = Guid.Parse(payload.Subject) };
             return Task.FromResult(result);
         }
     }

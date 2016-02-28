@@ -2,10 +2,12 @@
 using System.Net;
 using System.Threading.Tasks;
 using Conreign.Api.Framework.ErrorHandling;
+using Conreign.Core.Contracts;
 using Conreign.Core.Contracts.Abstractions;
 using Conreign.Core.Contracts.Auth;
 using Conreign.Core.Contracts.Auth.Actions;
 using Conreign.Core.Contracts.Auth.Data;
+using Conreign.Core.Contracts.Game;
 using MediatR;
 using Newtonsoft.Json.Linq;
 using Orleans;
@@ -41,11 +43,15 @@ namespace Conreign.Api.Framework.Auth
             {
                 return await _next.Handle(message);
             }
-            var meta = new Meta {Auth = new AuthPayload {AccessToken = accessToken}};
-            var action = new AuthenticateAction {Meta = meta};
+            var payload = new AccessTokenPayload {AccessToken = accessToken};
+            var action = new AuthenticateAction(payload);
             var auth = GrainClient.GrainFactory.GetGrain<IAuthGrain>(0);
             var result = await auth.Authenticate(action);
-            message.Meta["user"] = JObject.FromObject(result);
+            message.Meta["auth"] = JObject.FromObject(new AuthMeta {AccessToken = accessToken, ErrorMessage = result.ErrorMessage});
+            if (result.UserKey != null)
+            {
+                message.Meta["user"] = JObject.FromObject(new UserMeta {UserKey = result.UserKey.Value});
+            }
             return await _next.Handle(message);
         }
     }

@@ -1,0 +1,49 @@
+@import "~core/theme/base";
+
+.game-menu-wrapper {
+  display: flex;
+  @include align-items(center);
+  @include justify-content(center);
+
+  height: calc(100vh - 10.05em);
+  background: url(./background.jpg);
+  background-size: 100% 100%;
+
+  .game-menu {
+    $menu-highlight: transparentize($light-gray, 0.8);
+    @include flex(1);
+    background-color: $menu-highlight;
+    box-shadow: 0 0 5em 3em $menu-highlight;
+    padding: 7em 3em;
+    max-width: 80%;
+    text-align: center;
+    border-radius: 20em;
+
+    h1 {
+      color: $brand-secondary-accent;
+      text-shadow: 0 0 2em $brand;
+    }
+
+    h3 {
+      margin-top: $base-spacing;
+    }
+
+    .menu-input {
+      padding-bottom: $small-spacing;
+      input {
+        display: inline-block;
+        width: 80%;
+        text-align: center;
+
+        @include media($large-screen) {
+          max-width: 50%;
+        }
+      }
+    }
+
+    @include media($large-screen) {
+      max-width: 40%;
+    }
+
+  }
+}

@@ -1,9 +1,13 @@
 'use strict';
+import _ from 'lodash';
 import React from 'react';
+import {configure} from './services';
 import {createAppStore} from './store';
 import {createRoutes} from './routes';
 
-export function init(history, data = {}) {
+export function init(history, storage, data = {}) {
+
+    const services = configure({storage: storage}, CONFIG);
     const store = createAppStore(history, data);
     const routes = createRoutes(store);
 
@@ -14,7 +18,8 @@ export function init(history, data = {}) {
 
     const app = {
         store: store,
-        routes: routes
+        routes: routes,
+        services: services
     };
 
     if (DevTools) {

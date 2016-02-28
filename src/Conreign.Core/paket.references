@@ -1,2 +1,6 @@
 ﻿Microsoft.Orleans.Templates.Grains
 JWT
+AutoMapper
+Microsoft.Net.Http
+Microsoft.AspNet.WebApi.Client
+MongoDB.Driver

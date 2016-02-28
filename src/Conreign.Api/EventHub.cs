@@ -1,30 +1,43 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
+using Conreign.Api.Framework;
+using Conreign.Core.Contracts.Abstractions;
+using Conreign.Core.Contracts.Game.Actions;
+using MediatR;
 using Microsoft.AspNet.SignalR;
+using Newtonsoft.Json.Linq;
 using Orleans;
 using Orleans.Streams;
+using Serilog;
 
 namespace Conreign.Api
 {
     public class EventHub : Hub<IClient>
     {
-        private readonly Task<StreamSubscriptionHandle<object>> _initializationTask; 
+        private readonly IMediator _mediator;
+        private readonly Task<StreamSubscriptionHandle<EventEnvelope<object>>> _initializationTask;
 
-        public EventHub()
+        public EventHub(IMediator mediator)
         {
+            _mediator = mediator;
             var provider = GrainClient.GetStreamProvider("DefaultStream");
-            var stream = provider.GetStream<object>(Guid.Empty, null);
-            _initializationTask = stream.SubscribeAsync(new Observer(this));
+            var stream = provider.GetStream<EventEnvelope<object>>(Guid.Empty, null);
+            _initializationTask = stream.SubscribeAsync(new EventHubObserver(this));
         }
 
-        public override Task OnConnected()
+        public override async Task OnConnected()
         {
-            return base.OnConnected();
+            await base.OnConnected();
+            var action = new GenericAction {Type = "connect", Meta = GetMeta()};
+            await _mediator.SendAsync(action);
         }
 
-        public override Task OnDisconnected(bool stopCalled)
+        public override async Task OnDisconnected(bool stopCalled)
         {
-            return base.OnDisconnected(stopCalled);
+            await base.OnDisconnected(stopCalled);
+            var action = new GenericAction { Type = "disconnect", Meta = GetMeta() };
+            await _mediator.SendAsync(action);
         }
 
         protected override void Dispose(bool disposing)
@@ -34,29 +47,44 @@ namespace Conreign.Api
             base.Dispose(disposing);
         }
 
-        private class Observer: IAsyncObserver<object>
+        private JObject GetMeta()
         {
+            var token = Context.Headers["Authorization"]?.Replace("Bearer", string.Empty)?.Trim();
+            var meta = JObject.FromObject(new { auth = new { accessToken = token }});
+            return meta;
+        }
+
+        private class EventHubObserver: IAsyncObserver<EventEnvelope<object>>
+        {
+            private readonly ILogger _logger;
+
             private readonly EventHub _hub;
 
-            public Observer(EventHub hub)
+            public EventHubObserver(EventHub hub)
             {
+                _logger = Log.ForContext(GetType());
                 _hub = hub;
             }
 
-            public Task OnNextAsync(object item, StreamSequenceToken token = null)
+            public Task OnNextAsync(EventEnvelope<object> envelope, StreamSequenceToken token = null)
             {
-                _hub.Clients.All.HandleEvent(item);
+                var client = envelope.ConnectionIds == null 
+                    ? _hub.Clients.All 
+                    : _hub.Clients.Clients(envelope.ConnectionIds.ToList());
+                client.HandleEvent(envelope.Event);
                 return TaskDone.Done;
             }
 
             public Task OnCompletedAsync()
             {
-                throw new NotImplementedException();
+                _logger.Fatal("Global event stream unexpectedly completed.");
+                return TaskDone.Done;
             }
 
             public Task OnErrorAsync(Exception ex)
             {
-                throw new NotImplementedException();
+                _logger.Error(ex, "Event stream error: {Message}", ex.Message);
+                return TaskDone.Done;
             }
         }
 

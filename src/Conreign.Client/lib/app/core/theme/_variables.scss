@@ -13,17 +13,23 @@ $heading-line-height: 1.2;
 $base-border-radius: 3px;
 $base-spacing: $base-line-height * 1em;
 $small-spacing: $base-spacing / 2;
+$large-spacing: $base-spacing * 2;
 $base-z-index: 0;
 
 // Colors
-$blue: #1565c0;
-$dark-gray: #333;
-$medium-gray: #999;
+$brand-dark: #0b132b;
+$brand: #1c2541;
+$brand-light: #3a506b;
+
+$brand-secondary: #fff8c2;
+$brand-secondary-accent: #ffde58;
+
 $light-gray: #ddd;
 
 // Font Colors
-$base-font-color: $dark-gray;
-$action-color: $blue;
+$base-font-color: $light-gray;
+$link-color: $brand-secondary;
+$link-color-accent: $brand-secondary-accent;
 
 // Border
 $base-border-color: $light-gray;
@@ -35,7 +41,7 @@ $secondary-background-color: tint($base-border-color, 75%);
 
 // Forms
 $form-box-shadow: inset 0 1px 3px rgba(#000, 0.06);
-$form-box-shadow-focus: $form-box-shadow, 0 0 5px adjust-color($action-color, $lightness: -5%, $alpha: -0.3);
+$form-box-shadow-focus: $form-box-shadow, 0 0 5px adjust-color($link-color, $lightness: -5%, $alpha: -0.3);
 
 // Animations
 $base-duration: 150ms;

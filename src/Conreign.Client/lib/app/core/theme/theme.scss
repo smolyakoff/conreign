@@ -1,9 +1,13 @@
 @import "base";
 
-@import "~normalize.css";
-@import "typography";
-@import "buttons";
-@import "alerts";
-//@import "forms";
-//@import "lists";
-//@import "tables";
+:global {
+  @import "~normalize.css";
+  @import "typography";
+  @import "buttons";
+  @import "forms";
+  @import "alerts";
+
+  html, body, #root, #app {
+    height: 100%;
+  }
+}

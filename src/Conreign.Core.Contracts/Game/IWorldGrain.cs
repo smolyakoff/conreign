@@ -9,6 +9,10 @@ namespace Conreign.Core.Contracts.Game
     {
         Task<PlayerPayload> Arrive(ArriveAction action);
 
+        Task Connect(ConnectAction action);
+
+        Task Disconnect(DisconnectAction action);
+
         Task<GameStatusPayload> CheckGameStatus(CheckGameStatusAction action);
 
         Task<GameRoomPayload> ReserveGameRoom(ReserveGameRoomAction reservation);

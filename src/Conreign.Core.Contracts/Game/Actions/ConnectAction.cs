@@ -1,11 +1,25 @@
-﻿using Conreign.Core.Contracts.Abstractions;
-using Conreign.Core.Contracts.Auth;
-using Conreign.Core.Contracts.Auth.Data;
+﻿using System;
+using Conreign.Core.Contracts.Abstractions;
+using Orleans.Concurrency;
 
 namespace Conreign.Core.Contracts.Game.Actions
 {
-    public class ConnectAction : IMetadataContainer<IUserMeta>
+    [Immutable]
+    public class ConnectAction : IMetadataContainer<Meta>, IPayloadContainer<string>, IGrainAction<IWorldGrain>
     {
-        public IUserMeta Meta { get; set; }
+        public ConnectAction(string connectionId)
+        {
+            if (string.IsNullOrEmpty(connectionId))
+            {
+                throw new ArgumentNullException(nameof(connectionId));
+            }
+            Payload = connectionId;
+        }
+
+        public Meta Meta { get; set; }
+
+        public string Payload { get; }
+
+        public GrainKey<IWorldGrain> GrainKey => GrainKeyFactory.KeyOrNullFor<IWorldGrain>(default(long));
     }
 }

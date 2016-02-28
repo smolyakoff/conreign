@@ -67,12 +67,25 @@ namespace Conreign.Api.Framework.Owin
             {
                 throw new InvalidOperationException("Could not resolve IMediator.");
             }
-            var response = await mediator.SendAsync(action);
+            var tasks = new[]
+            {
+                Timeout(),
+                mediator.SendAsync(action)
+            };
+            var response = (await Task.WhenAny(tasks)).Result;
             if (response == null)
             {
-                throw new InvalidOperationException("Handler returned null as action result.");
+                context.Response.StatusCode = (int) HttpStatusCode.NoContent;
+                return;
             }
             await context.Response.SendJsonAsync(response.Payload, _serializer, response.StatusCode);
+        }
+
+        private static async Task<GenericActionResult> Timeout()
+        {
+            var delay = IsDebug ? TimeSpan.FromMinutes(2) : TimeSpan.FromSeconds(10);
+            await Task.Delay(delay);
+            return new GenericActionResult(HttpStatusCode.GatewayTimeout, null);
         }
 
         private Task NextOrNotFound(IOwinContext context)
@@ -80,6 +93,18 @@ namespace Conreign.Api.Framework.Owin
             return _next != null 
                 ? _next.Invoke(context) 
                 : context.Response.SendErrorAsync(UserError.NotFound(), _serializer);
+        }
+
+        private static bool IsDebug
+        {
+            get
+            {
+#if DEBUG
+                return true;
+#else
+                return false;
+#endif
+            }
         }
     }
 }

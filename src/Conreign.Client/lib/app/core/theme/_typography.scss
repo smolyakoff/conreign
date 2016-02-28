@@ -14,24 +14,40 @@ h4,
 h5,
 h6 {
   font-family: $heading-font-family;
-  font-size: $base-font-size;
   line-height: $heading-line-height;
   margin: 0 0 $small-spacing;
 }
+
+h1 {
+  font-size: $base-font-size * 2;
+}
+
+h2 {
+  font-size: $base-font-size * 1.8;
+}
+
+h3 {
+  font-size: $base-font-size * 1.5;
+}
+
+h4, h5, h6 {
+  font-size: $base-font-size;
+}
+
 
 p {
   margin: 0 0 $small-spacing;
 }
 
 a {
-  color: $action-color;
+  color: $link-color;
   text-decoration: none;
   transition: color $base-duration $base-timing;
 
   &:active,
   &:focus,
   &:hover {
-    color: shade($action-color, 25%);
+    color: $link-color-accent;
   }
 }
 

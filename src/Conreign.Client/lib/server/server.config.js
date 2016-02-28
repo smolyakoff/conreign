@@ -15,6 +15,16 @@ const container = convict({
         format: 'url',
         doc: 'Base URL for API server.',
         default: 'http://localhost:9000'
+    },
+    SESSION_SECRET: {
+        format: String,
+        doc: 'Session cryptographic key.',
+        default: 'TheF0rceAwakens!'
+    },
+    MONGO_URL: {
+        format: String,
+        doc: 'Mongo connection string.',
+        default: 'mongodb://localhost/conreign-sessions'
     }
 });
 

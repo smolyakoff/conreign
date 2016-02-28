@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Conreign.Core.Contracts;
 using Conreign.Core.Contracts.Abstractions;
 using Conreign.Core.Contracts.Auth.Data;
 
