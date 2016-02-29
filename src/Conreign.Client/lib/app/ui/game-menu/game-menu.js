@@ -19,18 +19,22 @@ export class GameMenuBase extends React.Component {
         init(this.props);
     }
     render() {
+        const {playerName, galaxyName} = this.props;
         return (
             <div styleName="game-menu-wrapper">
                 <div styleName="game-menu">
                     <h1>Welcome to Conreign Universe,</h1>
-                    <div styleName="menu-input">
-                        <input type="text" value={this.props.player.name}/>
+                    <div styleName="menu-form-field">
+                        <input type="text"
+                               value={playerName}/>
                     </div>
                     <h3>Your galaxy coordinates:</h3>
-                    <div styleName="menu-input">
-                        <input type="text"/>
+                    <div styleName="menu-form-field">
+                        <input type="text"
+                               className="no-border"
+                               value={'#' + galaxyName}/>
                     </div>
-                    <button>Navigate</button>
+                    <button styleName="navigate-btn">Navigate</button>
                 </div>
             </div>
         );

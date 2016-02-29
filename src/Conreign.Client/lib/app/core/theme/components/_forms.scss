@@ -29,7 +29,7 @@ select[multiple] {
   background-color: transparent;
   border: 0;
   outline: none;
-  border-bottom: 2px solid $brand-secondary;
+  border-bottom: 2px solid $brand;
   border-radius: $base-border-radius;
   box-shadow: $form-box-shadow;
   box-sizing: border-box;
@@ -45,7 +45,7 @@ select[multiple] {
   }
 
   &:focus {
-    border-color: $brand-secondary-accent;
+    border-color: $brand-accent;
     outline: none;
   }
 
@@ -56,6 +56,22 @@ select[multiple] {
     &:hover {
       border: $base-border;
     }
+  }
+
+  &.no-border {
+    border-bottom: 0;
+
+    &:hover {
+      color: $brand;
+      background-color: transparentize($brand-secondary-light, 0.9);
+      box-shadow: inset 0 0 5px transparentize($brand, 0.7);
+      border-radius: 5px;
+    }
+
+    &:focus {
+      color: $brand-accent;
+    }
+
   }
 }
 

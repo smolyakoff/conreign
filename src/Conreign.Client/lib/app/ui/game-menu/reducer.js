@@ -6,9 +6,10 @@ export const menu = handleActions([
     [arrive, (state, action) => {
         return {
             ...state,
-            player: action.payload.settings
+            ...action.payload
         };
     }]
 ], {
-    player: {}
+    playerName: null,
+    galaxyName: null
 });

@@ -3,7 +3,7 @@
 .footer {
   height: 12em;
   padding: $small-spacing * 1.5;
-  background-color: darken($brand-dark, 5%);
+  background-color: darken($brand-secondary-dark, 5%);
 
   @include media($large-screen) {
     height: 4em;

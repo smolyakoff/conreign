@@ -2,10 +2,10 @@
 
 :global {
   @import "~normalize.css";
-  @import "typography";
-  @import "buttons";
-  @import "forms";
-  @import "alerts";
+  @import "components/_typography";
+  @import "components/_buttons";
+  @import "components/_forms";
+  @import "components/_alerts";
 
   html, body, #root, #app {
     height: 100%;

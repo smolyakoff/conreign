@@ -24,7 +24,7 @@ namespace Conreign.Core.Game
             _membership = GrainFactory.GetGrain<IPlayerMembershipGrain>(default(long));
         }
 
-        public async Task<PlayerPayload> Arrive(ArriveAction action)
+        public async Task<WelcomeMessagePayload> Arrive(ArriveAction action)
         {
             var playerKey = action.Meta?.User?.UserKey ?? Guid.NewGuid();
             var accessToken = action.Meta?.Auth?.IsAuthenticated == true
@@ -32,10 +32,13 @@ namespace Conreign.Core.Game
                 : (await LoginAnonymous(playerKey))?.AccessToken;
             var getOrCreatePlayer = new GetPlayerSettingsAction(playerKey);
             var settings = await _membership.GetPlayerSettings(getOrCreatePlayer);
-            var player = new PlayerPayload
+            var galaxyNameGenerator = new GalaxyNameGenerator();
+            var galaxyName = await galaxyNameGenerator.Generate();
+            var player = new WelcomeMessagePayload
             {
                 AccessToken = accessToken,
-                Settings = settings
+                PlayerName = settings.Name,
+                GalaxyName = galaxyName
             };
             return player;
         }

@@ -39,6 +39,7 @@
     <Compile Include="Auth\AuthOptions.cs" />
     <Compile Include="Auth\JsonNetSerializer.cs" />
     <Compile Include="Auth\JwtTokenPayload.cs" />
+    <Compile Include="Game\GalaxyNameGenerator.cs" />
     <Compile Include="Game\GameGrain.cs" />
     <Compile Include="Game\Data\PlayerData.cs" />
     <Compile Include="Game\PlayerMembershipGrain.cs" />

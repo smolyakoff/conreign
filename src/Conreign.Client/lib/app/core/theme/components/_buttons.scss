@@ -1,9 +1,10 @@
 #{$all-buttons} {
   appearance: none;
-  background-color: $link-color;
-  border: 0;
+  background-color: transparent;
+  border: $base-border;
+  box-shadow: $base-shadow;
   border-radius: $base-border-radius;
-  color: #fff;
+  color: $base-font-color;
   cursor: pointer;
   display: inline-block;
   font-family: $base-font-family;
@@ -20,8 +21,8 @@
 
   &:hover,
   &:focus {
-    background-color: shade($link-color, 20%);
-    color: #fff;
+    background-color: transparentize(shade($brand-bright, 20%), 0.3);
+    color: $base-font-color;
   }
 
   &:disabled {

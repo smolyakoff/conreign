@@ -2,7 +2,7 @@
 
 .navigation-centered {
   $centered-navigation-logo-height: 4em;
-  $centered-navigation-background: $brand-dark;
+  $centered-navigation-background: $brand-secondary-dark;
 
   width: 100%;
   @include padding($small-spacing $base-spacing $base-spacing * 1.5 $base-spacing);

@@ -1,4 +1,4 @@
-@import "variables";
-@import "mixins";
+@import "base/variables";
+@import "base/mixins";
 @import "~bourbon-neat/app/assets/stylesheets/neat";
-@import "grid-settings";
+@import "base/grid-settings";

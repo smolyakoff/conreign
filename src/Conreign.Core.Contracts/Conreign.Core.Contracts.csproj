@@ -85,7 +85,7 @@
     <Compile Include="Auth\Data\IUserMeta.cs" />
     <Compile Include="Game\IWorldGrain.cs" />
     <Compile Include="Game\Data\MessagePayload.cs" />
-    <Compile Include="Game\Data\PlayerPayload.cs" />
+    <Compile Include="Game\Data\WelcomeMessagePayload.cs" />
     <Compile Include="Game\Data\PlayerReferencePayload.cs" />
     <Compile Include="Game\Data\PlayerSettingsPayload.cs" />
     <Compile Include="Properties\orleans.codegen.cs">
