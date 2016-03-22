@@ -1,20 +1,25 @@
 ﻿using System;
-using Conreign.Core.Contracts.Abstractions;
+using Conreign.Core.Contracts.Abstractions.Data;
+using Conreign.Core.Contracts.Game.Data;
+using Conreign.Framework.Contracts.Core.Data;
+using Conreign.Framework.Contracts.Routing;
+using MediatR;
 using Orleans.Concurrency;
 
 namespace Conreign.Core.Contracts.Game.Actions
 {
-    [Action(Internal = true)]
     [Immutable]
-    public class GetPlayerSettingsAction : IGrainAction<IPlayerMembershipGrain>, IPayloadContainer<Guid>
+    public class GetPlayerSettingsAction : IGrainAction<IPlayerGrain>, IPayloadContainer<KeyPayload<Guid>>, IMetadataContainer<Meta>, IAsyncRequest<PlayerSettingsPayload>
     {
         public GetPlayerSettingsAction(Guid playerKey)
         {
-            Payload = playerKey;
+            Payload = new KeyPayload<Guid>(playerKey);
         }
 
-        public GrainKey<IPlayerMembershipGrain> GrainKey => GrainKeyFactory.KeyOrNullFor<IPlayerMembershipGrain>(default(long));
+        public GrainKey<IPlayerGrain> GrainKey => GrainKeyFactory.KeyOrNullFor<IPlayerGrain>(Payload?.Key);
 
-        public Guid Payload { get; }
+        public Meta Meta { get; set; }
+
+        public KeyPayload<Guid> Payload { get; set; }
     }
 }

@@ -4,8 +4,8 @@
     {
         public string AccessToken { get; set; }
 
-        public string PlayerName { get; set; }
+        public PlayerSettingsPayload PlayerSettings { get; set; }
 
-        public string GalaxyName { get; set; }
+        public GameRoomPayload SuggestedGameRoom { get; set; }
     }
 }

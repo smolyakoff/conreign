@@ -52,12 +52,6 @@
     <None Include="App.config" />
     <None Include="paket.references" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Conreign.Api\Conreign.Api.csproj">
-      <Project>{6e0862dd-d0de-46fb-8231-e5a150808cf5}</Project>
-      <Name>Conreign.Api</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -156,6 +150,20 @@
     <Analyzer Include="..\..\packages\Microsoft.CodeAnalysis.Analyzers\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll">
       <Paket>True</Paket>
     </Analyzer>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Conreign.Core.Contracts\Conreign.Core.Contracts.csproj">
+      <Project>{00409622-346b-4926-b745-e5f595bd3bb7}</Project>
+      <Name>Conreign.Core.Contracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Conreign.Framework.Http\Conreign.Framework.Http.csproj">
+      <Project>{b290fde0-58f6-4f4a-8def-046d3460d095}</Project>
+      <Name>Conreign.Framework.Http</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Conreign.Framework\Conreign.Framework.csproj">
+      <Project>{d9e08e90-4862-4f3e-850d-34f7b09b2736}</Project>
+      <Name>Conreign.Framework</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.5' Or $(TargetFrameworkVersion) == 'v4.5.1' Or $(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3' Or $(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1')">

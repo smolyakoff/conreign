@@ -1,0 +1,8 @@
+﻿Microsoft.Orleans.Client
+Microsoft.Owin
+Microsoft.AspNet.SignalR.Core
+Newtonsoft.Json
+Autofac.Owin
+Autofac.SignalR
+Serilog
+MediatR

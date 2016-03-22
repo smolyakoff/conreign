@@ -14,10 +14,14 @@ namespace Conreign.Core.Utility
             writer.WriteRawValue(seconds);
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
+            JsonSerializer serializer)
         {
-            if (reader.Value == null) { return null; }
-            return Epoch.AddSeconds((long)reader.Value);
+            if (reader.Value == null)
+            {
+                return null;
+            }
+            return Epoch.AddSeconds((long) reader.Value);
         }
     }
 }

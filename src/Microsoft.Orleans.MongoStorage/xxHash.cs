@@ -36,18 +36,6 @@ namespace Microsoft.Orleans.Storage
 {
     public class xxHash
     {
-        public struct XXH_State
-        {
-            public ulong total_len;
-            public uint seed;
-            public uint v1;
-            public uint v2;
-            public uint v3;
-            public uint v4;
-            public int memsize;
-            public byte[] memory;
-        };
-
         const uint PRIME32_1 = 2654435761U;
         const uint PRIME32_2 = 2246822519U;
         const uint PRIME32_3 = 3266489917U;
@@ -55,15 +43,15 @@ namespace Microsoft.Orleans.Storage
         const uint PRIME32_5 = 374761393U;
 
         protected XXH_State _state;
+
         public xxHash()
         {
-
         }
 
         public static uint CalculateHash(byte[] buf, int len = -1, uint seed = 0)
         {
             uint h32;
-            int index = 0;
+            var index = 0;
             if (len == -1)
             {
                 len = buf.Length;
@@ -72,11 +60,11 @@ namespace Microsoft.Orleans.Storage
 
             if (len >= 16)
             {
-                int limit = len - 16;
-                uint v1 = seed + PRIME32_1 + PRIME32_2;
-                uint v2 = seed + PRIME32_2;
-                uint v3 = seed + 0;
-                uint v4 = seed - PRIME32_1;
+                var limit = len - 16;
+                var v1 = seed + PRIME32_1 + PRIME32_2;
+                var v2 = seed + PRIME32_2;
+                var v3 = seed + 0;
+                var v4 = seed - PRIME32_1;
 
                 do
                 {
@@ -97,19 +85,19 @@ namespace Microsoft.Orleans.Storage
                 h32 = seed + PRIME32_5;
             }
 
-            h32 += (uint)len;
+            h32 += (uint) len;
 
             while (index <= len - 4)
             {
-                h32 += BitConverter.ToUInt32(buf, index) * PRIME32_3;
-                h32 = RotateLeft(h32, 17) * PRIME32_4;
+                h32 += BitConverter.ToUInt32(buf, index)*PRIME32_3;
+                h32 = RotateLeft(h32, 17)*PRIME32_4;
                 index += 4;
             }
 
             while (index < len)
             {
-                h32 += buf[index] * PRIME32_5;
-                h32 = RotateLeft(h32, 11) * PRIME32_1;
+                h32 += buf[index]*PRIME32_5;
+                h32 = RotateLeft(h32, 11)*PRIME32_1;
                 index++;
             }
 
@@ -136,9 +124,9 @@ namespace Microsoft.Orleans.Storage
 
         public bool Update(byte[] input, int len)
         {
-            int index = 0;
+            var index = 0;
 
-            _state.total_len += (uint)len;
+            _state.total_len += (uint) len;
 
             if (_state.memsize + len < 16) // 버퍼 + 입력길이가 16바이트 이하일경우 버퍼에 저장만 해둔다
             {
@@ -167,11 +155,11 @@ namespace Microsoft.Orleans.Storage
 
             if (index <= len - 16)
             {
-                int limit = len - 16;
-                uint v1 = _state.v1;
-                uint v2 = _state.v2;
-                uint v3 = _state.v3;
-                uint v4 = _state.v4;
+                var limit = len - 16;
+                var v1 = _state.v1;
+                var v2 = _state.v2;
+                var v3 = _state.v3;
+                var v4 = _state.v4;
 
                 do
                 {
@@ -202,29 +190,30 @@ namespace Microsoft.Orleans.Storage
         public uint Digest()
         {
             uint h32;
-            int index = 0;
+            var index = 0;
             if (_state.total_len >= 16)
             {
-                h32 = RotateLeft(_state.v1, 1) + RotateLeft(_state.v2, 7) + RotateLeft(_state.v3, 12) + RotateLeft(_state.v4, 18);
+                h32 = RotateLeft(_state.v1, 1) + RotateLeft(_state.v2, 7) + RotateLeft(_state.v3, 12) +
+                      RotateLeft(_state.v4, 18);
             }
             else
             {
                 h32 = _state.seed + PRIME32_5;
             }
 
-            h32 += (UInt32)_state.total_len;
+            h32 += (UInt32) _state.total_len;
 
             while (index <= _state.memsize - 4)
             {
-                h32 += BitConverter.ToUInt32(_state.memory, index) * PRIME32_3;
-                h32 = RotateLeft(h32, 17) * PRIME32_4;
+                h32 += BitConverter.ToUInt32(_state.memory, index)*PRIME32_3;
+                h32 = RotateLeft(h32, 17)*PRIME32_4;
                 index += 4;
             }
 
             while (index < _state.memsize)
             {
-                h32 += _state.memory[index] * PRIME32_5;
-                h32 = RotateLeft(h32, 11) * PRIME32_1;
+                h32 += _state.memory[index]*PRIME32_5;
+                h32 = RotateLeft(h32, 11)*PRIME32_1;
                 index++;
             }
 
@@ -236,10 +225,11 @@ namespace Microsoft.Orleans.Storage
 
             return h32;
         }
+
         private static uint CalcSubHash(uint value, byte[] buf, int index)
         {
-            uint read_value = BitConverter.ToUInt32(buf, index);
-            value += read_value * PRIME32_2;
+            var read_value = BitConverter.ToUInt32(buf, index);
+            value += read_value*PRIME32_2;
             value = RotateLeft(value, 13);
             value *= PRIME32_1;
             return value;
@@ -250,5 +240,16 @@ namespace Microsoft.Orleans.Storage
             return (value << count) | (value >> (32 - count));
         }
 
+        public struct XXH_State
+        {
+            public ulong total_len;
+            public uint seed;
+            public uint v1;
+            public uint v2;
+            public uint v3;
+            public uint v4;
+            public int memsize;
+            public byte[] memory;
+        };
     }
 }

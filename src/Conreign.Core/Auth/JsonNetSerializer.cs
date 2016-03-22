@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Conreign.Core.Auth
 {
-    internal class JsonNetSerializer: IJsonSerializer
+    internal class JsonNetSerializer : IJsonSerializer
     {
         public string Serialize(object obj)
         {

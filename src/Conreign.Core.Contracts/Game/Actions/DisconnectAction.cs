@@ -1,11 +1,14 @@
 ﻿using System;
-using Conreign.Core.Contracts.Abstractions;
+using Conreign.Core.Contracts.Game.Data;
+using Conreign.Framework.Contracts.Core.Data;
+using Conreign.Framework.Contracts.Routing;
 using Orleans.Concurrency;
 
 namespace Conreign.Core.Contracts.Game.Actions
 {
     [Immutable]
-    public class DisconnectAction : IMetadataContainer<Meta>, IPayloadContainer<string>, IGrainAction<IWorldGrain>
+    public class DisconnectAction : IMetadataContainer<Meta>, IPayloadContainer<ConnectionPayload>,
+        IGrainAction<IPlayerGrain>
     {
         public DisconnectAction(string connectionId)
         {
@@ -13,13 +16,13 @@ namespace Conreign.Core.Contracts.Game.Actions
             {
                 throw new ArgumentNullException(nameof(connectionId));
             }
-            Payload = connectionId;
+            Payload = new ConnectionPayload(connectionId);
         }
+
+        public GrainKey<IPlayerGrain> GrainKey => GrainKeyFactory.KeyOrNullFor<IPlayerGrain>(Meta?.User?.UserKey);
 
         public Meta Meta { get; set; }
 
-        public string Payload { get; }
-
-        public GrainKey<IWorldGrain> GrainKey => GrainKeyFactory.KeyOrNullFor<IWorldGrain>(default(long));
+        public ConnectionPayload Payload { get; }
     }
 }

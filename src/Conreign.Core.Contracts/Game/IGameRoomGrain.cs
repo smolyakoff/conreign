@@ -1,20 +1,16 @@
 ﻿using System.Threading.Tasks;
 using Conreign.Core.Contracts.Game.Actions;
+using Conreign.Core.Contracts.Game.Data;
 using Orleans;
-using Orleans.Streams;
 
 namespace Conreign.Core.Contracts.Game
 {
     public interface IGameRoomGrain : IGrainWithStringKey
     {
-        Task UpdateGameParameters(UpdateGameParametersAction action);
+        Task<GameRoomPayload> LookInto(LookIntoGameRoomAction action);
 
-        Task<IAsyncObservable<object>> Visit(VisitGameRoomAction action);
+        Task<GameRoomStatusPayload> Enter(EnterGameRoomAction action);
 
         Task Leave(LeaveGameRoomAction action);
-
-        Task AcceptPlayer(AcceptPlayerAction action);
-
-        Task StartGame(StartGameAction action);
     }
 }

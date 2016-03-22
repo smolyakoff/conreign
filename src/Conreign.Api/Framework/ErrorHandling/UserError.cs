@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Net;
 using Conreign.Core.Contracts.Abstractions;
+using Conreign.Core.Contracts.Abstractions.Data;
+using Conreign.Core.Contracts.Abstractions.Exceptions;
 
 namespace Conreign.Api.Framework.ErrorHandling
 {

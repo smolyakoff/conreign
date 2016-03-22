@@ -20,7 +20,7 @@ namespace Conreign.Api.Host
                 .WriteTo.ColoredConsole()
                 .MinimumLevel.Debug()
                 .CreateLogger();
-            var tasks = new []
+            var tasks = new[]
             {
                 Task.Run(() => RunOwin()),
                 Task.Run(() => RunOrleans())

@@ -43,7 +43,7 @@
   <ItemGroup>
     <Compile Include="Configuration.cs" />
     <Compile Include="EventHub.cs" />
-    <Compile Include="Framework\ActionHandler.cs" />
+    <Compile Include="Framework\HttpActionHandler.cs" />
     <Compile Include="Framework\Auth\AuthDecorator.cs" />
     <Compile Include="Framework\Diagnostics\LoggingDecorator.cs" />
     <Compile Include="Framework\ErrorHandling\ErrorFactorySettings.cs" />
@@ -53,17 +53,10 @@
       <DependentUpon>Errors.resx</DependentUpon>
     </Compile>
     <Compile Include="ApiModule.cs" />
-    <Compile Include="Framework\Owin\AppBuilderExtensions.cs" />
-    <Compile Include="Framework\Owin\FrameworkOptions.cs" />
-    <Compile Include="Framework\Owin\FrameworkDispatcherMiddleware.cs" />
-    <Compile Include="Framework\Owin\FrameworkErrorHandlerMiddleware.cs" />
-    <Compile Include="Framework\Owin\OwinResponseExtensions.cs" />
-    <Compile Include="Framework\Owin\SerilogOwinLogger.cs" />
-    <Compile Include="Framework\Owin\SerilogOwinLoggerFactory.cs" />
     <Compile Include="Framework\Utility\ActionMapper.cs" />
     <Compile Include="Framework\ErrorHandling\ErrorFactory.cs" />
-    <Compile Include="Framework\GenericAction.cs" />
-    <Compile Include="Framework\GenericActionResult.cs" />
+    <Compile Include="Framework\HttpAction.cs" />
+    <Compile Include="Framework\HttpActionResult.cs" />
     <Compile Include="Framework\Utility\GrainFactoryExtensions.cs" />
     <Compile Include="Framework\ErrorHandling\IError.cs" />
     <Compile Include="Framework\Routing\Route.cs" />
@@ -94,6 +87,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Errors.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Framework\Owin\" />
   </ItemGroup>
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.0' Or $(TargetFrameworkVersion) == 'v4.5' Or $(TargetFrameworkVersion) == 'v4.5.1' Or $(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3' Or $(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1')">

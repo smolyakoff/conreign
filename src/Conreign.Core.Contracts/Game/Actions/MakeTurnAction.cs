@@ -1,6 +1,5 @@
-﻿using Conreign.Core.Contracts.Abstractions;
-using Conreign.Core.Contracts.Auth;
-using Conreign.Core.Contracts.Auth.Data;
+﻿using Conreign.Core.Contracts.Auth;
+using Conreign.Framework.Contracts.Core.Data;
 
 namespace Conreign.Core.Contracts.Game.Actions
 {

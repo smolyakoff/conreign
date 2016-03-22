@@ -1,26 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+
 <OrleansConfiguration xmlns="urn:orleans">
   <Globals>
     <SeedNode Address="localhost" Port="11111" />
-    <SystemStore SystemStoreType ="SqlServer"
-           DeploymentId="Conreign"
-           DataConnectionString="Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=ConreignSystem;Integrated Security=True;Pooling=False;Max Pool Size=200;Asynchronous Processing=True;MultipleActiveResultSets=True" 
-           AdoInvariant="System.Data.SqlClient" />
+    <SystemStore SystemStoreType="SqlServer"
+                 DeploymentId="Conreign"
+                 DataConnectionString="Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=ConreignSystem;Integrated Security=True;Pooling=False;Max Pool Size=200;Asynchronous Processing=True;MultipleActiveResultSets=True"
+                 AdoInvariant="System.Data.SqlClient" />
     <StorageProviders>
-      <Provider Type="Microsoft.Orleans.Storage.MongoStorage" 
-                Name="Default"/>
-      <Provider Type="Orleans.Storage.MemoryStorage" 
-                Name="PubSubStore" 
-                NumStorageGrains="1"/>
+      <Provider Type="Microsoft.Orleans.Storage.MongoStorage"
+                Name="Default" />
+      <Provider Type="Orleans.Storage.MemoryStorage"
+                Name="PubSubStore"
+                NumStorageGrains="1" />
     </StorageProviders>
     <StreamProviders>
-      <Provider Type="Orleans.Providers.Streams.SimpleMessageStream.SimpleMessageStreamProvider" 
-                Name="DefaultStream"/>
+      <Provider Type="Orleans.Providers.Streams.SimpleMessageStream.SimpleMessageStreamProvider"
+                Name="DefaultStream" />
     </StreamProviders>
   </Globals>
   <Defaults>
     <Networking Address="localhost" Port="11111" />
     <ProxyingGateway Address="localhost" Port="30000" />
-    <Startup Type="Conreign.Host.Startup,Conreign.Host"/>
+    <Startup Type="Conreign.Host.Startup,Conreign.Host" />
   </Defaults>
 </OrleansConfiguration>

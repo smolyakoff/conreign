@@ -1,11 +1,11 @@
-﻿using Conreign.Core.Contracts.Abstractions;
+﻿using Conreign.Core.Contracts.Game.Data;
+using Conreign.Framework.Contracts.Core.Data;
+using MediatR;
 
 namespace Conreign.Core.Contracts.Game.Actions
 {
-    public class ArriveAction : IGrainAction<IWorldGrain>, IMetadataContainer<Meta>
+    public class ArriveAction : IMetadataContainer<Meta>, IAsyncRequest<WelcomeMessagePayload>
     {
-        public GrainKey<IWorldGrain> GrainKey => GrainKeyFactory.KeyOrNullFor<IWorldGrain>(default(long));
-
         public Meta Meta { get; set; }
     }
 }

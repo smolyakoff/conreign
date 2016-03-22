@@ -1,5 +1,7 @@
 ﻿Microsoft.Orleans.Templates.Grains
+Serilog
 JWT
+MediatR
 AutoMapper
 Microsoft.Net.Http
 Microsoft.AspNet.WebApi.Client

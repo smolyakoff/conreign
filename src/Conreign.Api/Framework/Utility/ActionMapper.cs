@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Conreign.Core.Contracts;
 using Conreign.Core.Contracts.Abstractions;
+using Conreign.Core.Contracts.Abstractions.Data;
 using Conreign.Core.Contracts.Auth.Data;
 
 namespace Conreign.Api.Framework.Utility
@@ -17,7 +18,7 @@ namespace Conreign.Api.Framework.Utility
             _actions = new Dictionary<Type, ActionInfo>();
         }
 
-        public object Map(GenericAction action, Type targetType)
+        public object Map(HttpAction action, Type targetType)
         {
             var actionInfo = _actions.ContainsKey(targetType)
                 ? _actions[targetType]

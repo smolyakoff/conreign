@@ -8,14 +8,14 @@ using Serilog.Events;
 
 namespace Conreign.Api.Framework.Diagnostics
 {
-    public class LoggingDecorator : IAsyncRequestHandler<GenericAction, GenericActionResult>
+    public class LoggingDecorator : IAsyncRequestHandler<HttpAction, HttpActionResult>
     {
-        private readonly IAsyncRequestHandler<GenericAction, GenericActionResult> _next;
+        private readonly IAsyncRequestHandler<HttpAction, HttpActionResult> _next;
 
         private readonly ILogger _logger;
         private readonly Stopwatch _stopwatch = new Stopwatch();
 
-        public LoggingDecorator(IAsyncRequestHandler<GenericAction, GenericActionResult> next)
+        public LoggingDecorator(IAsyncRequestHandler<HttpAction, HttpActionResult> next)
         {
             _logger = Log.Logger.ForContext(typeof(LoggingDecorator));
             if (next == null)
@@ -25,7 +25,7 @@ namespace Conreign.Api.Framework.Diagnostics
             _next = next;
         }
 
-        public async Task<GenericActionResult> Handle(GenericAction message)
+        public async Task<HttpActionResult> Handle(HttpAction message)
         {
             var traceId = Guid.NewGuid();
             message.Meta = message.Meta ?? new JObject();

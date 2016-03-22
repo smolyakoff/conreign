@@ -5,5 +5,7 @@
         public string Permalink { get; set; }
 
         public string Name { get; set; }
+
+        public GameRoomStatus Status { get; set; }
     }
 }

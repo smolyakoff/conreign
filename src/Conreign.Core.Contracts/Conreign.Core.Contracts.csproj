@@ -34,37 +34,28 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Abstractions\ActionAttribute.cs" />
     <Compile Include="Abstractions\EventEnvelope.cs" />
+    <Compile Include="Abstractions\Data\KeyPayload.cs" />
+    <Compile Include="Auth\AuthenticationError.cs" />
     <Compile Include="Auth\AuthMeta.cs" />
+    <Compile Include="Auth\AuthorizationError.cs" />
+    <Compile Include="Game\Data\ConnectionPayload.cs" />
     <Compile Include="Game\Actions\DisconnectAction.cs" />
     <Compile Include="Game\Actions\GetPlayerSettingsAction.cs" />
-    <Compile Include="Game\IPlayerMembershipGrain.cs" />
-    <Compile Include="Game\IPlayerMembersipProvider.cs" />
-    <Compile Include="Game\UserMeta.cs" />
+    <Compile Include="Game\Actions\EnterGameRoomAction.cs" />
+    <Compile Include="Game\Data\GameRoomStatus.cs" />
+    <Compile Include="Game\Data\GameRoomStatusPayload.cs" />
+    <Compile Include="Game\Actions\LookIntoGameRoomAction.cs" />
+    <Compile Include="Game\Actions\GetPlayerInfoAction.cs" />
+    <Compile Include="Game\PlayerInfoPayload.cs" />
+    <Compile Include="Game\Streaming\StreamingExtensions.cs" />
+    <Compile Include="Game\Streaming\Streams.cs" />
+    <Compile Include="Auth\UserMeta.cs" />
     <Compile Include="Meta.cs" />
-    <Compile Include="Abstractions\TypedMessage.cs" />
-    <Compile Include="Abstractions\UserException.cs" />
-    <Compile Include="Abstractions\UserMessage.cs" />
-    <Compile Include="Auth\Actions\AuthenticateInternalAction.cs" />
-    <Compile Include="Auth\Actions\LoginAnonymousAction.cs" />
-    <Compile Include="Auth\Actions\AuthenticateAction.cs" />
-    <Compile Include="Auth\AuthErrors.cs" />
-    <Compile Include="Auth\Data\AccessTokenPayload.cs" />
-    <Compile Include="Auth\Data\ParsedAccessTokenPayload.cs" />
-    <Compile Include="Auth\Errors.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Errors.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Auth\IAuthGrain.cs" />
-    <Compile Include="Auth\Data\IAuthMeta.cs" />
-    <Compile Include="Game\IUserBucketGrain.cs" />
-    <Compile Include="Auth\Data\AuthenticationStatusPayload.cs" />
-    <Compile Include="Game\Actions\AcceptPlayerAction.cs" />
+    <Compile Include="Abstractions\Data\TypedMessage.cs" />
+    <Compile Include="Abstractions\Data\UserMessage.cs" />
+    <Compile Include="Auth\IAuthMeta.cs" />
     <Compile Include="Game\Actions\ArriveAction.cs" />
-    <Compile Include="Game\Actions\ChangePlayerSettingsAction.cs" />
-    <Compile Include="Game\Actions\CheckGameStatusAction.cs" />
     <Compile Include="Game\Actions\ConnectAction.cs" />
     <Compile Include="Game\Data\GameReferencePayload.cs" />
     <Compile Include="Game\Data\GameParametersPayload.cs" />
@@ -73,30 +64,19 @@
     <Compile Include="Game\Data\GameStatusPayload.cs" />
     <Compile Include="Game\Actions\LeaveGameRoomAction.cs" />
     <Compile Include="Game\Actions\MakeTurnAction.cs" />
-    <Compile Include="Abstractions\GrainKey.cs" />
-    <Compile Include="Abstractions\GrainKeyFactory.cs" />
     <Compile Include="Game\IGameChatGrain.cs" />
     <Compile Include="Game\IGameGrain.cs" />
     <Compile Include="Game\IGameRoomGrain.cs" />
-    <Compile Include="Abstractions\IMetadataContainer.cs" />
-    <Compile Include="Abstractions\IPayloadContainer.cs" />
-    <Compile Include="Abstractions\IGrainAction.cs" />
     <Compile Include="Game\IPlayerGrain.cs" />
-    <Compile Include="Auth\Data\IUserMeta.cs" />
+    <Compile Include="Auth\IUserMeta.cs" />
     <Compile Include="Game\IWorldGrain.cs" />
     <Compile Include="Game\Data\MessagePayload.cs" />
     <Compile Include="Game\Data\WelcomeMessagePayload.cs" />
-    <Compile Include="Game\Data\PlayerReferencePayload.cs" />
     <Compile Include="Game\Data\PlayerSettingsPayload.cs" />
     <Compile Include="Properties\orleans.codegen.cs">
       <Paket>True</Paket>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Game\Actions\SendChatMessageAction.cs" />
-    <Compile Include="Game\Actions\ReserveGameRoomAction.cs" />
-    <Compile Include="Game\Actions\StartGameAction.cs" />
-    <Compile Include="Game\Actions\UpdateGameParametersAction.cs" />
-    <Compile Include="Game\Actions\VisitGameRoomAction.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
@@ -113,12 +93,6 @@
   -->
   <ItemGroup>
     <None Include="paket.references" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Auth\Errors.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Errors.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETCore'">
@@ -461,6 +435,12 @@
     <Analyzer Include="..\..\packages\Microsoft.CodeAnalysis.Analyzers\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll">
       <Paket>True</Paket>
     </Analyzer>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Conreign.Framework.Contracts\Conreign.Framework.Contracts.csproj">
+      <Project>{a28940cc-b627-4fdc-a8a7-8788eaaba213}</Project>
+      <Name>Conreign.Framework.Contracts</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.5' Or $(TargetFrameworkVersion) == 'v4.5.1' Or $(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3' Or $(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1')">

@@ -10,6 +10,7 @@ using Conreign.Api.Framework.Auth;
 using Conreign.Api.Framework.Diagnostics;
 using Conreign.Api.Framework.Routing;
 using Conreign.Core.Contracts.Abstractions;
+using Conreign.Core.Contracts.Abstractions.Actions;
 using MediatR;
 using Module = Autofac.Module;
 
@@ -32,13 +33,13 @@ namespace Conreign.Api
                 .As<IMediator>()
                 .SingleInstance();
             builder.RegisterInstance(new RoutingTable(typeof (IGrainAction<>).Assembly));
-            builder.RegisterType<ActionHandler>()
-                .Named<IAsyncRequestHandler<GenericAction, GenericActionResult>>("ActionHandler")
+            builder.RegisterType<HttpActionHandler>()
+                .Named<IAsyncRequestHandler<HttpAction, HttpActionResult>>("ActionHandler")
                 .SingleInstance();
-            builder.RegisterDecorator<IAsyncRequestHandler<GenericAction, GenericActionResult>>(
+            builder.RegisterDecorator<IAsyncRequestHandler<HttpAction, HttpActionResult>>(
                 (c, next) => new AuthDecorator(next),
                 fromKey: "ActionHandler", toKey: "AuthenticatedActionHandler");
-            builder.RegisterDecorator<IAsyncRequestHandler<GenericAction, GenericActionResult>>(
+            builder.RegisterDecorator<IAsyncRequestHandler<HttpAction, HttpActionResult>>(
                 (c, next) => new LoggingDecorator(next),
                 fromKey: "AuthenticatedActionHandler").SingleInstance();
 
@@ -47,6 +48,8 @@ namespace Conreign.Api
                 var c = ctx.Resolve<IComponentContext>();
                 return t => c.Resolve(t);
             });
+
+           
 
             builder.Register<MultiInstanceFactory>(ctx =>
             {

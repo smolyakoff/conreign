@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Net;
-using Conreign.Core;
 using Conreign.Core.Game;
-using Orleans;
-using Orleans.Runtime.Configuration;
 using Orleans.Runtime.Host;
 
 namespace Conreign.Host
@@ -18,7 +15,7 @@ namespace Conreign.Host
         {
             var domain = AppDomain.CreateDomain(AppDomainName,
                 null,
-                new AppDomainSetup { AppDomainInitializer = InitializeSilo });
+                new AppDomainSetup {AppDomainInitializer = InitializeSilo});
             Console.WriteLine("Orleans silo is running... Press any key to terminate.");
             Console.ReadLine();
 

@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using System.Net;
 using Conreign.Core.Contracts.Abstractions;
+using Conreign.Core.Contracts.Abstractions.Data;
 
 namespace Conreign.Api.Framework.ErrorHandling
 {

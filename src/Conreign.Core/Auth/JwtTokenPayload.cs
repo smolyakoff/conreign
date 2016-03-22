@@ -6,21 +6,6 @@ namespace Conreign.Core.Auth
 {
     public class JwtTokenPayload
     {
-        public static JwtTokenPayload Create(string subject, TimeSpan lifetime, string audience = "conreign-client")
-        {
-            if (string.IsNullOrEmpty(subject))
-            {
-                throw new ArgumentException("Subject should not be empty.", nameof(subject));
-            }
-            if (lifetime.Ticks <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(lifetime));
-            }
-            var now = DateTime.UtcNow;
-            var expires = now.Add(lifetime);
-            return new JwtTokenPayload(subject, now, expires, audience);
-        }
-
         private JwtTokenPayload(string subject, DateTime issuedAt, DateTime expiresAt, string audience)
         {
             Id = Guid.NewGuid().ToString("N");
@@ -49,11 +34,26 @@ namespace Conreign.Core.Auth
         public string Subject { get; private set; }
 
         [JsonProperty(PropertyName = "exp")]
-        [JsonConverter(typeof(SecondsSinceEpochConverter))]
+        [JsonConverter(typeof (SecondsSinceEpochConverter))]
         public DateTime ExpiresAt { get; private set; }
 
         [JsonProperty(PropertyName = "iat")]
-        [JsonConverter(typeof(SecondsSinceEpochConverter))]
+        [JsonConverter(typeof (SecondsSinceEpochConverter))]
         public DateTime IssuedAt { get; private set; }
+
+        public static JwtTokenPayload Create(string subject, TimeSpan lifetime, string audience = "conreign-client")
+        {
+            if (string.IsNullOrEmpty(subject))
+            {
+                throw new ArgumentException("Subject should not be empty.", nameof(subject));
+            }
+            if (lifetime.Ticks <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(lifetime));
+            }
+            var now = DateTime.UtcNow;
+            var expires = now.Add(lifetime);
+            return new JwtTokenPayload(subject, now, expires, audience);
+        }
     }
 }

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Conreign.Core.Auth;
-using Conreign.Core.Contracts.Abstractions;
-using Conreign.Core.Contracts.Game;
 using Conreign.Core.Game;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans;
@@ -24,8 +22,8 @@ namespace Conreign.Host
             foreach (var grain in grains)
             {
                 var interfaces = grain.GetInterfaces()
-                    .Where(t => typeof(IGrain).IsAssignableFrom(t))
-                    .Where(t => t != typeof(IGrain))
+                    .Where(t => typeof (IGrain).IsAssignableFrom(t))
+                    .Where(t => t != typeof (IGrain))
                     .Where(t => !t.Name.EndsWith("Key"));
                 services.AddTransient(grain, grain);
                 foreach (var @interface in interfaces)
@@ -36,7 +34,5 @@ namespace Conreign.Host
             var provider = services.BuildServiceProvider();
             return provider;
         }
-
-        
     }
 }

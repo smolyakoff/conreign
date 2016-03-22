@@ -14,11 +14,11 @@ using Orleans;
 
 namespace Conreign.Api.Framework.Auth
 {
-    public class AuthDecorator : IAsyncRequestHandler<GenericAction, GenericActionResult>
+    public class AuthDecorator : IAsyncRequestHandler<HttpAction, HttpActionResult>
     {
-        private readonly IAsyncRequestHandler<GenericAction, GenericActionResult> _next;
+        private readonly IAsyncRequestHandler<HttpAction, HttpActionResult> _next;
 
-        public AuthDecorator(IAsyncRequestHandler<GenericAction, GenericActionResult> next)
+        public AuthDecorator(IAsyncRequestHandler<HttpAction, HttpActionResult> next)
         {
             if (next == null)
             {
@@ -27,7 +27,7 @@ namespace Conreign.Api.Framework.Auth
             _next = next;
         }
 
-        public async Task<GenericActionResult> Handle(GenericAction message)
+        public async Task<HttpActionResult> Handle(HttpAction message)
         {
             if (message.Meta == null)
             {

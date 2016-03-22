@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Conreign.Core.Contracts.Abstractions;
+using Conreign.Core.Contracts.Abstractions.Actions;
 using Serilog;
 
 namespace Conreign.Api.Framework.Routing
@@ -29,7 +30,7 @@ namespace Conreign.Api.Framework.Routing
             _routes = null;
         }
 
-        public Route Match(GenericAction action)
+        public Route Match(HttpAction action)
         {
             if (action == null)
             {
@@ -76,7 +77,7 @@ namespace Conreign.Api.Framework.Routing
 
         private static string GetActionKey(Type type)
         {
-            var regex = new Regex("Action$", RegexOptions.Compiled);
+            var regex = new Regex("Action|Query|Command$", RegexOptions.Compiled);
             return type.GetCustomAttribute<ActionAttribute>()?.Type ?? regex.Replace(type.Name, string.Empty);
         }
 

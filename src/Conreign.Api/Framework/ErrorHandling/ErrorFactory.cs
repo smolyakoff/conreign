@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Conreign.Core.Contracts.Abstractions;
+using Conreign.Core.Contracts.Abstractions.Exceptions;
 using Conreign.Core.Contracts.Auth;
 
 namespace Conreign.Api.Framework.ErrorHandling

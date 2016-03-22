@@ -1,5 +1,11 @@
-﻿using Conreign.Api.Framework.Owin;
+﻿using Autofac;
+using Conreign.Core.Contracts.Game;
+using Conreign.Framework;
+using Conreign.Framework.Http;
+using Conreign.Framework.Http.Owin;
 using Microsoft.Owin.Cors;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Owin;
 
 namespace Conreign.Api.Host
@@ -8,16 +14,32 @@ namespace Conreign.Api.Host
     {
         public void Configuration(IAppBuilder builder)
         {
-            var container = Api.Configuration.Container;
-            var hubConfiguration = Api.Configuration.CreateHubConfiguration();
-            var frameworkOptions = Api.Configuration.CreateFrameworkOptions();
-
+            var container = CreateContainer();
             builder.SetFrameworkLoggerFactory();
             builder.UseCors(CorsOptions.AllowAll);
-            builder.UseAutofacMiddleware(container);
-            builder.UseFrameworkErrorHandler(frameworkOptions);
-            builder.MapSignalR(hubConfiguration);
-            builder.MapFrameworkDispatcher(frameworkOptions);
+            builder.UseAutofacMiddleware(CreateContainer());
+            builder.UseFrameworkErrorHandler();
+            builder.MapFrameworkDispatcher();
+            builder.MapFrameworkEventHub(container);
+        }
+
+        private static IContainer CreateContainer()
+        {
+            var builder = new ContainerBuilder();
+
+            var configuration = new FrameworkConfiguration
+            {
+                GrainContractsAssembly = typeof (IWorldGrain).Assembly
+            };
+            builder.RegisterModule(new FrameworkModule(configuration));
+
+            var httpConfiguration = new HttpFrameworkConfiguration
+            {
+                SerializerSettings = new JsonSerializerSettings {ContractResolver = new CamelCasePropertyNamesContractResolver()}
+            };
+            builder.RegisterModule(new HttpFrameworkModule(httpConfiguration));
+
+            return builder.Build();
         }
     }
 }

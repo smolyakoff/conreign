@@ -29,14 +29,14 @@ namespace Conreign.Api
         public override async Task OnConnected()
         {
             await base.OnConnected();
-            var action = new GenericAction {Type = "connect", Meta = GetMeta()};
+            var action = new HttpAction {Type = "connect", Meta = GetMeta()};
             await _mediator.SendAsync(action);
         }
 
         public override async Task OnDisconnected(bool stopCalled)
         {
             await base.OnDisconnected(stopCalled);
-            var action = new GenericAction { Type = "disconnect", Meta = GetMeta() };
+            var action = new HttpAction { Type = "disconnect", Meta = GetMeta() };
             await _mediator.SendAsync(action);
         }
 
