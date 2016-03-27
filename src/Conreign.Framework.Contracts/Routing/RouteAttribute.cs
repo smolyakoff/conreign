@@ -5,7 +5,7 @@ namespace Conreign.Framework.Contracts.Routing
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class RouteAttribute: Attribute
     {
-        public RouteAttribute(Type requestType, Type responseType, string name)
+        public RouteAttribute(Type requestType, Type responseType, string key)
         {
             if (requestType == null)
             {
@@ -15,16 +15,16 @@ namespace Conreign.Framework.Contracts.Routing
             {
                 throw new ArgumentNullException(nameof(responseType));
             }
-            if (string.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(key))
             {
-                throw new ArgumentNullException(nameof(name));
+                throw new ArgumentNullException(nameof(key));
             }
             RequestType = requestType;
             ResponseType = responseType;
-            Name = name;
+            Key = key;
         }
 
-        public string Name { get; private set; }
+        public string Key { get; private set; }
 
         public Type RequestType { get; }
 

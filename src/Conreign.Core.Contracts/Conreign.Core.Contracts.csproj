@@ -47,6 +47,7 @@
     <Compile Include="Game\Data\GameRoomStatusPayload.cs" />
     <Compile Include="Game\Actions\LookIntoGameRoomAction.cs" />
     <Compile Include="Game\Actions\GetPlayerInfoAction.cs" />
+    <Compile Include="Game\IWorld.cs" />
     <Compile Include="Game\PlayerInfoPayload.cs" />
     <Compile Include="Game\Streaming\StreamingExtensions.cs" />
     <Compile Include="Game\Streaming\Streams.cs" />

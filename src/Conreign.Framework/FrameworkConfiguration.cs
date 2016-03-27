@@ -25,7 +25,7 @@ namespace Conreign.Framework
                 typeof (LoggingDecorator),
                 typeof (ExceptionHandlingDecorator),
                 typeof (AuthDecorator),
-                typeof (RequestHandler)
+                typeof (Router)
             };
         }
 

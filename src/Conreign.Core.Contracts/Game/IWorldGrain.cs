@@ -1,11 +1,8 @@
-﻿using Conreign.Core.Contracts.Game.Actions;
-using Conreign.Core.Contracts.Game.Data;
-using MediatR;
-using Orleans;
+﻿using Orleans;
 
 namespace Conreign.Core.Contracts.Game
 {
-    public interface IWorldGrain : IGrainWithIntegerKey, IAsyncRequestHandler<ArriveAction, WelcomeMessagePayload>
+    public interface IWorldGrain : IGrainWithIntegerKey, IWorld
     {
     }
 }

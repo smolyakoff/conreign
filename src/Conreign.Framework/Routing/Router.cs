@@ -1,121 +1,50 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Conreign.Framework.Contracts.Data;
-using Conreign.Framework.Contracts.Routing;
+using Conreign.Framework.Core;
+using Conreign.Framework.Core.Serialization;
 using MediatR;
-using Serilog;
+using Orleans;
 
 namespace Conreign.Framework.Routing
 {
-    public interface IRouteNamingConvention
+    internal class Router : IAsyncRequestHandler<Request, Response>
     {
-        string GetName(Type requestType, Type responseType, IEnumerable<Type> otherResponseTypes);
-    }
+        private readonly ActionMapper _actionMapper;
+        private readonly IMediator _mediator;
+        private readonly RouteTable _routingTable;
 
-    public class Router
-    {
-
-
-        private readonly Assembly _grainInterfacesAssembly;
-
-        private readonly object _locker = new object();
-
-        private readonly ILogger _logger;
-
-        private Dictionary<string, Route> _routes;
-
-        public static Router Build(params Assembly[] assemblies)
+        public Router(RouteTable routeTable, ActionMapper actionMapper, IMediator mediator)
         {
-            var types = assemblies.SelectMany(a => a.ExportedTypes);
-
-        }
-
-        private Router(Assembly grainInterfacesAssembly)
-        {
-            if (grainInterfacesAssembly == null)
+            if (routeTable == null)
             {
-                throw new ArgumentNullException(nameof(grainInterfacesAssembly));
+                throw new ArgumentNullException(nameof(routeTable));
             }
-            _logger = Log.ForContext(typeof (Router));
-            _grainInterfacesAssembly = grainInterfacesAssembly;
-            _routes = null;
-        }
-
-        public Route Match(Request action)
-        {
-            if (action == null)
+            if (actionMapper == null)
             {
-                throw new ArgumentNullException(nameof(action));
+                throw new ArgumentNullException(nameof(actionMapper));
             }
-            var routes = Build();
-            return routes.ContainsKey(action.Type)
-                ? routes[action.Type]
-                : null;
+            _routingTable = routeTable;
+            _actionMapper = actionMapper;
+            _mediator = mediator;
         }
 
-        private Dictionary<string, Route> Build()
+        public async Task<Response> Handle(Request request)
         {
-            if (_routes != null)
+            if (!GrainClient.IsInitialized)
             {
-                return _routes;
+                return Response.Problem(ErrorFactory.ServiceUnavailable());
             }
-            lock (_locker)
+            var route = _routingTable.Match(request.Type);
+            if (route == null)
             {
-                
+                return Response.Problem(ErrorFactory.HandlerNotFound(request?.Type ?? "<No Type>"));
             }
-        }
-
-        private static IEnumerable<Route> GetRoutes(Type type)
-        {
-            if (!type.IsClass || type.IsAbstract)
-            {
-                return Enumerable.Empty<Route>();
-            }
-            var interfaces = type.GetInterfaces()
-                .Where(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof (IAsyncRequest<>))
-                .ToList();
-            if (interfaces.Count == 0)
-            {
-                return Enumerable.Empty<Route>();
-            }
-            var routeAttributes = type.GetCustomAttributes<RouteAttribute>().ToDictionary(x => x.Name, x => x);
-            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof (IAsyncRequest<>);
-        }
-
-        private static string GetRouteName(Type requestType, Type responseType, bool single)
-        {
-            var regex = new Regex("Action|M$");
-        }
-
-        private static bool IsPublicGrainAction(Type type)
-        {
-            return type.IsClass &&
-                   !type.IsAbstract &&
-                   GetGrainActionInterface(type) != null;
-        }
-
-        private static string GetActionKey(Type type)
-        {
-            var regex = new Regex("Action|Query|Command$", RegexOptions.Compiled);
-            return type.GetCustomAttribute<ActionAttribute>()?.Type ?? regex.Replace(type.Name, string.Empty);
-        }
-
-        private static MethodInfo GetMethod(Type type)
-        {
-            var grainAction = GetGrainActionInterface(type);
-            var grainType = grainAction.GetGenericArguments()[0];
-            return grainType.GetMethods()
-                .FirstOrDefault(m => m.GetParameters().Any(p => type.IsAssignableFrom(p.ParameterType)));
-        }
-
-        private static Type GetGrainActionInterface(Type type)
-        {
-            return type.GetInterfaces()
-                .Where(t => t.IsConstructedGenericType)
-                .FirstOrDefault(t => t.GetGenericTypeDefinition() == typeof (IGrainAction<>));
+            dynamic action = _actionMapper.Map(request, route.RequestType);
+            var key = action.GrainKey.Key;
+            var grain = GrainFactoryExtensions.GetGrain(GrainClient.GrainFactory, route.Method.DeclaringType, key);
+            var result = await route.Method.Invoke(grain, new object[] {action});
+            return Response.Success(result);
         }
     }
 }

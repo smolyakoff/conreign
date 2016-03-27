@@ -70,7 +70,7 @@ namespace Conreign.Framework
                     .SingleInstance();
             }
 
-            builder.RegisterInstance(new Router(_configuration.GrainContractsAssembly));
+            builder.RegisterInstance(new RouteTable(_configuration.GrainContractsAssembly));
             builder.RegisterInstance(_configuration.Converter).As<IConverter>();
         }
     }

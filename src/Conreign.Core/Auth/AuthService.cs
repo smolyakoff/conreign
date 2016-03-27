@@ -4,6 +4,7 @@ using Conreign.Core.Auth.Actions;
 using Conreign.Core.Contracts.Auth;
 using Conreign.Core.Contracts.Game;
 using Conreign.Framework.Contracts.Auth;
+using Conreign.Framework.Contracts.Routing;
 using JWT;
 using MediatR;
 using Serilog;
@@ -32,6 +33,7 @@ namespace Conreign.Core.Auth
             _options = options;
         }
 
+        [Route("LoginAnonymous->AccessToken")]
         public Task<AccessTokenPayload> Handle(LoginAnonymousAction action)
         {
             var userId = action.Payload.ToString();
@@ -42,6 +44,7 @@ namespace Conreign.Core.Auth
             return Task.FromResult(result);
         }
 
+        [Route("Authenticate")]
         public Task<AuthenticationResultPayload> Handle(AuthenticateAction action)
         {
             var accessToken = action?.Payload?.AccessToken;

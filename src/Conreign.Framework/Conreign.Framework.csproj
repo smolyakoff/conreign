@@ -47,17 +47,22 @@
     <Compile Include="Core\EventHandler.cs" />
     <Compile Include="Diagnostics\LoggingDecorator.cs" />
     <Compile Include="Core\ErrorFactory.cs" />
-    <Compile Include="Routing\RequestHandler.cs" />
+    <Compile Include="Routing\IRoute.cs" />
+    <Compile Include="Routing\IRouteKeyConvention.cs" />
+    <Compile Include="Routing\MediatorRoute.cs" />
+    <Compile Include="Routing\OrleansRoute.cs" />
+    <Compile Include="Routing\RouteFactory.cs" />
+    <Compile Include="Routing\RouteType.cs" />
+    <Compile Include="Routing\Router.cs" />
     <Compile Include="FrameworkModule.cs" />
     <None Include="paket.references" />
     <Compile Include="ExceptionHandling\ExceptionHandlingDecorator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Routing\Route.cs" />
-    <Compile Include="Routing\Router.cs" />
+    <Compile Include="Routing\RouteTable.cs" />
     <Compile Include="Serialization\IConverter.cs" />
     <Compile Include="Serialization\JsonConverter.cs" />
     <Compile Include="Serialization\ActionMapper.cs" />
-    <Compile Include="Orleans\GrainFactoryExtensions.cs" />
+    <Compile Include="Routing\GrainFactoryExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

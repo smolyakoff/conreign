@@ -2,7 +2,7 @@
 using System.Linq;
 using Orleans;
 
-namespace Conreign.Framework.Orleans
+namespace Conreign.Framework.Routing
 {
     internal static class GrainFactoryExtensions
     {
