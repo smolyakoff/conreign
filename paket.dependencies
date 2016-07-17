@@ -17,8 +17,10 @@ nuget Microsoft.Orleans.OrleansRuntime
 nuget Microsoft.Orleans.OrleansProviders
 nuget Microsoft.Orleans.OrleansSQLUtils
 nuget Microsoft.Orleans.Client
-nuget Microsoft.Extensions.DependencyInjection.Abstractions prerelease
-nuget Microsoft.Extensions.DependencyInjection prerelease
+
+nuget System.Collections.Immutable
+nuget Microsoft.Extensions.DependencyInjection.Abstractions
+nuget Microsoft.Extensions.DependencyInjection
 
 nuget Autofac.Owin
 nuget Autofac.SignalR
