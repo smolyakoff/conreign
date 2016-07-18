@@ -1,4 +1,6 @@
-﻿namespace Conreign.Core.Contracts.Auth
+﻿using Conreign.Framework.Contracts.Authentication;
+
+namespace Conreign.Core.Contracts.Auth
 {
     public class AuthMeta
     {

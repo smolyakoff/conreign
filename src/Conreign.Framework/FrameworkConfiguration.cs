@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Conreign.Framework.Auth;
 using Conreign.Framework.Contracts.Core.Data;
 using Conreign.Framework.Contracts.Data;
 using Conreign.Framework.Contracts.ErrorHandling;
@@ -25,7 +24,7 @@ namespace Conreign.Framework
                 typeof (LoggingDecorator),
                 typeof (ExceptionHandlingDecorator),
                 typeof (AuthDecorator),
-                typeof (Router)
+                typeof (OldRouter)
             };
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using Conreign.Core.Contracts.Auth;
+using Conreign.Framework.Contracts.Authentication;
 using Conreign.Framework.Contracts.Core;
 using Conreign.Framework.Contracts.Core.Data;
 

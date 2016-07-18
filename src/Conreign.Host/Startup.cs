@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Conreign.Core.Auth;
-using Conreign.Core.Game;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans;
 

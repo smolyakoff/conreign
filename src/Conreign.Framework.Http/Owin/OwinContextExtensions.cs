@@ -2,6 +2,7 @@
 using Autofac;
 using Autofac.Integration.Owin;
 using Microsoft.Owin;
+using Orleans;
 
 namespace Conreign.Framework.Http.Owin
 {

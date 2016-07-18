@@ -1,2 +1,3 @@
-﻿MediatR
+﻿System.Collections.Immutable
+MediatR
 Microsoft.Orleans.Core
