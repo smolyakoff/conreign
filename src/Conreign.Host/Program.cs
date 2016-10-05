@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using Conreign.Core.Gameplay;
 using Orleans.Runtime.Host;
 
 namespace Conreign.Host

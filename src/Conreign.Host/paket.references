@@ -1,5 +1,4 @@
 ﻿Microsoft.Orleans.OrleansRuntime
 Microsoft.Orleans.OrleansSQLUtils
 Microsoft.Orleans.OrleansProviders
-Microsoft.Extensions.DependencyInjection.Abstractions
 Microsoft.Extensions.DependencyInjection

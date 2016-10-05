@@ -1,9 +1,2 @@
-﻿System.Collections.Immutable
-Microsoft.Orleans.Templates.Grains
-Serilog
-JWT
-MediatR
-AutoMapper
-Microsoft.Net.Http
-Microsoft.AspNet.WebApi.Client
-MongoDB.Driver
+﻿Microsoft.Orleans.Core
+Microsoft.Orleans.OrleansCodeGenerator.Build

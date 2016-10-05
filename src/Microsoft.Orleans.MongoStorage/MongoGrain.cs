@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson.Serialization.Attributes;
 
 namespace Microsoft.Orleans.Storage
 {
@@ -13,6 +12,6 @@ namespace Microsoft.Orleans.Storage
         public MongoGrainMeta Meta { get; set; }
 
         [BsonElement("data")]
-        public Dictionary<string, object> Data { get; set; }
+        public object Data { get; set; }
     }
 }

@@ -6,20 +6,18 @@ nuget FAKE.SQL.X64
 nuget FSharp.Data
 
 nuget Serilog
+nuget Serilog.Sinks.ColoredConsole
 nuget Polly
 nuget MediatR
 
 nuget MongoDB.Driver
 nuget Microsoft.Orleans.Core
-nuget Microsoft.Orleans.Templates.Interfaces
-nuget Microsoft.Orleans.Templates.Grains
+nuget Microsoft.Orleans.OrleansCodeGenerator.Build
 nuget Microsoft.Orleans.OrleansRuntime
 nuget Microsoft.Orleans.OrleansProviders
 nuget Microsoft.Orleans.OrleansSQLUtils
 nuget Microsoft.Orleans.Client
 
-nuget System.Collections.Immutable
-nuget Microsoft.Extensions.DependencyInjection.Abstractions
 nuget Microsoft.Extensions.DependencyInjection
 
 nuget Autofac.Owin
@@ -28,5 +26,3 @@ nuget Microsoft.Owin.Cors
 nuget Microsoft.AspNet.SignalR.SelfHost
 nuget JWT
 nuget AutoMapper
-nuget Microsoft.Net.Http
-nuget Microsoft.AspNet.WebApi.Client

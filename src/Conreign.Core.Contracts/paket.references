@@ -1,2 +1,2 @@
-﻿MediatR
-Microsoft.Orleans.Templates.Interfaces
+﻿Microsoft.Orleans.Core
+Microsoft.Orleans.OrleansCodeGenerator.Build

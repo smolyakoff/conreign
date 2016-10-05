@@ -2,6 +2,7 @@
 Microsoft.Orleans.OrleansSQLUtils
 Polly
 Serilog
+Serilog.Sinks.ColoredConsole
 Autofac.Owin
 Microsoft.Owin.Cors
 Microsoft.AspNet.SignalR.SelfHost

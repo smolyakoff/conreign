@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Conreign.Core.Auth;
+using Conreign.Core.Presence;
 using Microsoft.Extensions.DependencyInjection;
 using Orleans;
 
@@ -10,11 +10,7 @@ namespace Conreign.Host
     {
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddInstance(new AuthOptions
-            {
-                JwtSecret = "conreign-debug"
-            });
-            var grains = typeof (WorldGrain).Assembly.DefinedTypes
+            var grains = typeof (UniverseGrain).Assembly.DefinedTypes
                 .Where(t => t.IsClass)
                 .Where(t => typeof (Grain).IsAssignableFrom(t))
                 .ToList();

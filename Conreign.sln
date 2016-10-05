@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Core.Contracts", "src\Conreign.Core.Contracts\Conreign.Core.Contracts.csproj", "{00409622-346B-4926-B745-E5F595BD3BB7}"
 EndProject
@@ -25,13 +25,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{B07536
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Orleans.MongoStorage", "src\Microsoft.Orleans.MongoStorage\Microsoft.Orleans.MongoStorage.csproj", "{BA953785-1EFC-461E-9227-AD3E4C07EE7C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Framework", "src\Conreign.Framework\Conreign.Framework.csproj", "{D9E08E90-4862-4F3E-850D-34F7B09B2736}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Framework.Contracts", "src\Conreign.Framework.Contracts\Conreign.Framework.Contracts.csproj", "{A28940CC-B627-4FDC-A8A7-8788EAABA213}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Framework.Http", "src\Conreign.Framework.Http\Conreign.Framework.Http.csproj", "{B290FDE0-58F6-4F4A-8DEF-046D3460D095}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Host", "Host", "{2397B05B-F57A-4F01-9531-43496876623A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Core.Client", "src\Conreign.Core.Client\Conreign.Core.Client.csproj", "{27E2FBDD-0197-44A8-98F5-8C45DE87F964}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,18 +55,10 @@ Global
 		{BA953785-1EFC-461E-9227-AD3E4C07EE7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA953785-1EFC-461E-9227-AD3E4C07EE7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA953785-1EFC-461E-9227-AD3E4C07EE7C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D9E08E90-4862-4F3E-850D-34F7B09B2736}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D9E08E90-4862-4F3E-850D-34F7B09B2736}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D9E08E90-4862-4F3E-850D-34F7B09B2736}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D9E08E90-4862-4F3E-850D-34F7B09B2736}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A28940CC-B627-4FDC-A8A7-8788EAABA213}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A28940CC-B627-4FDC-A8A7-8788EAABA213}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A28940CC-B627-4FDC-A8A7-8788EAABA213}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A28940CC-B627-4FDC-A8A7-8788EAABA213}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B290FDE0-58F6-4F4A-8DEF-046D3460D095}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B290FDE0-58F6-4F4A-8DEF-046D3460D095}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B290FDE0-58F6-4F4A-8DEF-046D3460D095}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B290FDE0-58F6-4F4A-8DEF-046D3460D095}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27E2FBDD-0197-44A8-98F5-8C45DE87F964}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27E2FBDD-0197-44A8-98F5-8C45DE87F964}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27E2FBDD-0197-44A8-98F5-8C45DE87F964}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27E2FBDD-0197-44A8-98F5-8C45DE87F964}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -81,9 +69,7 @@ Global
 		{F7DCD733-0513-474E-8D35-7615D7F9EDA3} = {2397B05B-F57A-4F01-9531-43496876623A}
 		{3B96DD78-2990-4EC2-BD1D-55D1A36884A3} = {2397B05B-F57A-4F01-9531-43496876623A}
 		{BA953785-1EFC-461E-9227-AD3E4C07EE7C} = {420E0885-10E8-44C7-899B-FF39004DEADE}
-		{D9E08E90-4862-4F3E-850D-34F7B09B2736} = {420E0885-10E8-44C7-899B-FF39004DEADE}
-		{A28940CC-B627-4FDC-A8A7-8788EAABA213} = {420E0885-10E8-44C7-899B-FF39004DEADE}
-		{B290FDE0-58F6-4F4A-8DEF-046D3460D095} = {420E0885-10E8-44C7-899B-FF39004DEADE}
+		{27E2FBDD-0197-44A8-98F5-8C45DE87F964} = {420E0885-10E8-44C7-899B-FF39004DEADE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8

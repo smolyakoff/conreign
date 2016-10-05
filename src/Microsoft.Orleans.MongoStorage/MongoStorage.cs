@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Orleans;
@@ -46,7 +45,7 @@ namespace Microsoft.Orleans.Storage
             return TaskDone.Done;
         }
 
-        public async Task ReadStateAsync(string grainType, GrainReference grainReference, GrainState grainState)
+        public async Task ReadStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
         {
             EnsureNotClosed();
             var meta = grainState.ToGrainMeta(grainReference, grainType, _serviceId);
@@ -62,11 +61,8 @@ namespace Microsoft.Orleans.Storage
                     LogVerbose3($"Grain state not found. {meta}", MongoStorageCode.TraceNotFound);
                     return;
                 }
-                grainState.Etag = doc.Meta.ETag;
-                if (doc.Data != null)
-                {
-                    grainState.SetAll(doc.Data);
-                }
+                grainState.ETag = doc.Meta.ETag;
+                grainState.State = doc.Data;
                 LogVerbose3($"Read data: {meta}", MongoStorageCode.TraceRead);
             }
             catch (Exception ex)
@@ -76,7 +72,7 @@ namespace Microsoft.Orleans.Storage
             }
         }
 
-        public async Task WriteStateAsync(string grainType, GrainReference grainReference, GrainState grainState)
+        public async Task WriteStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
         {
             EnsureNotClosed();
             var meta = grainState.ToGrainMeta(grainReference, grainType, _serviceId);
@@ -85,19 +81,19 @@ namespace Microsoft.Orleans.Storage
                 var collectionName = Conventions.CollectionNameForGrain(grainType, _options.CollectionNamePrefix);
                 var collection = _database.GetCollection<MongoGrain>(collectionName);
                 LogVerbose3($"Writing data: {meta}", MongoStorageCode.TraceWriting);
-                if (string.IsNullOrEmpty(grainState.Etag))
+                if (string.IsNullOrEmpty(grainState.ETag))
                 {
                     var grain = grainState.ToGrain(grainReference, grainType, _serviceId);
                     grain.Meta.Timestamp = DateTime.UtcNow;
                     await collection.InsertOneAsync(grain);
-                    grainState.Etag = grain.Meta.ETag;
+                    grainState.ETag = grain.Meta.ETag;
                 }
                 else
                 {
                     var id = Conventions.PrimaryKeyForGrain(_serviceId, grainReference);
                     // Update data and generate new timestamp
                     var update = Builders<MongoGrain>.Update
-                        .Set(x => x.Data, new Dictionary<string, object>(grainState.AsDictionary()))
+                        .Set(x => x.Data, grainState.State)
                         .CurrentDate(x => x.Meta.Timestamp, UpdateDefinitionCurrentDateType.Date);
                     var options = new FindOneAndUpdateOptions<MongoGrain>
                     {
@@ -115,7 +111,7 @@ namespace Microsoft.Orleans.Storage
                             $"Inconsistent state for grain: {meta}. ETag has changed or document has already been deleted.";
                         throw new InconsistentStateException(message);
                     }
-                    grainState.Etag = updatedGrain.Meta.ETag;
+                    grainState.ETag = updatedGrain.Meta.ETag;
                 }
                 LogVerbose3($"Wrote data: {meta}", MongoStorageCode.TraceWrite);
             }
@@ -126,7 +122,7 @@ namespace Microsoft.Orleans.Storage
             }
         }
 
-        public async Task ClearStateAsync(string grainType, GrainReference grainReference, GrainState grainState)
+        public async Task ClearStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
         {
             EnsureNotClosed();
             var meta = grainState.ToGrainMeta(grainReference, grainType, _serviceId);
@@ -137,8 +133,8 @@ namespace Microsoft.Orleans.Storage
                 LogVerbose3($"Deleting data: {meta}", MongoStorageCode.TraceDeleting);
                 var id = Conventions.PrimaryKeyForGrain(_serviceId, grainReference);
                 await collection.DeleteOneAsync(x => x.Id == id);
-                grainState.SetAll(null);
-                grainState.Etag = null;
+                grainState.State = null;
+                grainState.ETag = null;
                 LogVerbose3($"Deleted data: {meta}", MongoStorageCode.TraceDelete);
             }
             catch (Exception ex)
