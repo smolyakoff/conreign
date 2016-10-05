@@ -23,7 +23,7 @@ export function init(history, storage, data = {}) {
     };
 
     if (DevTools) {
-        app.devTools = <DevTools/>;
+        app.devTools = <DevTools defaultIsVisible={false}/>;
     }
 
     if (BROWSER) {
