@@ -10,7 +10,7 @@ using Polly;
 
 namespace Conreign.Core.Client
 {
-    public class GameClient : IDisposable
+    public class GameClient
     {
         private readonly IGrainFactory _factory;
         private readonly Lazy<IUniverse> _universe;
@@ -33,7 +33,6 @@ namespace Conreign.Core.Client
             }
             if (!GrainClient.IsInitialized)
             {
-                GrainClient.Initialize(configFilePath);
                 var policy = Policy
                     .Handle<Exception>()
                     .WaitAndRetry(5, attempt => TimeSpan.FromSeconds(attempt * 3));
@@ -41,8 +40,8 @@ namespace Conreign.Core.Client
             }
             var client = new GameClient(GrainClient.GrainFactory);
             var stream = GrainClient
-                .GetStreamProvider("abc")
-                .GetStream<MessageEnvelope>(SystemKeys.CommunicationStreamKey, SystemKeys.CommunicationStreamNamespace);
+                .GetStreamProvider(StreamConstants.DefaultProviderName)
+                .GetStream<MessageEnvelope>(StreamConstants.ClientStreamKey, StreamConstants.ClientStreamNamespace);
             client._subscription = await stream.SubscribeAsync(client.OnNext, client.OnError, client.OnCompleted);
             return client;
         }

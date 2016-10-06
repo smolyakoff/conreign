@@ -21,8 +21,8 @@ namespace Conreign.Core.Gameplay
                 State, 
                 GrainFactory.GetGrain<IUniverseGrain>(default(long)),
                 this);
-            var provider = GetStreamProvider(SystemKeys.StreamProviderName);
-            _communicationStream = provider.GetStream<MessageEnvelope>(SystemKeys.CommunicationStreamKey, SystemKeys.CommunicationStreamNamespace);
+            var provider = GetStreamProvider(StreamConstants.DefaultProviderName);
+            _communicationStream = provider.GetStream<MessageEnvelope>(StreamConstants.ClientStreamKey, StreamConstants.ClientStreamNamespace);
             return Task.CompletedTask;
         }
 
