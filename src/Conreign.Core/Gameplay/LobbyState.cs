@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using Conreign.Core.Communication;
 using Conreign.Core.Contracts.Gameplay.Data;
+using Conreign.Core.Presence;
 
 namespace Conreign.Core.Gameplay
 {
@@ -10,5 +10,6 @@ namespace Conreign.Core.Gameplay
         public HubState Hub { get; set; } = new HubState();
         public List<PlayerData> Players { get; set; } = new List<PlayerData>();
         public MapData Map { get; set; } = new MapData();
+        public GameOptionsData GameOptions { get; set; } = new GameOptionsData();
     }
 }

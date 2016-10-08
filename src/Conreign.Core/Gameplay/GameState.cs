@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Conreign.Core.Communication;
 using Conreign.Core.Contracts.Gameplay.Data;
+using Conreign.Core.Contracts.Presence;
+using Conreign.Core.Presence;
 
 namespace Conreign.Core.Gameplay
 {

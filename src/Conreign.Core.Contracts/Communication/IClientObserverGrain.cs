@@ -3,7 +3,7 @@ using Orleans;
 
 namespace Conreign.Core.Contracts.Communication
 {
-    public interface IObserverGrain : IGrainWithGuidCompoundKey, IObserver, IConnectable
+    public interface IClientObserverGrain : IGrainWithGuidCompoundKey, IClientObserver, IConnectable
     {
 
     }

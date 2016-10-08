@@ -6,7 +6,7 @@ namespace Conreign.Core.Contracts.Presence
 {
     public interface IVisitable
     {
-        Task Join(Guid userId, IObserver observer);
+        Task Join(Guid userId, IClientObserver observer);
         Task Leave(Guid userId);
     }
 }

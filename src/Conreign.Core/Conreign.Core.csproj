@@ -34,10 +34,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Auth\OrleansUserContext.cs" />
-    <Compile Include="Communication\EventState.cs" />
-    <Compile Include="Communication\HubState.cs" />
+    <Compile Include="Gameplay\Colors.cs" />
     <Compile Include="Gameplay\Game.cs" />
-    <Compile Include="Communication\Hub.cs" />
     <Compile Include="Gameplay\GameGrain.cs" />
     <Compile Include="Gameplay\GamePlayerState.cs" />
     <Compile Include="Gameplay\GameState.cs" />
@@ -45,17 +43,22 @@
     <Compile Include="Gameplay\Lobby.cs" />
     <Compile Include="Gameplay\LobbyGrain.cs" />
     <Compile Include="Gameplay\LobbyState.cs" />
-    <Compile Include="Communication\ObserverGrain.cs" />
+    <Compile Include="Communication\ClientObserverGrain.cs" />
     <Compile Include="Gameplay\PlanetState.cs" />
     <Compile Include="Gameplay\Player.cs" />
     <Compile Include="Gameplay\PlayerGrain.cs" />
     <Compile Include="Gameplay\PlayerState.cs" />
     <Compile Include="Gameplay\User.cs" />
     <Compile Include="Gameplay\UserGrain.cs" />
+    <Compile Include="Presence\EventState.cs" />
+    <Compile Include="Presence\Hub.cs" />
+    <Compile Include="Presence\HubExtensions.cs" />
+    <Compile Include="Presence\HubState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Presence\Universe.cs" />
     <Compile Include="Presence\UniverseGrain.cs" />
     <Compile Include="Presence\UniverseState.cs" />
+    <Compile Include="Utility\EnumerableExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Conreign.Core.Contracts\Conreign.Core.Contracts.csproj">

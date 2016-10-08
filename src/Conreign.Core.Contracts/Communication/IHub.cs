@@ -6,7 +6,8 @@ namespace Conreign.Core.Contracts.Communication
 {
     public interface IHub
     {
-        Task Notify(object @event, ISet<Guid> users);
-        Task NotifyEverybody(object @event);
+        Task Notify(ISet<Guid> users, params IClientEvent[] events);
+        Task NotifyEverybody(params IClientEvent[] events);
+        Task NotifyEverybodyExcept(ISet<Guid> users, params IClientEvent[] events);
     }
 }

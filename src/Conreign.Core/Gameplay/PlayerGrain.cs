@@ -10,53 +10,43 @@ namespace Conreign.Core.Gameplay
     public class PlayerGrain : Grain<PlayerState>, IPlayerGrain
     {
         private Player _player;
-        private IObserverGrain _observer;
+        private IClientObserverGrain _observer;
 
         public override Task OnActivateAsync()
         {
             string roomId;
             var userId = this.GetPrimaryKey(out roomId);
-            _observer = GrainFactory.GetGrain<IObserverGrain>(userId, roomId, null);
+            _observer = GrainFactory.GetGrain<IClientObserverGrain>(userId, roomId, null);
             InitializeState();
             _player = new Player(
                 State, 
                 _observer);
-            return Task.CompletedTask;
-        }
-
-        public Task UpdateGameOptions()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task LaunchFleet()
-        {
-            throw new NotImplementedException();
+            return base.OnActivateAsync();
         }
 
         public Task UpdateOptions(PlayerOptionsData options)
         {
-            throw new NotImplementedException();
+            return _player.UpdateOptions(options);
         }
 
         public Task UpdateGameOptions(GameOptionsData options)
         {
-            throw new NotImplementedException();
+            return _player.UpdateGameOptions(options);
         }
 
         public Task StartGame()
         {
-            throw new NotImplementedException();
+            return _player.StartGame();
         }
 
         public Task LaunchFleet(FleetData fleet)
         {
-            throw new NotImplementedException();
+            return _player.LaunchFleet(fleet);
         }
 
         public Task EndTurn()
         {
-            throw new NotImplementedException();
+            return _player.EndTurn();
         }
 
         public Task Write(string text)
@@ -64,9 +54,9 @@ namespace Conreign.Core.Gameplay
             return _player.Write(text);
         }
 
-        public Task<IRoomState> GetState()
+        public Task<IRoomData> GetState()
         {
-            throw new NotImplementedException();
+            return _player.GetState();
         }
 
         public async Task Connect(Guid connectionId)

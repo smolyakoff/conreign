@@ -5,6 +5,8 @@ using Conreign.Core.Communication;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Gameplay;
 using Conreign.Core.Contracts.Gameplay.Data;
+using Conreign.Core.Contracts.Presence;
+using Conreign.Core.Presence;
 
 namespace Conreign.Core.Gameplay
 {
@@ -23,7 +25,7 @@ namespace Conreign.Core.Gameplay
             _state = state;
         }
 
-        public Task<IRoomState> GetState(Guid userId)
+        public Task<IRoomData> GetState(Guid userId)
         {
             throw new NotImplementedException();
         }
@@ -34,7 +36,7 @@ namespace Conreign.Core.Gameplay
             throw new NotImplementedException();
         }
 
-        public Task EndTurn()
+        public Task EndTurn(Guid userId)
         {
             throw new NotImplementedException();
         }
@@ -44,17 +46,22 @@ namespace Conreign.Core.Gameplay
             return Task.CompletedTask;
         }
 
-        public Task Notify(object @event, ISet<Guid> users)
+        public Task Notify(ISet<Guid> users, params IClientEvent[] events)
         {
-            return _hub.Notify(@event, users);
+            return _hub.Notify(users, events);
         }
 
-        public Task NotifyEverybody(object @event)
+        public Task NotifyEverybody(params IClientEvent[] events)
         {
-            return _hub.NotifyEverybody(@event);
+            return _hub.NotifyEverybody(events);
         }
 
-        public Task Join(Guid userId, IObserver observer)
+        public Task NotifyEverybodyExcept(ISet<Guid> users, params IClientEvent[] events)
+        {
+            return _hub.NotifyEverybodyExcept(users, events);
+        }
+
+        public Task Join(Guid userId, IClientObserver observer)
         {
             return _hub.Join(userId, observer);
         }

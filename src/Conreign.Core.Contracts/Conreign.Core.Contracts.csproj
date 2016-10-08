@@ -34,12 +34,18 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Auth\IUserContext.cs" />
+    <Compile Include="Communication\IClientEvent.cs" />
     <Compile Include="Communication\IHub.cs" />
-    <Compile Include="Communication\IObserverGrain.cs" />
+    <Compile Include="Communication\IClientObserverGrain.cs" />
+    <Compile Include="Communication\IObserver%271.cs" />
     <Compile Include="Gameplay\Data\GameData.cs" />
+    <Compile Include="Gameplay\Data\LobbyData.cs" />
     <Compile Include="Gameplay\Data\MapData.cs" />
     <Compile Include="Gameplay\Data\PlanetData.cs" />
     <Compile Include="Gameplay\Data\PlayerData.cs" />
+    <Compile Include="Gameplay\Events\PlayerJoined.cs" />
+    <Compile Include="Presence\Events\LeaderChanged.cs" />
+    <Compile Include="Presence\PresenceStatus.cs" />
     <Compile Include="Gameplay\Events\ChatMessageReceived.cs" />
     <Compile Include="Gameplay\Data\FleetData.cs" />
     <Compile Include="Gameplay\Data\GameOptionsData.cs" />
@@ -55,17 +61,17 @@
     <Compile Include="Gameplay\IUser.cs" />
     <Compile Include="Gameplay\Data\PlayerOptionsData.cs" />
     <Compile Include="Gameplay\IPlayer.cs" />
-    <Compile Include="Gameplay\Data\IRoomState.cs" />
+    <Compile Include="Gameplay\Data\IRoomData.cs" />
     <Compile Include="Gameplay\IUserGrain.cs" />
     <Compile Include="Presence\IConnectable.cs" />
     <Compile Include="Presence\IVisitable.cs" />
     <Compile Include="Presence\IUniverse.cs" />
     <Compile Include="Presence\IUniverseGrain.cs" />
-    <Compile Include="Presence\UserStatusChanged.cs" />
+    <Compile Include="Presence\Events\UserStatusChanged.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Gameplay\Data\RoomMode.cs" />
     <Compile Include="Presence\IConnectionTracker.cs" />
-    <Compile Include="Communication\IObserver.cs" />
+    <Compile Include="Communication\IClientObserver.cs" />
     <Compile Include="Communication\StreamConstants.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

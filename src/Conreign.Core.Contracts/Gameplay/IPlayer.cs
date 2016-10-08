@@ -11,6 +11,6 @@ namespace Conreign.Core.Contracts.Gameplay
         Task LaunchFleet(FleetData fleet);
         Task EndTurn();
         Task Write(string text);
-        Task<IRoomState> GetState();
+        Task<IRoomData> GetState();
     }
 }

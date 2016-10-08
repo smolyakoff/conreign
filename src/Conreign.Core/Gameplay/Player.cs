@@ -7,16 +7,20 @@ using Conreign.Core.Contracts.Gameplay.Events;
 
 namespace Conreign.Core.Gameplay
 {
-    public class Player : IConnectablePlayer, IObserver
+    public class Player : IConnectablePlayer
     {
         private readonly PlayerState _state;
-        private readonly IObserver _self;
+        private readonly IClientObserver _observer;
 
-        public Player(PlayerState state, IObserver self = null)
+        public Player(PlayerState state, IClientObserver observer)
         {
             if (state == null)
             {
                 throw new ArgumentNullException(nameof(state));
+            }
+            if (observer == null)
+            {
+                throw new ArgumentNullException(nameof(observer));
             }
             if (string.IsNullOrEmpty(state.RoomId))
             {
@@ -31,7 +35,7 @@ namespace Conreign.Core.Gameplay
                 throw new ArgumentException("Room should be initialized", nameof(state));
             }
             _state = state;
-            _self = self ?? this;
+            _observer = observer;
         }
 
         public Task UpdateOptions(PlayerOptionsData options)
@@ -42,7 +46,8 @@ namespace Conreign.Core.Gameplay
 
         public Task UpdateGameOptions(GameOptionsData options)
         {
-            throw new NotImplementedException();
+            var lobby = EnsureIsInLobby();
+            return lobby.UpdateGameOptions(_state.UserId, options);
         }
 
         public async Task StartGame()
@@ -60,7 +65,8 @@ namespace Conreign.Core.Gameplay
 
         public Task EndTurn()
         {
-            throw new NotImplementedException();
+            var game = EnsureIsInGame();
+            return game.EndTurn(_state.UserId);
         }
 
         public Task Write(string text)
@@ -73,14 +79,9 @@ namespace Conreign.Core.Gameplay
             return _state.Room.NotifyEverybody(@event);
         }
 
-        public Task<IRoomState> GetState()
+        public Task<IRoomData> GetState()
         {
             return _state.Room.GetState(_state.UserId);
-        }
-
-        public Task Notify(object @event)
-        {
-            return this == _self ? Task.CompletedTask : _self.Notify(@event);
         }
 
         public async Task Connect(Guid connectionId)
@@ -89,7 +90,7 @@ namespace Conreign.Core.Gameplay
             var isFirstConnection = _state.ConnectionIds.Count == 1;
             if (isFirstConnection)
             {
-                await _state.Room.Join(_state.UserId, _self);
+                await _state.Room.Join(_state.UserId, _observer);
             }
         }
 

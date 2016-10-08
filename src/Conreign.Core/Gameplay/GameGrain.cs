@@ -32,7 +32,7 @@ namespace Conreign.Core.Gameplay
             return Task.CompletedTask;
         }
 
-        public Task<IRoomState> GetState(Guid userId)
+        public Task<IRoomData> GetState(Guid userId)
         {
             throw new System.NotImplementedException();
         }
@@ -47,22 +47,27 @@ namespace Conreign.Core.Gameplay
             throw new NotImplementedException();
         }
 
-        public Task EndTurn()
+        public Task EndTurn(Guid userId)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task Notify(object @event, ISet<Guid> users)
+        public Task Notify(ISet<Guid> users, params IClientEvent[] events)
         {
-            return _game.Notify(@event, users);
+            return _game.Notify(users, events);
         }
 
-        public Task NotifyEverybody(object @event)
+        public Task NotifyEverybody(params IClientEvent[] events)
         {
-            return _game.NotifyEverybody(@event);
+            return _game.NotifyEverybody(events);
         }
 
-        public Task Join(Guid userId, IObserver observer)
+        public Task NotifyEverybodyExcept(ISet<Guid> users, params IClientEvent[] events)
+        {
+            return _game.NotifyEverybodyExcept(users, events);
+        }
+
+        public Task Join(Guid userId, IClientObserver observer)
         {
             return _game.Join(userId, observer);
         }

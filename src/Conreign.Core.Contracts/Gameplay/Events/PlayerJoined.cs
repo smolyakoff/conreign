@@ -1,12 +1,12 @@
 ﻿using System;
 using Conreign.Core.Contracts.Communication;
+using Conreign.Core.Contracts.Gameplay.Data;
 
 namespace Conreign.Core.Contracts.Gameplay.Events
 {
     [Serializable]
-    public class ChatMessageReceived : IClientEvent
+    public class PlayerJoined : IClientEvent
     {
-        public Guid SenderId { get; set; }
-        public string Text { get; set; }
+        public PlayerData Player { get; set; }
     }
 }

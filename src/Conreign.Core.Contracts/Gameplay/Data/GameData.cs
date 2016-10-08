@@ -9,7 +9,7 @@ namespace Conreign.Core.Contracts.Gameplay.Data
     [Immutable]
     public class GameData
     {
-        public GameData(MapData map, List<PlayerData> players, Dictionary<Guid, IObserver> hubMembers)
+        public GameData(MapData map, List<PlayerData> players, Dictionary<Guid, IClientObserver> hubMembers)
         {
             if (map == null)
             {
@@ -30,6 +30,6 @@ namespace Conreign.Core.Contracts.Gameplay.Data
 
         public MapData Map { get; }
         public List<PlayerData> Players { get; }
-        public Dictionary<Guid, IObserver> HubMembers { get; }
+        public Dictionary<Guid, IClientObserver> HubMembers { get; }
     }
 }

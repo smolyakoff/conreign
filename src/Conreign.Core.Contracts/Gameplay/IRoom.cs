@@ -8,6 +8,6 @@ namespace Conreign.Core.Contracts.Gameplay
 {
     public interface IRoom : IHub, IVisitable
     {
-        Task<IRoomState> GetState(Guid userId);
+        Task<IRoomData> GetState(Guid userId);
     }
 }

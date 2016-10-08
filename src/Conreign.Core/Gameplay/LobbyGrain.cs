@@ -12,15 +12,16 @@ namespace Conreign.Core.Gameplay
     {
         private Lobby _lobby;
 
-        public override Task OnActivateAsync()
+        public override async Task OnActivateAsync()
         {
             _lobby = new Lobby(State, this.AsReference<ILobbyGrain>());
-            return Task.CompletedTask;
+            await _lobby.RegenerateMap();
+            await base.OnActivateAsync();
         }
 
-        public Task<IRoomState> GetState(Guid userId)
+        public Task<IRoomData> GetState(Guid userId)
         {
-            throw new System.NotImplementedException();
+            return _lobby.GetState(userId);
         }
 
         public Task UpdateGameOptions()
@@ -41,17 +42,22 @@ namespace Conreign.Core.Gameplay
             return game;
         }
 
-        public Task Notify(object @event, ISet<Guid> users)
+        public Task Notify(ISet<Guid> users, params IClientEvent[] @event)
         {
-            return _lobby.Notify(@event, users);
+            return _lobby.Notify(users, @event);
         }
 
-        public Task NotifyEverybody(object @event)
+        public Task NotifyEverybody(params IClientEvent[] @event)
         {
             return _lobby.NotifyEverybody(@event);
         }
 
-        public Task Join(Guid userId, IObserver observer)
+        public Task NotifyEverybodyExcept(ISet<Guid> users, params IClientEvent[] events)
+        {
+            return _lobby.NotifyEverybodyExcept(users, events);
+        }
+
+        public Task Join(Guid userId, IClientObserver observer)
         {
             return _lobby.Join(userId, observer);
         }
@@ -72,11 +78,6 @@ namespace Conreign.Core.Gameplay
         }
 
         public Task<IGame> StartGame(Guid userId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task Notify(object @event)
         {
             throw new NotImplementedException();
         }
