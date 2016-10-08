@@ -1,40 +1,27 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Gameplay;
-using Conreign.Core.Contracts.Gameplay.Commands;
-using Conreign.Core.Contracts.Presence;
+using Conreign.Core.Contracts.Gameplay.Data;
 using Orleans;
-using Orleans.Streams;
 
 namespace Conreign.Core.Gameplay
 {
     public class PlayerGrain : Grain<PlayerState>, IPlayerGrain
     {
         private Player _player;
-        private IAsyncStream<MessageEnvelope> _communicationStream;
+        private IObserverGrain _observer;
 
         public override Task OnActivateAsync()
         {
+            string roomId;
+            var userId = this.GetPrimaryKey(out roomId);
+            _observer = GrainFactory.GetGrain<IObserverGrain>(userId, roomId, null);
+            InitializeState();
             _player = new Player(
                 State, 
-                GrainFactory.GetGrain<IUniverseGrain>(default(long)),
-                this);
-            var provider = GetStreamProvider(StreamConstants.DefaultProviderName);
-            _communicationStream = provider.GetStream<MessageEnvelope>(StreamConstants.ClientStreamKey, StreamConstants.ClientStreamNamespace);
+                _observer);
             return Task.CompletedTask;
-        }
-
-        public Task JoinRoom(JoinRoomCommand command)
-        {
-            return _player.JoinRoom(command);
-        }
-
-        public async Task UpdateOptions(UpdatePlayerOptionsCommand command)
-        {
-            await _player.UpdateOptions(command);
-            await WriteStateAsync();
         }
 
         public Task UpdateGameOptions()
@@ -42,13 +29,27 @@ namespace Conreign.Core.Gameplay
             throw new NotImplementedException();
         }
 
-        public async Task StartGame(StartGameCommand command)
+        public Task LaunchFleet()
         {
-            await _player.StartGame(command);
-            await WriteStateAsync();
+            throw new NotImplementedException();
         }
 
-        public Task LaunchFleet()
+        public Task UpdateOptions(PlayerOptionsData options)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UpdateGameOptions(GameOptionsData options)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task StartGame()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task LaunchFleet(FleetData fleet)
         {
             throw new NotImplementedException();
         }
@@ -58,9 +59,9 @@ namespace Conreign.Core.Gameplay
             throw new NotImplementedException();
         }
 
-        public Task Write(WriteCommand command)
+        public Task Write(string text)
         {
-            return _player.Write(command);
+            return _player.Write(text);
         }
 
         public Task<IRoomState> GetState()
@@ -68,19 +69,31 @@ namespace Conreign.Core.Gameplay
             throw new NotImplementedException();
         }
 
-        public Task Disconnect(DisconnectCommand command)
+        public async Task Connect(Guid connectionId)
         {
-            return _player.Disconnect(command);
+            await _observer.Connect(connectionId);
+            await _player.Connect(connectionId);
         }
 
-        public Task Notify(object @event)
+        public async Task Disconnect(Guid connectionId)
         {
-            if (@event == null)
+            await _observer.Disconnect(connectionId);
+            await _player.Disconnect(connectionId);
+        }
+
+        private void InitializeState()
+        {
+            string roomId;
+            State.UserId = this.GetPrimaryKey(out roomId);
+            State.RoomId = roomId;
+            if (State.Room == null)
             {
-                throw new ArgumentNullException(nameof(@event));
+                State.Room = GrainFactory.GetGrain<ILobbyGrain>(roomId);
             }
-            var envelope = new MessageEnvelope(@event, State.ConnectionIds.ToArray());
-            return _communicationStream.OnNextAsync(envelope);
+            foreach (var connectionId in State.ConnectionIds)
+            {
+                _observer.Connect(connectionId);
+            }
         }
     }
 }

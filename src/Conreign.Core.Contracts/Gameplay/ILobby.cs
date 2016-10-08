@@ -1,12 +1,13 @@
-﻿using System.Threading.Tasks;
-using Conreign.Core.Contracts.Gameplay.Commands;
+﻿using System;
+using System.Threading.Tasks;
+using Conreign.Core.Contracts.Gameplay.Data;
 
 namespace Conreign.Core.Contracts.Gameplay
 {
     public interface ILobby : IRoom
     {
-        Task UpdateGameSettings();
-        Task UpdatePlayerOptions(UpdatePlayerOptionsCommand command);
-        Task<IGame> StartGame(StartGameCommand command);
+        Task UpdateGameOptions(Guid userId, GameOptionsData options);
+        Task UpdatePlayerOptions(Guid userId, PlayerOptionsData options);
+        Task<IGame> StartGame(Guid userId);
     }
 }

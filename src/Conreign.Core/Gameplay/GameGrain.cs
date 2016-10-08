@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Gameplay;
-using Conreign.Core.Contracts.Gameplay.Commands;
+using Conreign.Core.Contracts.Gameplay.Data;
 using Orleans;
 
 namespace Conreign.Core.Gameplay
@@ -17,24 +19,17 @@ namespace Conreign.Core.Gameplay
             return base.OnActivateAsync();
         }
 
-        public Task Join(JoinCommand command)
+        public Task Initialize(GameData data)
         {
-            return _game.Join(command);
-        }
-
-        public Task Leave(LeaveCommand command)
-        {
-            return _game.Leave(command);
-        }
-
-        public Task Notify(NotifyCommand command)
-        {
-            return _game.Notify(command);
-        }
-
-        public Task NotifyEverybody(NotifyEverybodyCommand command)
-        {
-            throw new NotImplementedException();
+            State.Map = data.Map;
+            State.Hub.Members = data.HubMembers;
+            State.Players = data.Players.Select(p => new GamePlayerState
+            {
+                Color = p.Color,
+                Nickname = p.Nickname,
+                UserId = p.UserId
+            }).ToList();
+            return Task.CompletedTask;
         }
 
         public Task<IRoomState> GetState(Guid userId)
@@ -47,17 +42,34 @@ namespace Conreign.Core.Gameplay
             throw new System.NotImplementedException();
         }
 
+        public Task LaunchFleet(Guid userId, FleetData fleet)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task EndTurn()
         {
             throw new System.NotImplementedException();
         }
 
-        public Task Initialize(InitializeGameCommand command)
+        public Task Notify(object @event, ISet<Guid> users)
         {
-            State.Map = command.Map;
-            State.Hub.Members = command.HubMembers;
-            State.Players = command.Players;
-            return Task.CompletedTask;
+            return _game.Notify(@event, users);
+        }
+
+        public Task NotifyEverybody(object @event)
+        {
+            return _game.NotifyEverybody(@event);
+        }
+
+        public Task Join(Guid userId, IObserver observer)
+        {
+            return _game.Join(userId, observer);
+        }
+
+        public Task Leave(Guid userId)
+        {
+            return _game.Leave(userId);
         }
     }
 }

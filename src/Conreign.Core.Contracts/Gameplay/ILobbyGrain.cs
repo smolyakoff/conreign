@@ -1,4 +1,5 @@
-﻿using Orleans;
+﻿using Conreign.Core.Contracts.Communication;
+using Orleans;
 
 namespace Conreign.Core.Contracts.Gameplay
 {

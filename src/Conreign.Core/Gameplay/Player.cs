@@ -2,27 +2,21 @@ using System;
 using System.Threading.Tasks;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Gameplay;
-using Conreign.Core.Contracts.Gameplay.Commands;
+using Conreign.Core.Contracts.Gameplay.Data;
 using Conreign.Core.Contracts.Gameplay.Events;
-using Conreign.Core.Contracts.Presence;
 
 namespace Conreign.Core.Gameplay
 {
-    public class Player : IPlayer, IChannel
+    public class Player : IConnectablePlayer, IObserver
     {
         private readonly PlayerState _state;
-        private readonly IChannel _self;
-        private readonly IConnectable _connectable;
+        private readonly IObserver _self;
 
-        public Player(PlayerState state, IConnectable connectable, IChannel self = null)
+        public Player(PlayerState state, IObserver self = null)
         {
             if (state == null)
             {
                 throw new ArgumentNullException(nameof(state));
-            }
-            if (connectable == null)
-            {
-                throw new ArgumentNullException(nameof(connectable));
             }
             if (string.IsNullOrEmpty(state.RoomId))
             {
@@ -37,53 +31,31 @@ namespace Conreign.Core.Gameplay
                 throw new ArgumentException("Room should be initialized", nameof(state));
             }
             _state = state;
-            _connectable = connectable;
             _self = self ?? this;
         }
 
-        public async Task JoinRoom(JoinRoomCommand command)
+        public Task UpdateOptions(PlayerOptionsData options)
         {
-            var connectCommand = new ConnectCommand
-            {
-                ConnectionId = command.ConnectionId,
-                Connection = _self,
-            };
-            await _connectable.Connect(connectCommand);
-
-            _state.ConnectionIds.Add(command.ConnectionId);
-            var isFirstConnection = _state.ConnectionIds.Count == 1;
-            if (isFirstConnection)
-            {
-                var joinCommand = new JoinCommand
-                {
-                    Observer = _self,
-                    UserId = _state.UserId
-                };
-                await _state.Room.Join(joinCommand);
-            }
+            var lobby = EnsureIsInLobby();
+            return lobby.UpdatePlayerOptions(_state.UserId, options);
         }
 
-        public Task UpdateOptions(UpdatePlayerOptionsCommand command)
-        {
-            var lobby = EnsureBeingInLobby("It's not allowed to change name during the game");
-            return lobby.UpdatePlayerOptions(command);
-        }
-
-        public Task UpdateGameOptions()
+        public Task UpdateGameOptions(GameOptionsData options)
         {
             throw new NotImplementedException();
         }
 
-        public async Task StartGame(StartGameCommand command)
+        public async Task StartGame()
         {
-            var lobby = EnsureBeingInLobby("Should be in lobby to start the game");
-            var game = await lobby.StartGame(command);
+            var lobby = EnsureIsInLobby();
+            var game = await lobby.StartGame(_state.UserId);
             _state.Room = game;
         }
 
-        public Task LaunchFleet()
+        public Task LaunchFleet(FleetData fleet)
         {
-            throw new NotImplementedException();
+            var game = EnsureIsInGame();
+            return game.LaunchFleet(_state.UserId, fleet);
         }
 
         public Task EndTurn()
@@ -91,15 +63,14 @@ namespace Conreign.Core.Gameplay
             throw new NotImplementedException();
         }
 
-        public Task Write(WriteCommand command)
+        public Task Write(string text)
         {
-            var @event = new ChatMessageReceivedEvent
+            var @event = new ChatMessageReceived
             {
-                SenderId = command.UserId,
-                Text = command.Text
+                SenderId = _state.UserId,
+                Text = text
             };
-            var notifyCommand = new NotifyEverybodyCommand(@event);
-            return _state.Room.NotifyEverybody(notifyCommand);
+            return _state.Room.NotifyEverybody(@event);
         }
 
         public Task<IRoomState> GetState()
@@ -107,24 +78,48 @@ namespace Conreign.Core.Gameplay
             return _state.Room.GetState(_state.UserId);
         }
 
-        public Task Disconnect(DisconnectCommand command)
-        {
-            throw new NotImplementedException();
-        }
-
         public Task Notify(object @event)
         {
             return this == _self ? Task.CompletedTask : _self.Notify(@event);
         }
 
-        private ILobby EnsureBeingInLobby(string message)
+        public async Task Connect(Guid connectionId)
+        {
+            _state.ConnectionIds.Add(connectionId);
+            var isFirstConnection = _state.ConnectionIds.Count == 1;
+            if (isFirstConnection)
+            {
+                await _state.Room.Join(_state.UserId, _self);
+            }
+        }
+
+        public async Task Disconnect(Guid connectionId)
+        {
+            _state.ConnectionIds.Remove(connectionId);
+            if (_state.ConnectionIds.Count == 0)
+            {
+                await _state.Room.Leave(_state.UserId);
+            }
+        }
+
+        private ILobby EnsureIsInLobby()
         {
             var lobby = _state.Room as ILobby;
             if (lobby == null)
             {
-                throw new InvalidOperationException(message);
+                throw new InvalidOperationException("Player should be in lobby to perform this action.");
             }
             return lobby;
+        }
+
+        private IGame EnsureIsInGame()
+        {
+            var game = _state.Room as IGame;
+            if (game == null)
+            {
+                throw new InvalidOperationException("Player should be in game to perform this action.");
+            }
+            return game;
         }
     }
 }

@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Conreign.Core.Communication;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Gameplay;
-using Conreign.Core.Contracts.Gameplay.Commands;
+using Conreign.Core.Contracts.Gameplay.Data;
+
 
 namespace Conreign.Core.Gameplay
 {
@@ -28,24 +30,24 @@ namespace Conreign.Core.Gameplay
             _gameFactory = gameFactory;
         }
 
-        public Task Join(JoinCommand command)
+        public Task Notify(object @event, ISet<Guid> users)
         {
-            return _hub.Join(command);
+            return _hub.Notify(@event, users);
         }
 
-        public Task Leave(LeaveCommand command)
+        public Task NotifyEverybody(object @event)
         {
-            return _hub.Leave(command);
+            return _hub.NotifyEverybody(@event);
         }
 
-        public Task Notify(NotifyCommand command)
+        public Task Join(Guid userId, IObserver observer)
         {
-            return _hub.Notify(command);
+            return _hub.Join(userId, observer);
         }
 
-        public Task NotifyEverybody(NotifyEverybodyCommand command)
+        public Task Leave(Guid userId)
         {
-            return _hub.NotifyEverybody(command);
+            return _hub.Leave(userId);
         }
 
         public Task<IRoomState> GetState(Guid userId)
@@ -53,19 +55,19 @@ namespace Conreign.Core.Gameplay
             throw new NotImplementedException();
         }
 
-        public Task UpdateGameSettings()
+        public Task UpdateGameOptions(Guid userId, GameOptionsData options)
         {
             throw new NotImplementedException();
         }
 
-        public Task UpdatePlayerOptions(UpdatePlayerOptionsCommand command)
+        public Task UpdatePlayerOptions(Guid userId, PlayerOptionsData options)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IGame> StartGame(StartGameCommand command)
+        public Task<IGame> StartGame(Guid userId)
         {
-            return _gameFactory.CreateGame();
+            throw new NotImplementedException();
         }
     }
 }

@@ -6,7 +6,7 @@ namespace Conreign.Core.Gameplay
 {
     public class PlayerState
     {
-        public HashSet<string> ConnectionIds { get; } = new HashSet<string>();
+        public HashSet<Guid> ConnectionIds { get; } = new HashSet<Guid>();
         public Guid UserId { get; set; }
         public string RoomId { get; set; }
         public IRoom Room { get; set; }

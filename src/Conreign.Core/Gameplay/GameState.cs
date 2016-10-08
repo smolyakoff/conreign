@@ -7,9 +7,10 @@ namespace Conreign.Core.Gameplay
 {
     public class GameState
     {
+        public string RoomId { get; set; }
         public int Turn { get; set; }
-        public MapState Map { get; set; } = new MapState();
-        public List<PlayerOptionsState> Players { get; set; } = new List<PlayerOptionsState>();
+        public MapData Map { get; set; } = new MapData();
+        public List<GamePlayerState> Players { get; set; } = new List<GamePlayerState>();
         public HubState Hub { get; set; } = new HubState();
         public Dictionary<Guid, GameStatisticsState> Statistics { get; set; } = new Dictionary<Guid, GameStatisticsState>();
     }

@@ -29,7 +29,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Host", "Host", "{2397B05B-F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Core.Client", "src\Conreign.Core.Client\Conreign.Core.Client.csproj", "{27E2FBDD-0197-44A8-98F5-8C45DE87F964}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Experiments", "src\Conreign.Experiments\Conreign.Experiments\Conreign.Experiments.csproj", "{3CEB03BC-7199-4C73-A486-6984CB4A42E5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Experiments", "src\Conreign.Experiments\Conreign.Experiments.csproj", "{D2AD8837-45D2-4DA4-A1E2-6D4F6651B5DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,10 +61,10 @@ Global
 		{27E2FBDD-0197-44A8-98F5-8C45DE87F964}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{27E2FBDD-0197-44A8-98F5-8C45DE87F964}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27E2FBDD-0197-44A8-98F5-8C45DE87F964}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3CEB03BC-7199-4C73-A486-6984CB4A42E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3CEB03BC-7199-4C73-A486-6984CB4A42E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3CEB03BC-7199-4C73-A486-6984CB4A42E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3CEB03BC-7199-4C73-A486-6984CB4A42E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2AD8837-45D2-4DA4-A1E2-6D4F6651B5DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2AD8837-45D2-4DA4-A1E2-6D4F6651B5DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2AD8837-45D2-4DA4-A1E2-6D4F6651B5DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2AD8837-45D2-4DA4-A1E2-6D4F6651B5DA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -76,7 +76,7 @@ Global
 		{3B96DD78-2990-4EC2-BD1D-55D1A36884A3} = {2397B05B-F57A-4F01-9531-43496876623A}
 		{BA953785-1EFC-461E-9227-AD3E4C07EE7C} = {420E0885-10E8-44C7-899B-FF39004DEADE}
 		{27E2FBDD-0197-44A8-98F5-8C45DE87F964} = {420E0885-10E8-44C7-899B-FF39004DEADE}
-		{3CEB03BC-7199-4C73-A486-6984CB4A42E5} = {420E0885-10E8-44C7-899B-FF39004DEADE}
+		{D2AD8837-45D2-4DA4-A1E2-6D4F6651B5DA} = {420E0885-10E8-44C7-899B-FF39004DEADE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8

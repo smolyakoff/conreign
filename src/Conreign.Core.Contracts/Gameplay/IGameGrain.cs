@@ -1,11 +1,11 @@
 ﻿using System.Threading.Tasks;
-using Conreign.Core.Contracts.Gameplay.Commands;
+using Conreign.Core.Contracts.Gameplay.Data;
 using Orleans;
 
 namespace Conreign.Core.Contracts.Gameplay
 {
     public interface IGameGrain : IGrainWithStringKey, IGame
     {
-        Task Initialize(InitializeGameCommand command);
+        Task Initialize(GameData data);
     }
 }

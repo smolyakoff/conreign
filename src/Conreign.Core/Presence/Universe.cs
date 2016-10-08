@@ -4,7 +4,7 @@ using Conreign.Core.Contracts.Presence;
 
 namespace Conreign.Core.Presence
 {
-    public class Universe : IUniverse, IConnectable
+    public class Universe : IUniverse, IConnectionTracker
     {
         private readonly UniverseState _state;
 
@@ -17,22 +17,30 @@ namespace Conreign.Core.Presence
             _state = state;
         }
 
-        public async Task Disconnect(DisconnectCommand command)
+        public async Task Disconnect(Guid connectionId)
         {
-            if (!_state.Connections.ContainsKey(command.ConnectionId))
+            if (!_state.Connections.ContainsKey(connectionId))
             {
                 return;
             }
-            var connection = _state.Connections[command.ConnectionId];
-            await connection.Disconnect(command);
-            _state.Connections.Remove(command.ConnectionId);
+            var connection = _state.Connections[connectionId];
+            await connection.Disconnect(connectionId);
+            _state.Connections.Remove(connectionId);
         }
 
-        public Task Connect(ConnectCommand command)
+        public async Task Track(Guid connectionId, IConnectable connectable)
         {
-            var connection = command.Connection;
-            _state.Connections[command.ConnectionId] = connection;
-            return Task.CompletedTask;
+            if (_state.Connections.ContainsKey(connectionId))
+            {
+                var previousConnection = _state.Connections[connectionId];
+                if (previousConnection != connectable)
+                {
+                    await previousConnection.Disconnect(connectionId);
+                }
+                return;
+            }
+            await connectable.Connect(connectionId);
+            _state.Connections[connectionId] = connectable;
         }
     }
 }

@@ -6,4 +6,9 @@ namespace Conreign.Core.Contracts.Communication
     {
         Task Notify(object @event);
     }
+
+    public interface IObserver<T>
+    {
+        
+    }
 }

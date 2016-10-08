@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Conreign.Core.Communication;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Gameplay;
+using Conreign.Core.Contracts.Gameplay.Data;
 
 namespace Conreign.Core.Gameplay
 {
@@ -21,32 +23,13 @@ namespace Conreign.Core.Gameplay
             _state = state;
         }
 
-        public Task Join(JoinCommand command)
-        {
-            return _hub.Join(command);
-        }
-
-        public Task Leave(LeaveCommand command)
-        {
-            return _hub.Leave(command);
-        }
-
-        public Task Notify(NotifyCommand command)
-        {
-            return _hub.Notify(command);
-        }
-
-        public Task NotifyEverybody(NotifyEverybodyCommand command)
-        {
-            return _hub.NotifyEverybody(command);
-        }
-
         public Task<IRoomState> GetState(Guid userId)
         {
             throw new NotImplementedException();
         }
 
-        public Task LaunchFleet()
+
+        public Task LaunchFleet(Guid userId, FleetData fleet)
         {
             throw new NotImplementedException();
         }
@@ -59,6 +42,26 @@ namespace Conreign.Core.Gameplay
         internal Task CalculateTurn()
         {
             return Task.CompletedTask;
+        }
+
+        public Task Notify(object @event, ISet<Guid> users)
+        {
+            return _hub.Notify(@event, users);
+        }
+
+        public Task NotifyEverybody(object @event)
+        {
+            return _hub.NotifyEverybody(@event);
+        }
+
+        public Task Join(Guid userId, IObserver observer)
+        {
+            return _hub.Join(userId, observer);
+        }
+
+        public Task Leave(Guid userId)
+        {
+            return _hub.Leave(userId);
         }
     }
 }
