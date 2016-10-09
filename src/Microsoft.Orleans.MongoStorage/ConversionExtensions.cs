@@ -1,6 +1,7 @@
 ﻿using System;
 using Orleans;
 using Orleans.Runtime;
+using Orleans.Serialization;
 
 namespace Microsoft.Orleans.Storage
 {
@@ -11,8 +12,8 @@ namespace Microsoft.Orleans.Storage
         {
             return new MongoGrain
             {
-                Id = Conventions.PrimaryKeyForGrain(serviceId, reference),
-                Data = grainState.State,
+                Id = Keys.PrimaryKeyForGrain(serviceId, reference),
+                Data = SerializationManager.SerializeToByteArray(grainState.State),
                 Meta = grainState.ToGrainMeta(reference, grainType, serviceId)
             };
         }
@@ -24,7 +25,7 @@ namespace Microsoft.Orleans.Storage
             {
                 ETag = state.ETag,
                 GrainId = reference.ToKeyString(),
-                GrainStateType = state.GetType().FullName,
+                GrainStateType = state.State.GetType().FullName,
                 GrainType = grainType,
                 ServiceId = serviceId.ToString()
             };

@@ -6,7 +6,7 @@ namespace Conreign.Core.Presence
 {
     public class HubState
     {
-        public Dictionary<Guid, IClientObserver> Members { get; set; } = new Dictionary<Guid, IClientObserver>();
+        public Dictionary<Guid, IClientPublisher> Members { get; set; } = new Dictionary<Guid, IClientPublisher>();
         public List<Guid> JoinOrder { get; set; } = new List<Guid>();
         public List<EventState> Events { get; set; } = new List<EventState>();
     }

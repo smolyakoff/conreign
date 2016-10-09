@@ -3,3 +3,4 @@ Microsoft.Orleans.OrleansCodeGenerator
 Microsoft.Orleans.OrleansSQLUtils
 Microsoft.Orleans.OrleansProviders
 Microsoft.Extensions.DependencyInjection
+MongoDB.Driver

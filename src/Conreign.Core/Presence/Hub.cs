@@ -21,9 +21,9 @@ namespace Conreign.Core.Presence
             _state = state;
         }
 
-        public async Task Join(Guid userId, IClientObserver observer)
+        public async Task Join(Guid userId, IClientPublisher publisher)
         {
-            var events = WithLeaderCheck(() => JoinInternal(userId, observer));
+            var events = WithLeaderCheck(() => JoinInternal(userId, publisher));
             await this.NotifyEverybody(events);
         }
 
@@ -93,9 +93,9 @@ namespace Conreign.Core.Presence
             }
         }
 
-        private IEnumerable<IClientEvent> JoinInternal(Guid userId, IClientObserver observer)
+        private IEnumerable<IClientEvent> JoinInternal(Guid userId, IClientPublisher publisher)
         {
-            _state.Members[userId] = observer;
+            _state.Members[userId] = publisher;
             if (!_state.JoinOrder.Contains(userId))
             {
                 _state.JoinOrder.Add(userId);
@@ -132,11 +132,11 @@ namespace Conreign.Core.Presence
                 yield return @event;
             }
             var currentLeader = LeaderUserId;
-            if (previousLeader == currentLeader || currentLeader == null)
+            if (previousLeader == currentLeader)
             {
                 yield break;
             }
-            var leaderChanged = new LeaderChanged { UserId = currentLeader.Value };
+            var leaderChanged = new LeaderChanged { UserId = currentLeader };
             yield return leaderChanged;
         }
     }

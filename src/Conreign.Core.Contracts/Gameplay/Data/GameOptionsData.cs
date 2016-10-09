@@ -6,14 +6,14 @@ namespace Conreign.Core.Contracts.Gameplay.Data
     {
         public GameOptionsData()
         {
-            MapHeight = 8;
-            MapWidth = 8;
-            NeutralPlanets = 10;
+            MapHeight = Defaults.MapHeight;
+            MapWidth = Defaults.MapWidth;
+            NeutralPlanetsCount = Defaults.NeutralPlayersCount;
         }
 
         public int MapWidth { get; set; }
         public int MapHeight { get; set; }
-        public int NeutralPlanets { get; set; }
+        public int NeutralPlanetsCount { get; set; }
 
         public bool Equals(GameOptionsData other)
         {
@@ -25,7 +25,7 @@ namespace Conreign.Core.Contracts.Gameplay.Data
             {
                 return true;
             }
-            return MapWidth == other.MapWidth && MapHeight == other.MapHeight && NeutralPlanets == other.NeutralPlanets;
+            return MapWidth == other.MapWidth && MapHeight == other.MapHeight && NeutralPlanetsCount == other.NeutralPlanetsCount;
         }
 
         public override bool Equals(object obj)
@@ -51,7 +51,7 @@ namespace Conreign.Core.Contracts.Gameplay.Data
             {
                 var hashCode = MapWidth;
                 hashCode = (hashCode*397) ^ MapHeight;
-                hashCode = (hashCode*397) ^ NeutralPlanets;
+                hashCode = (hashCode*397) ^ NeutralPlanetsCount;
                 return hashCode;
             }
         }

@@ -7,6 +7,11 @@ namespace Conreign.Core.Contracts.Gameplay.Events
     [Serializable]
     public class PlayerJoined : IClientEvent
     {
-        public PlayerData Player { get; set; }
+        public PlayerJoined(PlayerData player)
+        {
+            Player = player;
+        }
+
+        public PlayerData Player { get; }
     }
 }

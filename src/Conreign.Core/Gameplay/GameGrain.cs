@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Gameplay;
@@ -19,22 +18,17 @@ namespace Conreign.Core.Gameplay
             return base.OnActivateAsync();
         }
 
-        public Task Initialize(GameData data)
+        public Task Initialize(InitialGameData data)
         {
             State.Map = data.Map;
             State.Hub.Members = data.HubMembers;
-            State.Players = data.Players.Select(p => new GamePlayerState
-            {
-                Color = p.Color,
-                Nickname = p.Nickname,
-                UserId = p.UserId
-            }).ToList();
+            State.Players = data.Players;
             return Task.CompletedTask;
         }
 
         public Task<IRoomData> GetState(Guid userId)
         {
-            throw new System.NotImplementedException();
+            return _game.GetState(userId);
         }
 
         public Task LaunchFleet()
@@ -67,9 +61,9 @@ namespace Conreign.Core.Gameplay
             return _game.NotifyEverybodyExcept(users, events);
         }
 
-        public Task Join(Guid userId, IClientObserver observer)
+        public Task Join(Guid userId, IClientPublisher publisher)
         {
-            return _game.Join(userId, observer);
+            return _game.Join(userId, publisher);
         }
 
         public Task Leave(Guid userId)

@@ -8,38 +8,21 @@ using Orleans;
 
 namespace Conreign.Core.Gameplay
 {
-    public class LobbyGrain : Grain<LobbyState>, ILobbyGrain
+    public class LobbyGrain : Grain<LobbyState>, ILobbyGrain, IGameFactory
     {
         private Lobby _lobby;
 
         public override async Task OnActivateAsync()
         {
-            _lobby = new Lobby(State, this.AsReference<ILobbyGrain>());
-            await _lobby.RegenerateMap();
+            await InitializeState();
+            var bus = GrainFactory.GetGrain<IBusGrain>(State.RoomId);
+            _lobby = new Lobby(State, this, bus);
             await base.OnActivateAsync();
         }
 
         public Task<IRoomData> GetState(Guid userId)
         {
             return _lobby.GetState(userId);
-        }
-
-        public Task UpdateGameOptions()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public async Task<IGame> CreateGame()
-        {
-            var game = GrainFactory.GetGrain<IGameGrain>(this.GetPrimaryKeyString());
-            var command = new GameData(
-                State.Map,
-                State.Players,
-                State.Hub.Members
-            );
-            await game.Initialize(command);
-            DeactivateOnIdle();
-            return game;
         }
 
         public Task Notify(ISet<Guid> users, params IClientEvent[] @event)
@@ -57,9 +40,9 @@ namespace Conreign.Core.Gameplay
             return _lobby.NotifyEverybodyExcept(users, events);
         }
 
-        public Task Join(Guid userId, IClientObserver observer)
+        public Task Join(Guid userId, IClientPublisher publisher)
         {
-            return _lobby.Join(userId, observer);
+            return _lobby.Join(userId, publisher);
         }
 
         public Task Leave(Guid userId)
@@ -69,17 +52,42 @@ namespace Conreign.Core.Gameplay
 
         public Task UpdateGameOptions(Guid userId, GameOptionsData options)
         {
-            throw new NotImplementedException();
+            return _lobby.UpdateGameOptions(userId, options);
         }
 
         public Task UpdatePlayerOptions(Guid userId, PlayerOptionsData options)
         {
+            return _lobby.UpdatePlayerOptions(userId, options);
+        }
+
+        public Task GenerateMap(Guid userId)
+        {
             throw new NotImplementedException();
         }
 
-        public Task<IGame> StartGame(Guid userId)
+        public async Task<IGame> StartGame(Guid userId)
         {
-            throw new NotImplementedException();
+            var game = await _lobby.StartGame(userId);
+            // DeactivateOnIdle();
+            return game;
+        }
+
+        private Task InitializeState()
+        {
+            State.RoomId = this.GetPrimaryKeyString();
+            return Task.CompletedTask;
+        }
+
+        public async Task<IGame> CreateGame()
+        {
+            var game = GrainFactory.GetGrain<IGameGrain>(this.GetPrimaryKeyString());
+            var command = new InitialGameData(
+                State.MapEditor.Map,
+                State.Players,
+                State.Hub.Members
+            );
+            await game.Initialize(command);
+            return game;
         }
     }
 }

@@ -8,7 +8,7 @@ using Orleans.Streams;
 
 namespace Conreign.Core.Communication
 {
-    public class ClientObserverGrain : Grain, IClientObserverGrain
+    public class ClientPublisherGrain : Grain, IClientPublisherGrain
     {
         private IStreamProvider _streamProvider;
         private IDictionary<Guid, IAsyncStream<IClientEvent>> _streams;

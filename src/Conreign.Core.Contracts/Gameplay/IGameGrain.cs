@@ -6,6 +6,6 @@ namespace Conreign.Core.Contracts.Gameplay
 {
     public interface IGameGrain : IGrainWithStringKey, IGame
     {
-        Task Initialize(GameData data);
+        Task Initialize(InitialGameData data);
     }
 }

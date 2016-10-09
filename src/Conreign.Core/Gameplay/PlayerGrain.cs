@@ -1,8 +1,10 @@
 using System;
 using System.Threading.Tasks;
+using Conreign.Core.Communication;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Gameplay;
 using Conreign.Core.Contracts.Gameplay.Data;
+using Conreign.Core.Contracts.Gameplay.Events;
 using Orleans;
 
 namespace Conreign.Core.Gameplay
@@ -10,18 +12,22 @@ namespace Conreign.Core.Gameplay
     public class PlayerGrain : Grain<PlayerState>, IPlayerGrain
     {
         private Player _player;
-        private IClientObserverGrain _observer;
+        private IClientPublisherGrain _publisher;
+        private IBus _roomBus;
 
-        public override Task OnActivateAsync()
+        public override async Task OnActivateAsync()
         {
-            string roomId;
-            var userId = this.GetPrimaryKey(out roomId);
-            _observer = GrainFactory.GetGrain<IClientObserverGrain>(userId, roomId, null);
-            InitializeState();
-            _player = new Player(
-                State, 
-                _observer);
-            return base.OnActivateAsync();
+            InitializeStateAndPublisher();
+            _player = new Player(State, _publisher);
+            _roomBus = GrainFactory.GetGrain<IBusGrain>(State.RoomId).AsBus();
+            await _roomBus.Subscribe(this.AsReference<IPlayerGrain>());
+            await base.OnActivateAsync();
+        }
+
+        public override async Task OnDeactivateAsync()
+        {
+            await _roomBus.Unsubscribe(this.AsReference<IPlayerGrain>());
+            await base.OnDeactivateAsync();
         }
 
         public Task UpdateOptions(PlayerOptionsData options)
@@ -34,9 +40,10 @@ namespace Conreign.Core.Gameplay
             return _player.UpdateGameOptions(options);
         }
 
-        public Task StartGame()
+        public async Task StartGame()
         {
-            return _player.StartGame();
+            await _player.StartGame();
+            await WriteStateAsync();
         }
 
         public Task LaunchFleet(FleetData fleet)
@@ -61,17 +68,21 @@ namespace Conreign.Core.Gameplay
 
         public async Task Connect(Guid connectionId)
         {
-            await _observer.Connect(connectionId);
+            await _publisher.Connect(connectionId);
             await _player.Connect(connectionId);
         }
 
         public async Task Disconnect(Guid connectionId)
         {
-            await _observer.Disconnect(connectionId);
+            await _publisher.Disconnect(connectionId);
             await _player.Disconnect(connectionId);
+            if (State.ConnectionIds.Count == 0)
+            {
+                DeactivateOnIdle();
+            }
         }
 
-        private void InitializeState()
+        private void InitializeStateAndPublisher()
         {
             string roomId;
             State.UserId = this.GetPrimaryKey(out roomId);
@@ -80,10 +91,16 @@ namespace Conreign.Core.Gameplay
             {
                 State.Room = GrainFactory.GetGrain<ILobbyGrain>(roomId);
             }
+            _publisher = GrainFactory.GetGrain<IClientPublisherGrain>(State.UserId, roomId, null);
             foreach (var connectionId in State.ConnectionIds)
             {
-                _observer.Connect(connectionId);
+                _publisher.Connect(connectionId);
             }
+        }
+
+        public Task Handle(GameStarted.System @event)
+        {
+            return _player.Handle(@event);
         }
     }
 }

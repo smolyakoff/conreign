@@ -13,7 +13,7 @@ namespace Conreign.Core.Contracts.Gameplay.Data
         public List<PlayerData> Players { get; set; } = new List<PlayerData>();
         public Dictionary<Guid, PresenceStatus> PlayerStatuses { get; set; } = new Dictionary<Guid, PresenceStatus>();
         public MapData Map { get; set; } = new MapData();
-        public Guid LeaderUserId { get; set; }
-        public GameOptionsData GameOptions { get; set; } = new GameOptionsData();
+        public Guid? LeaderUserId { get; set; }
+        public int NeutralPlanetsCount { get; set; } = Defaults.NeutralPlayersCount;
     }
 }

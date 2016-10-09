@@ -5,13 +5,14 @@ nuget FAKE
 nuget FAKE.SQL.X64
 nuget FSharp.Data
 
+nuget xunit
+
 nuget System.Reactive.Core
 nuget System.Reactive.Linq
+nuget Polly
+nuget FluentValidation
 
 nuget Serilog.Sinks.ColoredConsole
-nuget Polly
-nuget MediatR
-
 nuget MongoDB.Driver
 nuget Microsoft.Orleans.OrleansCodeGenerator.Build
 nuget Microsoft.Orleans.OrleansRuntime
@@ -21,6 +22,7 @@ nuget Microsoft.Orleans.Client
 nuget Microsoft.Extensions.DependencyInjection 1.0.0-rc1-final
 nuget Microsoft.Extensions.DependencyInjection.Abstractions 1.0.0-rc1-final
 
+nuget MediatR
 nuget Autofac.Owin
 nuget Autofac.SignalR
 nuget Microsoft.Owin.Cors

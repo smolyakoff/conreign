@@ -1,5 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Conreign.Core.Client.Exceptions;
 using Conreign.Core.Contracts.Communication;
@@ -17,6 +21,7 @@ namespace Conreign.Core.Client
         private StreamSubscriptionHandle<IClientEvent> _stream;
         private bool _isDisposed;
         private readonly ISubject<IClientEvent> _subject;
+        private readonly TimeSpan _eventWaitTimeout = TimeSpan.FromSeconds(10);
 
         internal static async Task<GameConnection> Initialize(IGrainFactory grainFactory, Guid connectionId)
         {
@@ -44,6 +49,8 @@ namespace Conreign.Core.Client
 
         public Guid Id { get; }
 
+        public IObservable<object> Events => _subject;
+
         public IUser Login()
         {
             return Authenticate(null);
@@ -57,7 +64,19 @@ namespace Conreign.Core.Client
             return _factory.GetGrain<IUserGrain>(userId);
         }
 
-        public IObservable<object> Events => _subject;
+        public async Task<T> WaitFor<T>() where T : IClientEvent
+        {
+            var tasks = new[]
+            {
+                Events.OfType<T>().FirstAsync().ToTask(),
+                Task.Run(new Func<Task<T>>(async () =>
+                {
+                    await Task.Delay(_eventWaitTimeout);
+                    throw new TimeoutException($"Timeouted waiting for event: {typeof(T).Name}");
+                })),
+            };
+            return await await Task.WhenAny(tasks);
+        }
 
         private void PrepareContext(Guid? userId)
         {

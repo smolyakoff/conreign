@@ -12,6 +12,6 @@ namespace Conreign.Core.Contracts.Gameplay.Data
         List<PlayerData> Players { get; }
         Dictionary<Guid, PresenceStatus> PlayerStatuses { get; }
         MapData Map { get; }
-        Guid LeaderUserId { get; set; }
+        Guid? LeaderUserId { get; set; }
     }
 }

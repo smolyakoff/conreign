@@ -2,7 +2,7 @@
 
 namespace Conreign.Core.Contracts.Communication
 {
-    public interface IObserver<in T>
+    public interface IPublisher<in T> where T : class
     {
         Task Notify(params T[] events);
     }

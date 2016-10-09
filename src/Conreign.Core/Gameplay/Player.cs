@@ -7,20 +7,20 @@ using Conreign.Core.Contracts.Gameplay.Events;
 
 namespace Conreign.Core.Gameplay
 {
-    public class Player : IConnectablePlayer
+    public class Player : IConnectablePlayer, IEventHandler<GameStarted.System>
     {
         private readonly PlayerState _state;
-        private readonly IClientObserver _observer;
+        private readonly IClientPublisher _clientPublisher;
 
-        public Player(PlayerState state, IClientObserver observer)
+        public Player(PlayerState state, IClientPublisher clientPublisher)
         {
             if (state == null)
             {
                 throw new ArgumentNullException(nameof(state));
             }
-            if (observer == null)
+            if (clientPublisher == null)
             {
-                throw new ArgumentNullException(nameof(observer));
+                throw new ArgumentNullException(nameof(clientPublisher));
             }
             if (string.IsNullOrEmpty(state.RoomId))
             {
@@ -35,7 +35,7 @@ namespace Conreign.Core.Gameplay
                 throw new ArgumentException("Room should be initialized", nameof(state));
             }
             _state = state;
-            _observer = observer;
+            _clientPublisher = clientPublisher;
         }
 
         public Task UpdateOptions(PlayerOptionsData options)
@@ -90,7 +90,7 @@ namespace Conreign.Core.Gameplay
             var isFirstConnection = _state.ConnectionIds.Count == 1;
             if (isFirstConnection)
             {
-                await _state.Room.Join(_state.UserId, _observer);
+                await _state.Room.Join(_state.UserId, _clientPublisher);
             }
         }
 
@@ -101,6 +101,15 @@ namespace Conreign.Core.Gameplay
             {
                 await _state.Room.Leave(_state.UserId);
             }
+        }
+
+        public Task Handle(GameStarted.System @event)
+        {
+            if (_state.Room is ILobby)
+            {
+                _state.Room = @event.Game;
+            }
+            return Task.CompletedTask;
         }
 
         private ILobby EnsureIsInLobby()

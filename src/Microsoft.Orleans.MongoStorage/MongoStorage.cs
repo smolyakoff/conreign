@@ -1,15 +1,21 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Orleans.Storage.Conventions;
+using MongoDB.Bson.Serialization.Conventions;
+using MongoDB.Bson.Serialization.Options;
 using MongoDB.Driver;
 using Orleans;
 using Orleans.Providers;
 using Orleans.Runtime;
+using Orleans.Serialization;
 using Orleans.Storage;
 
 namespace Microsoft.Orleans.Storage
 {
     public class MongoStorage : IStorageProvider
     {
+        private static bool _isInitialized;
+
         private MongoClient _client;
 
         private IMongoDatabase _database;
@@ -17,12 +23,27 @@ namespace Microsoft.Orleans.Storage
         private MongoStorageOptions _options;
         private Guid _serviceId;
 
+        public static void EnsureInitialized()
+        {
+            if (_isInitialized)
+            {
+                return;
+            }
+            _isInitialized = true;
+            var conventions = new ConventionPack
+            {
+                new DictionaryRepresentationConvention(DictionaryRepresentation.ArrayOfArrays)
+            };
+            ConventionRegistry.Register("Orleans", conventions, x => true);
+        }
+
         public string Name { get; private set; }
 
         public Logger Log { get; private set; }
 
         public Task Init(string name, IProviderRuntime providerRuntime, IProviderConfiguration config)
         {
+            EnsureInitialized();
             Name = name;
             _serviceId = providerRuntime.ServiceId;
             Log = providerRuntime.GetLogger($"Storage.MongoStorage.{_serviceId}");
@@ -51,9 +72,9 @@ namespace Microsoft.Orleans.Storage
             var meta = grainState.ToGrainMeta(grainReference, grainType, _serviceId);
             try
             {
-                var collectionName = Conventions.CollectionNameForGrain(grainType, _options.CollectionNamePrefix);
+                var collectionName = Keys.CollectionNameForGrain(grainType, _options.CollectionNamePrefix);
                 var collection = _database.GetCollection<MongoGrain>(collectionName);
-                var id = Conventions.PrimaryKeyForGrain(_serviceId, grainReference);
+                var id = Keys.PrimaryKeyForGrain(_serviceId, grainReference);
                 LogVerbose3($"Reading data: {meta}", MongoStorageCode.TraceReading);
                 var doc = await collection.Find(x => x.Id == id).FirstOrDefaultAsync();
                 if (doc == null)
@@ -62,7 +83,7 @@ namespace Microsoft.Orleans.Storage
                     return;
                 }
                 grainState.ETag = doc.Meta.ETag;
-                grainState.State = doc.Data;
+                grainState.State = SerializationManager.DeserializeFromByteArray<object>(doc.Data);
                 LogVerbose3($"Read data: {meta}", MongoStorageCode.TraceRead);
             }
             catch (Exception ex)
@@ -78,23 +99,23 @@ namespace Microsoft.Orleans.Storage
             var meta = grainState.ToGrainMeta(grainReference, grainType, _serviceId);
             try
             {
-                var collectionName = Conventions.CollectionNameForGrain(grainType, _options.CollectionNamePrefix);
+                var collectionName = Keys.CollectionNameForGrain(grainType, _options.CollectionNamePrefix);
                 var collection = _database.GetCollection<MongoGrain>(collectionName);
                 LogVerbose3($"Writing data: {meta}", MongoStorageCode.TraceWriting);
                 if (string.IsNullOrEmpty(grainState.ETag))
                 {
                     var grain = grainState.ToGrain(grainReference, grainType, _serviceId);
-                    grain.Meta.Timestamp = DateTime.UtcNow;
+                    grain.Meta.Timestamp = DateTime.UtcNow.Ticks;
                     await collection.InsertOneAsync(grain);
                     grainState.ETag = grain.Meta.ETag;
                 }
                 else
                 {
-                    var id = Conventions.PrimaryKeyForGrain(_serviceId, grainReference);
+                    var id = Keys.PrimaryKeyForGrain(_serviceId, grainReference);
                     // Update data and generate new timestamp
                     var update = Builders<MongoGrain>.Update
-                        .Set(x => x.Data, grainState.State)
-                        .CurrentDate(x => x.Meta.Timestamp, UpdateDefinitionCurrentDateType.Date);
+                        .Set(x => x.Data, SerializationManager.SerializeToByteArray(grainState.State))
+                        .Set(x => x.Meta.Timestamp, DateTime.UtcNow.Ticks);
                     var options = new FindOneAndUpdateOptions<MongoGrain>
                     {
                         IsUpsert = false,
@@ -128,12 +149,11 @@ namespace Microsoft.Orleans.Storage
             var meta = grainState.ToGrainMeta(grainReference, grainType, _serviceId);
             try
             {
-                var collectionName = Conventions.CollectionNameForGrain(grainType, _options.CollectionNamePrefix);
+                var collectionName = Keys.CollectionNameForGrain(grainType, _options.CollectionNamePrefix);
                 var collection = _database.GetCollection<MongoGrain>(collectionName);
                 LogVerbose3($"Deleting data: {meta}", MongoStorageCode.TraceDeleting);
-                var id = Conventions.PrimaryKeyForGrain(_serviceId, grainReference);
+                var id = Keys.PrimaryKeyForGrain(_serviceId, grainReference);
                 await collection.DeleteOneAsync(x => x.Id == id);
-                grainState.State = null;
                 grainState.ETag = null;
                 LogVerbose3($"Deleted data: {meta}", MongoStorageCode.TraceDelete);
             }

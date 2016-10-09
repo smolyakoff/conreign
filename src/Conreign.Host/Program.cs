@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Net;
+using Conreign.Core.Communication;
 using Conreign.Core.Gameplay;
+using MongoDB.Bson.Serialization;
 using Orleans.Runtime.Host;
 
 namespace Conreign.Host
@@ -34,6 +36,7 @@ namespace Conreign.Host
             var started = _host.StartOrleansSilo();
             if (started)
             {
+                Initialize();
                 return;
             }
             var message = $"Failed to start Orleans silo '{_host.Name}' as a {_host.Type}.";
@@ -49,6 +52,11 @@ namespace Conreign.Host
             _host.Dispose();
             GC.SuppressFinalize(_host);
             _host = null;
+        }
+
+        private static void Initialize()
+        {
+            BsonClassMap.RegisterClassMap<BusState>();
         }
     }
 }

@@ -8,12 +8,12 @@ namespace Microsoft.Orleans.Storage
     {
         public MongoGrainMeta()
         {
-            Timestamp = DateTime.UtcNow;
+            Timestamp = DateTime.UtcNow.Ticks;
         }
 
         [BsonRequired]
         [BsonElement("ts")]
-        public DateTime Timestamp { get; set; }
+        public long Timestamp { get; set; }
 
         [BsonIgnore]
         public string ETag
@@ -44,16 +44,16 @@ namespace Microsoft.Orleans.Storage
                 $"GrainId={GrainId}, GrainType={GrainType}, GrainStateType={GrainStateType}, ServiceId={ServiceId}, ETag={ETag ?? "<null>"}";
         }
 
-        private static string FormatETag(DateTime value)
+        private static string FormatETag(long value)
         {
-            return value == new DateTime() ? null : value.Ticks.ToString(CultureInfo.InvariantCulture);
+            return value.ToString();
         }
 
-        private static DateTime ParseETag(string etag)
+        private static long ParseETag(string etag)
         {
             if (string.IsNullOrEmpty(etag))
             {
-                return new DateTime();
+                return 0;
             }
             long ticks;
             var valid = long.TryParse(etag, out ticks);
@@ -61,7 +61,7 @@ namespace Microsoft.Orleans.Storage
             {
                 throw new ArgumentException("Invalid ETag format. Should be a string with DateTime.Ticks value.");
             }
-            return new DateTime(ticks, DateTimeKind.Utc);
+            return ticks;
         }
     }
 }

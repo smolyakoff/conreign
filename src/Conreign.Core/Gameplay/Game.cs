@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Conreign.Core.Communication;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Gameplay;
 using Conreign.Core.Contracts.Gameplay.Data;
-using Conreign.Core.Contracts.Presence;
 using Conreign.Core.Presence;
 
 namespace Conreign.Core.Gameplay
@@ -27,9 +25,8 @@ namespace Conreign.Core.Gameplay
 
         public Task<IRoomData> GetState(Guid userId)
         {
-            throw new NotImplementedException();
+            return Task.FromResult<IRoomData>(new GameData());
         }
-
 
         public Task LaunchFleet(Guid userId, FleetData fleet)
         {
@@ -61,9 +58,9 @@ namespace Conreign.Core.Gameplay
             return _hub.NotifyEverybodyExcept(users, events);
         }
 
-        public Task Join(Guid userId, IClientObserver observer)
+        public Task Join(Guid userId, IClientPublisher publisher)
         {
-            return _hub.Join(userId, observer);
+            return _hub.Join(userId, publisher);
         }
 
         public Task Leave(Guid userId)
