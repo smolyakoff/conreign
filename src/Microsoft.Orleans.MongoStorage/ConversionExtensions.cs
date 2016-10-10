@@ -13,7 +13,7 @@ namespace Microsoft.Orleans.Storage
             return new MongoGrain
             {
                 Id = Keys.PrimaryKeyForGrain(serviceId, reference),
-                Data = SerializationManager.SerializeToByteArray(grainState.State),
+                Data = grainState.State,
                 Meta = grainState.ToGrainMeta(reference, grainType, serviceId)
             };
         }

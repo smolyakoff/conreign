@@ -1,10 +1,16 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Conreign.Core.Communication;
+using Conreign.Core.Gameplay;
 using Microsoft.Orleans.Storage.Conventions;
+using Microsoft.Orleans.Storage.Serialization;
+using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Bson.Serialization.Options;
 using MongoDB.Driver;
 using Orleans;
+using Orleans.CodeGeneration;
+using Orleans.Core;
 using Orleans.Providers;
 using Orleans.Runtime;
 using Orleans.Serialization;
@@ -35,6 +41,9 @@ namespace Microsoft.Orleans.Storage
                 new DictionaryRepresentationConvention(DictionaryRepresentation.ArrayOfArrays)
             };
             ConventionRegistry.Register("Orleans", conventions, x => true);
+            BsonSerializer.RegisterSerializationProvider(new OrleansSerializerProvider());
+            BsonSerializer.RegisterDiscriminatorConvention(typeof(EventHandlerAdapter<>), new HierarchicalDiscriminatorConvention("_t"));
+            BsonClassMap.RegisterClassMap<PlayerState>();
         }
 
         public string Name { get; private set; }
@@ -49,7 +58,7 @@ namespace Microsoft.Orleans.Storage
             Log = providerRuntime.GetLogger($"Storage.MongoStorage.{_serviceId}");
             if (Log.IsVerbose3)
             {
-                Log.Verbose3($"Going to initialize mongo storage client.");
+                Log.Verbose3("Going to initialize mongo storage client.");
             }
             _options = MongoStorageOptions.Create(config);
             _client = new MongoClient(_options.ConnectionString);
@@ -83,7 +92,7 @@ namespace Microsoft.Orleans.Storage
                     return;
                 }
                 grainState.ETag = doc.Meta.ETag;
-                grainState.State = SerializationManager.DeserializeFromByteArray<object>(doc.Data);
+                grainState.State = doc.Data;
                 LogVerbose3($"Read data: {meta}", MongoStorageCode.TraceRead);
             }
             catch (Exception ex)
@@ -114,7 +123,7 @@ namespace Microsoft.Orleans.Storage
                     var id = Keys.PrimaryKeyForGrain(_serviceId, grainReference);
                     // Update data and generate new timestamp
                     var update = Builders<MongoGrain>.Update
-                        .Set(x => x.Data, SerializationManager.SerializeToByteArray(grainState.State))
+                        .Set(x => x.Data, grainState.State)
                         .Set(x => x.Meta.Timestamp, DateTime.UtcNow.Ticks);
                     var options = new FindOneAndUpdateOptions<MongoGrain>
                     {

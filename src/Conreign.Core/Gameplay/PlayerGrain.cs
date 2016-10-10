@@ -17,7 +17,7 @@ namespace Conreign.Core.Gameplay
 
         public override async Task OnActivateAsync()
         {
-            InitializeStateAndPublisher();
+            await InitializeStateAndPublisher();
             _player = new Player(State, _publisher);
             _roomBus = GrainFactory.GetGrain<IBusGrain>(State.RoomId).AsBus();
             await _roomBus.Subscribe(this.AsReference<IPlayerGrain>());
@@ -82,7 +82,7 @@ namespace Conreign.Core.Gameplay
             }
         }
 
-        private void InitializeStateAndPublisher()
+        private async Task InitializeStateAndPublisher()
         {
             string roomId;
             State.UserId = this.GetPrimaryKey(out roomId);
@@ -94,7 +94,7 @@ namespace Conreign.Core.Gameplay
             _publisher = GrainFactory.GetGrain<IClientPublisherGrain>(State.UserId, roomId, null);
             foreach (var connectionId in State.ConnectionIds)
             {
-                _publisher.Connect(connectionId);
+               await _publisher.Connect(connectionId);
             }
         }
 

@@ -12,6 +12,6 @@ namespace Microsoft.Orleans.Storage
         public MongoGrainMeta Meta { get; set; }
 
         [BsonElement("data")]
-        public byte[] Data { get; set; }
+        public object Data { get; set; }
     }
 }
