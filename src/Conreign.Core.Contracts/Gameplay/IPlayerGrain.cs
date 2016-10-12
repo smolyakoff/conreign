@@ -1,10 +1,16 @@
 using Conreign.Core.Contracts.Communication;
+using Conreign.Core.Contracts.Communication.Events;
 using Conreign.Core.Contracts.Gameplay.Events;
 using Orleans;
 
 namespace Conreign.Core.Contracts.Gameplay
 {
-    public interface IPlayerGrain : IGrainWithGuidCompoundKey, IConnectablePlayer, IEventHandler<GameStarted.System>
+    public interface IPlayerGrain : 
+        IGrainWithGuidCompoundKey,
+        IPlayer,
+        IEventHandler<GameStarted.System>,
+        IEventHandler<Connected>,
+        IEventHandler<Disconnected>
     {
     }
 }

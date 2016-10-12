@@ -1,13 +1,14 @@
 using System;
 using System.Threading.Tasks;
 using Conreign.Core.Contracts.Communication;
+using Conreign.Core.Contracts.Communication.Events;
 using Conreign.Core.Contracts.Gameplay;
 using Conreign.Core.Contracts.Gameplay.Data;
 using Conreign.Core.Contracts.Gameplay.Events;
 
 namespace Conreign.Core.Gameplay
 {
-    public class Player : IConnectablePlayer, IEventHandler<GameStarted.System>
+    public class Player : IPlayer, IEventHandler<GameStarted.System>, IEventHandler<Connected>, IEventHandler<Disconnected>
     {
         private readonly PlayerState _state;
         private readonly IClientPublisher _clientPublisher;
@@ -84,9 +85,9 @@ namespace Conreign.Core.Gameplay
             return _state.Room.GetState(_state.UserId);
         }
 
-        public async Task Connect(Guid connectionId)
+        public async Task Handle(Connected @event)
         {
-            _state.ConnectionIds.Add(connectionId);
+            _state.ConnectionIds.Add(@event.ConnectionId);
             var isFirstConnection = _state.ConnectionIds.Count == 1;
             if (isFirstConnection)
             {
@@ -94,9 +95,9 @@ namespace Conreign.Core.Gameplay
             }
         }
 
-        public async Task Disconnect(Guid connectionId)
+        public async Task Handle(Disconnected @event)
         {
-            _state.ConnectionIds.Remove(connectionId);
+            _state.ConnectionIds.Remove(@event.ConnectionId);
             if (_state.ConnectionIds.Count == 0)
             {
                 await _state.Room.Leave(_state.UserId);

@@ -8,5 +8,6 @@ namespace Conreign.Core.Contracts.Communication
     {
         Task Subscribe(Type baseType, IEventHandler handler);
         Task Unsubscribe(Type baseType, IEventHandler handler);
+        Task UnsubscribeAll(IEventHandler handler);
     }
 }

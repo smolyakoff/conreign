@@ -1,14 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using Conreign.Core.Contracts.Communication;
 using Orleans;
 
 namespace Conreign.Core.Contracts.Gameplay
 {
-    public interface IUserGrain : IGrainWithGuidKey, IUser, IPlayerFactory
+    public interface IUserGrain : IGrainWithGuidKey, IUser, IPlayerFactory, ISystemPublisherFactory
     {
-    }
-
-    public interface ICollectorGrain : IGrainWithIntegerKey
-    {
-        Task Collect(object @event);
     }
 }

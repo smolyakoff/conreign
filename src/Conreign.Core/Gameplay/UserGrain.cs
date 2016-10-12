@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Conreign.Core.Auth;
-using Conreign.Core.Contracts;
+using Conreign.Core.Communication;
+using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Gameplay;
 using Conreign.Core.Contracts.Presence;
 using Orleans;
@@ -13,12 +14,15 @@ namespace Conreign.Core.Gameplay
     public class UserGrain : Grain<Guid>, IUserGrain
     {
         private User _user;
+        private static bool _universeActivated;
 
         public override Task OnActivateAsync()
         {
-            var universe = GrainFactory.GetGrain<IUniverseGrain>(default(long));
             var context = new OrleansUserContext();
-            _user = new User(context, universe, this);
+            _user = new User(
+                context, 
+                this.AsReference<IUserGrain>(), 
+                this.AsReference<IUserGrain>());
             return base.OnActivateAsync();
         }
 
@@ -27,11 +31,31 @@ namespace Conreign.Core.Gameplay
             return _user.JoinRoom(roomId);
         }
 
-        public Task<IConnectablePlayer> Create(string roomId)
+        public Task<IPlayer> CreatePlayer(string roomId)
         {
-            var player = GrainFactory
-                .GetGrain<IPlayerGrain>(this.GetPrimaryKey(), roomId, null);
-            return Task.FromResult<IConnectablePlayer>(player);
+            var player = GrainFactory.GetGrain<IPlayerGrain>(this.GetPrimaryKey(), roomId, null);
+            return Task.FromResult<IPlayer>(player);
+        }
+
+        public async Task<ISystemPublisher> CreateSystemPublisher(string topic)
+        {
+            if (topic == SystemTopics.Global)
+            {
+                await EnsureUniverseActivated();
+            }
+            var publisher = GrainFactory.GetGrain<IBusGrain>(topic);
+            return publisher;
+        }
+
+        private async Task EnsureUniverseActivated()
+        {
+            if (_universeActivated)
+            {
+                return;
+            }
+            var universe = GrainFactory.GetGrain<IUniverseGrain>(default(long));
+            await universe.Ping();
+            _universeActivated = true;
         }
     }
 }

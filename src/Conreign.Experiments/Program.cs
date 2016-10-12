@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Conreign.Core.Client;
 using Conreign.Core.Contracts.Gameplay.Data;
 using Conreign.Core.Contracts.Gameplay.Events;
+using Conreign.Core.Contracts.Presence.Events;
+using Newtonsoft.Json;
 
 namespace Conreign.Experiments
 {
@@ -50,7 +52,8 @@ namespace Conreign.Experiments
                 {
                     var started = await connection.WaitFor<GameStarted>();
                     Console.WriteLine("Now it's started!");
-                }  
+                }
+                  
             }
         }
     }
@@ -59,14 +62,18 @@ namespace Conreign.Experiments
     {
         public void OnNext(object value)
         {
-            Console.WriteLine();
-            //Console.WriteLine(
-            //    JsonConvert.SerializeObject(
-            //        value,
-            //        Formatting.Indented,
-            //        new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.Auto}
-            //        )
-            //    );
+            if (value.GetType() != typeof(UserStatusChanged))
+            {
+                return;
+            }
+            //Console.WriteLine();
+            Console.WriteLine(
+                JsonConvert.SerializeObject(
+                    value,
+                    Formatting.Indented,
+                    new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto }
+                    )
+                );
             Console.WriteLine(value.GetType().Name);
         }
 

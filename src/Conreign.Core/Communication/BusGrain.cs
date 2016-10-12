@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Conreign.Core.Contracts.Communication;
@@ -12,6 +13,7 @@ namespace Conreign.Core.Communication
 {
     public class BusGrain : Grain<BusState>, IBusGrain
     {
+        private Dictionary<Type, MethodInfo> _handlerMethodCache;
         private IAsyncStream<ISystemEvent> _stream;
         private StreamSubscriptionHandle<ISystemEvent> _subscription;
         private Logger _logger;
@@ -19,6 +21,7 @@ namespace Conreign.Core.Communication
         public override async Task OnActivateAsync()
         {
             await InitializeState();
+            _handlerMethodCache = new Dictionary<Type, MethodInfo>();
             _logger = GetLogger(typeof(BusGrain).Name);
             var provider = GetStreamProvider(StreamConstants.ClientStreamProviderName);
             var stream = provider.GetStream<ISystemEvent>(State.StreamId, State.Topic);
@@ -48,23 +51,29 @@ namespace Conreign.Core.Communication
             }
             if (!typeof(ISystemEvent).IsAssignableFrom(baseType))
             {
-                throw new ArgumentException("Base type should implement ISystemEvent interface", nameof(baseType));
+                throw new ArgumentException("Base type should implement ISystemEvent interface.", nameof(baseType));
             }
             var @interface = handler
                 .GetType()
                 .GetInterfaces()
                 .Where(x => typeof(IEventHandler).IsAssignableFrom(x) && x.IsGenericType)
                 .FirstOrDefault(x => baseType.IsAssignableFrom(x.GetGenericArguments()[0]));
-            // TODO: good validation
             if (@interface == null)
             {
-                throw new ArgumentException();
+                throw new ArgumentException($"Expected interface to be IEventHandler<${baseType.Name}>.");
             }
             var set = State.Subscribers.ContainsKey(baseType)
                 ? State.Subscribers[baseType]
                 : new HashSet<IEventHandler>();
             State.Subscribers[baseType] = set;
             set.Add(handler);
+
+            if (!_handlerMethodCache.ContainsKey(baseType))
+            {
+                var type = typeof(IEventHandler<>).MakeGenericType(baseType);
+                var method = type.GetMethod("Handle");
+                _handlerMethodCache.Add(baseType, method);
+            }
             await WriteStateAsync();
         }
 
@@ -92,6 +101,23 @@ namespace Conreign.Core.Communication
             {
                 await WriteStateAsync();
             }
+        }
+
+        public async Task UnsubscribeAll(IEventHandler handler)
+        {
+            if (handler == null)
+            {
+                throw new ArgumentNullException(nameof(handler));
+            }
+            var removed = false;
+            foreach (var set in State.Subscribers.Values)
+            {
+                removed = set.Remove(handler);
+            }
+            if (removed)
+            {
+                await WriteStateAsync();
+            } 
         }
 
         public async Task Notify(params ISystemEvent[] events)
@@ -143,11 +169,9 @@ namespace Conreign.Core.Communication
             await WriteStateAsync();
         }
 
-        private static Task Handle(Type baseType, IEventHandler handler, ISystemEvent @event)
+        private Task Handle(Type baseType, IEventHandler handler, ISystemEvent @event)
         {
-            // TODO: reflection cache
-            var type = typeof(IEventHandler<>).MakeGenericType(baseType);
-            var method = type.GetMethod("Handle");
+            var method = _handlerMethodCache[baseType];
             return (Task) method.Invoke(handler, new object[]{@event});
         }
 

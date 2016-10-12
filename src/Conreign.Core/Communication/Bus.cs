@@ -22,6 +22,11 @@ namespace Conreign.Core.Communication
             return _grain.Unsubscribe(typeof(T), handler);
         }
 
+        public Task UnsubscribeAll(IEventHandler handler)
+        {
+            return _grain.UnsubscribeAll(handler);
+        }
+
         public Task Notify(params ISystemEvent[] events)
         {
             return _grain.Notify(events);

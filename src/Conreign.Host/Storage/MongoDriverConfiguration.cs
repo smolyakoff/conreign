@@ -1,6 +1,7 @@
 ﻿using System;
 using Conreign.Core.Communication;
 using Conreign.Core.Gameplay;
+using Conreign.Core.Presence;
 using MongoDB.Bson.Serialization;
 
 namespace Conreign.Host.Storage
@@ -20,6 +21,7 @@ namespace Conreign.Host.Storage
             BsonSerializer.RegisterSerializer(typeof(Type), new TypeSerializer());
             BsonSerializer.RegisterSerializer(Type.GetType("System.RuntimeType"), new TypeSerializer());
 
+            BsonClassMap.RegisterClassMap<UniverseState>();
             BsonClassMap.RegisterClassMap<BusState>();
             BsonClassMap.RegisterClassMap<PlayerState>();
         }

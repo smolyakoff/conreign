@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Conreign.Core.Contracts.Communication;
+using Conreign.Core.Contracts.Communication.Events;
 using Conreign.Core.Contracts.Presence;
 
 namespace Conreign.Core.Presence
 {
-    public class Universe : IUniverse, IConnectionTracker
+    public class Universe : IUniverse, IEventHandler<Connected>
     {
         private readonly UniverseState _state;
 
@@ -23,24 +25,31 @@ namespace Conreign.Core.Presence
             {
                 return;
             }
-            var connection = _state.Connections[connectionId];
-            await connection.Disconnect(connectionId);
+            var bus = _state.Connections[connectionId];
+            var @event = new Disconnected(connectionId);
+            await bus.Notify(@event);
             _state.Connections.Remove(connectionId);
         }
 
-        public async Task Track(Guid connectionId, IConnectable connectable)
+        public async Task Handle(Connected @event)
         {
+            if (@event == null)
+            {
+                throw new ArgumentNullException(nameof(@event));
+            }
+            var connectionId = @event.ConnectionId;
+            var connection = @event.Connection;
             if (_state.Connections.ContainsKey(connectionId))
             {
                 var previousConnection = _state.Connections[connectionId];
-                if (previousConnection != connectable)
+                if (previousConnection != connection)
                 {
-                    await previousConnection.Disconnect(connectionId);
+                    await previousConnection.Notify(new Disconnected(connectionId));
                 }
                 return;
             }
-            await connectable.Connect(connectionId);
-            _state.Connections[connectionId] = connectable;
+            await connection.Notify(new Connected(connectionId, connection));
+            _state.Connections[connectionId] = connection;
         }
     }
 }

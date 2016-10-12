@@ -25,7 +25,7 @@ namespace Conreign.Core.Utility
             {
                 return;
             }
-            throw UserException.Create(ValidationError.BadInput, results.ToConreignValidationErrorDetails());
+            throw UserException.Create<ValidationError, ValidationErrorDetails>(ValidationError.BadInput, results.ToConreignValidationErrorDetails());
         }
 
         private static ValidationErrorDetails ToConreignValidationErrorDetails(this ValidationResult result)

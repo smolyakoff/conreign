@@ -1,44 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Conreign.Core.Communication;
 using Conreign.Core.Contracts.Auth;
+using Conreign.Core.Contracts.Communication;
+using Conreign.Core.Contracts.Communication.Events;
 using Conreign.Core.Contracts.Gameplay;
-using Conreign.Core.Contracts.Presence;
-using Orleans;
 
 namespace Conreign.Core.Gameplay
 {
     public class User : IUser
     {
         private readonly IUserContext _userContext;
-        private readonly IConnectionTracker _connectionTracker;
+        private readonly ISystemPublisherFactory _systemPublisherFactory;
         private readonly IPlayerFactory _playerFactory;
-        private readonly Dictionary<string, IConnectablePlayer> _playersCache;
+        private readonly Dictionary<string, IPlayer> _playersCache;
+        private ISystemPublisher _globalPublisher;
 
-        public User(IUserContext userContext, IConnectionTracker connectionTracker, IPlayerFactory playerFactory)
+        public User(IUserContext userContext, ISystemPublisherFactory systemPublisherFactory, IPlayerFactory playerFactory)
         {
-            if (connectionTracker == null)
-            {
-                throw new ArgumentNullException(nameof(connectionTracker));
-            }
             if (playerFactory == null)
             {
                 throw new ArgumentNullException(nameof(playerFactory));
             }
             _userContext = userContext;
-            _connectionTracker = connectionTracker;
+            _systemPublisherFactory = systemPublisherFactory;
             _playerFactory = playerFactory;
-            _playersCache = new Dictionary<string, IConnectablePlayer>();
+            _playersCache = new Dictionary<string, IPlayer>();
         }
 
         public async Task<IPlayer> JoinRoom(string roomId)
         {
+            if (string.IsNullOrEmpty(roomId))
+            {
+                throw new ArgumentException("Room id cannot be null or empty.", nameof(roomId));
+            }
+            _globalPublisher = _globalPublisher ?? await _systemPublisherFactory.CreateSystemPublisher(SystemTopics.Global);
             var connectionId = _userContext.ConnectionId;
             var player = _playersCache.ContainsKey(roomId)
                 ? _playersCache[roomId]
-                : await _playerFactory.Create(roomId);
+                : await _playerFactory.CreatePlayer(roomId);
             _playersCache[roomId] = player;
-            await _connectionTracker.Track(connectionId, player);
+            var publisher = await _systemPublisherFactory.CreateSystemPublisher(SystemTopics.Player(_userContext.UserId, roomId));
+            var @event = new Connected(connectionId, publisher);
+            await _globalPublisher.Notify(@event);
             return player;
         }
     }

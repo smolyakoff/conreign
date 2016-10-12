@@ -1,6 +1,8 @@
 using System;
 using System.Threading.Tasks;
-using Conreign.Core.Contracts.Gameplay;
+using Conreign.Core.Communication;
+using Conreign.Core.Contracts.Communication;
+using Conreign.Core.Contracts.Communication.Events;
 using Conreign.Core.Contracts.Presence;
 using Orleans;
 
@@ -9,11 +11,21 @@ namespace Conreign.Core.Presence
     public class UniverseGrain : Grain<UniverseState>, IUniverseGrain
     {
         private Universe _universe;
+        private IBus _bus;
 
-        public override Task OnActivateAsync()
+        public override async Task OnActivateAsync()
         {
             _universe = new Universe(State);
-            return base.OnActivateAsync();
+            _bus = GrainFactory.GetGrain<IBusGrain>(SystemTopics.Global).AsBus();
+            await _bus.Subscribe(this.AsReference<IUniverseGrain>());
+            RegisterTimer(SaveState, null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
+            await base.OnActivateAsync();
+        }
+
+        public override async Task OnDeactivateAsync()
+        {
+            await _bus.Unsubscribe(this.AsReference<IUniverseGrain>());
+            await base.OnDeactivateAsync();
         }
 
         public Task Disconnect(Guid connectionId)
@@ -21,14 +33,19 @@ namespace Conreign.Core.Presence
             return _universe.Disconnect(connectionId);
         }
 
-        public Task Track(Guid connectionId, IConnectable connectable)
+        public Task Ping()
         {
-            return _universe.Track(connectionId, connectable);
+            return Task.CompletedTask;
         }
 
-        public Task Test(IPlayerGrain player)
+        public Task Handle(Connected @event)
         {
-            return _universe.Track(Guid.NewGuid(), player);
+            return _universe.Handle(@event);
+        }
+
+        private Task SaveState(object arg)
+        {
+            return WriteStateAsync();
         }
     }
 }

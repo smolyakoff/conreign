@@ -6,5 +6,6 @@ namespace Conreign.Core.Contracts.Communication
     {
         Task Subscribe<T>(IEventHandler<T> handler) where T : class, ISystemEvent;
         Task Unsubscribe<T>(IEventHandler<T> handler) where T : class, ISystemEvent;
+        Task UnsubscribeAll(IEventHandler handler);
     }
 }

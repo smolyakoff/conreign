@@ -25,6 +25,8 @@ namespace Conreign.Core.Client
 
         internal static async Task<GameConnection> Initialize(IGrainFactory grainFactory, Guid connectionId)
         {
+            var universe = grainFactory.GetGrain<IUniverseGrain>(default(long));
+            await universe.Ping();
             var stream = GrainClient.GetStreamProvider(StreamConstants.ClientStreamProviderName)
                 .GetStream<IClientEvent>(connectionId, StreamConstants.ClientStreamNamespace);
             var existingHandles = await stream.GetAllSubscriptionHandles();

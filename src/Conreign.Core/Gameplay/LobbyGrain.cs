@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Conreign.Core.Communication;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Gameplay;
 using Conreign.Core.Contracts.Gameplay.Data;
@@ -15,7 +16,7 @@ namespace Conreign.Core.Gameplay
         public override async Task OnActivateAsync()
         {
             await InitializeState();
-            var bus = GrainFactory.GetGrain<IBusGrain>(State.RoomId);
+            var bus = GrainFactory.GetGrain<IBusGrain>(SystemTopics.Room(State.RoomId));
             _lobby = new Lobby(State, this, bus);
             await base.OnActivateAsync();
         }

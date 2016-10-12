@@ -39,6 +39,7 @@
     <Compile Include="Communication\BusState.cs" />
     <Compile Include="Communication\Bus.cs" />
     <Compile Include="Communication\CommunicationError.cs" />
+    <Compile Include="Communication\SystemTopics.cs" />
     <Compile Include="Gameplay\Editor\GameOptionsValidator.cs" />
     <Compile Include="Gameplay\Editor\PlayerListEditor.cs" />
     <Compile Include="Gameplay\Editor\PlayerOptionsValidator.cs" />
@@ -102,9 +103,7 @@
   <ItemGroup>
     <None Include="paket.references" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Gameplay\Events\" />
-  </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.5' Or $(TargetFrameworkVersion) == 'v4.5.1' Or $(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3' Or $(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1' Or $(TargetFrameworkVersion) == 'v4.6.2' Or $(TargetFrameworkVersion) == 'v4.6.3')">
       <ItemGroup>
