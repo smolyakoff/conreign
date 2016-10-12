@@ -9,7 +9,7 @@ namespace Conreign.Core.Communication
     {
         public Guid StreamId { get; set; }
         public string Topic { get; set; }
-        public Dictionary<Type, HashSet<IEventHandler<ISystemEvent>>> Subscribers { get; set; } = new Dictionary<Type, HashSet<IEventHandler<ISystemEvent>>>();
+        public Dictionary<Type, HashSet<IEventHandler>> Subscribers { get; set; } = new Dictionary<Type, HashSet<IEventHandler>>();
         public StreamSequenceToken StreamSequenceToken { get; set; }
     }
 }

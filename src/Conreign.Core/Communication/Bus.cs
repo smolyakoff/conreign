@@ -14,14 +14,12 @@ namespace Conreign.Core.Communication
 
         public Task Subscribe<T>(IEventHandler<T> handler) where T : class, ISystemEvent
         {
-            var adapter = new EventHandlerAdapter<T>(handler);
-            return _grain.Subscribe(typeof(T), adapter);
+            return _grain.Subscribe(typeof(T), handler);
         }
 
         public Task Unsubscribe<T>(IEventHandler<T> handler) where T : class, ISystemEvent
         {
-            var adapter = new EventHandlerAdapter<T>(handler);
-            return _grain.Unsubscribe(typeof(T), adapter);
+            return _grain.Unsubscribe(typeof(T), handler);
         }
 
         public Task Notify(params ISystemEvent[] events)

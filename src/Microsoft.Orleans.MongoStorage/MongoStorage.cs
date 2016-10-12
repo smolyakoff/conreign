@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Conreign.Core.Communication;
-using Conreign.Core.Gameplay;
 using Microsoft.Orleans.Storage.Conventions;
 using Microsoft.Orleans.Storage.Serialization;
 using MongoDB.Bson.Serialization;
@@ -9,11 +7,8 @@ using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Bson.Serialization.Options;
 using MongoDB.Driver;
 using Orleans;
-using Orleans.CodeGeneration;
-using Orleans.Core;
 using Orleans.Providers;
 using Orleans.Runtime;
-using Orleans.Serialization;
 using Orleans.Storage;
 
 namespace Microsoft.Orleans.Storage
@@ -38,12 +33,10 @@ namespace Microsoft.Orleans.Storage
             _isInitialized = true;
             var conventions = new ConventionPack
             {
-                new DictionaryRepresentationConvention(DictionaryRepresentation.ArrayOfArrays)
+                new DictionaryRepresentationConvention(DictionaryRepresentation.ArrayOfArrays),
             };
             ConventionRegistry.Register("Orleans", conventions, x => true);
             BsonSerializer.RegisterSerializationProvider(new OrleansSerializerProvider());
-            BsonSerializer.RegisterDiscriminatorConvention(typeof(EventHandlerAdapter<>), new HierarchicalDiscriminatorConvention("_t"));
-            BsonClassMap.RegisterClassMap<PlayerState>();
         }
 
         public string Name { get; private set; }

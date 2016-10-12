@@ -46,27 +46,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serialization\GrainReferenceSerializer.cs" />
     <Compile Include="Serialization\OrleansSerializerProvider.cs" />
-    <Compile Include="Serialization\TypeSerializer.cs" />
     <Compile Include="Validator.cs" />
     <Compile Include="xxHash.cs" />
     <Compile Include="Conventions\DictionaryRepresentationConvention.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="paket.references" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Conreign.Core.Client\Conreign.Core.Client.csproj">
-      <Project>{27e2fbdd-0197-44a8-98f5-8c45de87f964}</Project>
-      <Name>Conreign.Core.Client</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Conreign.Core.Contracts\Conreign.Core.Contracts.csproj">
-      <Project>{00409622-346b-4926-b745-e5f595bd3bb7}</Project>
-      <Name>Conreign.Core.Contracts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Conreign.Core\Conreign.Core.csproj">
-      <Project>{dfdbf49b-30fa-424e-9ad2-85b35f39a053}</Project>
-      <Name>Conreign.Core</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

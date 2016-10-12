@@ -36,7 +36,7 @@ namespace Conreign.Core.Communication
             await base.OnActivateAsync();
         }
 
-        public async Task Subscribe(Type baseType, IEventHandler<ISystemEvent> handler)
+        public async Task Subscribe(Type baseType, IEventHandler handler)
         {
             if (baseType == null)
             {
@@ -50,15 +50,25 @@ namespace Conreign.Core.Communication
             {
                 throw new ArgumentException("Base type should implement ISystemEvent interface", nameof(baseType));
             }
+            var @interface = handler
+                .GetType()
+                .GetInterfaces()
+                .Where(x => typeof(IEventHandler).IsAssignableFrom(x) && x.IsGenericType)
+                .FirstOrDefault(x => baseType.IsAssignableFrom(x.GetGenericArguments()[0]));
+            // TODO: good validation
+            if (@interface == null)
+            {
+                throw new ArgumentException();
+            }
             var set = State.Subscribers.ContainsKey(baseType)
                 ? State.Subscribers[baseType]
-                : new HashSet<IEventHandler<ISystemEvent>>();
+                : new HashSet<IEventHandler>();
             State.Subscribers[baseType] = set;
             set.Add(handler);
             await WriteStateAsync();
         }
 
-        public async Task Unsubscribe(Type baseType, IEventHandler<ISystemEvent> handler)
+        public async Task Unsubscribe(Type baseType, IEventHandler handler)
         {
             if (baseType == null)
             {
@@ -108,17 +118,20 @@ namespace Conreign.Core.Communication
             }
             var type = @event.GetType();
             var subscribers = State.Subscribers
-                .Where(x => x.Key.IsAssignableFrom(type))
-                .SelectMany(x => x.Value)
+                .Where(pair => pair.Key.IsAssignableFrom(type))
+                .SelectMany(pair => pair.Value.Select(handler => new
+                {
+                    BaseType = pair.Key,
+                    Handler = handler
+                }))
                 .ToList();
-
             try
             {
                 var ts = TaskScheduler.Current;
                 await Task.Factory.StartNew(() =>
                 {
                     var tasks = subscribers
-                        .Select(s => s.Handle(@event))
+                        .Select(x => Handle(x.BaseType, x.Handler, @event))
                         .ToList();
                     return Task.WhenAll(tasks);
                 }, CancellationToken.None, TaskCreationOptions.None, ts);
@@ -128,6 +141,14 @@ namespace Conreign.Core.Communication
                 State.StreamSequenceToken = token;
             }
             await WriteStateAsync();
+        }
+
+        private static Task Handle(Type baseType, IEventHandler handler, ISystemEvent @event)
+        {
+            // TODO: reflection cache
+            var type = typeof(IEventHandler<>).MakeGenericType(baseType);
+            var method = type.GetMethod("Handle");
+            return (Task) method.Invoke(handler, new object[]{@event});
         }
 
         private Task OnCompleted()
@@ -155,7 +176,7 @@ namespace Conreign.Core.Communication
             {
                 State.StreamId = Guid.NewGuid();
             }
-            await WriteStateAsync();
+            await WriteStateAsync(); 
         }
     }
 }

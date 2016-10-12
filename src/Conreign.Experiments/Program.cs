@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 using Conreign.Core.Client;
 using Conreign.Core.Contracts.Gameplay.Data;
 using Conreign.Core.Contracts.Gameplay.Events;
-using Conreign.Core.Contracts.Presence.Events;
-using Newtonsoft.Json;
 
 namespace Conreign.Experiments
 {

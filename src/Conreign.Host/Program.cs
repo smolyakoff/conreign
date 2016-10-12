@@ -2,6 +2,7 @@
 using System.Net;
 using Conreign.Core.Communication;
 using Conreign.Core.Gameplay;
+using Conreign.Host.Storage;
 using MongoDB.Bson.Serialization;
 using Orleans.Runtime.Host;
 
@@ -56,7 +57,7 @@ namespace Conreign.Host
 
         private static void Initialize()
         {
-            BsonClassMap.RegisterClassMap<BusState>();
+            MongoDriverConfiguration.EnsureInitialized();
         }
     }
 }
