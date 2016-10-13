@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Conreign.Core.Auth;
-using Conreign.Core.Communication;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Gameplay;
 using Conreign.Core.Contracts.Presence;
@@ -16,14 +15,15 @@ namespace Conreign.Core.Gameplay
         private User _user;
         private static bool _universeActivated;
 
-        public override Task OnActivateAsync()
+        public override async Task OnActivateAsync()
         {
             var context = new OrleansUserContext();
             _user = new User(
                 context, 
                 this.AsReference<IUserGrain>(), 
                 this.AsReference<IUserGrain>());
-            return base.OnActivateAsync();
+            await EnsureUniverseActivated();
+            await base.OnActivateAsync();
         }
 
         public Task<IPlayer> JoinRoom(string roomId)
@@ -37,14 +37,10 @@ namespace Conreign.Core.Gameplay
             return Task.FromResult<IPlayer>(player);
         }
 
-        public async Task<ISystemPublisher> CreateSystemPublisher(string topic)
+        public Task<IPublisher<ISystemEvent>> CreateSystemPublisher(string topic)
         {
-            if (topic == SystemTopics.Global)
-            {
-                await EnsureUniverseActivated();
-            }
             var publisher = GrainFactory.GetGrain<IBusGrain>(topic);
-            return publisher;
+            return Task.FromResult((IPublisher<ISystemEvent>)publisher);
         }
 
         private async Task EnsureUniverseActivated()

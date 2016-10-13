@@ -21,7 +21,7 @@ namespace Conreign.Core.Presence
             _state = state;
         }
 
-        public async Task Join(Guid userId, IClientPublisher publisher)
+        public async Task Join(Guid userId, IPublisher<IEvent> publisher)
         {
             var events = WithLeaderCheck(() => JoinInternal(userId, publisher));
             await this.NotifyEverybody(events);
@@ -33,7 +33,7 @@ namespace Conreign.Core.Presence
             await this.NotifyEverybody(events);
         }
 
-        public async Task Notify(ISet<Guid> userIds, params IClientEvent[] events)
+        public async Task Notify(ISet<Guid> userIds, params IEvent[] events)
         {
             if (userIds == null)
             {
@@ -49,21 +49,23 @@ namespace Conreign.Core.Presence
                 .ToList();
             var tasks = receivers.Select(x => x.Notify(events)).ToList();
             await Task.WhenAll(tasks);
-            var states = events.Select(x => new EventState
-            {
-                Recipients = new HashSet<Guid>(userIds),
-                Event = x
-            });
+            var states = events
+                .OfType<IClientEvent>()
+                .Select(x => new EventState
+                {
+                    Recipients = new HashSet<Guid>(userIds),
+                    Event = x
+                });
             _state.Events.AddRange(states);
         }
 
-        public Task NotifyEverybody(params IClientEvent[] events)
+        public Task NotifyEverybody(params IEvent[] events)
         {
             var ids = new HashSet<Guid>(_state.Members.Select(x => x.Key));
             return Notify(ids, events);
         }
 
-        public Task NotifyEverybodyExcept(ISet<Guid> users, params IClientEvent[] events)
+        public Task NotifyEverybodyExcept(ISet<Guid> users, params IEvent[] events)
         {
             var ids = new HashSet<Guid>(_state.Members.Select(x => x.Key));
             ids.ExceptWith(users);
@@ -93,7 +95,7 @@ namespace Conreign.Core.Presence
             }
         }
 
-        private IEnumerable<IClientEvent> JoinInternal(Guid userId, IClientPublisher publisher)
+        private IEnumerable<IClientEvent> JoinInternal(Guid userId, IPublisher<IEvent> publisher)
         {
             _state.Members[userId] = publisher;
             if (!_state.JoinOrder.Contains(userId))

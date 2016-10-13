@@ -18,14 +18,5 @@ namespace Conreign.Core.Communication
             }
             return $"player:{roomId}:{userId}";
         }
-
-        public static string Room(string roomId)
-        {
-            if (string.IsNullOrEmpty(roomId))
-            {
-                throw new ArgumentException("Room id cannot be null or empty.", nameof(roomId));
-            }
-            return $"room:{roomId}";
-        }
     }
 }

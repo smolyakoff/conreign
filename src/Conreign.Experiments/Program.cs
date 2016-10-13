@@ -62,10 +62,6 @@ namespace Conreign.Experiments
     {
         public void OnNext(object value)
         {
-            if (value.GetType() != typeof(UserStatusChanged))
-            {
-                return;
-            }
             //Console.WriteLine();
             Console.WriteLine(
                 JsonConvert.SerializeObject(

@@ -46,22 +46,22 @@ namespace Conreign.Core.Gameplay
             throw new System.NotImplementedException();
         }
 
-        public Task Notify(ISet<Guid> users, params IClientEvent[] events)
+        public Task Notify(ISet<Guid> users, params IEvent[] events)
         {
             return _game.Notify(users, events);
         }
 
-        public Task NotifyEverybody(params IClientEvent[] events)
+        public Task NotifyEverybody(params IEvent[] events)
         {
             return _game.NotifyEverybody(events);
         }
 
-        public Task NotifyEverybodyExcept(ISet<Guid> users, params IClientEvent[] events)
+        public Task NotifyEverybodyExcept(ISet<Guid> users, params IEvent[] events)
         {
             return _game.NotifyEverybodyExcept(users, events);
         }
 
-        public Task Join(Guid userId, IClientPublisher publisher)
+        public Task Join(Guid userId, IPublisher<IEvent> publisher)
         {
             return _game.Join(userId, publisher);
         }

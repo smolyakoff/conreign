@@ -11,17 +11,17 @@ namespace Conreign.Core.Gameplay
     public class Player : IPlayer, IEventHandler<GameStarted.System>, IEventHandler<Connected>, IEventHandler<Disconnected>
     {
         private readonly PlayerState _state;
-        private readonly IClientPublisher _clientPublisher;
+        private readonly IPublisher<IEvent> _publisher;
 
-        public Player(PlayerState state, IClientPublisher clientPublisher)
+        public Player(PlayerState state, IPublisher<IEvent> publisher)
         {
             if (state == null)
             {
                 throw new ArgumentNullException(nameof(state));
             }
-            if (clientPublisher == null)
+            if (publisher == null)
             {
-                throw new ArgumentNullException(nameof(clientPublisher));
+                throw new ArgumentNullException(nameof(publisher));
             }
             if (string.IsNullOrEmpty(state.RoomId))
             {
@@ -36,7 +36,7 @@ namespace Conreign.Core.Gameplay
                 throw new ArgumentException("Room should be initialized", nameof(state));
             }
             _state = state;
-            _clientPublisher = clientPublisher;
+            _publisher = publisher;
         }
 
         public Task UpdateOptions(PlayerOptionsData options)
@@ -91,7 +91,7 @@ namespace Conreign.Core.Gameplay
             var isFirstConnection = _state.ConnectionIds.Count == 1;
             if (isFirstConnection)
             {
-                await _state.Room.Join(_state.UserId, _clientPublisher);
+                await _state.Room.Join(_state.UserId, _publisher);
             }
         }
 

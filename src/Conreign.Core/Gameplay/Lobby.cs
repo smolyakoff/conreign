@@ -22,9 +22,8 @@ namespace Conreign.Core.Gameplay
         private readonly MapEditor _mapEditor;
         private readonly PlayerListEditor _playerListEditor;
         private readonly IGameFactory _gameFactory;
-        private readonly ISystemPublisher _systemPublisher;
 
-        public Lobby(LobbyState state, IGameFactory gameFactory, ISystemPublisher systemPublisher)
+        public Lobby(LobbyState state, IGameFactory gameFactory)
         {
             if (state == null)
             {
@@ -33,10 +32,6 @@ namespace Conreign.Core.Gameplay
             if (gameFactory == null)
             {
                 throw new ArgumentNullException(nameof(gameFactory));
-            }
-            if (systemPublisher == null)
-            {
-                throw new ArgumentNullException(nameof(systemPublisher));
             }
             if (string.IsNullOrEmpty(state.RoomId))
             {
@@ -50,25 +45,24 @@ namespace Conreign.Core.Gameplay
                 new UniformRandomPlanetGenerator(UniformRandomPlanetGeneratorOptions.NeutralPlanetDefaults));
             _playerListEditor = new PlayerListEditor(_state.Players);
             _gameFactory = gameFactory;
-            _systemPublisher = systemPublisher;
         }
 
-        public Task Notify(ISet<Guid> users, params IClientEvent[] events)
+        public Task Notify(ISet<Guid> users, params IEvent[] events)
         {
             return _hub.Notify(users, events);
         }
 
-        public Task NotifyEverybody(params IClientEvent[] @event)
+        public Task NotifyEverybody(params IEvent[] @event)
         {
             return _hub.NotifyEverybody(@event);
         }
 
-        public Task NotifyEverybodyExcept(ISet<Guid> users, params IClientEvent[] events)
+        public Task NotifyEverybodyExcept(ISet<Guid> users, params IEvent[] events)
         {
             return _hub.NotifyEverybodyExcept(users, events);
         }
 
-        public async Task Join(Guid userId, IClientPublisher publisher)
+        public async Task Join(Guid userId, IPublisher<IEvent> publisher)
         {
             EnsureGameIsNotStarted();
             if (!_playerListEditor.Contains(userId))
@@ -168,17 +162,18 @@ namespace Conreign.Core.Gameplay
             EnsureGameIsNotStarted();
             _state.IsGameStarted = true;
             var game = await _gameFactory.CreateGame();
-            await _systemPublisher.Notify(new GameStarted.System(game));
-            await _hub.NotifyEverybody(new GameStarted());
+            await _hub.NotifyEverybody(new GameStarted(), new GameStarted.System(game));
             return game;
         }
 
         private void EnsureGameIsNotStarted()
         {
-            if (_state.IsGameStarted)
+            if (!_state.IsGameStarted)
             {
-                throw UserException.Create(GameplayError.GameIsAlreadyInProgress, $"Game {_state.RoomId} is already in progress.");
+                return;
             }
+            var message = $"Game {_state.RoomId} is already in progress.";
+            throw UserException.Create(GameplayError.GameIsAlreadyInProgress, message);
         }
     }
 }

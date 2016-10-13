@@ -15,7 +15,7 @@ namespace Conreign.Core.Gameplay
         private readonly ISystemPublisherFactory _systemPublisherFactory;
         private readonly IPlayerFactory _playerFactory;
         private readonly Dictionary<string, IPlayer> _playersCache;
-        private ISystemPublisher _globalPublisher;
+        private IPublisher<ISystemEvent> _globalPublisher;
 
         public User(IUserContext userContext, ISystemPublisherFactory systemPublisherFactory, IPlayerFactory playerFactory)
         {

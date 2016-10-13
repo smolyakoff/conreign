@@ -11,28 +11,33 @@ using Orleans.Streams;
 namespace Conreign.Core.Communication
 {
     [PreferLocalPlacement]
-    public class ClientPublisherGrain : Grain, IClientPublisherGrain
+    public class PublisherGrain : Grain, IPublisherGrain
     {
         private IStreamProvider _streamProvider;
         private IDictionary<Guid, IAsyncStream<IClientEvent>> _streams;
+        private IBusGrain _bus;
 
         public override async Task OnActivateAsync()
         {
             _streams = new Dictionary<Guid, IAsyncStream<IClientEvent>>();
             _streamProvider = GetStreamProvider(StreamConstants.ClientStreamProviderName);
+            _bus = GrainFactory.GetGrain<IBusGrain>(this.GetPrimaryKeyString());
             await base.OnActivateAsync();
         }
 
-        public Task Notify(params IClientEvent[] events)
+        public Task Notify(params IEvent[] events)
         {
             if (events == null)
             {
                 throw new ArgumentNullException(nameof(events));
             }
-            var tasks = _streams.Keys
-                .SelectMany(connectionId => events.Select(e => _streams[connectionId].OnNextAsync(e)))
-                .ToArray();
-            return Task.WhenAll(tasks);
+            var clientEvents = events.OfType<IClientEvent>();
+            var systemEvents = events.OfType<ISystemEvent>();
+            var clientTasks = _streams.Keys
+                .SelectMany(connectionId => clientEvents.Select(e => _streams[connectionId].OnNextAsync(e)));
+            var systemTasks = systemEvents.Select(e => _bus.Notify(e));
+            var allTasks = systemTasks.Concat(clientTasks).ToList();
+            return Task.WhenAll(allTasks);
         }
 
         public Task Handle(Connected @event)

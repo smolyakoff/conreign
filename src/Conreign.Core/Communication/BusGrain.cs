@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Conreign.Core.Contracts.Communication;
 using Orleans;
-using Orleans.Runtime;
 using Orleans.Streams;
 
 namespace Conreign.Core.Communication
@@ -15,109 +14,55 @@ namespace Conreign.Core.Communication
     {
         private Dictionary<Type, MethodInfo> _handlerMethodCache;
         private IAsyncStream<ISystemEvent> _stream;
-        private StreamSubscriptionHandle<ISystemEvent> _subscription;
-        private Logger _logger;
+        private Dictionary<Guid, StreamSubscriptionHandle<ISystemEvent>> _subscriptions;
 
         public override async Task OnActivateAsync()
         {
             await InitializeState();
             _handlerMethodCache = new Dictionary<Type, MethodInfo>();
-            _logger = GetLogger(typeof(BusGrain).Name);
             var provider = GetStreamProvider(StreamConstants.ClientStreamProviderName);
             var stream = provider.GetStream<ISystemEvent>(State.StreamId, State.Topic);
             _stream = stream;
-            var handles = await stream.GetAllSubscriptionHandles();
-            if (handles.Count > 0)
-            {
-                _subscription = handles[0];
-                await _subscription.ResumeAsync(OnNext, OnError, OnCompleted, State.StreamSequenceToken);
-            }
-            else
-            {
-                _subscription = await stream.SubscribeAsync(OnNext, OnError, OnCompleted, State.StreamSequenceToken);
-            }
+            await RestoreSubscriptions();
             await base.OnActivateAsync();
         }
 
-        public async Task Subscribe(Type baseType, IEventHandler handler)
+        public async Task Subscribe(IEventHandler handler)
         {
-            if (baseType == null)
-            {
-                throw new ArgumentNullException(nameof(baseType));
-            }
             if (handler == null)
             {
                 throw new ArgumentNullException(nameof(handler));
             }
-            if (!typeof(ISystemEvent).IsAssignableFrom(baseType))
-            {
-                throw new ArgumentException("Base type should implement ISystemEvent interface.", nameof(baseType));
-            }
-            var @interface = handler
-                .GetType()
-                .GetInterfaces()
-                .Where(x => typeof(IEventHandler).IsAssignableFrom(x) && x.IsGenericType)
-                .FirstOrDefault(x => baseType.IsAssignableFrom(x.GetGenericArguments()[0]));
-            if (@interface == null)
-            {
-                throw new ArgumentException($"Expected interface to be IEventHandler<${baseType.Name}>.");
-            }
-            var set = State.Subscribers.ContainsKey(baseType)
-                ? State.Subscribers[baseType]
-                : new HashSet<IEventHandler>();
-            State.Subscribers[baseType] = set;
-            set.Add(handler);
-
-            if (!_handlerMethodCache.ContainsKey(baseType))
-            {
-                var type = typeof(IEventHandler<>).MakeGenericType(baseType);
-                var method = type.GetMethod("Handle");
-                _handlerMethodCache.Add(baseType, method);
-            }
-            await WriteStateAsync();
-        }
-
-        public async Task Unsubscribe(Type baseType, IEventHandler handler)
-        {
-            if (baseType == null)
-            {
-                throw new ArgumentNullException(nameof(baseType));
-            }
-            if (handler == null)
-            {
-                throw new ArgumentNullException(nameof(handler));
-            }
-            if (!typeof(ISystemEvent).IsAssignableFrom(baseType))
-            {
-                throw new ArgumentException("Base type should implement ISystemEvent interface", nameof(baseType));
-            }
-            if (!State.Subscribers.ContainsKey(baseType))
+            if (State.HandlerSubscriptions.ContainsKey(handler))
             {
                 return;
             }
-            var set = State.Subscribers[baseType];
-            var removed = set.Remove(handler);
-            if (removed)
+            var subscription = await SubscribeInternal(handler);
+            if (subscription == null)
             {
-                await WriteStateAsync();
+                return;
             }
+            _subscriptions[subscription.HandleId] = subscription;
+            State.HandlerSubscriptions[handler] = subscription.HandleId;
+            await WriteStateAsync();
         }
 
-        public async Task UnsubscribeAll(IEventHandler handler)
+        public async Task Unsubscribe(IEventHandler handler)
         {
             if (handler == null)
             {
                 throw new ArgumentNullException(nameof(handler));
             }
-            var removed = false;
-            foreach (var set in State.Subscribers.Values)
+            if (!State.HandlerSubscriptions.ContainsKey(handler))
             {
-                removed = set.Remove(handler);
+                return;
             }
-            if (removed)
-            {
-                await WriteStateAsync();
-            } 
+            var id = State.HandlerSubscriptions[handler];
+            var subscription = _subscriptions[id];
+            State.HandlerSubscriptions.Remove(handler);
+            _subscriptions.Remove(id);
+            await subscription.UnsubscribeAsync();
+            await WriteStateAsync();
         }
 
         public async Task Notify(params ISystemEvent[] events)
@@ -136,37 +81,61 @@ namespace Conreign.Core.Communication
             }, CancellationToken.None, TaskCreationOptions.None, ts);
         }
 
-        private async Task OnNext(ISystemEvent @event, StreamSequenceToken token)
+        private async Task<StreamSubscriptionHandle<ISystemEvent>> ResumeInternal(IEventHandler handler, StreamSubscriptionHandle<ISystemEvent> subscription)
         {
-            if (@event == null)
+            var func = CreateHandlerFunctionOrNull(handler);
+            if (func == null)
             {
-                throw new ArgumentNullException(nameof(@event));
+                return null;
             }
-            var type = @event.GetType();
-            var subscribers = State.Subscribers
-                .Where(pair => pair.Key.IsAssignableFrom(type))
-                .SelectMany(pair => pair.Value.Select(handler => new
-                {
-                    BaseType = pair.Key,
-                    Handler = handler
-                }))
+            await subscription.ResumeAsync(func);
+            return subscription;
+        }
+
+        private async Task<StreamSubscriptionHandle<ISystemEvent>> SubscribeInternal(IEventHandler handler)
+        {
+            var func = CreateHandlerFunctionOrNull(handler);
+            if (func == null)
+            {
+                return null;
+            }
+            var subscription = await _stream.SubscribeAsync(func);
+            return subscription;
+        }
+
+        private List<Type> GetSupportedEvents(IEventHandler handler)
+        {
+            var eventTypes = handler
+                .GetType()
+                .GetInterfaces()
+                .Where(x => typeof(IEventHandler).IsAssignableFrom(x) && x.IsGenericType)
+                .Select(x => x.GetGenericArguments()[0])
+                .Where(x => typeof(ISystemEvent).IsAssignableFrom(x))
                 .ToList();
-            try
+            foreach (var eventType in eventTypes.Where(x => !_handlerMethodCache.ContainsKey(x)))
             {
-                var ts = TaskScheduler.Current;
-                await Task.Factory.StartNew(() =>
+                var type = typeof(IEventHandler<>).MakeGenericType(eventType);
+                var method = type.GetMethod("Handle");
+                _handlerMethodCache.Add(eventType, method);
+            }
+            return eventTypes;
+        }
+
+        private Func<ISystemEvent, StreamSequenceToken, Task> CreateHandlerFunctionOrNull(IEventHandler handler)
+        {
+            var supportedTypes = GetSupportedEvents(handler);
+            if (supportedTypes.Count == 0)
+            {
+                return null;
+            }
+            return async (@event, token) =>
+            {
+                var targetTypes = supportedTypes.Where(t => t.IsInstanceOfType(@event));
+                foreach (var targetType in targetTypes)
                 {
-                    var tasks = subscribers
-                        .Select(x => Handle(x.BaseType, x.Handler, @event))
-                        .ToList();
-                    return Task.WhenAll(tasks);
-                }, CancellationToken.None, TaskCreationOptions.None, ts);
-            }
-            finally
-            {
-                State.StreamSequenceToken = token;
-            }
-            await WriteStateAsync();
+                    await Handle(targetType, handler, @event);
+                }
+            };
         }
 
         private Task Handle(Type baseType, IEventHandler handler, ISystemEvent @event)
@@ -175,32 +144,32 @@ namespace Conreign.Core.Communication
             return (Task) method.Invoke(handler, new object[]{@event});
         }
 
-        private Task OnCompleted()
-        {
-            _logger.Error(
-                (int) CommunicationError.BusStreamUnexpectedlyCompleted,
-                $"Bus stream [{State.Topic}:{State.StreamId}] unexpectedly completed.");
-            DeactivateOnIdle();
-            return Task.CompletedTask;
-        }
-
-        private Task OnError(Exception ex)
-        {
-            _logger.Error(
-                (int) CommunicationError.BusStreamUnexpectedException,
-                $"Bus stream [{State.Topic}:{State.StreamId}] unexpected exception: {ex.Message}",
-                ex);
-            return Task.CompletedTask;
-        }
-
         private async Task InitializeState()
         {
             State.Topic = this.GetPrimaryKeyString();
             if (State.StreamId == Guid.Empty)
             {
                 State.StreamId = Guid.NewGuid();
+                await WriteStateAsync();
             }
-            await WriteStateAsync(); 
+        }
+
+        private async Task RestoreSubscriptions()
+        {
+            var handles = await _stream.GetAllSubscriptionHandles();
+            _subscriptions = handles.ToDictionary(x => x.HandleId, x => x);
+            var tasks = new List<Task>();
+            foreach (var pair in State.HandlerSubscriptions)
+            {
+                StreamSubscriptionHandle<ISystemEvent> subscription;
+                var hasSubscription = _subscriptions.TryGetValue(pair.Value, out subscription);
+                tasks.Add(hasSubscription ? ResumeInternal(pair.Key, subscription) : SubscribeInternal(pair.Key));
+            }
+            var toUnsubscribe = _subscriptions
+                .Where(x => !State.HandlerSubscriptions.Values.Contains(x.Key))
+                .Select(pair => pair.Value.UnsubscribeAsync());
+            tasks.AddRange(toUnsubscribe);
+            await Task.WhenAll(tasks);
         }
     }
 }

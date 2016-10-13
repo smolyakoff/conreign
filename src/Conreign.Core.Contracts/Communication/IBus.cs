@@ -2,10 +2,9 @@
 
 namespace Conreign.Core.Contracts.Communication
 {
-    public interface IBus : ISystemPublisher
+    public interface IBus : IPublisher<ISystemEvent>
     {
-        Task Subscribe<T>(IEventHandler<T> handler) where T : class, ISystemEvent;
-        Task Unsubscribe<T>(IEventHandler<T> handler) where T : class, ISystemEvent;
-        Task UnsubscribeAll(IEventHandler handler);
+        Task Subscribe(IEventHandler handler);
+        Task Unsubscribe(IEventHandler handler);
     }
 }

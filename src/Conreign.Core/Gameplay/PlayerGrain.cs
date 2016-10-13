@@ -12,27 +12,22 @@ namespace Conreign.Core.Gameplay
     public class PlayerGrain : Grain<PlayerState>, IPlayerGrain
     {
         private Player _player;
-        private IClientPublisherGrain _publisher;
-        private IBus _roomBus;
+        private IPublisherGrain _publisher;
         private IBus _playerBus;
 
         public override async Task OnActivateAsync()
         {
             await InitializeState();
-            _publisher = GrainFactory.GetGrain<IClientPublisherGrain>(State.UserId, State.RoomId, null);
+            _publisher = GrainFactory.GetGrain<IPublisherGrain>(SystemTopics.Player(State.UserId, State.RoomId));
             _player = new Player(State, _publisher);
-            _roomBus = GrainFactory.GetGrain<IBusGrain>(SystemTopics.Room(State.RoomId)).AsBus();
-            _playerBus = GrainFactory.GetGrain<IBusGrain>(SystemTopics.Player(State.UserId, State.RoomId)).AsBus();
-            await _roomBus.Subscribe<GameStarted.System>(this.AsReference<IPlayerGrain>());
-            await _playerBus.Subscribe<Connected>(this.AsReference<IPlayerGrain>());
-            await _playerBus.Subscribe<Disconnected>(this.AsReference<IPlayerGrain>());
+            _playerBus = GrainFactory.GetGrain<IBusGrain>(SystemTopics.Player(State.UserId, State.RoomId));
+            await _playerBus.Subscribe(this.AsReference<IPlayerGrain>());
             await base.OnActivateAsync();
         }
 
         public override async Task OnDeactivateAsync()
         {
-            await _roomBus.UnsubscribeAll(this.AsReference<IPlayerGrain>());
-            await _playerBus.UnsubscribeAll(this.AsReference<IPlayerGrain>());
+            await _playerBus.Unsubscribe(this.AsReference<IPlayerGrain>());
             await base.OnDeactivateAsync();
         }
 

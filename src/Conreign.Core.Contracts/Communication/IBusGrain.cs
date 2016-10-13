@@ -1,13 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
-using Orleans;
+﻿using Orleans;
 
 namespace Conreign.Core.Contracts.Communication
 {
-    public interface IBusGrain : IGrainWithStringKey, ISystemPublisher
+    public interface IBusGrain : IGrainWithStringKey, IBus
     {
-        Task Subscribe(Type baseType, IEventHandler handler);
-        Task Unsubscribe(Type baseType, IEventHandler handler);
-        Task UnsubscribeAll(IEventHandler handler);
     }
 }

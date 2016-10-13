@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Conreign.Core.Communication;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Gameplay;
 using Conreign.Core.Contracts.Gameplay.Data;
@@ -16,8 +15,7 @@ namespace Conreign.Core.Gameplay
         public override async Task OnActivateAsync()
         {
             await InitializeState();
-            var bus = GrainFactory.GetGrain<IBusGrain>(SystemTopics.Room(State.RoomId));
-            _lobby = new Lobby(State, this, bus);
+            _lobby = new Lobby(State, this);
             await base.OnActivateAsync();
         }
 
@@ -26,22 +24,22 @@ namespace Conreign.Core.Gameplay
             return _lobby.GetState(userId);
         }
 
-        public Task Notify(ISet<Guid> users, params IClientEvent[] @event)
+        public Task Notify(ISet<Guid> users, params IEvent[] @event)
         {
             return _lobby.Notify(users, @event);
         }
 
-        public Task NotifyEverybody(params IClientEvent[] @event)
+        public Task NotifyEverybody(params IEvent[] @event)
         {
             return _lobby.NotifyEverybody(@event);
         }
 
-        public Task NotifyEverybodyExcept(ISet<Guid> users, params IClientEvent[] events)
+        public Task NotifyEverybodyExcept(ISet<Guid> users, params IEvent[] events)
         {
             return _lobby.NotifyEverybodyExcept(users, events);
         }
 
-        public Task Join(Guid userId, IClientPublisher publisher)
+        public Task Join(Guid userId, IPublisher<IEvent> publisher)
         {
             return _lobby.Join(userId, publisher);
         }

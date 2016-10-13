@@ -6,6 +6,15 @@ namespace Conreign.Core.Utility
 {
     public static class EnumerableExtensions
     {
+        public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+            return new HashSet<T>(source);
+        }
+
         public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source)
         {
             return source.Shuffle(new Random());

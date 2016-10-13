@@ -43,22 +43,22 @@ namespace Conreign.Core.Gameplay
             return Task.CompletedTask;
         }
 
-        public Task Notify(ISet<Guid> users, params IClientEvent[] events)
+        public Task Notify(ISet<Guid> users, params IEvent[] events)
         {
             return _hub.Notify(users, events);
         }
 
-        public Task NotifyEverybody(params IClientEvent[] events)
+        public Task NotifyEverybody(params IEvent[] events)
         {
             return _hub.NotifyEverybody(events);
         }
 
-        public Task NotifyEverybodyExcept(ISet<Guid> users, params IClientEvent[] events)
+        public Task NotifyEverybodyExcept(ISet<Guid> users, params IEvent[] events)
         {
             return _hub.NotifyEverybodyExcept(users, events);
         }
 
-        public Task Join(Guid userId, IClientPublisher publisher)
+        public Task Join(Guid userId, IPublisher<IEvent> publisher)
         {
             return _hub.Join(userId, publisher);
         }

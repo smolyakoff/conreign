@@ -41,11 +41,12 @@
     <Compile Include="Communication\IBus.cs" />
     <Compile Include="Communication\IBusGrain.cs" />
     <Compile Include="Communication\IClientEvent.cs" />
+    <Compile Include="Communication\IEvent.cs" />
     <Compile Include="Communication\IEventHandler%271.cs" />
+    <Compile Include="Communication\IEventHandler.cs" />
     <Compile Include="Communication\IHub.cs" />
-    <Compile Include="Communication\IClientPublisherGrain.cs" />
+    <Compile Include="Communication\IPublisherGrain.cs" />
     <Compile Include="Communication\IPublisher%271.cs" />
-    <Compile Include="Communication\ISystemPublisher.cs" />
     <Compile Include="Communication\ISystemEvent.cs" />
     <Compile Include="Exceptions\UserException%271.cs" />
     <Compile Include="Exceptions\UserException%272.cs" />
@@ -88,7 +89,6 @@
     <Compile Include="Presence\Events\UserStatusChanged.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Gameplay\Data\RoomMode.cs" />
-    <Compile Include="Communication\IClientPublisher.cs" />
     <Compile Include="Communication\StreamConstants.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
