@@ -8,9 +8,9 @@ namespace Conreign.Core.Contracts.Gameplay.Events
     {
 
         [Serializable]
-        public class System : ISystemEvent
+        public class Server : IServerEvent
         {
-            public System(IGame game)
+            public Server(IGame game)
             {
                 Game = game;
             }

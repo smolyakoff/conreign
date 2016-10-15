@@ -5,7 +5,7 @@ namespace Conreign.Core.Contracts.Communication.Events
 {
     [Serializable]
     [Immutable]
-    public class Disconnected : ISystemEvent
+    public class Disconnected : IServerEvent
     {
         public Disconnected(Guid connectionId)
         {

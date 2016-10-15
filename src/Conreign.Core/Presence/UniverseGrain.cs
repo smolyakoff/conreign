@@ -16,7 +16,7 @@ namespace Conreign.Core.Presence
         public override async Task OnActivateAsync()
         {
             _universe = new Universe(State);
-            _bus = GrainFactory.GetGrain<IBusGrain>(SystemTopics.Global);
+            _bus = GrainFactory.GetGrain<IBusGrain>(ServerTopics.Global);
             await _bus.Subscribe(this.AsReference<IUniverseGrain>());
             RegisterTimer(SaveState, null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
             await base.OnActivateAsync();

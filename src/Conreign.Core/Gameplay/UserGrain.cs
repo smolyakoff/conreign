@@ -37,10 +37,10 @@ namespace Conreign.Core.Gameplay
             return Task.FromResult<IPlayer>(player);
         }
 
-        public Task<IPublisher<ISystemEvent>> CreateSystemPublisher(string topic)
+        public Task<IPublisher<IServerEvent>> CreateSystemPublisher(string topic)
         {
             var publisher = GrainFactory.GetGrain<IBusGrain>(topic);
-            return Task.FromResult((IPublisher<ISystemEvent>)publisher);
+            return Task.FromResult((IPublisher<IServerEvent>)publisher);
         }
 
         private async Task EnsureUniverseActivated()

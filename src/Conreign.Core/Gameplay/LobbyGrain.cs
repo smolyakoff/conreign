@@ -1,22 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Conreign.Core.Communication;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Gameplay;
 using Conreign.Core.Contracts.Gameplay.Data;
+using Conreign.Core.Contracts.Gameplay.Events;
 using Orleans;
 
 namespace Conreign.Core.Gameplay
 {
-    public class LobbyGrain : Grain<LobbyState>, ILobbyGrain, IGameFactory
+    public class LobbyGrain : Grain<LobbyState>, ILobbyGrain
     {
         private Lobby _lobby;
+        private IBusGrain _bus;
 
         public override async Task OnActivateAsync()
         {
             await InitializeState();
             _lobby = new Lobby(State, this);
+            _bus = GrainFactory.GetGrain<IBusGrain>(ServerTopics.Room(State.RoomId));
+            await _bus.Subscribe(this.AsReference<ILobbyGrain>());
             await base.OnActivateAsync();
+        }
+
+        public override async Task OnDeactivateAsync()
+        {
+            await _bus.Unsubscribe(this.AsReference<ILobbyGrain>());
+            await base.OnDeactivateAsync();
         }
 
         public Task<IRoomData> GetState(Guid userId)
@@ -61,7 +72,7 @@ namespace Conreign.Core.Gameplay
 
         public Task GenerateMap(Guid userId)
         {
-            throw new NotImplementedException();
+            return _lobby.GenerateMap(userId);
         }
 
         public async Task<IGame> StartGame(Guid userId)
@@ -74,6 +85,7 @@ namespace Conreign.Core.Gameplay
         private Task InitializeState()
         {
             State.RoomId = this.GetPrimaryKeyString();
+            State.Hub.Self = GrainFactory.GetGrain<IBusGrain>(ServerTopics.Room(State.RoomId));
             return Task.CompletedTask;
         }
 
@@ -81,12 +93,19 @@ namespace Conreign.Core.Gameplay
         {
             var game = GrainFactory.GetGrain<IGameGrain>(this.GetPrimaryKeyString());
             var command = new InitialGameData(
-                State.MapEditor.Map,
-                State.Players,
-                State.Hub.Members
+                map: State.MapEditor.Map,
+                players: State.Players,
+                hub: State.Hub.Self,
+                hubMembers: State.Hub.Members,
+                hubJoinOrder: State.Hub.JoinOrder
             );
             await game.Initialize(command);
             return game;
+        }
+
+        public Task Handle(GameEnded @event)
+        {
+            return _lobby.Handle(@event);
         }
     }
 }

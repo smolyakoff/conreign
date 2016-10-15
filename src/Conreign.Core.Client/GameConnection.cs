@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
+using System.Threading;
 using System.Threading.Tasks;
 using Conreign.Core.Client.Exceptions;
 using Conreign.Core.Contracts.Communication;
@@ -66,18 +67,11 @@ namespace Conreign.Core.Client
             return _factory.GetGrain<IUserGrain>(userId);
         }
 
-        public async Task<T> WaitFor<T>() where T : IClientEvent
+        public Task<T> WaitFor<T>() where T : IClientEvent
         {
-            var tasks = new[]
-            {
-                Events.OfType<T>().FirstAsync().ToTask(),
-                Task.Run(new Func<Task<T>>(async () =>
-                {
-                    await Task.Delay(_eventWaitTimeout);
-                    throw new TimeoutException($"Timeouted waiting for event: {typeof(T).Name}");
-                })),
-            };
-            return await await Task.WhenAny(tasks);
+            var cts = new CancellationTokenSource();
+            cts.CancelAfter(_eventWaitTimeout);
+            return Events.OfType<T>().FirstAsync().ToTask(cts.Token);
         }
 
         private void PrepareContext(Guid? userId)

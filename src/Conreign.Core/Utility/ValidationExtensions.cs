@@ -28,6 +28,16 @@ namespace Conreign.Core.Utility
             throw UserException.Create<ValidationError, ValidationErrorDetails>(ValidationError.BadInput, results.ToConreignValidationErrorDetails());
         }
 
+        public static void EnsureIsValid<T, TValidator>(this T value) where TValidator : IValidator<T>, new()
+        {
+            if (value == null)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+            var validator = new TValidator();
+            value.EnsureIsValid(validator);
+        }
+
         private static ValidationErrorDetails ToConreignValidationErrorDetails(this ValidationResult result)
         {
             if (result.IsValid)

@@ -7,6 +7,7 @@ namespace Conreign.Core.Contracts.Gameplay
     public interface IGame : IRoom
     {
         Task LaunchFleet(Guid userId, FleetData fleet);
+        Task CancelFleet(Guid userId, FleetCancelationData fleet);
         Task EndTurn(Guid userId);
     }
 }

@@ -8,7 +8,8 @@ namespace Conreign.Core.Contracts.Gameplay
     public interface IPlayerGrain : 
         IGrainWithGuidCompoundKey,
         IPlayer,
-        IEventHandler<GameStarted.System>,
+        IEventHandler<GameStarted.Server>,
+        IEventHandler<GameEnded>,
         IEventHandler<Connected>,
         IEventHandler<Disconnected>
     {

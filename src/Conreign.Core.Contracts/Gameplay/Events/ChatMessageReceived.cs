@@ -1,5 +1,6 @@
 ﻿using System;
 using Conreign.Core.Contracts.Communication;
+using Conreign.Core.Contracts.Gameplay.Data;
 using Orleans.Concurrency;
 
 namespace Conreign.Core.Contracts.Gameplay.Events
@@ -8,7 +9,13 @@ namespace Conreign.Core.Contracts.Gameplay.Events
     [Immutable]
     public class ChatMessageReceived : IClientEvent
     {
-        public Guid SenderId { get; set; }
-        public string Text { get; set; }
+        public ChatMessageReceived(Guid senderId, TextMessageData message)
+        {
+            SenderId = senderId;
+            Message = message;
+        }
+
+        public Guid SenderId { get; }
+        public TextMessageData Message { get; }
     }
 }

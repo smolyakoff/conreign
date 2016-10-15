@@ -13,15 +13,15 @@ namespace Conreign.Core.Communication
     public class BusGrain : Grain<BusState>, IBusGrain
     {
         private Dictionary<Type, MethodInfo> _handlerMethodCache;
-        private IAsyncStream<ISystemEvent> _stream;
-        private Dictionary<Guid, StreamSubscriptionHandle<ISystemEvent>> _subscriptions;
+        private IAsyncStream<IServerEvent> _stream;
+        private Dictionary<Guid, StreamSubscriptionHandle<IServerEvent>> _subscriptions;
 
         public override async Task OnActivateAsync()
         {
             await InitializeState();
             _handlerMethodCache = new Dictionary<Type, MethodInfo>();
             var provider = GetStreamProvider(StreamConstants.ClientStreamProviderName);
-            var stream = provider.GetStream<ISystemEvent>(State.StreamId, State.Topic);
+            var stream = provider.GetStream<IServerEvent>(State.StreamId, State.Topic);
             _stream = stream;
             await RestoreSubscriptions();
             await base.OnActivateAsync();
@@ -65,7 +65,7 @@ namespace Conreign.Core.Communication
             await WriteStateAsync();
         }
 
-        public async Task Notify(params ISystemEvent[] events)
+        public async Task Notify(params IServerEvent[] events)
         {
             if (events == null)
             {
@@ -81,7 +81,7 @@ namespace Conreign.Core.Communication
             }, CancellationToken.None, TaskCreationOptions.None, ts);
         }
 
-        private async Task<StreamSubscriptionHandle<ISystemEvent>> ResumeInternal(IEventHandler handler, StreamSubscriptionHandle<ISystemEvent> subscription)
+        private async Task<StreamSubscriptionHandle<IServerEvent>> ResumeInternal(IEventHandler handler, StreamSubscriptionHandle<IServerEvent> subscription)
         {
             var func = CreateHandlerFunctionOrNull(handler);
             if (func == null)
@@ -92,7 +92,7 @@ namespace Conreign.Core.Communication
             return subscription;
         }
 
-        private async Task<StreamSubscriptionHandle<ISystemEvent>> SubscribeInternal(IEventHandler handler)
+        private async Task<StreamSubscriptionHandle<IServerEvent>> SubscribeInternal(IEventHandler handler)
         {
             var func = CreateHandlerFunctionOrNull(handler);
             if (func == null)
@@ -110,7 +110,7 @@ namespace Conreign.Core.Communication
                 .GetInterfaces()
                 .Where(x => typeof(IEventHandler).IsAssignableFrom(x) && x.IsGenericType)
                 .Select(x => x.GetGenericArguments()[0])
-                .Where(x => typeof(ISystemEvent).IsAssignableFrom(x))
+                .Where(x => typeof(IServerEvent).IsAssignableFrom(x))
                 .ToList();
             foreach (var eventType in eventTypes.Where(x => !_handlerMethodCache.ContainsKey(x)))
             {
@@ -121,7 +121,7 @@ namespace Conreign.Core.Communication
             return eventTypes;
         }
 
-        private Func<ISystemEvent, StreamSequenceToken, Task> CreateHandlerFunctionOrNull(IEventHandler handler)
+        private Func<IServerEvent, StreamSequenceToken, Task> CreateHandlerFunctionOrNull(IEventHandler handler)
         {
             var supportedTypes = GetSupportedEvents(handler);
             if (supportedTypes.Count == 0)
@@ -138,7 +138,7 @@ namespace Conreign.Core.Communication
             };
         }
 
-        private Task Handle(Type baseType, IEventHandler handler, ISystemEvent @event)
+        private Task Handle(Type baseType, IEventHandler handler, IServerEvent @event)
         {
             var method = _handlerMethodCache[baseType];
             return (Task) method.Invoke(handler, new object[]{@event});
@@ -161,7 +161,7 @@ namespace Conreign.Core.Communication
             var tasks = new List<Task>();
             foreach (var pair in State.HandlerSubscriptions)
             {
-                StreamSubscriptionHandle<ISystemEvent> subscription;
+                StreamSubscriptionHandle<IServerEvent> subscription;
                 var hasSubscription = _subscriptions.TryGetValue(pair.Value, out subscription);
                 tasks.Add(hasSubscription ? ResumeInternal(pair.Key, subscription) : SubscribeInternal(pair.Key));
             }

@@ -9,7 +9,12 @@ namespace Conreign.Core.Contracts.Gameplay.Data
     [Immutable]
     public class InitialGameData
     {
-        public InitialGameData(MapData map, List<PlayerData> players, Dictionary<Guid, IPublisher<IEvent>> hubMembers)
+        public InitialGameData(
+            MapData map, 
+            List<PlayerData> players,
+            IPublisher<IServerEvent> hub,
+            Dictionary<Guid, IPublisher<IEvent>> hubMembers, 
+            List<Guid> hubJoinOrder)
         {
             if (map == null)
             {
@@ -19,6 +24,10 @@ namespace Conreign.Core.Contracts.Gameplay.Data
             {
                 throw new ArgumentNullException(nameof(players));
             }
+            if (hub == null)
+            {
+                throw new ArgumentNullException(nameof(hub));
+            }
             if (hubMembers == null)
             {
                 throw new ArgumentNullException(nameof(hubMembers));
@@ -26,10 +35,14 @@ namespace Conreign.Core.Contracts.Gameplay.Data
             Map = map;
             Players = players;
             HubMembers = hubMembers;
+            HubJoinOrder = hubJoinOrder;
+            Hub = hub;
         }
 
         public MapData Map { get; }
         public List<PlayerData> Players { get; }
+        public IPublisher<IServerEvent> Hub { get; }
         public Dictionary<Guid, IPublisher<IEvent>> HubMembers { get; }
+        public List<Guid> HubJoinOrder { get; }
     }
 }

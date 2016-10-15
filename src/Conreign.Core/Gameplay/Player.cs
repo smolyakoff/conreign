@@ -5,10 +5,16 @@ using Conreign.Core.Contracts.Communication.Events;
 using Conreign.Core.Contracts.Gameplay;
 using Conreign.Core.Contracts.Gameplay.Data;
 using Conreign.Core.Contracts.Gameplay.Events;
+using Conreign.Core.Gameplay.Validators;
+using Conreign.Core.Utility;
 
 namespace Conreign.Core.Gameplay
 {
-    public class Player : IPlayer, IEventHandler<GameStarted.System>, IEventHandler<Connected>, IEventHandler<Disconnected>
+    public class Player : IPlayer, 
+        IEventHandler<GameStarted.Server>,
+        IEventHandler<GameEnded>,
+        IEventHandler<Connected>, 
+        IEventHandler<Disconnected>
     {
         private readonly PlayerState _state;
         private readonly IPublisher<IEvent> _publisher;
@@ -55,7 +61,7 @@ namespace Conreign.Core.Gameplay
         {
             var lobby = EnsureIsInLobby();
             var game = await lobby.StartGame(_state.UserId);
-            _state.Room = game;
+            _state.Game = game;
         }
 
         public Task LaunchFleet(FleetData fleet)
@@ -64,19 +70,26 @@ namespace Conreign.Core.Gameplay
             return game.LaunchFleet(_state.UserId, fleet);
         }
 
+        public Task CancelFleet(FleetCancelationData fleetCancelation)
+        {
+            var game = EnsureIsInGame();
+            return game.CancelFleet(_state.UserId, fleetCancelation);
+        }
+
         public Task EndTurn()
         {
             var game = EnsureIsInGame();
             return game.EndTurn(_state.UserId);
         }
 
-        public Task Write(string text)
+        public Task Write(TextMessageData textMessage)
         {
-            var @event = new ChatMessageReceived
+            if (textMessage == null)
             {
-                SenderId = _state.UserId,
-                Text = text
-            };
+                throw new ArgumentNullException(nameof(textMessage));
+            }
+            textMessage.EnsureIsValid<TextMessageData, TextMessageValidator>();
+            var @event = new ChatMessageReceived(_state.UserId, textMessage);
             return _state.Room.NotifyEverybody(@event);
         }
 
@@ -104,11 +117,20 @@ namespace Conreign.Core.Gameplay
             }
         }
 
-        public Task Handle(GameStarted.System @event)
+        public Task Handle(GameStarted.Server @event)
         {
-            if (_state.Room is ILobby)
+            if (_state.Game == null)
             {
-                _state.Room = @event.Game;
+                _state.Game = @event.Game;
+            }
+            return Task.CompletedTask;
+        }
+
+        public Task Handle(GameEnded @event)
+        {
+            if (_state.Game != null)
+            {
+                _state.Game = null;
             }
             return Task.CompletedTask;
         }

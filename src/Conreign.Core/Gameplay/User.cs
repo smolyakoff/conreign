@@ -15,7 +15,7 @@ namespace Conreign.Core.Gameplay
         private readonly ISystemPublisherFactory _systemPublisherFactory;
         private readonly IPlayerFactory _playerFactory;
         private readonly Dictionary<string, IPlayer> _playersCache;
-        private IPublisher<ISystemEvent> _globalPublisher;
+        private IPublisher<IServerEvent> _globalPublisher;
 
         public User(IUserContext userContext, ISystemPublisherFactory systemPublisherFactory, IPlayerFactory playerFactory)
         {
@@ -35,13 +35,15 @@ namespace Conreign.Core.Gameplay
             {
                 throw new ArgumentException("Room id cannot be null or empty.", nameof(roomId));
             }
-            _globalPublisher = _globalPublisher ?? await _systemPublisherFactory.CreateSystemPublisher(SystemTopics.Global);
+            _globalPublisher = _globalPublisher ?? await _systemPublisherFactory.CreateSystemPublisher(ServerTopics.Global);
             var connectionId = _userContext.ConnectionId;
-            var player = _playersCache.ContainsKey(roomId)
-                ? _playersCache[roomId]
-                : await _playerFactory.CreatePlayer(roomId);
+            if (_playersCache.ContainsKey(roomId))
+            {
+                return _playersCache[roomId];
+            }
+            var player = await _playerFactory.CreatePlayer(roomId);
             _playersCache[roomId] = player;
-            var publisher = await _systemPublisherFactory.CreateSystemPublisher(SystemTopics.Player(_userContext.UserId, roomId));
+            var publisher = await _systemPublisherFactory.CreateSystemPublisher(ServerTopics.Player(_userContext.UserId, roomId));
             var @event = new Connected(connectionId, publisher);
             await _globalPublisher.Notify(@event);
             return player;

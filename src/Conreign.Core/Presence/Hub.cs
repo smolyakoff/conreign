@@ -59,10 +59,15 @@ namespace Conreign.Core.Presence
             _state.Events.AddRange(states);
         }
 
-        public Task NotifyEverybody(params IEvent[] events)
+        public async Task NotifyEverybody(params IEvent[] events)
         {
             var ids = new HashSet<Guid>(_state.Members.Select(x => x.Key));
-            return Notify(ids, events);
+            var serverEvents = events.OfType<IServerEvent>().ToArray();
+            if (serverEvents.Length > 0)
+            {
+                await _state.Self.Notify(serverEvents);
+            }
+            await Notify(ids, events);
         }
 
         public Task NotifyEverybodyExcept(ISet<Guid> users, params IEvent[] events)

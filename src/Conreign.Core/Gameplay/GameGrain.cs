@@ -4,26 +4,32 @@ using System.Threading.Tasks;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Gameplay;
 using Conreign.Core.Contracts.Gameplay.Data;
+using Conreign.Core.Contracts.Gameplay.Events;
+using Conreign.Core.Gameplay.Battle;
 using Orleans;
 
 namespace Conreign.Core.Gameplay
 {
     public class GameGrain : Grain<GameState>, IGameGrain
     {
+        private static readonly TimeSpan TickInterval = TimeSpan.FromSeconds(5);
+        private const int TurnLengthInTicks = 12;
+
         private Game _game;
+        private IDisposable _timer;
+        private int _tick;
 
         public override Task OnActivateAsync()
         {
-            _game = new Game(State);
+            _game = new Game(State, new CoinBattleStrategy());
             return base.OnActivateAsync();
         }
 
-        public Task Initialize(InitialGameData data)
+        public async Task Initialize(InitialGameData data)
         {
-            State.Map = data.Map;
-            State.Hub.Members = data.HubMembers;
-            State.Players = data.Players;
-            return Task.CompletedTask;
+            await _game.Initialize(data);
+            await NotifyEverybody(new GameStarted(), new GameStarted.Server(this.AsReference<IGameGrain>()));
+            ScheduleTimer();
         }
 
         public Task<IRoomData> GetState(Guid userId)
@@ -31,19 +37,23 @@ namespace Conreign.Core.Gameplay
             return _game.GetState(userId);
         }
 
-        public Task LaunchFleet()
-        {
-            throw new System.NotImplementedException();
-        }
-
         public Task LaunchFleet(Guid userId, FleetData fleet)
         {
-            throw new NotImplementedException();
+            return _game.LaunchFleet(userId, fleet);
         }
 
-        public Task EndTurn(Guid userId)
+        public Task CancelFleet(Guid userId, FleetCancelationData fleet)
         {
-            throw new System.NotImplementedException();
+            return _game.CancelFleet(userId, fleet);
+        }
+
+        public async Task EndTurn(Guid userId)
+        {
+            await _game.EndTurn(userId);
+            if (!_game.IsAnybodyThinking)
+            {
+                await CalculateTurnInternal();
+            }
         }
 
         public Task Notify(ISet<Guid> users, params IEvent[] events)
@@ -69,6 +79,42 @@ namespace Conreign.Core.Gameplay
         public Task Leave(Guid userId)
         {
             return _game.Leave(userId);
+        }
+
+        private async Task Tick(object arg)
+        {
+            if (_timer == null)
+            {
+                return;
+            }
+            if (_tick == TurnLengthInTicks)
+            {
+                await CalculateTurnInternal();
+            }
+            else
+            {
+                await _game.NotifyEverybody(new GameTicked(_tick));
+                _tick++;
+            }
+        }
+
+        private async Task CalculateTurnInternal()
+        {
+            StopTimer();
+            await _game.CalculateTurn();
+            ScheduleTimer();
+        }
+
+        private void ScheduleTimer()
+        {
+            _timer = RegisterTimer(Tick, null, TimeSpan.Zero, TickInterval);
+        }
+
+        private void StopTimer()
+        {
+            _tick = 0;
+            _timer?.Dispose();
+            _timer = null;
         }
     }
 }

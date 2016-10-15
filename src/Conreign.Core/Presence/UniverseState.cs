@@ -6,6 +6,6 @@ namespace Conreign.Core.Presence
 {
     public class UniverseState
     {
-        public Dictionary<Guid, IPublisher<ISystemEvent>> Connections { get; set; } = new Dictionary<Guid, IPublisher<ISystemEvent>>();
+        public Dictionary<Guid, IPublisher<IServerEvent>> Connections { get; set; } = new Dictionary<Guid, IPublisher<IServerEvent>>();
     }
 }

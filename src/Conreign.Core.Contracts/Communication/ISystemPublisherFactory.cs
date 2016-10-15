@@ -4,6 +4,6 @@ namespace Conreign.Core.Contracts.Communication
 {
     public interface ISystemPublisherFactory
     {
-        Task<IPublisher<ISystemEvent>> CreateSystemPublisher(string topic);
+        Task<IPublisher<IServerEvent>> CreateSystemPublisher(string topic);
     }
 }

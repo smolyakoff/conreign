@@ -14,13 +14,13 @@ using Conreign.Core.Presence;
 
 namespace Conreign.Core.Gameplay
 {
-    public class Lobby : ILobby
+    public class Lobby : ILobby, IEventHandler<GameEnded>
     {
         private readonly LobbyState _state;
 
-        private readonly Hub _hub;
-        private readonly MapEditor _mapEditor;
-        private readonly PlayerListEditor _playerListEditor;
+        private Hub _hub;
+        private MapEditor _mapEditor;
+        private PlayerListEditor _playerListEditor;
         private readonly IGameFactory _gameFactory;
 
         public Lobby(LobbyState state, IGameFactory gameFactory)
@@ -38,13 +38,8 @@ namespace Conreign.Core.Gameplay
                 throw new ArgumentException("Room id should be initialized", nameof(state));
             }
             _state = state;
-            _hub = new Hub(state.Hub);
-            _mapEditor = new MapEditor(
-                state.MapEditor, 
-                new UniformRandomPlanetGenerator(UniformRandomPlanetGeneratorOptions.PlayerPlanetDefaults),
-                new UniformRandomPlanetGenerator(UniformRandomPlanetGeneratorOptions.NeutralPlanetDefaults));
-            _playerListEditor = new PlayerListEditor(_state.Players);
             _gameFactory = gameFactory;
+            Initialize();
         }
 
         public Task Notify(ISet<Guid> users, params IEvent[] events)
@@ -65,6 +60,7 @@ namespace Conreign.Core.Gameplay
         public async Task Join(Guid userId, IPublisher<IEvent> publisher)
         {
             EnsureGameIsNotStarted();
+
             if (!_playerListEditor.Contains(userId))
             {
                 var player = _playerListEditor.Add(userId);
@@ -97,10 +93,7 @@ namespace Conreign.Core.Gameplay
 
         public Task<IRoomData> GetState(Guid userId)
         {
-            if (!_hub.HasMemberOnline(userId))
-            {
-                throw new InvalidOperationException("Operation is only allowed for online members.");
-            }
+            EnsureUserIsOnline(userId);
             var state = new LobbyData
             {
                 Events = _hub.GetEvents(userId).ToList(),
@@ -116,7 +109,9 @@ namespace Conreign.Core.Gameplay
 
         public async Task UpdateGameOptions(Guid userId, GameOptionsData options)
         {
+            EnsureUserIsOnline(userId);
             EnsureGameIsNotStarted();
+
             var current = new GameOptionsData
             {
                 MapWidth = _mapEditor.MapWidth,
@@ -134,7 +129,9 @@ namespace Conreign.Core.Gameplay
 
         public async Task UpdatePlayerOptions(Guid userId, PlayerOptionsData options)
         {
+            EnsureUserIsOnline(userId);
             EnsureGameIsNotStarted();
+
             if (!_playerListEditor.Contains(userId))
             {
                 return;
@@ -150,20 +147,55 @@ namespace Conreign.Core.Gameplay
 
         public Task GenerateMap(Guid userId)
         {
+            EnsureUserIsOnline(userId);
             EnsureGameIsNotStarted();
+
             _mapEditor.Generate();
             var mapUpdated = new MapUpdated(_state.MapEditor.Map);
-            _hub.NotifyEverybody(mapUpdated);
-            return Task.CompletedTask;
+            return _hub.NotifyEverybody(mapUpdated);
         }
 
         public async Task<IGame> StartGame(Guid userId)
         {
+            EnsureUserIsOnline(userId);
             EnsureGameIsNotStarted();
+
             _state.IsGameStarted = true;
             var game = await _gameFactory.CreateGame();
-            await _hub.NotifyEverybody(new GameStarted(), new GameStarted.System(game));
             return game;
+        }
+
+        public Task Handle(GameEnded @event)
+        {
+            Reset();
+            return Task.CompletedTask;
+        }
+
+        private void Reset()
+        {
+            _state.IsGameStarted = false;
+            _state.MapEditor = new MapEditorState();
+            _state.Hub = new HubState();
+            _state.Players = new List<PlayerData>();
+            Initialize();
+        }
+
+        private void Initialize()
+        {
+            _hub = new Hub(_state.Hub);
+            _mapEditor = new MapEditor(
+                _state.MapEditor,
+                new UniformRandomPlanetGenerator(UniformRandomPlanetGeneratorOptions.PlayerPlanetDefaults),
+                new UniformRandomPlanetGenerator(UniformRandomPlanetGeneratorOptions.NeutralPlanetDefaults));
+            _playerListEditor = new PlayerListEditor(_state.Players);
+        }
+
+        private void EnsureUserIsOnline(Guid userId)
+        {
+            if (!_hub.HasMemberOnline(userId))
+            {
+                throw new InvalidOperationException("Operation is only allowed for online members.");
+            }
         }
 
         private void EnsureGameIsNotStarted()

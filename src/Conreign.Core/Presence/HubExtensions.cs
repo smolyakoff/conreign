@@ -8,7 +8,7 @@ namespace Conreign.Core.Presence
 {
     public static class HubExtensions
     {
-        public static Task NotifyEverybody(this IHub hub, IEnumerable<IClientEvent> events)
+        public static Task NotifyEverybody(this IHub hub, IEnumerable<IEvent> events)
         {
             if (hub == null)
             {
@@ -19,6 +19,19 @@ namespace Conreign.Core.Presence
                 throw new ArgumentNullException(nameof(events));
             }
             return hub.NotifyEverybody(events.ToArray());
+        }
+
+        public static Task Notify(this IHub hub, Guid userId, params IEvent[] events)
+        {
+            if (hub == null)
+            {
+                throw new ArgumentNullException(nameof(hub));
+            }
+            if (events == null)
+            {
+                throw new ArgumentNullException(nameof(events));
+            }
+            return hub.Notify(new HashSet<Guid> {userId}, events);
         }
     }
 }

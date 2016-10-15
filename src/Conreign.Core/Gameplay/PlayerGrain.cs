@@ -18,9 +18,9 @@ namespace Conreign.Core.Gameplay
         public override async Task OnActivateAsync()
         {
             await InitializeState();
-            _publisher = GrainFactory.GetGrain<IPublisherGrain>(SystemTopics.Player(State.UserId, State.RoomId));
+            _publisher = GrainFactory.GetGrain<IPublisherGrain>(ServerTopics.Player(State.UserId, State.RoomId));
             _player = new Player(State, _publisher);
-            _playerBus = GrainFactory.GetGrain<IBusGrain>(SystemTopics.Player(State.UserId, State.RoomId));
+            _playerBus = GrainFactory.GetGrain<IBusGrain>(ServerTopics.Player(State.UserId, State.RoomId));
             await _playerBus.Subscribe(this.AsReference<IPlayerGrain>());
             await base.OnActivateAsync();
         }
@@ -52,14 +52,19 @@ namespace Conreign.Core.Gameplay
             return _player.LaunchFleet(fleet);
         }
 
+        public Task CancelFleet(FleetCancelationData fleetCancelation)
+        {
+            return _player.CancelFleet(fleetCancelation);
+        }
+
         public Task EndTurn()
         {
             return _player.EndTurn();
         }
 
-        public Task Write(string text)
+        public Task Write(TextMessageData textMessage)
         {
-            return _player.Write(text);
+            return _player.Write(textMessage);
         }
 
         public Task<IRoomData> GetState()
@@ -72,14 +77,14 @@ namespace Conreign.Core.Gameplay
             string roomId;
             State.UserId = this.GetPrimaryKey(out roomId);
             State.RoomId = roomId;
-            if (State.Room == null)
+            if (State.Lobby == null)
             {
-                State.Room = GrainFactory.GetGrain<ILobbyGrain>(roomId);
+                State.Lobby = GrainFactory.GetGrain<ILobbyGrain>(roomId);
             }
             return Task.CompletedTask;
         }
 
-        public Task Handle(GameStarted.System @event)
+        public Task Handle(GameStarted.Server @event)
         {
             return _player.Handle(@event);
         }
@@ -94,6 +99,11 @@ namespace Conreign.Core.Gameplay
         {
             await _publisher.Handle(@event);
             await _player.Handle(@event);
+        }
+
+        public Task Handle(GameEnded @event)
+        {
+            return _player.Handle(@event);
         }
     }
 }

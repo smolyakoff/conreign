@@ -1,7 +1,7 @@
 using Conreign.Core.Contracts.Gameplay.Data;
 using FluentValidation;
 
-namespace Conreign.Core.Gameplay.Editor
+namespace Conreign.Core.Gameplay.Validators
 {
     internal class GameOptionsValidator : AbstractValidator<GameOptionsData>
     {

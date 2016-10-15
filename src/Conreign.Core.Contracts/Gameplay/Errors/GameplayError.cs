@@ -2,6 +2,7 @@
 {
     public enum GameplayError
     {
-        GameIsAlreadyInProgress
+        GameIsAlreadyInProgress,
+        TurnIsAlreadyEnded
     }
 }

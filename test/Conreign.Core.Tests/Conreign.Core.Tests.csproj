@@ -36,6 +36,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Gameplay\MapTest.cs" />
     <Compile Include="Gameplay\SequencesTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -43,6 +44,10 @@
     <None Include="paket.references" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Conreign.Core.Contracts\Conreign.Core.Contracts.csproj">
+      <Project>{00409622-346B-4926-B745-E5F595BD3BB7}</Project>
+      <Name>Conreign.Core.Contracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Conreign.Core\Conreign.Core.csproj">
       <Project>{dfdbf49b-30fa-424e-9ad2-85b35f39a053}</Project>
       <Name>Conreign.Core</Name>

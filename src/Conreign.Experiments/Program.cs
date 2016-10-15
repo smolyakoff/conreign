@@ -34,24 +34,25 @@ namespace Conreign.Experiments
                 var user = connection.Login();
 
                 var player = await user.JoinRoom("conreign");
-                await player.Write("Hello, world!");
+                await player.Write(new TextMessageData {Text = "Hello, world!"});
                 await player.UpdateOptions(new PlayerOptionsData
                 {
                     Nickname = "username",
                     Color = "#020000"
                 });
-                Thread.Sleep(random.Next(500));
+                await Task.Delay(random.Next(500));
                 var room = await player.GetState();
                 logger.OnNext(room);
                 if (isLeader)
                 {
-                    Thread.Sleep(500);
+                    await Task.Delay(3000);
                     await player.StartGame();
                 }
                 else
                 {
                     var started = await connection.WaitFor<GameStarted>();
                     Console.WriteLine("Now it's started!");
+                    await Task.Delay(TimeSpan.FromMinutes(3));
                 }
                   
             }

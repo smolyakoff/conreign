@@ -2,7 +2,7 @@
 
 namespace Conreign.Core.Communication
 {
-    public static class SystemTopics
+    public static class ServerTopics
     {
         public const string Global = "global";
 
@@ -17,6 +17,11 @@ namespace Conreign.Core.Communication
                 throw new ArgumentException("Room id cannot be null or empty.", nameof(roomId));
             }
             return $"player:{roomId}:{userId}";
+        }
+
+        public static string Room(string roomId)
+        {
+            return $"room:{roomId}";
         }
     }
 }

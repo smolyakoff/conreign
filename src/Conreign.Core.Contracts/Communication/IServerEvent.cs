@@ -1,6 +1,6 @@
 ﻿namespace Conreign.Core.Contracts.Communication
 {
-    public interface ISystemEvent : IEvent
+    public interface IServerEvent : IEvent
     {
     }
 }

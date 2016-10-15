@@ -9,6 +9,10 @@ namespace Conreign.Core.Gameplay
         public HashSet<Guid> ConnectionIds { get; } = new HashSet<Guid>();
         public Guid UserId { get; set; }
         public string RoomId { get; set; }
-        public IRoom Room { get; set; }
+
+        public ILobby Lobby { get; set; }
+        public IGame Game { get; set; }
+
+        public IRoom Room => (Lobby as IRoom) ?? Game;
     }
 }
