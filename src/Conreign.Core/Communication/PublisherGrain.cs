@@ -14,14 +14,14 @@ namespace Conreign.Core.Communication
     public class PublisherGrain : Grain, IPublisherGrain
     {
         private IStreamProvider _streamProvider;
-        private IDictionary<Guid, IAsyncStream<IClientEvent>> _streams;
-        private IBusGrain _bus;
+        private IDictionary<Guid, IAsyncStream<IClientEvent>> _clientStreams;
+        private IAsyncStream<IServerEvent> _serverStream;
 
         public override async Task OnActivateAsync()
         {
-            _streams = new Dictionary<Guid, IAsyncStream<IClientEvent>>();
+            _clientStreams = new Dictionary<Guid, IAsyncStream<IClientEvent>>();
             _streamProvider = GetStreamProvider(StreamConstants.ClientStreamProviderName);
-            _bus = GrainFactory.GetGrain<IBusGrain>(this.GetPrimaryKeyString());
+            _serverStream = _streamProvider.GetStream<IServerEvent>(Guid.Empty, this.GetPrimaryKeyString());
             await base.OnActivateAsync();
         }
 
@@ -33,21 +33,23 @@ namespace Conreign.Core.Communication
             }
             var clientEvents = events.OfType<IClientEvent>();
             var systemEvents = events.OfType<IServerEvent>();
-            var clientTasks = _streams.Keys
-                .SelectMany(connectionId => clientEvents.Select(e => _streams[connectionId].OnNextAsync(e)));
-            var systemTasks = systemEvents.Select(e => _bus.Notify(e));
-            var allTasks = systemTasks.Concat(clientTasks).ToList();
-            return Task.WhenAll(allTasks);
+            var clientTasks = _clientStreams
+                .Keys
+                .SelectMany(connectionId => clientEvents.Select(e => _clientStreams[connectionId].OnNextAsync(e)));
+            var serverTasks = systemEvents
+                .Select(e => _serverStream.OnNextAsync(e))
+                .ToList();
+            return Task.WhenAll(serverTasks.Concat(clientTasks));
         }
 
         public Task Handle(Connected @event)
         {
             var connectionId = @event.ConnectionId;
-            if (_streams.ContainsKey(connectionId))
+            if (_clientStreams.ContainsKey(connectionId))
             {
                 return Task.CompletedTask;
             }
-            _streams[connectionId] = CreateStream(connectionId);
+            _clientStreams[connectionId] = CreateStream(connectionId);
             return Task.CompletedTask;
         }
 
@@ -55,10 +57,10 @@ namespace Conreign.Core.Communication
         {
             var connectionId = @event.ConnectionId;
             IAsyncStream<IClientEvent> stream;
-            var isConnected = _streams.TryGetValue(connectionId, out stream);
+            var isConnected = _clientStreams.TryGetValue(connectionId, out stream);
             if (isConnected)
             {
-                _streams.Remove(connectionId);
+                _clientStreams.Remove(connectionId);
                 await stream.OnCompletedAsync();
             }
         }

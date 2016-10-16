@@ -21,7 +21,7 @@ namespace Conreign.Core.Gameplay.Battle
             var defenderShips = defender.Ships;
             var attackerWinThreshold = attacker.Power/totalPower; 
 
-            while (attackerShips > 0 || defenderShips > 0)
+            while (attackerShips > 0 && defenderShips > 0)
             {
                 var r = _random.NextDouble();
                 if (r < attackerWinThreshold)

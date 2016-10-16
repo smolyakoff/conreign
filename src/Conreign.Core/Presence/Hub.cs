@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Conreign.Core.Contracts.Communication;
+using Conreign.Core.Contracts.Gameplay.Events;
 using Conreign.Core.Contracts.Presence;
 using Conreign.Core.Contracts.Presence.Events;
 
@@ -65,6 +66,10 @@ namespace Conreign.Core.Presence
             var serverEvents = events.OfType<IServerEvent>().ToArray();
             if (serverEvents.Length > 0)
             {
+                if (events.Any(e => e.GetType() == typeof(GameStarted.Server)))
+                {
+                    var x = 1;
+                }
                 await _state.Self.Notify(serverEvents);
             }
             await Notify(ids, events);

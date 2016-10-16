@@ -60,9 +60,9 @@ namespace Conreign.Core.Gameplay
         public async Task Join(Guid userId, IPublisher<IEvent> publisher)
         {
             EnsureGameIsNotStarted();
-
             if (!_playerListEditor.Contains(userId))
             {
+                Console.WriteLine("Join");
                 var player = _playerListEditor.Add(userId);
                 var playerJoined = new PlayerJoined(player);
                 if (_playerListEditor.Count == 1)
@@ -194,7 +194,7 @@ namespace Conreign.Core.Gameplay
         {
             if (!_hub.HasMemberOnline(userId))
             {
-                throw new InvalidOperationException("Operation is only allowed for online members.");
+                throw new InvalidOperationException($"User ${userId} is not a online at {_state.RoomId}.");
             }
         }
 

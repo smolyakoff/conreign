@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Communication.Events;
@@ -6,6 +7,7 @@ using Conreign.Core.Contracts.Gameplay;
 using Conreign.Core.Contracts.Gameplay.Data;
 using Conreign.Core.Contracts.Gameplay.Events;
 using Conreign.Core.Gameplay.Validators;
+using Conreign.Core.Presence;
 using Conreign.Core.Utility;
 
 namespace Conreign.Core.Gameplay
@@ -62,6 +64,9 @@ namespace Conreign.Core.Gameplay
             var lobby = EnsureIsInLobby();
             var game = await lobby.StartGame(_state.UserId);
             _state.Game = game;
+            await _state.Room.NotifyEverybodyExcept(
+                new HashSet<Guid> {_state.UserId}, 
+                new GameStarted.Server(game));
         }
 
         public Task LaunchFleet(FleetData fleet)
@@ -93,9 +98,10 @@ namespace Conreign.Core.Gameplay
             return _state.Room.NotifyEverybody(@event);
         }
 
-        public Task<IRoomData> GetState()
+        public async Task<IRoomData> GetState()
         {
-            return _state.Room.GetState(_state.UserId);
+            var state = await _state.Room.GetState(_state.UserId);
+            return state;
         }
 
         public async Task Handle(Connected @event)
@@ -117,13 +123,13 @@ namespace Conreign.Core.Gameplay
             }
         }
 
-        public Task Handle(GameStarted.Server @event)
+        public async Task Handle(GameStarted.Server @event)
         {
             if (_state.Game == null)
             {
                 _state.Game = @event.Game;
             }
-            return Task.CompletedTask;
+            await _state.Room.Notify(_state.UserId, new GameStarted());
         }
 
         public Task Handle(GameEnded @event)

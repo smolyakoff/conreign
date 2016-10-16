@@ -28,7 +28,6 @@ namespace Conreign.Core.Gameplay
         public async Task Initialize(InitialGameData data)
         {
             await _game.Initialize(data);
-            await NotifyEverybody(new GameStarted(), new GameStarted.Server(this.AsReference<IGameGrain>()));
             ScheduleTimer();
         }
 
@@ -85,6 +84,11 @@ namespace Conreign.Core.Gameplay
         {
             if (_timer == null)
             {
+                return;
+            }
+            if (_game.IsEnded)
+            {
+                StopTimer();
                 return;
             }
             if (_tick == TurnLengthInTicks)

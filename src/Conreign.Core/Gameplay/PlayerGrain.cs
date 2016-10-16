@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Conreign.Core.Communication;
 using Conreign.Core.Contracts.Communication;
@@ -6,6 +7,7 @@ using Conreign.Core.Contracts.Gameplay;
 using Conreign.Core.Contracts.Gameplay.Data;
 using Conreign.Core.Contracts.Gameplay.Events;
 using Orleans;
+using Orleans.Streams;
 
 namespace Conreign.Core.Gameplay
 {
@@ -13,21 +15,22 @@ namespace Conreign.Core.Gameplay
     {
         private Player _player;
         private IPublisherGrain _publisher;
-        private IBus _playerBus;
+        private StreamSubscriptionHandle<IServerEvent> _subscription;
 
         public override async Task OnActivateAsync()
         {
             await InitializeState();
             _publisher = GrainFactory.GetGrain<IPublisherGrain>(ServerTopics.Player(State.UserId, State.RoomId));
             _player = new Player(State, _publisher);
-            _playerBus = GrainFactory.GetGrain<IBusGrain>(ServerTopics.Player(State.UserId, State.RoomId));
-            await _playerBus.Subscribe(this.AsReference<IPlayerGrain>());
+            var stream = GetStreamProvider(StreamConstants.ClientStreamProviderName)
+                .GetStream<IServerEvent>(Guid.Empty, ServerTopics.Player(State.UserId, State.RoomId));
+            _subscription = await this.EnsureIsSubscribedOnce(stream);
             await base.OnActivateAsync();
         }
 
         public override async Task OnDeactivateAsync()
         {
-            await _playerBus.Unsubscribe(this.AsReference<IPlayerGrain>());
+            await _subscription.UnsubscribeAsync();
             await base.OnDeactivateAsync();
         }
 
@@ -67,9 +70,13 @@ namespace Conreign.Core.Gameplay
             return _player.Write(textMessage);
         }
 
-        public Task<IRoomData> GetState()
+        public async Task<IRoomData> GetState()
         {
-            return _player.GetState();
+            Console.WriteLine("Player grain get state");
+            var st = await State.Room.GetState(State.UserId);
+            return st;
+            //var state = await _player.GetState();
+            //return state;
         }
 
         private Task InitializeState()
@@ -104,6 +111,11 @@ namespace Conreign.Core.Gameplay
         public Task Handle(GameEnded @event)
         {
             return _player.Handle(@event);
+        }
+
+        public Task Ping()
+        {
+            return Task.CompletedTask;
         }
     }
 }

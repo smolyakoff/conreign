@@ -36,7 +36,24 @@
     <Compile Include="Auth\OrleansUserContext.cs" />
     <Compile Include="Communication\BusGrain.cs" />
     <Compile Include="Communication\BusState.cs" />
+    <Compile Include="Communication\Publisher.cs" />
     <Compile Include="Communication\ServerTopics.cs" />
+    <Compile Include="Gameplay\AI\BattleBehaviour.cs" />
+    <Compile Include="Gameplay\AI\BotContext.cs" />
+    <Compile Include="Gameplay\AI\Bot.cs" />
+    <Compile Include="Gameplay\AI\IBotBattleStrategy.cs" />
+    <Compile Include="Gameplay\AI\IBotBehaviour%271.cs" />
+    <Compile Include="Gameplay\AI\IBotBehaviour.cs" />
+    <Compile Include="Gameplay\AI\IBotContext.cs" />
+    <Compile Include="Gameplay\AI\ILifetimeBotBehaviour.cs" />
+    <Compile Include="Gameplay\AI\JoinRoomBehaviour.cs" />
+    <Compile Include="Gameplay\AI\LogBehaviour.cs" />
+    <Compile Include="Gameplay\AI\NaiveBotBattleStrategyOptions.cs" />
+    <Compile Include="Gameplay\AI\StartGameBehaviour.cs" />
+    <Compile Include="Utility\PropertyComparer%272.cs" />
+    <Compile Include="Gameplay\AI\ReadOnlyMap.cs" />
+    <Compile Include="Gameplay\AI\ReadOnlyPlanetData.cs" />
+    <Compile Include="Gameplay\AI\NaiveBotBattleStrategy.cs" />
     <Compile Include="Gameplay\Battle\BattleFleet.cs" />
     <Compile Include="Gameplay\Battle\BattleOutcome.cs" />
     <Compile Include="Gameplay\Battle\CoinBattleStrategy.cs" />
@@ -66,7 +83,6 @@
     <Compile Include="Gameplay\Editor\Sequences.cs" />
     <Compile Include="Gameplay\Editor\UniformRandomPlanetGeneratorOptions.cs" />
     <Compile Include="Gameplay\Editor\UniformRandomPlanetGenerator.cs" />
-    <Compile Include="Gameplay\User.cs" />
     <Compile Include="Gameplay\UserGrain.cs" />
     <Compile Include="Gameplay\Validators\TextMessageValidator.cs" />
     <Compile Include="Presence\EventState.cs" />
@@ -108,7 +124,6 @@
   <ItemGroup>
     <None Include="paket.references" />
   </ItemGroup>
-  <ItemGroup />
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.5' Or $(TargetFrameworkVersion) == 'v4.5.1' Or $(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3' Or $(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1' Or $(TargetFrameworkVersion) == 'v4.6.2' Or $(TargetFrameworkVersion) == 'v4.6.3')">
       <ItemGroup>

@@ -4,27 +4,29 @@ using Conreign.Core.Communication;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Communication.Events;
 using Conreign.Core.Contracts.Presence;
+using Conreign.Core.Gameplay;
 using Orleans;
+using Orleans.Streams;
 
 namespace Conreign.Core.Presence
 {
     public class UniverseGrain : Grain<UniverseState>, IUniverseGrain
     {
         private Universe _universe;
-        private IBus _bus;
+        private StreamSubscriptionHandle<IServerEvent> _subscription;
 
         public override async Task OnActivateAsync()
         {
             _universe = new Universe(State);
-            _bus = GrainFactory.GetGrain<IBusGrain>(ServerTopics.Global);
-            await _bus.Subscribe(this.AsReference<IUniverseGrain>());
-            RegisterTimer(SaveState, null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
+            var stream = GetStreamProvider(StreamConstants.ClientStreamProviderName)
+                .GetStream<IServerEvent>(Guid.Empty, ServerTopics.Global);
+            _subscription = await this.EnsureIsSubscribedOnce(stream);
             await base.OnActivateAsync();
         }
 
         public override async Task OnDeactivateAsync()
         {
-            await _bus.Unsubscribe(this.AsReference<IUniverseGrain>());
+            await _subscription.UnsubscribeAsync();
             await base.OnDeactivateAsync();
         }
 
@@ -41,11 +43,6 @@ namespace Conreign.Core.Presence
         public Task Handle(Connected @event)
         {
             return _universe.Handle(@event);
-        }
-
-        private Task SaveState(object arg)
-        {
-            return WriteStateAsync();
         }
     }
 }

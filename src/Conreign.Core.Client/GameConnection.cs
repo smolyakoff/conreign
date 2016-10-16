@@ -16,6 +16,18 @@ using Orleans.Streams;
 
 namespace Conreign.Core.Client
 {
+    public class LoginResult
+    {
+        public LoginResult(IUser user, Guid userId)
+        {
+            User = user;
+            UserId = userId;
+        }
+
+        public IUser User { get; }
+        public Guid UserId { get; }
+    }
+
     public class GameConnection : IDisposable
     {
         private readonly IGrainFactory _factory;
@@ -52,25 +64,26 @@ namespace Conreign.Core.Client
 
         public Guid Id { get; }
 
-        public IObservable<object> Events => _subject;
+        public IObservable<IClientEvent> Events => _subject;
 
-        public IUser Login()
+        public LoginResult Login()
         {
             return Authenticate(null);
         }
 
-        public IUser Authenticate(string accessToken)
+        public LoginResult Authenticate(string accessToken)
         {
             EnsureIsNotDisposed();
             var userId = Guid.NewGuid();
             PrepareContext(userId);
-            return _factory.GetGrain<IUserGrain>(userId);
+            var user = _factory.GetGrain<IUserGrain>(userId);
+            return new LoginResult(user, userId);
         }
 
-        public Task<T> WaitFor<T>() where T : IClientEvent
+        public Task<T> WaitFor<T>(TimeSpan timeout) where T : IClientEvent
         {
             var cts = new CancellationTokenSource();
-            cts.CancelAfter(_eventWaitTimeout);
+            cts.CancelAfter(timeout);
             return Events.OfType<T>().FirstAsync().ToTask(cts.Token);
         }
 

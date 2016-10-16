@@ -7,9 +7,9 @@ namespace Conreign.Core.Contracts.Gameplay.Events
 {
     [Serializable]
     [Immutable]
-    public class AttackEnded : IClientEvent
+    public class AttackHappened : IClientEvent
     {
-        public AttackEnded(AttackOutcome outcome, string planetName, Guid attackerUserId, Guid? defenderUserId)
+        public AttackHappened(AttackOutcome outcome, string planetName, Guid attackerUserId, Guid? defenderUserId)
         {
             Outcome = outcome;
             PlanetName = planetName;

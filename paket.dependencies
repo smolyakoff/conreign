@@ -9,6 +9,7 @@ nuget xunit
 
 nuget System.Reactive.Core
 nuget System.Reactive.Linq
+nuget System.Interactive.Async
 nuget Polly
 nuget FluentValidation
 

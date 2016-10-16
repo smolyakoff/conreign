@@ -112,7 +112,8 @@ namespace Conreign.Core.Gameplay
 
             var validator = new LaunchFleetValidator(userId, _map);
             fleet.EnsureIsValid(validator);
-            var state = _state.PlayerStates.GetOrCreateDefault(userId, () => new PlayerGameState());;
+            var state = _state.PlayerStates.GetOrCreateDefault(userId, () => new PlayerGameState());
+            ;
             state.WaitingFleets.Add(fleet);
             var planet = _map.GetPlanetByNameOrNull(fleet.From);
             planet.Ships -= fleet.Ships;
@@ -161,6 +162,8 @@ namespace Conreign.Core.Gameplay
                 await MoveFleets(player);
                 player.TurnStatus = TurnStatus.Thinking;
             }
+            await MarkDeadPlayers();
+            await CheckGameEnd();
             var tasks = _state.PlayerStates
                 .Select(x =>
                 {
@@ -172,8 +175,6 @@ namespace Conreign.Core.Gameplay
                 })
                 .ToList();
             await Task.WhenAll(tasks);
-            await MarkDeadPlayers();
-            await CheckGameEnd();
             _state.Turn += 1;
         }
 
@@ -211,6 +212,7 @@ namespace Conreign.Core.Gameplay
                 .ToList();
             foreach (var @event in events)
             {
+                _state.PlayerStates[@event.UserId].TurnStatus = TurnStatus.Ended;
                 _state.PlayerStates[@event.UserId].Statistics.DeathTurn = _state.Turn;
             }
             return this.NotifyEverybody(events);
@@ -228,7 +230,7 @@ namespace Conreign.Core.Gameplay
             _state.IsEnded = true;
             _state.IsStarted = false;
             var @event = new GameEnded(
-                _state.RoomId, 
+                _state.RoomId,
                 _state.PlayerStates.ToDictionary(x => x.Key, x => x.Value.Statistics));
             return this.NotifyEverybody(@event);
         }
@@ -245,6 +247,7 @@ namespace Conreign.Core.Gameplay
             {
                 movingFleet.Position = movingFleet.Route
                     .SkipWhile(x => x != movingFleet.Position)
+                    .Skip(1)
                     .First();
                 var destination = _map.GetPlanetPositionByName(movingFleet.Fleet.To);
                 if (movingFleet.Position != destination)
@@ -252,33 +255,51 @@ namespace Conreign.Core.Gameplay
                     continue;
                 }
                 arrived.Add(movingFleet);
-                // Handle battle
-                await HandleBattle(movingFleet);
+                await HandleFleetArrival(movingFleet.Fleet);
             }
             player.MovingFleets = player.MovingFleets
                 .Where(x => !arrived.Contains(x))
                 .ToList();
         }
 
-        private async Task HandleBattle(MovingFleetData movingFleet)
+        private async Task HandleFleetArrival(FleetData fleet)
         {
-            var attackPlanet = _map.GetPlanetByNameOrNull(movingFleet.Fleet.From);
-            if (attackPlanet.OwnerId == null)
+            var attackerPlanet = _map.GetPlanetByName(fleet.From);
+            if (attackerPlanet.OwnerId == null)
             {
-                throw new InvalidOperationException($"Attack planet {attackPlanet.Name} does not have an owner.");
+                throw new InvalidOperationException($"Attacker planet {attackerPlanet.Name} is neutral.");
             }
-            var attacker = new BattleFleet(movingFleet.Fleet.Ships, attackPlanet.Power);
-            var defenderPlanet = _map.GetPlanetByNameOrNull(movingFleet.Fleet.To);
+            var defenderPlanet = _map.GetPlanetByName(fleet.To);
+            if (attackerPlanet.OwnerId == defenderPlanet.OwnerId)
+            {
+                defenderPlanet.Ships += fleet.Ships;
+                var reinforcementsArrived = new ReinforcementsArrived(
+                    planetName: attackerPlanet.Name,
+                    ownerId: attackerPlanet.OwnerId.Value,
+                    ships: fleet.Ships);
+                await this.Notify(attackerPlanet.OwnerId.Value, reinforcementsArrived);
+                return;
+            }
+            await HandleBattle(fleet, attackerPlanet, defenderPlanet);
+        }
+
+        private async Task HandleBattle(FleetData fleet, PlanetData attackerPlanet, PlanetData defenderPlanet)
+        {
+            if (attackerPlanet.OwnerId == null)
+            {
+                throw new InvalidOperationException($"Attacker planet {attackerPlanet.Name} is neutral.");
+            }
+            var attacker = new BattleFleet(fleet.Ships, attackerPlanet.Power);
             var defender = new BattleFleet(defenderPlanet.Ships, defenderPlanet.Power);
             var battleOutcome = _battleStrategy.Calculate(attacker, defender);
             var previousDefenderOwnerId = defenderPlanet.OwnerId;
-            var attackerStats = _state.PlayerStates[attackPlanet.OwnerId.Value].Statistics;
+            var attackerStats = _state.PlayerStates[attackerPlanet.OwnerId.Value].Statistics;
             attackerStats.ShipsDestroyed += defender.Ships - battleOutcome.DefenderShips;
             attackerStats.ShipsLost += attacker.Ships - battleOutcome.AttackerShips;
             if (battleOutcome.AttackerShips > 0)
             {
                 attackerStats.BattlesWon += 1;
-                defenderPlanet.OwnerId = attackPlanet.OwnerId;
+                defenderPlanet.OwnerId = attackerPlanet.OwnerId;
                 defenderPlanet.Ships = battleOutcome.AttackerShips;
             }
             else
@@ -287,12 +308,11 @@ namespace Conreign.Core.Gameplay
                 defenderPlanet.Ships = battleOutcome.DefenderShips;
             }
             var attackOutcome = battleOutcome.AttackerShips > 0 ? AttackOutcome.Win : AttackOutcome.Defeat;
-            var attackEnded = new AttackEnded(
-                attackerUserId: attackPlanet.OwnerId.Value,
+            var attackEnded = new AttackHappened(
+                attackerUserId: attackerPlanet.OwnerId.Value,
                 defenderUserId: defenderPlanet.OwnerId,
                 planetName: defenderPlanet.Name,
                 outcome: attackOutcome);
-            await this.Notify(attackPlanet.OwnerId.Value, attackEnded);
             if (previousDefenderOwnerId != null)
             {
                 var defenderStats = _state.PlayerStates[previousDefenderOwnerId.Value].Statistics;
@@ -306,8 +326,8 @@ namespace Conreign.Core.Gameplay
                 {
                     defenderStats.BattlesWon += 1;
                 }
-                await this.Notify(previousDefenderOwnerId.Value, attackEnded);
             }
+            await NotifyEverybody(attackEnded);
         }
 
         private void CalculateResources()
@@ -329,7 +349,7 @@ namespace Conreign.Core.Gameplay
                 var position = _map.GetPlanetPositionByName(fleet.From);
                 var movingFleet = new MovingFleetData
                 {
-                    Route = _map.CalculateRoute(fleet.From, fleet.To),
+                    Route = _map.GenerateRoute(fleet.From, fleet.To),
                     Fleet = fleet,
                     Position = position
                 };

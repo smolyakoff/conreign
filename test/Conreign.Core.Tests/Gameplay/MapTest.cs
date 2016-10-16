@@ -25,7 +25,7 @@ namespace Conreign.Core.Tests.Gameplay
                 [fromX, fromY] = new PlanetData {Name = "A"},
                 [toX, toY] = new PlanetData {Name = "B"}
             };
-            var route = map.CalculateRoute("A", "B");
+            var route = map.GenerateRoute("A", "B");
 
             // Assert start and end points
             var source = new Coordinate(fromX, fromY, width, height);

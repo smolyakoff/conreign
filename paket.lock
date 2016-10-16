@@ -483,6 +483,15 @@ NUGET
       System.Runtime (>= 4.1) - framework: >= netstandard13
       System.Runtime.Extensions (>= 4.1) - framework: >= netstandard13
       System.Runtime.InteropServices (>= 4.1) - framework: >= netstandard13
+    System.Interactive.Async (3.0)
+      System.Collections (>= 4.0.11) - framework: >= netstandard10
+      System.Diagnostics.Debug (>= 4.0.11) - framework: >= netstandard10
+      System.Linq (>= 4.1) - framework: >= netstandard10
+      System.Resources.ResourceManager (>= 4.0.1) - framework: >= netstandard10
+      System.Runtime (>= 4.1) - framework: >= netstandard10
+      System.Runtime.Extensions (>= 4.1) - framework: >= netstandard10
+      System.Threading (>= 4.0.11) - framework: >= netstandard10
+      System.Threading.Tasks (>= 4.0.11) - framework: >= netstandard10
     System.IO (4.1) - framework: >= net463, dnxcore50, >= netstandard10, netstandard13, netstandard14, >= netstandard16
       Microsoft.NETCore.Platforms (>= 1.0.1) - framework: dnxcore50, netstandard10, netstandard13, >= netstandard15
       Microsoft.NETCore.Targets (>= 1.0.1) - framework: dnxcore50, netstandard10, netstandard13, >= netstandard15

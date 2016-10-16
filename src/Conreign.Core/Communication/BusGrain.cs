@@ -6,13 +6,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Conreign.Core.Contracts.Communication;
 using Orleans;
+using Orleans.Concurrency;
 using Orleans.Streams;
 
 namespace Conreign.Core.Communication
 {
-    public class BusGrain : Grain<BusState>, IBusGrain
+    public class BusGrain : Grain<BusState>
     {
-        private Dictionary<Type, MethodInfo> _handlerMethodCache;
+        private static Dictionary<Type, MethodInfo> _handlerMethodCache;
         private IAsyncStream<IServerEvent> _stream;
         private Dictionary<Guid, StreamSubscriptionHandle<IServerEvent>> _subscriptions;
 
@@ -71,14 +72,14 @@ namespace Conreign.Core.Communication
             {
                 throw new ArgumentNullException(nameof(events));
             }
-            var ts = TaskScheduler.Current;
-            await Task.Factory.StartNew(async () =>
-            {
-                foreach (var @event in events)
-                {
-                    await _stream.OnNextAsync(@event);
-                }
-            }, CancellationToken.None, TaskCreationOptions.None, ts);
+            //var ts = TaskScheduler.Current;
+            //foreach (var @event in events)
+            //{
+            //    Console.WriteLine("Next Start");
+            //    await _stream.OnNextAsync(@event);
+            //    Console.WriteLine("Next End");
+            //}
+
         }
 
         private async Task<StreamSubscriptionHandle<IServerEvent>> ResumeInternal(IEventHandler handler, StreamSubscriptionHandle<IServerEvent> subscription)
@@ -101,6 +102,11 @@ namespace Conreign.Core.Communication
             }
             var subscription = await _stream.SubscribeAsync(func);
             return subscription;
+        }
+
+        private bool Test(IStreamIdentity stream, object filterdata, object item)
+        {
+            throw new NotImplementedException();
         }
 
         private List<Type> GetSupportedEvents(IEventHandler handler)
@@ -138,7 +144,7 @@ namespace Conreign.Core.Communication
             };
         }
 
-        private Task Handle(Type baseType, IEventHandler handler, IServerEvent @event)
+        private static Task Handle(Type baseType, IEventHandler handler, IServerEvent @event)
         {
             var method = _handlerMethodCache[baseType];
             return (Task) method.Invoke(handler, new object[]{@event});

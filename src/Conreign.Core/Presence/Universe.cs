@@ -42,13 +42,12 @@ namespace Conreign.Core.Presence
             if (_state.Connections.ContainsKey(connectionId))
             {
                 var previousConnection = _state.Connections[connectionId];
-                if (previousConnection != connection)
+                if (!previousConnection.Equals(connection))
                 {
                     await previousConnection.Notify(new Disconnected(connectionId));
                 }
                 return;
             }
-            await connection.Notify(new Connected(connectionId, connection));
             _state.Connections[connectionId] = connection;
         }
     }

@@ -13,6 +13,6 @@ namespace Conreign.Core.Gameplay
         public ILobby Lobby { get; set; }
         public IGame Game { get; set; }
 
-        public IRoom Room => (Lobby as IRoom) ?? Game;
+        public IRoom Room => (Game as IRoom) ?? Lobby;
     }
 }

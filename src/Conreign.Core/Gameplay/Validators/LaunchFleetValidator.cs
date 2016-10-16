@@ -24,10 +24,16 @@ namespace Conreign.Core.Gameplay.Validators
                 .Must(BelongToSender);
             RuleFor(x => x.To)
                 .NotEmpty()
-                .Must(Exist);
+                .Must(Exist)
+                .Must(NotBeTheSameAsFrom);
             RuleFor(x => x.Ships)
                 .GreaterThan(0)
                 .Must(BeEnoughShips);
+        }
+
+        private static bool NotBeTheSameAsFrom(FleetData fleet, string to)
+        {
+            return to != fleet.From;
         }
 
         private bool BeEnoughShips(FleetData fleet, int ships)

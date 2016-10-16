@@ -1,3 +1,6 @@
+System.Reactive.Core
+System.Reactive.Linq
+System.Interactive.Async
 Microsoft.Orleans.Client content: none
 Microsoft.Orleans.OrleansSQLUtils
 MongoDB.Driver

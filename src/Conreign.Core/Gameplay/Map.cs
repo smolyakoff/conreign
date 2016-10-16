@@ -25,6 +25,15 @@ namespace Conreign.Core.Gameplay
         public long FreeCellsCount => CellsCount - _state.Planets.Count;
         public long CellsCount => (long)_state.Width*_state.Height;
 
+        public long MaxDistance
+        {
+            get
+            {
+                var dim = Width < Height ? Width : Height;
+                return 2*dim - 2 + Math.Abs(Width - Height);
+            }
+        }
+
         public PlanetData this[long coordinate]
         {
             get
@@ -63,6 +72,8 @@ namespace Conreign.Core.Gameplay
             }
         }
 
+        public PlanetData this[string name] => GetPlanetByName(name);
+
         public bool ContainsPlanet(long coordinate)
         {
             return _state.Planets.ContainsKey(coordinate);
@@ -93,7 +104,51 @@ namespace Conreign.Core.Gameplay
             return _state.Planets.Values.FirstOrDefault(x => x.Name == name);
         }
 
-        public List<long> CalculateRoute(string from, string to)
+        public PlanetData GetPlanetByName(string name)
+        {
+            var planet = GetPlanetByNameOrNull(name);
+            if (planet == null)
+            {
+                throw new InvalidOperationException($"Planet {name} was not found");
+            }
+            return planet;;
+        }
+
+        public long CalculateDistance(string from, string to)
+        {
+            if (string.IsNullOrEmpty(from))
+            {
+                throw new ArgumentException("From cannot be null or empty.", nameof(from));
+            }
+            if (string.IsNullOrEmpty(to))
+            {
+                throw new ArgumentException("To cannot be null or empty.", nameof(to));
+            }
+            var source = GetPlanetCoordinateByName(from);
+            var destination = GetPlanetCoordinateByName(to);
+            var current = source;
+            var path = new List<long> { current.Position };
+            while (current != destination)
+            {
+                var distanceX = Math.Abs(destination.X - current.X);
+                var distanceY = Math.Abs(destination.Y - current.Y);
+                var x = 0;
+                var y = 0;
+                if (distanceX >= distanceY)
+                {
+                    x = destination.X - current.X > 0 ? 1 : -1;
+                }
+                else
+                {
+                    y = destination.Y - current.Y > 0 ? 1 : -1;
+                }
+                current = current.Move(x, y);
+                path.Add(current.Position);
+            }
+            return path.LongCount();
+        }
+
+        public List<long> GenerateRoute(string from, string to)
         {
             if (string.IsNullOrEmpty(from))
             {
