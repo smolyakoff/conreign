@@ -17,25 +17,22 @@ namespace Conreign.Core.Gameplay
     {
         private static bool _universeActivated;
         private OrleansUserContext _context;
-        private IAsyncStream<IServerEvent> _globalStream;
+        private Topic _globalTopic;
 
         public override async Task OnActivateAsync()
         {
             _context = new OrleansUserContext();
             await EnsureUniverseActivated();
-            _globalStream = GetStreamProvider(StreamConstants.ClientStreamProviderName)
-                    .GetStream<IServerEvent>(default(Guid), ServerTopics.Global);
+            _globalTopic = Topic.Global(GetStreamProvider(StreamConstants.ProviderName));
             await base.OnActivateAsync();
         }
 
         public async Task<IPlayer> JoinRoom(string roomId)
         {
             var player = GrainFactory.GetGrain<IPlayerGrain>(this.GetPrimaryKey(), roomId, null);
-            var stream = GetStreamProvider(StreamConstants.ClientStreamProviderName)
-                .GetStream<Disconnected>(Guid.Empty, ServerTopics.Player(this.GetPrimaryKey(), roomId));
-            var @event = new Connected(_context.ConnectionId, new Publisher<Disconnected>(stream));
+            var @event = new Connected(_context.ConnectionId, TopicIds.Player(_context.UserId, roomId));
             await player.Handle(@event);
-            await _globalStream.OnNextAsync(@event);
+            await _globalTopic.Send(@event);
             return player;
         }
 

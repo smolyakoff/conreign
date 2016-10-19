@@ -6,7 +6,7 @@ using Conreign.Core.Contracts.Presence;
 
 namespace Conreign.Core.Contracts.Gameplay
 {
-    public interface IRoom : IHub, IVisitable
+    public interface IRoom : IHub, IConnectable
     {
         Task<IRoomData> GetState(Guid userId);
     }

@@ -24,6 +24,7 @@ namespace Conreign.Core.Gameplay.AI
         public async Task Start(BotContext context)
         {
             await Task.Delay(_delay);
+
             context.Player = await context.User.JoinRoom(_roomId);
             await context.Player.UpdateOptions(new PlayerOptionsData
             {

@@ -37,6 +37,7 @@ namespace Conreign.Core.Gameplay.AI
 
         public async Task Handle(GameStarted @event, BotContext context)
         {
+            Console.WriteLine($"I'm started");
             if (context.Player == null)
             {
                 return;

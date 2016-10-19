@@ -38,17 +38,17 @@
     <Compile Include="Common\ValidationFailure.cs" />
     <Compile Include="Communication\Events\Connected.cs" />
     <Compile Include="Communication\Events\Disconnected.cs" />
-    <Compile Include="Communication\IBus.cs" />
-    <Compile Include="Communication\IBusGrain.cs" />
     <Compile Include="Communication\IClientEvent.cs" />
+    <Compile Include="Presence\IConnectable.cs" />
+    <Compile Include="Communication\IUserTopic.cs" />
     <Compile Include="Communication\IEvent.cs" />
     <Compile Include="Communication\IEventHandler%271.cs" />
     <Compile Include="Communication\IEventHandler.cs" />
     <Compile Include="Communication\IHub.cs" />
     <Compile Include="Communication\IPingable.cs" />
-    <Compile Include="Communication\IPublisherGrain.cs" />
-    <Compile Include="Communication\IPublisher%271.cs" />
     <Compile Include="Communication\IServerEvent.cs" />
+    <Compile Include="Communication\ITopic.cs" />
+    <Compile Include="Communication\ITopicFactory.cs" />
     <Compile Include="Exceptions\UserException%271.cs" />
     <Compile Include="Exceptions\UserException%272.cs" />
     <Compile Include="Exceptions\UserException.cs" />
@@ -80,7 +80,6 @@
     <Compile Include="Gameplay\Data\FleetCancelationData.cs" />
     <Compile Include="Gameplay\Data\TextMessageData.cs" />
     <Compile Include="Presence\Events\LeaderChanged.cs" />
-    <Compile Include="Communication\ISystemPublisherFactory.cs" />
     <Compile Include="Presence\PresenceStatus.cs" />
     <Compile Include="Gameplay\Events\ChatMessageReceived.cs" />
     <Compile Include="Gameplay\Data\FleetData.cs" />
@@ -98,7 +97,6 @@
     <Compile Include="Gameplay\IPlayer.cs" />
     <Compile Include="Gameplay\Data\IRoomData.cs" />
     <Compile Include="Gameplay\IUserGrain.cs" />
-    <Compile Include="Presence\IVisitable.cs" />
     <Compile Include="Presence\IUniverse.cs" />
     <Compile Include="Presence\IUniverseGrain.cs" />
     <Compile Include="Presence\Events\UserStatusChanged.cs" />

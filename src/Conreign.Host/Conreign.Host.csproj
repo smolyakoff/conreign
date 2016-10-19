@@ -51,10 +51,6 @@
     <None Include="paket.references" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Conreign.Core.Client\Conreign.Core.Client.csproj">
-      <Project>{27e2fbdd-0197-44a8-98f5-8c45de87f964}</Project>
-      <Name>Conreign.Core.Client</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Conreign.Core.Contracts\Conreign.Core.Contracts.csproj">
       <Project>{00409622-346b-4926-b745-e5f595bd3bb7}</Project>
       <Name>Conreign.Core.Contracts</Name>

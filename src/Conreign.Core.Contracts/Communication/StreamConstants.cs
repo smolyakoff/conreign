@@ -1,10 +1,8 @@
-﻿using System;
-
-namespace Conreign.Core.Contracts.Communication
+﻿namespace Conreign.Core.Contracts.Communication
 {
     public class StreamConstants
     {
-        public const string ClientStreamProviderName = "DefaultStream";
-        public const string ClientStreamNamespace = "Conreign.Client";
+        public const string ProviderName = "DefaultStream";
+        public const string ClientNamespace = "conreign/clients";
     }
 }

@@ -20,20 +20,26 @@ namespace Conreign.Core.Gameplay
     {
         private readonly GameState _state;
         private readonly IBattleStrategy _battleStrategy;
+        private readonly IUserTopic _topic;
         private Hub _hub;
         private Map _map;
 
-        public Game(GameState state, IBattleStrategy battleStrategy)
+        public Game(GameState state, IUserTopic topic, IBattleStrategy battleStrategy)
         {
             if (state == null)
             {
                 throw new ArgumentNullException(nameof(state));
             }
+            if (topic == null)
+            {
+                throw new ArgumentNullException(nameof(topic));
+            }
             if (battleStrategy == null)
             {
                 throw new ArgumentNullException(nameof(battleStrategy));
             }
-            _hub = new Hub(state.Hub);
+            _topic = topic;
+            _hub = new Hub(state.Hub, topic);
             _map = new Map(state.Map);
             _state = state;
             _battleStrategy = battleStrategy;
@@ -58,16 +64,27 @@ namespace Conreign.Core.Gameplay
             _state.Map = data.Map;
             _state.Hub = new HubState
             {
-                Self = data.Hub,
-                Members = data.HubMembers,
+                Members = data.HubMembers
+                    .ToDictionary(x => x.Key, x => new HubMemberState {ConnectionIds = x.Value}),
                 JoinOrder = data.HubJoinOrder
             };
             _state.Players = data.Players;
-            _state.PlayerStates = data.Players.ToDictionary(x => x.UserId, x => new PlayerGameState());
+            _state.PlayerStates = data.Players
+                .ToDictionary(x => x.UserId, x => new PlayerGameState());
             _state.Turn = 0;
             _map = new Map(_state.Map);
-            _hub = new Hub(_state.Hub);
+            _hub = new Hub(_state.Hub, _topic);
             return Task.CompletedTask;
+        }
+
+        public Task Connect(Guid userId, Guid connectionId)
+        {
+            return _hub.Connect(userId, connectionId);
+        }
+
+        public Task Disconnect(Guid userId, Guid connectionId)
+        {
+            return _hub.Disconnect(userId, connectionId);
         }
 
         public Task<IRoomData> GetState(Guid userId)
@@ -178,9 +195,9 @@ namespace Conreign.Core.Gameplay
             _state.Turn += 1;
         }
 
-        public Task Notify(ISet<Guid> users, params IEvent[] events)
+        public Task Notify(ISet<Guid> userIds, params IEvent[] events)
         {
-            return _hub.Notify(users, events);
+            return _hub.Notify(userIds, events);
         }
 
         public Task NotifyEverybody(params IEvent[] events)
@@ -188,20 +205,11 @@ namespace Conreign.Core.Gameplay
             return _hub.NotifyEverybody(events);
         }
 
-        public Task NotifyEverybodyExcept(ISet<Guid> users, params IEvent[] events)
+        public Task NotifyEverybodyExcept(ISet<Guid> userIds, params IEvent[] events)
         {
-            return _hub.NotifyEverybodyExcept(users, events);
+            return _hub.NotifyEverybodyExcept(userIds, events);
         }
 
-        public Task Join(Guid userId, IPublisher<IEvent> publisher)
-        {
-            return _hub.Join(userId, publisher);
-        }
-
-        public Task Leave(Guid userId)
-        {
-            return _hub.Leave(userId);
-        }
 
         private Task MarkDeadPlayers()
         {

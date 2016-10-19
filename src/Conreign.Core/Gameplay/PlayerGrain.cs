@@ -7,23 +7,23 @@ using Conreign.Core.Contracts.Gameplay;
 using Conreign.Core.Contracts.Gameplay.Data;
 using Conreign.Core.Contracts.Gameplay.Events;
 using Orleans;
+using Orleans.Concurrency;
 using Orleans.Streams;
 
 namespace Conreign.Core.Gameplay
 {
+    [Reentrant]
     public class PlayerGrain : Grain<PlayerState>, IPlayerGrain
     {
         private Player _player;
-        private IPublisherGrain _publisher;
         private StreamSubscriptionHandle<IServerEvent> _subscription;
 
         public override async Task OnActivateAsync()
         {
             await InitializeState();
-            _publisher = GrainFactory.GetGrain<IPublisherGrain>(ServerTopics.Player(State.UserId, State.RoomId));
-            _player = new Player(State, _publisher);
-            var stream = GetStreamProvider(StreamConstants.ClientStreamProviderName)
-                .GetStream<IServerEvent>(Guid.Empty, ServerTopics.Player(State.UserId, State.RoomId));
+            var provider = GetStreamProvider(StreamConstants.ProviderName);
+            var stream = provider.GetServerStream(TopicIds.Player(State.UserId, State.RoomId));            
+            _player = new Player(State);
             _subscription = await this.EnsureIsSubscribedOnce(stream);
             await base.OnActivateAsync();
         }
@@ -72,11 +72,7 @@ namespace Conreign.Core.Gameplay
 
         public async Task<IRoomData> GetState()
         {
-            Console.WriteLine("Player grain get state");
-            var st = await State.Room.GetState(State.UserId);
-            return st;
-            //var state = await _player.GetState();
-            //return state;
+            return await State.Room.GetState(State.UserId);
         }
 
         private Task InitializeState()
@@ -98,13 +94,11 @@ namespace Conreign.Core.Gameplay
 
         public async Task Handle(Connected @event)
         {
-            await _publisher.Handle(@event);
             await _player.Handle(@event);
         }
 
         public async Task Handle(Disconnected @event)
         {
-            await _publisher.Handle(@event);
             await _player.Handle(@event);
         }
 

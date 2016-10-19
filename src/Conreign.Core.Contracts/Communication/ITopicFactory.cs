@@ -2,8 +2,8 @@
 
 namespace Conreign.Core.Contracts.Communication
 {
-    public interface IPublisher<in T> where T : class
+    public interface ITopicFactory
     {
-        Task Notify(params T[] events);
+        Task<ITopic> Create(string id);
     }
 }

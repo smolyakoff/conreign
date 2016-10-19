@@ -22,7 +22,6 @@ namespace Conreign.Host.Storage
             BsonSerializer.RegisterSerializer(Type.GetType("System.RuntimeType"), new TypeSerializer());
 
             BsonClassMap.RegisterClassMap<UniverseState>();
-            BsonClassMap.RegisterClassMap<BusState>();
             BsonClassMap.RegisterClassMap<PlayerState>();
         }
     }

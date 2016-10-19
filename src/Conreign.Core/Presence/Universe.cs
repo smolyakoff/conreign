@@ -9,14 +9,20 @@ namespace Conreign.Core.Presence
     public class Universe : IUniverse, IEventHandler<Connected>
     {
         private readonly UniverseState _state;
+        private readonly ITopicFactory _topicFactory;
 
-        public Universe(UniverseState state)
+        public Universe(UniverseState state, ITopicFactory topicFactory)
         {
             if (state == null)
             {
                 throw new ArgumentNullException(nameof(state));
             }
+            if (topicFactory == null)
+            {
+                throw new ArgumentNullException(nameof(topicFactory));
+            }
             _state = state;
+            _topicFactory = topicFactory;
         }
 
         public async Task Disconnect(Guid connectionId)
@@ -25,9 +31,9 @@ namespace Conreign.Core.Presence
             {
                 return;
             }
-            var bus = _state.Connections[connectionId];
+            var topic = await _topicFactory.Create(_state.Connections[connectionId]);
             var @event = new Disconnected(connectionId);
-            await bus.Notify(@event);
+            await topic.Send(@event);
             _state.Connections.Remove(connectionId);
         }
 
@@ -38,17 +44,18 @@ namespace Conreign.Core.Presence
                 throw new ArgumentNullException(nameof(@event));
             }
             var connectionId = @event.ConnectionId;
-            var connection = @event.Connection;
+            var currentTopic = @event.TopicId;
             if (_state.Connections.ContainsKey(connectionId))
             {
-                var previousConnection = _state.Connections[connectionId];
-                if (!previousConnection.Equals(connection))
+                var previousTopic = _state.Connections[connectionId];
+                if (previousTopic != currentTopic)
                 {
-                    await previousConnection.Notify(new Disconnected(connectionId));
+                    var topic = await _topicFactory.Create(previousTopic);
+                    await topic.Send(new Disconnected(connectionId));
                 }
                 return;
             }
-            _state.Connections[connectionId] = connection;
+            _state.Connections[connectionId] = currentTopic;
         }
     }
 }

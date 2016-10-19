@@ -17,10 +17,8 @@ namespace Conreign.Core.Gameplay.AI
 
         public async Task Handle(PlayerJoined @event, BotContext context)
         {
-            Console.WriteLine("Joining...");
             if (_started || context.Player == null)
             {
-                Console.WriteLine("Exiting because of started or player null");
                 return;
             }
 
@@ -33,7 +31,6 @@ namespace Conreign.Core.Gameplay.AI
             {
                 _currentCount++;
             }
-            Console.WriteLine($"Joined: {_currentCount}");
             if (_currentCount < _targetPlayersCount)
             {
                 return;
@@ -43,9 +40,8 @@ namespace Conreign.Core.Gameplay.AI
                 return;
             }
             _started = true;
-            Console.WriteLine("Starting game...");
             await context.Player.StartGame();
-            Console.WriteLine("Started game");
+            var st = await context.Player.GetState();
         }
     }
 }

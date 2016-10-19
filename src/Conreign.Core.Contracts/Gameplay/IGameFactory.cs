@@ -1,9 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace Conreign.Core.Contracts.Gameplay
 {
     public interface IGameFactory
     {
-        Task<IGame> CreateGame();
+        Task<IGame> CreateGame(Guid userId);
     }
 }

@@ -17,17 +17,21 @@ namespace Conreign.Core.Gameplay
     public class Lobby : ILobby, IEventHandler<GameEnded>
     {
         private readonly LobbyState _state;
-
+        private readonly IUserTopic _topic;
         private Hub _hub;
         private MapEditor _mapEditor;
         private PlayerListEditor _playerListEditor;
         private readonly IGameFactory _gameFactory;
 
-        public Lobby(LobbyState state, IGameFactory gameFactory)
+        public Lobby(LobbyState state, IUserTopic topic, IGameFactory gameFactory)
         {
             if (state == null)
             {
                 throw new ArgumentNullException(nameof(state));
+            }
+            if (topic == null)
+            {
+                throw new ArgumentNullException(nameof(topic));
             }
             if (gameFactory == null)
             {
@@ -38,13 +42,14 @@ namespace Conreign.Core.Gameplay
                 throw new ArgumentException("Room id should be initialized", nameof(state));
             }
             _state = state;
+            _topic = topic;
             _gameFactory = gameFactory;
             Initialize();
         }
 
-        public Task Notify(ISet<Guid> users, params IEvent[] events)
+        public Task Notify(ISet<Guid> userIds, params IEvent[] events)
         {
-            return _hub.Notify(users, events);
+            return _hub.Notify(userIds, events);
         }
 
         public Task NotifyEverybody(params IEvent[] @event)
@@ -52,43 +57,9 @@ namespace Conreign.Core.Gameplay
             return _hub.NotifyEverybody(@event);
         }
 
-        public Task NotifyEverybodyExcept(ISet<Guid> users, params IEvent[] events)
+        public Task NotifyEverybodyExcept(ISet<Guid> userIds, params IEvent[] events)
         {
-            return _hub.NotifyEverybodyExcept(users, events);
-        }
-
-        public async Task Join(Guid userId, IPublisher<IEvent> publisher)
-        {
-            EnsureGameIsNotStarted();
-            if (!_playerListEditor.Contains(userId))
-            {
-                Console.WriteLine("Join");
-                var player = _playerListEditor.Add(userId);
-                var playerJoined = new PlayerJoined(player);
-                if (_playerListEditor.Count == 1)
-                {
-                    _mapEditor.Generate();
-                }
-                if (!_mapEditor.CanPlacePlanet)
-                {
-                    var options = new GameOptionsData
-                    {
-                        MapWidth = _mapEditor.MapWidth + 1,
-                        MapHeight = _mapEditor.MapHeigth + 1,
-                        NeutralPlanetsCount = _mapEditor.NeutralPlanetsCount
-                    };
-                    _mapEditor.Generate(options);
-                }
-                _mapEditor.PlacePlanet(userId);
-                var mapUpdated = new MapUpdated(_state.MapEditor.Map);
-                await _hub.NotifyEverybody(playerJoined, mapUpdated);
-            }
-            await _hub.Join(userId, publisher);
-        }
-
-        public async Task Leave(Guid userId)
-        {
-            await _hub.Leave(userId);
+            return _hub.NotifyEverybodyExcept(userIds, events);
         }
 
         public Task<IRoomData> GetState(Guid userId)
@@ -161,8 +132,42 @@ namespace Conreign.Core.Gameplay
             EnsureGameIsNotStarted();
 
             _state.IsGameStarted = true;
-            var game = await _gameFactory.CreateGame();
+            var game = await _gameFactory.CreateGame(userId);
             return game;
+        }
+
+        public async Task Connect(Guid userId, Guid connectionId)
+        {
+            EnsureGameIsNotStarted();
+
+            if (!_playerListEditor.Contains(userId))
+            {
+                var player = _playerListEditor.Add(userId);
+                var playerJoined = new PlayerJoined(player);
+                if (_playerListEditor.Count == 1)
+                {
+                    _mapEditor.Generate();
+                }
+                if (!_mapEditor.CanPlacePlanet)
+                {
+                    var options = new GameOptionsData
+                    {
+                        MapWidth = _mapEditor.MapWidth + 1,
+                        MapHeight = _mapEditor.MapHeigth + 1,
+                        NeutralPlanetsCount = _mapEditor.NeutralPlanetsCount
+                    };
+                    _mapEditor.Generate(options);
+                }
+                _mapEditor.PlacePlanet(userId);
+                var mapUpdated = new MapUpdated(_state.MapEditor.Map);
+                await _hub.NotifyEverybody(playerJoined, mapUpdated);
+            }
+            await _hub.Connect(userId, connectionId);
+        }
+
+        public Task Disconnect(Guid userId, Guid connectionId)
+        {
+            return _hub.Disconnect(userId, connectionId);
         }
 
         public Task Handle(GameEnded @event)
@@ -182,7 +187,7 @@ namespace Conreign.Core.Gameplay
 
         private void Initialize()
         {
-            _hub = new Hub(_state.Hub);
+            _hub = new Hub(_state.Hub, _topic);
             _mapEditor = new MapEditor(
                 _state.MapEditor,
                 new UniformRandomPlanetGenerator(UniformRandomPlanetGeneratorOptions.PlayerPlanetDefaults),

@@ -7,13 +7,13 @@ namespace Conreign.Core.Contracts.Communication.Events
     [Immutable]
     public class Connected : IServerEvent
     {
-        public Connected(Guid connectionId, IPublisher<Disconnected> connection)
+        public Connected(Guid connectionId, string topicId)
         {
             ConnectionId = connectionId;
-            Connection = connection;
+            TopicId = topicId;
         }
 
         public Guid ConnectionId { get; }
-        public IPublisher<Disconnected> Connection { get; }
+        public string TopicId { get; }
     }
 }

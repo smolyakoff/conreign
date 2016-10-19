@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Conreign.Core.Contracts.Communication;
 using Orleans.Concurrency;
 
 namespace Conreign.Core.Contracts.Gameplay.Data
@@ -10,10 +9,10 @@ namespace Conreign.Core.Contracts.Gameplay.Data
     public class InitialGameData
     {
         public InitialGameData(
+            Guid initiatorId,
             MapData map, 
             List<PlayerData> players,
-            IPublisher<IServerEvent> hub,
-            Dictionary<Guid, IPublisher<IEvent>> hubMembers, 
+            Dictionary<Guid, HashSet<Guid>> hubMembers,
             List<Guid> hubJoinOrder)
         {
             if (map == null)
@@ -24,25 +23,25 @@ namespace Conreign.Core.Contracts.Gameplay.Data
             {
                 throw new ArgumentNullException(nameof(players));
             }
-            if (hub == null)
-            {
-                throw new ArgumentNullException(nameof(hub));
-            }
             if (hubMembers == null)
             {
                 throw new ArgumentNullException(nameof(hubMembers));
             }
+            if (hubJoinOrder == null)
+            {
+                throw new ArgumentNullException(nameof(hubJoinOrder));
+            }
+            InitiatorId = initiatorId;
             Map = map;
             Players = players;
             HubMembers = hubMembers;
             HubJoinOrder = hubJoinOrder;
-            Hub = hub;
         }
 
+        public Guid InitiatorId { get; }
         public MapData Map { get; }
         public List<PlayerData> Players { get; }
-        public IPublisher<IServerEvent> Hub { get; }
-        public Dictionary<Guid, IPublisher<IEvent>> HubMembers { get; }
+        public Dictionary<Guid, HashSet<Guid>> HubMembers { get; }
         public List<Guid> HubJoinOrder { get; }
     }
 }

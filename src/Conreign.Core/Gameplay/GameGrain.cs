@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Conreign.Core.Communication;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Gameplay;
 using Conreign.Core.Contracts.Gameplay.Data;
 using Conreign.Core.Contracts.Gameplay.Events;
 using Conreign.Core.Gameplay.Battle;
+using Conreign.Core.Presence;
 using Orleans;
+using Orleans.Concurrency;
 
 namespace Conreign.Core.Gameplay
 {
@@ -21,13 +24,16 @@ namespace Conreign.Core.Gameplay
 
         public override Task OnActivateAsync()
         {
-            _game = new Game(State, new CoinBattleStrategy());
+            var topic = Topic.Room(GetStreamProvider(StreamConstants.ProviderName), this.GetPrimaryKeyString());
+            _game = new Game(State, topic, new CoinBattleStrategy());
             return base.OnActivateAsync();
         }
 
         public async Task Initialize(InitialGameData data)
         {
             await _game.Initialize(data);
+            var gameStarted = new GameStarted.Server(this.AsReference<IGameGrain>());
+            await _game.NotifyEverybodyExcept(data.InitiatorId, gameStarted);
             ScheduleTimer();
         }
 
@@ -55,9 +61,9 @@ namespace Conreign.Core.Gameplay
             }
         }
 
-        public Task Notify(ISet<Guid> users, params IEvent[] events)
+        public Task Notify(ISet<Guid> userIds, params IEvent[] events)
         {
-            return _game.Notify(users, events);
+            return _game.Notify(userIds, events);
         }
 
         public Task NotifyEverybody(params IEvent[] events)
@@ -65,19 +71,19 @@ namespace Conreign.Core.Gameplay
             return _game.NotifyEverybody(events);
         }
 
-        public Task NotifyEverybodyExcept(ISet<Guid> users, params IEvent[] events)
+        public Task NotifyEverybodyExcept(ISet<Guid> userIds, params IEvent[] events)
         {
-            return _game.NotifyEverybodyExcept(users, events);
+            return _game.NotifyEverybodyExcept(userIds, events);
         }
 
-        public Task Join(Guid userId, IPublisher<IEvent> publisher)
+        public Task Connect(Guid userId, Guid connectionId)
         {
-            return _game.Join(userId, publisher);
+            return _game.Connect(userId, connectionId);
         }
 
-        public Task Leave(Guid userId)
+        public Task Disconnect(Guid userId, Guid connectionId)
         {
-            return _game.Leave(userId);
+            return _game.Disconnect(userId, connectionId);
         }
 
         private async Task Tick(object arg)

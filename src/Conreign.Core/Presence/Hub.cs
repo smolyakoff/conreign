@@ -6,32 +6,54 @@ using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Gameplay.Events;
 using Conreign.Core.Contracts.Presence;
 using Conreign.Core.Contracts.Presence.Events;
+using Conreign.Core.Utility;
 
 namespace Conreign.Core.Presence
 {
-    public class Hub : IHub, IVisitable
+    public class Hub : IHub
     {
         private readonly HubState _state;
+        private readonly IUserTopic _topic;
 
-        public Hub(HubState state)
+        public Hub(HubState state, IUserTopic topic)
         {
             if (state == null)
             {
                 throw new ArgumentNullException(nameof(state));
             }
+            if (topic == null)
+            {
+                throw new ArgumentNullException(nameof(topic));
+            }
             _state = state;
+            _topic = topic;
         }
 
-        public async Task Join(Guid userId, IPublisher<IEvent> publisher)
+        public async Task Connect(Guid userId, Guid connectionId)
         {
-            var events = WithLeaderCheck(() => JoinInternal(userId, publisher));
-            await this.NotifyEverybody(events);
+            var member = _state.Members.GetOrCreateDefault(userId);
+            member.ConnectionIds.Add(connectionId);
+            var isFirstConnection = member.ConnectionIds.Count == 1;
+            if (isFirstConnection)
+            {
+                var events = WithLeaderCheck(() => Join(userId));
+                await this.NotifyEverybody(events);
+            }
         }
 
-        public async Task Leave(Guid userId)
+        public async Task Disconnect(Guid userId, Guid connectionId)
         {
-            var events = WithLeaderCheck(() => LeaveInternal(userId));
-            await this.NotifyEverybody(events);
+            if (!_state.Members.ContainsKey(userId))
+            {
+                return;
+            }
+            var member = _state.Members.GetOrCreateDefault(userId);
+            member.ConnectionIds.Remove(connectionId);
+            if (member.ConnectionIds.Count == 0)
+            {
+                var events = WithLeaderCheck(() => Leave(userId));
+                await this.NotifyEverybody(events);
+            }
         }
 
         public async Task Notify(ISet<Guid> userIds, params IEvent[] events)
@@ -44,12 +66,16 @@ namespace Conreign.Core.Presence
             {
                 throw new ArgumentNullException(nameof(events));
             }
-            var receivers = _state.Members
+            var targetUserIds = _state.Members
+                .Select(x => x.Key)
+                .Where(userIds.Contains)
+                .ToHashSet();
+            var targetConnectionIds = _state.Members
                 .Where(x => userIds.Contains(x.Key))
-                .Select(x => x.Value)
-                .ToList();
-            var tasks = receivers.Select(x => x.Notify(events)).ToList();
-            await Task.WhenAll(tasks);
+                .SelectMany(x => x.Value.ConnectionIds)
+                .ToHashSet();
+            await _topic.Broadcast(targetUserIds, targetConnectionIds, events);
+            // TODO: filter events, not all of them should be saved
             var states = events
                 .OfType<IClientEvent>()
                 .Select(x => new EventState
@@ -62,29 +88,26 @@ namespace Conreign.Core.Presence
 
         public async Task NotifyEverybody(params IEvent[] events)
         {
-            var ids = new HashSet<Guid>(_state.Members.Select(x => x.Key));
+            var ids = _state.Members.Select(x => x.Key).ToHashSet();
             var serverEvents = events.OfType<IServerEvent>().ToArray();
             if (serverEvents.Length > 0)
             {
-                if (events.Any(e => e.GetType() == typeof(GameStarted.Server)))
-                {
-                    var x = 1;
-                }
-                await _state.Self.Notify(serverEvents);
+                await _topic.Send(serverEvents);
             }
             await Notify(ids, events);
         }
 
-        public Task NotifyEverybodyExcept(ISet<Guid> users, params IEvent[] events)
+        public Task NotifyEverybodyExcept(ISet<Guid> userIds, params IEvent[] events)
         {
-            var ids = new HashSet<Guid>(_state.Members.Select(x => x.Key));
-            ids.ExceptWith(users);
+            var ids = _state.Members.Select(x => x.Key).ToHashSet();
+            ids.ExceptWith(userIds);
             return Notify(ids, events);
         }
 
         public bool HasMemberOnline(Guid userId)
         {
-            return _state.Members.ContainsKey(userId);
+            return _state.Members.ContainsKey(userId) && 
+                _state.Members[userId].ConnectionIds.Count > 0;
         }
 
         public IEnumerable<IClientEvent> GetEvents(Guid userId)
@@ -105,9 +128,8 @@ namespace Conreign.Core.Presence
             }
         }
 
-        private IEnumerable<IClientEvent> JoinInternal(Guid userId, IPublisher<IEvent> publisher)
+        private IEnumerable<IClientEvent> Join(Guid userId)
         {
-            _state.Members[userId] = publisher;
             if (!_state.JoinOrder.Contains(userId))
             {
                 _state.JoinOrder.Add(userId);
@@ -121,13 +143,8 @@ namespace Conreign.Core.Presence
 
         }
 
-        private IEnumerable<IClientEvent> LeaveInternal(Guid userId)
+        private static IEnumerable<IClientEvent> Leave(Guid userId)
         {
-            var removed = _state.Members.Remove(userId);
-            if (!removed)
-            {
-                yield break;
-            }
             var @event = new UserStatusChanged
             {
                 Status = PresenceStatus.Offline,

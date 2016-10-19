@@ -40,8 +40,8 @@ namespace Conreign.Core.Client
         {
             var universe = grainFactory.GetGrain<IUniverseGrain>(default(long));
             await universe.Ping();
-            var stream = GrainClient.GetStreamProvider(StreamConstants.ClientStreamProviderName)
-                .GetStream<IClientEvent>(connectionId, StreamConstants.ClientStreamNamespace);
+            var stream = GrainClient.GetStreamProvider(StreamConstants.ProviderName)
+                .GetStream<IClientEvent>(connectionId, StreamConstants.ClientNamespace);
             var existingHandles = await stream.GetAllSubscriptionHandles();
             var connection = new GameConnection(connectionId, grainFactory);
             var handle = existingHandles.Count > 0 

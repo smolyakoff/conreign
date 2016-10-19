@@ -24,13 +24,13 @@ namespace Conreign.Core.Gameplay.AI
             return Task.CompletedTask;
         }
 
-        public Task Handle(PlayerUpdated @event, BotContext context)
+        public async Task Handle(PlayerUpdated @event, BotContext context)
         {
+            await Handle((IClientEvent) @event, context);
             if (@event.Player.UserId == context.UserId)
             {
                 _name = @event.Player.Nickname;
             }
-            return Task.CompletedTask;
         }
     }
 }

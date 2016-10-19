@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Communication.Events;
@@ -19,17 +18,12 @@ namespace Conreign.Core.Gameplay
         IEventHandler<Disconnected>
     {
         private readonly PlayerState _state;
-        private readonly IPublisher<IEvent> _publisher;
 
-        public Player(PlayerState state, IPublisher<IEvent> publisher)
+        public Player(PlayerState state)
         {
             if (state == null)
             {
                 throw new ArgumentNullException(nameof(state));
-            }
-            if (publisher == null)
-            {
-                throw new ArgumentNullException(nameof(publisher));
             }
             if (string.IsNullOrEmpty(state.RoomId))
             {
@@ -44,7 +38,6 @@ namespace Conreign.Core.Gameplay
                 throw new ArgumentException("Room should be initialized", nameof(state));
             }
             _state = state;
-            _publisher = publisher;
         }
 
         public Task UpdateOptions(PlayerOptionsData options)
@@ -64,9 +57,7 @@ namespace Conreign.Core.Gameplay
             var lobby = EnsureIsInLobby();
             var game = await lobby.StartGame(_state.UserId);
             _state.Game = game;
-            await _state.Room.NotifyEverybodyExcept(
-                new HashSet<Guid> {_state.UserId}, 
-                new GameStarted.Server(game));
+            await game.NotifyEverybody(new GameStarted());
         }
 
         public Task LaunchFleet(FleetData fleet)
@@ -104,32 +95,23 @@ namespace Conreign.Core.Gameplay
             return state;
         }
 
-        public async Task Handle(Connected @event)
+        public Task Handle(Connected @event)
         {
-            _state.ConnectionIds.Add(@event.ConnectionId);
-            var isFirstConnection = _state.ConnectionIds.Count == 1;
-            if (isFirstConnection)
-            {
-                await _state.Room.Join(_state.UserId, _publisher);
-            }
+            return _state.Room.Connect(_state.UserId, @event.ConnectionId);
         }
 
-        public async Task Handle(Disconnected @event)
+        public Task Handle(Disconnected @event)
         {
-            _state.ConnectionIds.Remove(@event.ConnectionId);
-            if (_state.ConnectionIds.Count == 0)
-            {
-                await _state.Room.Leave(_state.UserId);
-            }
+            return _state.Room.Disconnect(_state.UserId, @event.ConnectionId);
         }
 
-        public async Task Handle(GameStarted.Server @event)
+        public Task Handle(GameStarted.Server @event)
         {
             if (_state.Game == null)
             {
                 _state.Game = @event.Game;
             }
-            await _state.Room.Notify(_state.UserId, new GameStarted());
+            return Task.CompletedTask;
         }
 
         public Task Handle(GameEnded @event)

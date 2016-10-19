@@ -34,10 +34,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Auth\OrleansUserContext.cs" />
-    <Compile Include="Communication\BusGrain.cs" />
-    <Compile Include="Communication\BusState.cs" />
-    <Compile Include="Communication\Publisher.cs" />
-    <Compile Include="Communication\ServerTopics.cs" />
+    <Compile Include="Communication\EventObserver%272.cs" />
+    <Compile Include="Communication\Topic.cs" />
+    <Compile Include="Communication\TopicIds.cs" />
     <Compile Include="Gameplay\AI\BattleBehaviour.cs" />
     <Compile Include="Gameplay\AI\BotContext.cs" />
     <Compile Include="Gameplay\AI\Bot.cs" />
@@ -50,6 +49,8 @@
     <Compile Include="Gameplay\AI\LogBehaviour.cs" />
     <Compile Include="Gameplay\AI\NaiveBotBattleStrategyOptions.cs" />
     <Compile Include="Gameplay\AI\StartGameBehaviour.cs" />
+    <Compile Include="Communication\StreamExtensions.cs" />
+    <Compile Include="Presence\HubMemberState.cs" />
     <Compile Include="Utility\PropertyComparer%272.cs" />
     <Compile Include="Gameplay\AI\ReadOnlyMap.cs" />
     <Compile Include="Gameplay\AI\ReadOnlyPlanetData.cs" />
@@ -71,7 +72,6 @@
     <Compile Include="Gameplay\Lobby.cs" />
     <Compile Include="Gameplay\LobbyGrain.cs" />
     <Compile Include="Gameplay\LobbyState.cs" />
-    <Compile Include="Communication\PublisherGrain.cs" />
     <Compile Include="Gameplay\Map.cs" />
     <Compile Include="Gameplay\Editor\MapEditor.cs" />
     <Compile Include="Gameplay\Editor\MapEditorState.cs" />
