@@ -1,22 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Gameplay;
-using Conreign.Core.Contracts.Gameplay.Events;
+using Conreign.Core.Gameplay.AI.Behaviours;
 
 namespace Conreign.Core.Gameplay.AI
 {
     public class Bot : IEventHandler<IClientEvent>
     {
         private readonly BotContext _context;
-        private readonly Dictionary<Type, List<IBotBehaviour>> _eventBehaviours;
-        private readonly List<IBotBehaviour> _genericBehaviours;
+        private readonly Dictionary<Type, List<IBotBehaviour>> _behaviours;
+        private ActionBlock<IClientEvent> _processor;
 
-        public static Bot Create(Guid userId, IUser user, IEnumerable<IBotBehaviour> behaviours)
+        public static Bot Create(string readableId, Guid userId, IUser user, IEnumerable<IBotBehaviour> behaviours)
         {
+            if (string.IsNullOrEmpty(readableId))
+            {
+                throw new ArgumentException("Readable id cannot be null or empty.", nameof(readableId));
+            }
             if (user == null)
             {
                 throw new ArgumentNullException(nameof(user));
@@ -25,7 +29,6 @@ namespace Conreign.Core.Gameplay.AI
             {
                 throw new ArgumentNullException(nameof(behaviours));
             }
-            var context = new BotContext(userId, user);
             var groups = behaviours
                 .ToList()
                 .SelectMany(b =>
@@ -46,54 +49,60 @@ namespace Conreign.Core.Gameplay.AI
                         });
                     return types;
                 })
+                .Where(x => x.Type != null)
                 .GroupBy(x => x.Type)
                 .ToList();
-            var generic = groups
-                .Where(x => x.Key == null)
-                .SelectMany(x => x)
-                .Select(x => x.Behaviour)
-                .ToList();
-            var eventBehaviours = groups
-                .Where(x => x.Key != null)
+            var behaviors = groups
                 .ToDictionary(x => x.Key, x => x.Select(y => y.Behaviour).ToList());
-            return new Bot(context, eventBehaviours, generic);
+            return new Bot(readableId, userId, user, behaviors);
         }
 
-        private Bot(BotContext context, Dictionary<Type, List<IBotBehaviour>> eventBehaviours, List<IBotBehaviour> genericBehaviours)
+        private Bot(string readableId, Guid userId, IUser user, Dictionary<Type, List<IBotBehaviour>> behaviours)
         {
-            _context = context;
-            _eventBehaviours = eventBehaviours;
-            _genericBehaviours = genericBehaviours;
+            _processor = _processor = new ActionBlock<IClientEvent>(Process);
+            _context = new BotContext(readableId, userId, user, _processor.Complete);
+            _behaviours = behaviours;
         }
+
+        public Task Completion => _processor.Completion;
 
         public Task Handle(IClientEvent @event)
         {
-            if (@event == null)
+            return @event == null 
+                ? Task.CompletedTask 
+                : _processor.SendAsync(@event);
+        }
+
+        public Task Start()
+        {
+            if (_processor.Completion.IsCompleted)
             {
-                return Task.CompletedTask;
+                _processor = new ActionBlock<IClientEvent>(Process);
             }
+            return Handle(new BotStarted());
+        }
+
+        public Task Stop()
+        {
+            return Handle(new BotStopped());
+        }
+
+        private async Task Process(IClientEvent @event)
+        {
             var type = @event.GetType();
-            var tasks = _eventBehaviours
+            var tasks = _behaviours
                 .Where(x => x.Key.IsAssignableFrom(type))
                 .SelectMany(x => x.Value)
                 .Select(b =>
                 {
                     dynamic behaviour = b;
-                    return (Task) behaviour.Handle((dynamic)@event, _context);
+                    return (Task)behaviour.Handle((dynamic)@event, _context);
                 })
                 .ToList();
-            return Task.WhenAll(tasks);
-        }
-
-        public Task Start()
-        {
-            var tasks = _eventBehaviours
-                .Values
-                .SelectMany(x => x)
-                .Concat(_genericBehaviours)
-                .OfType<ILifetimeBotBehaviour>()
-                .Select(x => x.Start(_context));
-            return Task.WhenAll(tasks);
+            foreach (var task in tasks)
+            {
+                await task;
+            }
         }
     }
 }

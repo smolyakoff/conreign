@@ -1,2 +1,4 @@
+System.Threading.Tasks.Dataflow
+Serilog
 FluentValidation
 Microsoft.Orleans.OrleansCodeGenerator.Build

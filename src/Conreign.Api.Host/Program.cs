@@ -5,6 +5,7 @@ using Microsoft.Owin.Hosting;
 using Orleans;
 using Polly;
 using Serilog;
+using Serilog.Events;
 
 namespace Conreign.Api.Host
 {
@@ -17,7 +18,7 @@ namespace Conreign.Api.Host
         public static void Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
-                .WriteTo.ColoredConsole()
+                .WriteTo.LiterateConsole()
                 .MinimumLevel.Debug()
                 .CreateLogger();
             var tasks = new[]

@@ -1,5 +1,4 @@
 System.Reactive.Core
 System.Reactive.Linq
-System.Interactive.Async
 Polly
 Microsoft.Orleans.Client content: none

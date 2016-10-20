@@ -73,7 +73,6 @@ namespace Conreign.Core.Communication
 
         public async Task Broadcast(ISet<Guid> userIds, ISet<Guid> connectionIds, params IEvent[] events)
         {
-            Console.WriteLine($"Topic: {_id} Notify: {string.Join(",", events.Select(e => e.GetType().Name))} ");
             var serverEvents = events.OfType<IServerEvent>();
             var clientEvents = events.OfType<IClientEvent>();
             var serverStreams = userIds

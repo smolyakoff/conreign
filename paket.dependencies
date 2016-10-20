@@ -7,13 +7,13 @@ nuget FSharp.Data
 
 nuget xunit
 
+nuget System.Threading.Tasks.Dataflow
 nuget System.Reactive.Core
 nuget System.Reactive.Linq
-nuget System.Interactive.Async
 nuget Polly
 nuget FluentValidation
 
-nuget Serilog.Sinks.ColoredConsole
+nuget Serilog.Sinks.Literate
 nuget MongoDB.Driver
 nuget Microsoft.Orleans.OrleansCodeGenerator.Build
 nuget Microsoft.Orleans.OrleansRuntime

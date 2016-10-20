@@ -1,8 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Conreign.Core.Contracts.Gameplay.Events;
 
-namespace Conreign.Core.Gameplay.AI
+namespace Conreign.Core.Gameplay.AI.Behaviours
 {
     public class StartGameBehaviour : IBotBehaviour<PlayerJoined>
     {
@@ -40,8 +39,8 @@ namespace Conreign.Core.Gameplay.AI
                 return;
             }
             _started = true;
+            await Task.Delay(1000);
             await context.Player.StartGame();
-            var st = await context.Player.GetState();
         }
     }
 }

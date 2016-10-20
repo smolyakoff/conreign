@@ -1,4 +1,4 @@
-namespace Conreign.Core.Gameplay.AI
+namespace Conreign.Core.Gameplay.AI.Behaviours
 {
     public interface IBotBehaviour
     {

@@ -214,6 +214,7 @@ namespace Conreign.Core.Gameplay
         private Task MarkDeadPlayers()
         {
             var events = _state.Players
+                .Where(x => _state.PlayerStates[x.UserId].Statistics.DeathTurn == null)
                 .Select(x => x.UserId)
                 .Where(PlayerShouldDie)
                 .Select(x => new PlayerDead(x))

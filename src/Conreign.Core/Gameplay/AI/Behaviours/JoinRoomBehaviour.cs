@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using Conreign.Core.Contracts.Gameplay.Data;
 
-namespace Conreign.Core.Gameplay.AI
+namespace Conreign.Core.Gameplay.AI.Behaviours
 {
-    public class JoinRoomBehaviour : ILifetimeBotBehaviour
+    public class JoinRoomBehaviour : IBotBehaviour<BotStarted>
     {
         private readonly string _roomId;
         private readonly string _name;
@@ -21,10 +21,9 @@ namespace Conreign.Core.Gameplay.AI
             _delay = delay;
         }
 
-        public async Task Start(BotContext context)
+        public async Task Handle(BotStarted @event, BotContext context)
         {
             await Task.Delay(_delay);
-
             context.Player = await context.User.JoinRoom(_roomId);
             await context.Player.UpdateOptions(new PlayerOptionsData
             {

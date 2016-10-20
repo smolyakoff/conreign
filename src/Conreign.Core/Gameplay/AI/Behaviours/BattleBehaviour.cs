@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Conreign.Core.Contracts.Gameplay.Data;
 using Conreign.Core.Contracts.Gameplay.Events;
 
-namespace Conreign.Core.Gameplay.AI
+namespace Conreign.Core.Gameplay.AI.Behaviours
 {
     public class BattleBehaviour :
         IBotBehaviour<TurnCalculationEnded>, 
@@ -37,7 +37,6 @@ namespace Conreign.Core.Gameplay.AI
 
         public async Task Handle(GameStarted @event, BotContext context)
         {
-            Console.WriteLine($"I'm started");
             if (context.Player == null)
             {
                 return;
@@ -57,6 +56,12 @@ namespace Conreign.Core.Gameplay.AI
             return Task.CompletedTask;
         }
 
+        public Task Handle(GameEnded @event, BotContext context)
+        {
+            _ended = true;
+            return Task.CompletedTask;
+        }
+
         private async Task Think(BotContext context)
         {
             var map = new ReadOnlyMap(new Map(_map));
@@ -64,12 +69,6 @@ namespace Conreign.Core.Gameplay.AI
             var tasks = fleets.Select(x => context.Player.LaunchFleet(x));
             await Task.WhenAll(tasks);
             await context.Player.EndTurn();
-        }
-
-        public Task Handle(GameEnded @event, BotContext context)
-        {
-            _ended = true;
-            return Task.CompletedTask;
         }
     }
 }

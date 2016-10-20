@@ -1,6 +1,6 @@
 System.Reactive.Core
 System.Reactive.Linq
-System.Interactive.Async
+Serilog.Sinks.Literate
 Microsoft.Orleans.Client content: none
 Microsoft.Orleans.OrleansSQLUtils
 MongoDB.Driver
