@@ -1,10 +1,7 @@
-﻿using System;
-
-namespace Conreign.Core.Client.Commands
+﻿namespace Conreign.Core.Client.Messages
 {
     public class SayCommand
     {
-        public Guid UserId { get; set; }
         public string RoomId { get; set; }
         public string Text { get; set; }
     }

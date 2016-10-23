@@ -5,6 +5,6 @@ namespace Conreign.Core.Contracts.Gameplay
 {
     public interface IUser
     {
-        Task<IPlayer> JoinRoom(string roomId);
+        Task<IPlayer> JoinRoom(string roomId, Guid connectionId);
     }
 }

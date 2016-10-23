@@ -15,7 +15,7 @@ namespace Conreign.Core.Gameplay.AI
         private readonly Dictionary<Type, List<IBotBehaviour>> _behaviours;
         private ActionBlock<IClientEvent> _processor;
 
-        public static Bot Create(string readableId, Guid userId, IUser user, IEnumerable<IBotBehaviour> behaviours)
+        public static Bot Create(Guid connectionId, string readableId, Guid userId, IUser user, IEnumerable<IBotBehaviour> behaviours)
         {
             if (string.IsNullOrEmpty(readableId))
             {
@@ -54,13 +54,13 @@ namespace Conreign.Core.Gameplay.AI
                 .ToList();
             var behaviors = groups
                 .ToDictionary(x => x.Key, x => x.Select(y => y.Behaviour).ToList());
-            return new Bot(readableId, userId, user, behaviors);
+            return new Bot(connectionId, readableId, userId, user, behaviors);
         }
 
-        private Bot(string readableId, Guid userId, IUser user, Dictionary<Type, List<IBotBehaviour>> behaviours)
+        private Bot(Guid connectionId, string readableId, Guid userId, IUser user, Dictionary<Type, List<IBotBehaviour>> behaviours)
         {
             _processor = _processor = new ActionBlock<IClientEvent>(Process);
-            _context = new BotContext(readableId, userId, user, _processor.Complete);
+            _context = new BotContext(connectionId, readableId, userId, user, _processor.Complete);
             _behaviours = behaviours;
         }
 

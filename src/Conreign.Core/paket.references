@@ -1,4 +1,5 @@
 System.Threading.Tasks.Dataflow
 Serilog
+JWT
 FluentValidation
 Microsoft.Orleans.OrleansCodeGenerator.Build

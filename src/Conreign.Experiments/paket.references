@@ -1,6 +1,6 @@
 System.Reactive.Core
 System.Reactive.Linq
 Serilog.Sinks.Literate
+MediatR
 Microsoft.Orleans.Client content: none
 Microsoft.Orleans.OrleansSQLUtils
-MongoDB.Driver

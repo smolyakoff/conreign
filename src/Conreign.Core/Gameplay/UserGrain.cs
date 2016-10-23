@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Conreign.Core.Auth;
 using Conreign.Core.Communication;
@@ -8,7 +9,6 @@ using Conreign.Core.Contracts.Gameplay;
 using Conreign.Core.Contracts.Presence;
 using Orleans;
 using Orleans.Concurrency;
-using Orleans.Streams;
 
 namespace Conreign.Core.Gameplay
 {
@@ -16,23 +16,28 @@ namespace Conreign.Core.Gameplay
     public class UserGrain : Grain<Guid>, IUserGrain
     {
         private static bool _universeActivated;
-        private OrleansUserContext _context;
         private Topic _globalTopic;
+        private readonly Dictionary<string, IPlayer> _players = new Dictionary<string, IPlayer>();
 
         public override async Task OnActivateAsync()
         {
-            _context = new OrleansUserContext();
             await EnsureUniverseActivated();
             _globalTopic = Topic.Global(GetStreamProvider(StreamConstants.ProviderName));
             await base.OnActivateAsync();
         }
 
-        public async Task<IPlayer> JoinRoom(string roomId)
+        public async Task<IPlayer> JoinRoom(string roomId, Guid connectionId)
         {
-            var player = GrainFactory.GetGrain<IPlayerGrain>(this.GetPrimaryKey(), roomId, null);
-            var @event = new Connected(_context.ConnectionId, TopicIds.Player(_context.UserId, roomId));
+            if (_players.ContainsKey(roomId))
+            {
+                return _players[roomId];
+            }
+            var userId = this.GetPrimaryKey();
+            var player = GrainFactory.GetGrain<IPlayerGrain>(userId, roomId, null);
+            var @event = new Connected(connectionId, TopicIds.Player(userId, roomId));
             await player.Handle(@event);
             await _globalTopic.Send(@event);
+            _players[roomId] = player;
             return player;
         }
 

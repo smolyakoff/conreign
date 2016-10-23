@@ -1,12 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Reactive.Threading.Tasks;
-using System.Threading;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Conreign.Core.Client.Exceptions;
+using Conreign.Core.Contracts.Auth;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Gameplay;
 using Conreign.Core.Contracts.Presence;
@@ -16,34 +13,21 @@ using Orleans.Streams;
 
 namespace Conreign.Core.Client
 {
-    public class LoginResult
-    {
-        public LoginResult(IUser user, Guid userId)
-        {
-            User = user;
-            UserId = userId;
-        }
-
-        public IUser User { get; }
-        public Guid UserId { get; }
-    }
-
-    public class GameConnection : IDisposable
+    public class OrleansGameConnection : IDisposable, IGameConnection
     {
         private readonly IGrainFactory _factory;
         private StreamSubscriptionHandle<IClientEvent> _stream;
         private bool _isDisposed;
         private readonly ISubject<IClientEvent> _subject;
-        private readonly TimeSpan _eventWaitTimeout = TimeSpan.FromSeconds(10);
 
-        internal static async Task<GameConnection> Initialize(IGrainFactory grainFactory, Guid connectionId)
+        internal static async Task<OrleansGameConnection> Initialize(IGrainFactory grainFactory, Guid connectionId)
         {
             var universe = grainFactory.GetGrain<IUniverseGrain>(default(long));
             await universe.Ping();
             var stream = GrainClient.GetStreamProvider(StreamConstants.ProviderName)
                 .GetStream<IClientEvent>(connectionId, StreamConstants.ClientNamespace);
             var existingHandles = await stream.GetAllSubscriptionHandles();
-            var connection = new GameConnection(connectionId, grainFactory);
+            var connection = new OrleansGameConnection(connectionId, grainFactory);
             var handle = existingHandles.Count > 0 
                 ? existingHandles[0] 
                 : await stream.SubscribeAsync(connection.OnNext, connection.OnError, connection.OnCompleted);
@@ -55,7 +39,7 @@ namespace Conreign.Core.Client
             return connection;
         }
 
-        private GameConnection(Guid connectionId, IGrainFactory factory)
+        private OrleansGameConnection(Guid connectionId, IGrainFactory factory)
         {
             Id = connectionId;
             _subject = new Subject<IClientEvent>();
@@ -66,31 +50,26 @@ namespace Conreign.Core.Client
 
         public IObservable<IClientEvent> Events => _subject;
 
-        public LoginResult Login()
-        {
-            return Authenticate(null);
-        }
-
-        public LoginResult Authenticate(string accessToken)
+        public async Task<LoginResult> Login()
         {
             EnsureIsNotDisposed();
-            var userId = Guid.NewGuid();
-            PrepareContext(userId);
+            var auth = _factory.GetGrain<IAuthGrain>(default(long));
+            var token = await auth.Login();
+            return await Authenticate(token);
+        }
+
+        public async Task<LoginResult> Authenticate(string accessToken)
+        {
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                throw new ArgumentException("Access token cannot be null or empty.", nameof(accessToken));
+            }
+            EnsureIsNotDisposed();
+            var auth = _factory.GetGrain<IAuthGrain>(default(long));
+            var identity = await auth.Authenticate(accessToken);
+            var userId = Guid.Parse(identity.FindFirst(x => x.Type == ClaimTypes.NameIdentifier).Value);
             var user = _factory.GetGrain<IUserGrain>(userId);
-            return new LoginResult(user, userId);
-        }
-
-        public Task<T> WaitFor<T>(TimeSpan timeout) where T : IClientEvent
-        {
-            var cts = new CancellationTokenSource();
-            cts.CancelAfter(timeout);
-            return Events.OfType<T>().FirstAsync().ToTask(cts.Token);
-        }
-
-        private void PrepareContext(Guid? userId)
-        {
-            RequestContext.Set("ConnectionId", Id);
-            RequestContext.Set("UserId", userId);
+            return new LoginResult(user, userId, accessToken);
         }
 
         private Task OnNext(IClientEvent @event, StreamSequenceToken token)

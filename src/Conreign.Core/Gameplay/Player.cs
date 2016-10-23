@@ -6,7 +6,6 @@ using Conreign.Core.Contracts.Gameplay;
 using Conreign.Core.Contracts.Gameplay.Data;
 using Conreign.Core.Contracts.Gameplay.Events;
 using Conreign.Core.Gameplay.Validators;
-using Conreign.Core.Presence;
 using Conreign.Core.Utility;
 
 namespace Conreign.Core.Gameplay

@@ -23,6 +23,8 @@ nuget Microsoft.Orleans.Client
 nuget Microsoft.Extensions.DependencyInjection 1.0.0-rc1-final
 nuget Microsoft.Extensions.DependencyInjection.Abstractions 1.0.0-rc1-final
 
+nuget SimpleInjector
+nuget SimpleInjector.Extensions.ExecutionContextScoping
 nuget MediatR
 nuget Autofac.Owin
 nuget Autofac.SignalR

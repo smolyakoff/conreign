@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Conreign.Core.Client.Commands
+namespace Conreign.Core.Client.Messages
 {
     public class StartGameCommand
     {

@@ -1,4 +1,9 @@
 System.Reactive.Core
 System.Reactive.Linq
+System.Threading.Tasks.Dataflow
+MediatR
 Polly
+AutoMapper
+SimpleInjector
+SimpleInjector.Extensions.ExecutionContextScoping
 Microsoft.Orleans.Client content: none

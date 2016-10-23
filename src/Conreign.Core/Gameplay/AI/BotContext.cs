@@ -8,7 +8,7 @@ namespace Conreign.Core.Gameplay.AI
     {
         private readonly Action _complete;
 
-        internal BotContext(string readableId, Guid userId, IUser user, Action complete)
+        internal BotContext(Guid connectionId, string readableId, Guid userId, IUser user, Action complete)
         {
             if (user == null)
             {
@@ -23,6 +23,7 @@ namespace Conreign.Core.Gameplay.AI
                 throw new ArgumentException("Readable id cannot be null or empty.", nameof(readableId));
             }
             _complete = complete;
+            ConnectionId = connectionId;
             ReadableId = readableId;
             UserId = userId;
             User = user;
@@ -32,6 +33,7 @@ namespace Conreign.Core.Gameplay.AI
         }
 
         public string ReadableId { get; }
+        public Guid ConnectionId { get; }
         public Guid UserId { get; }
         public IPlayer Player { get; set; }
         public IUser User { get; }

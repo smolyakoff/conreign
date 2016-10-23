@@ -41,9 +41,9 @@ namespace Conreign.Core.Client
             return Task.FromResult(client);
         }
 
-        public Task<GameConnection> Connect(Guid connectionId)
+        public Task<OrleansGameConnection> Connect(Guid connectionId)
         {
-            return GameConnection.Initialize(_factory, connectionId);
+            return OrleansGameConnection.Initialize(_factory, connectionId);
         }
     }
 }
