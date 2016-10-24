@@ -1,4 +1,4 @@
-System.Threading.Tasks.Dataflow
+Microsoft.Tpl.Dataflow
 Serilog
 JWT
 FluentValidation

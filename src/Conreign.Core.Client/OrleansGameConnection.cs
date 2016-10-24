@@ -13,7 +13,7 @@ using Orleans.Streams;
 
 namespace Conreign.Core.Client
 {
-    public class OrleansGameConnection : IDisposable, IGameConnection
+    public class OrleansGameConnection : IGameConnection
     {
         private readonly IGrainFactory _factory;
         private StreamSubscriptionHandle<IClientEvent> _stream;

@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Conreign.Core.Client.Messages;
 using Conreign.Core.Contracts.Communication;
+using MediatR;
 
 namespace Conreign.Core.Client
 {
-    public interface IGameConnection : IDisposable
+    public interface IGameHandler : IDisposable
     {
-        Guid Id { get; }
         IObservable<IClientEvent> Events { get; }
-
-        Task<LoginResult> Authenticate(string accessToken);
-        Task<LoginResult> Login();
+        Task<T> Handle<T>(IAsyncRequest<T> command, Metadata metadata);
     }
 }

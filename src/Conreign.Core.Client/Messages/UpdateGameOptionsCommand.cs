@@ -3,9 +3,9 @@ using MediatR;
 
 namespace Conreign.Core.Client.Messages
 {
-    public class UpdatePlayerOptionsCommand : IAsyncRequest
+    public class UpdateGameOptionsCommand : IAsyncRequest
     {
         public string RoomId { get; set; }
-        public PlayerOptionsData Options { get; set; }
+        public GameOptionsData Options { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 System.Reactive.Core
 System.Reactive.Linq
-System.Threading.Tasks.Dataflow
+Microsoft.Tpl.Dataflow
 MediatR
 Polly
 AutoMapper

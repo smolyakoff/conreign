@@ -1,7 +1,4 @@
-Microsoft.Orleans.Client content: none
 Microsoft.Orleans.OrleansSQLUtils
-Polly
 Serilog.Sinks.Literate
-Autofac.Owin
 Microsoft.Owin.Cors
 Microsoft.AspNet.SignalR.SelfHost

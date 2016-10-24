@@ -8,7 +8,8 @@ namespace Conreign.Core.Client.Handlers
     {
         public MappingProfile()
         {
-            CreateMap<UpdatePlayerOptionsCommand, PlayerOptionsData>();
+            CreateMap<CancelFleetCommand, FleetCancelationData>();
+            CreateMap<WriteCommand, TextMessageData>();
         }
     }
 }

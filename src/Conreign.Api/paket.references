@@ -1,0 +1,4 @@
+SimpleInjector
+Newtonsoft.Json
+MediatR
+Microsoft.AspNet.SignalR.Core

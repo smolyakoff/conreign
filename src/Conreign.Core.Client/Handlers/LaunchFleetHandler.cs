@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Conreign.Core.Client.Messages;
-using Conreign.Core.Contracts.Gameplay.Data;
 using MediatR;
 
 namespace Conreign.Core.Client.Handlers
@@ -22,7 +21,7 @@ namespace Conreign.Core.Client.Handlers
         public async Task<Unit> Handle(LaunchFleetCommand message)
         {
             var player = await _context.User.JoinRoom(message.RoomId, _context.Connection.Id);
-            await player.LaunchFleet(new FleetData());
+            await player.LaunchFleet(message.Fleet);
             return Unit.Value;
         }
     }

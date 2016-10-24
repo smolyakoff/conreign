@@ -7,9 +7,10 @@ using Polly;
 
 namespace Conreign.Core.Client
 {
-    public class GameClient
+    public sealed class GameClient : IDisposable
     {
         private readonly IGrainFactory _factory;
+        private bool _isDisposed;
 
         private GameClient(IGrainFactory factory)
         {
@@ -43,7 +44,26 @@ namespace Conreign.Core.Client
 
         public Task<OrleansGameConnection> Connect(Guid connectionId)
         {
+            EnsureIsNotDisposed();
             return OrleansGameConnection.Initialize(_factory, connectionId);
+        }
+
+        public void Dispose()
+        {
+            if (_isDisposed || !GrainClient.IsInitialized)
+            {
+                return;
+            }
+            _isDisposed = true;
+            GrainClient.Uninitialize();
+        }
+
+        private void EnsureIsNotDisposed()
+        {
+            if (_isDisposed)
+            {
+                throw new ObjectDisposedException("GameClient");
+            }
         }
     }
 }

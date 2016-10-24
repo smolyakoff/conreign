@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Conreign.Core.Client;
 using Conreign.Core.Client.Messages;
 using Conreign.Core.Contracts.Communication;
+using Conreign.Core.Contracts.Gameplay.Data;
 using Conreign.Core.Contracts.Gameplay.Events;
 using Conreign.Core.Gameplay.AI;
 using Conreign.Core.Gameplay.AI.Behaviours;
@@ -51,20 +52,35 @@ namespace Conreign.Experiments
             using (var connection = await client.Connect(Guid.NewGuid()))
             {
                 var handler = new GameHandler(connection);
-                handler.Events.Subscribe(WriteEvent);
+                handler.Events.Subscribe(Write);
                 var meta = new Metadata();
                 var loginResponse = await handler.Handle(new LoginCommand(), meta);
-                Log.Debug("Received login response: {@LoginResponse}", loginResponse);
+                Write(loginResponse);
                 meta = new Metadata {AccessToken = loginResponse.AccessToken};
                 var joinRoom = new JoinRoomCommand {RoomId = "conreign"};
                 await handler.Handle(joinRoom, meta);
                 var updatePlayer = new UpdatePlayerOptionsCommand
                 {
                     RoomId = "conreign",
-                    Nickname = "smolyakoff",
-                    Color = "#660101"
+                    Options = new PlayerOptionsData
+                    {
+                        Nickname = "smolyakoff",
+                        Color = "#010101"
+                    }
                 };
                 await handler.Handle(updatePlayer, meta);
+                var write = new WriteCommand
+                {
+                    RoomId = "conreign",
+                    Text = "Hello!"
+                };
+                await handler.Handle(write, meta);
+                var getState = new GetRoomStateCommand
+                {
+                    RoomId = "conreign"
+                };
+                var state = await handler.Handle(getState, meta);
+                Write(state);
             }
         }
 
@@ -102,9 +118,9 @@ namespace Conreign.Experiments
             }
         }
 
-        private static void WriteEvent(IClientEvent @event)
+        private static void Write(object data)
         {
-            Log.Debug("{@Event}", @event);
+            Log.Debug("{@Data}", data);
         }
     }
 }

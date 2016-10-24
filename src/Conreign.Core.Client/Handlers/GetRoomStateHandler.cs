@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Conreign.Core.Client.Messages;
+using Conreign.Core.Contracts.Gameplay.Data;
 using MediatR;
 
 namespace Conreign.Core.Client.Handlers
 {
-    internal class UpdatePlayerOptionsHandler : IAsyncRequestHandler<UpdatePlayerOptionsCommand, Unit>
+    public class GetRoomStateHandler : IAsyncRequestHandler<GetRoomStateCommand, IRoomData>
     {
         private readonly IHandlerContext _context;
 
-        public UpdatePlayerOptionsHandler(IHandlerContext context)
+        public GetRoomStateHandler(IHandlerContext context)
         {
             if (context == null)
             {
@@ -18,11 +19,10 @@ namespace Conreign.Core.Client.Handlers
             _context = context;
         }
 
-        public async Task<Unit> Handle(UpdatePlayerOptionsCommand message)
+        public async Task<IRoomData> Handle(GetRoomStateCommand message)
         {
             var player = await _context.User.JoinRoom(message.RoomId, _context.Connection.Id);
-            await player.UpdateOptions(message.Options);
-            return Unit.Value;
+            return await player.GetState();
         }
     }
 }

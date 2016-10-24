@@ -13,7 +13,7 @@ using SimpleInjector.Extensions.ExecutionContextScoping;
 
 namespace Conreign.Core.Client
 {
-    public class GameHandler
+    public class GameHandler : IGameHandler
     {
         private static readonly Type HandlerType = typeof(IAsyncRequestHandler<,>);
         private const string HandlerContextKey = "ConreignClientContext";
@@ -21,6 +21,7 @@ namespace Conreign.Core.Client
         private readonly Container _container;
         private readonly Mediator _mediator;
         private readonly ActionBlock<WorkItem> _processor;
+        private bool _isDisposed;
 
         public GameHandler(IGameConnection connection)
         {
@@ -44,6 +45,7 @@ namespace Conreign.Core.Client
 
         public async Task<T> Handle<T>(IAsyncRequest<T> command, Metadata metadata)
         {
+            EnsureIsNotDisposed();
             if (command == null)
             {
                 throw new ArgumentNullException(nameof(command));
@@ -57,6 +59,24 @@ namespace Conreign.Core.Client
             _processor.Post(workItem);
             var result = await source.Task;
             return (T) result;
+        }
+
+        public void Dispose()
+        {
+            if (_isDisposed)
+            {
+                return;
+            }
+            _connection.Dispose();
+            _isDisposed = true;
+        }
+
+        private void EnsureIsNotDisposed()
+        {
+            if (_isDisposed)
+            {
+                throw new ObjectDisposedException("GameHandler");
+            }
         }
 
         private async Task Process(WorkItem workItem)

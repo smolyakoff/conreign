@@ -5,11 +5,11 @@ using MediatR;
 
 namespace Conreign.Core.Client.Handlers
 {
-    internal class UpdatePlayerOptionsHandler : IAsyncRequestHandler<UpdatePlayerOptionsCommand, Unit>
+    public class StartGameHandler : IAsyncRequestHandler<StartGameCommand, Unit>
     {
         private readonly IHandlerContext _context;
 
-        public UpdatePlayerOptionsHandler(IHandlerContext context)
+        public StartGameHandler(IHandlerContext context)
         {
             if (context == null)
             {
@@ -18,10 +18,10 @@ namespace Conreign.Core.Client.Handlers
             _context = context;
         }
 
-        public async Task<Unit> Handle(UpdatePlayerOptionsCommand message)
+        public async Task<Unit> Handle(StartGameCommand message)
         {
             var player = await _context.User.JoinRoom(message.RoomId, _context.Connection.Id);
-            await player.UpdateOptions(message.Options);
+            await player.StartGame();
             return Unit.Value;
         }
     }

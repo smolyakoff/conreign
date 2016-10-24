@@ -1,4 +1,4 @@
-﻿using Autofac;
+﻿using Conreign.Api.Configuration;
 using Microsoft.Owin.Cors;
 using Owin;
 
@@ -8,15 +8,12 @@ namespace Conreign.Api.Host
     {
         public void Configuration(IAppBuilder builder)
         {
-            var container = CreateContainer();
             builder.UseCors(CorsOptions.AllowAll);
-            builder.UseAutofacMiddleware(CreateContainer());
-        }
-
-        private static IContainer CreateContainer()
-        {
-            var builder = new ContainerBuilder();
-            return builder.Build();
+            var options = new ConreignApiOptions
+            {
+                OrleansClientConfigFilePath = "OrleansClientConfiguration.xml"
+            };
+            builder.MapConreignApi(options);
         }
     }
 }

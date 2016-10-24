@@ -2,8 +2,9 @@
 
 namespace Conreign.Core.Client.Messages
 {
-    public class StartGameCommand : IAsyncRequest
+    public class WriteCommand : IAsyncRequest
     {
         public string RoomId { get; set; }
+        public string Text { get; set; }
     }
 }
