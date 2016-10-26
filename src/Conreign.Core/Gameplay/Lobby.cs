@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Conreign.Core.Contracts.Client;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Exceptions;
 using Conreign.Core.Contracts.Gameplay;
@@ -67,7 +68,7 @@ namespace Conreign.Core.Gameplay
             EnsureUserIsOnline(userId);
             var state = new LobbyData
             {
-                Events = _hub.GetEvents(userId).ToList(),
+                Events = _hub.GetEvents(userId).Select(x => new MessageEnvelope {Payload = x}).ToList(),
                 Players = _state.Players,
                 PlayerStatuses = _state.Players
                     .ToDictionary(x => x.UserId,  x => _hub.HasMemberOnline(x.UserId) ? PresenceStatus.Online : PresenceStatus.Offline),

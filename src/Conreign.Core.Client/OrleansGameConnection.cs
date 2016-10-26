@@ -8,7 +8,6 @@ using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Gameplay;
 using Conreign.Core.Contracts.Presence;
 using Orleans;
-using Orleans.Runtime;
 using Orleans.Streams;
 
 namespace Conreign.Core.Client

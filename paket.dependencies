@@ -10,6 +10,7 @@ nuget xunit
 nuget Microsoft.Tpl.Dataflow
 nuget System.Reactive.Core
 nuget System.Reactive.Linq
+nuget System.IdentityModel.Tokens.Jwt
 nuget Polly
 nuget FluentValidation
 
@@ -30,6 +31,7 @@ nuget Autofac.Owin
 nuget Autofac.SignalR
 nuget Microsoft.Owin.Cors
 nuget Microsoft.AspNet.SignalR.Core
+nuget Microsoft.AspNet.SignalR.Client
 nuget Microsoft.AspNet.SignalR.SelfHost
 nuget JWT
 nuget AutoMapper

@@ -1,50 +1,46 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Linq;
 using System.Threading.Tasks;
 using Conreign.Core.Client;
-using Conreign.Core.Client.Messages;
+using Conreign.Core.Contracts.Client;
 using Conreign.Core.Contracts.Communication;
-using MediatR;
 using Microsoft.AspNet.SignalR;
 
 namespace Conreign.Api.Hubs
 {
-    public class GameHub : Hub<IObserver<IClientEvent>>
+    public class GameHub : Hub<IObserver<MessageEnvelope>>
     {
-        private readonly ConcurrentDictionary<string, GameHubConnection> _handlers;
-        private readonly GameClient _client;
+        private static readonly ConcurrentDictionary<string, GameHubConnection> Handlers = new ConcurrentDictionary<string, GameHubConnection>();
+        private readonly OrleansGameClient _client;
 
-        public GameHub(GameClient client)
+        public GameHub(OrleansGameClient client)
         {
             if (client == null)
             {
                 throw new ArgumentNullException(nameof(client));
             }
             _client = client;
-            _handlers = new ConcurrentDictionary<string, GameHubConnection>();
         }
 
-        public Task<object> Send(IAsyncRequest<object> command)
+        public async Task<MessageEnvelope> Send(MessageEnvelope envelope)
         {
-            if (command == null)
+            if (envelope == null)
             {
-                throw new ArgumentNullException(nameof(command));
+                throw new ArgumentNullException(nameof(envelope));
             }
             var handler = GetHandlerSafely();
-            var meta = ParseMetadata();
-            return handler.Handle(command, meta);
+            var result = await handler.Handle((dynamic)envelope.Payload, envelope.Meta);
+            return new MessageEnvelope {Payload = result};
         }
 
-        public Task Post(IAsyncRequest command)
+        public Task Post(MessageEnvelope envelope)
         {
-            if (command == null)
+            if (envelope == null)
             {
-                throw new ArgumentNullException(nameof(command));
+                throw new ArgumentNullException(nameof(envelope));
             }
             var handler = GetHandlerSafely();
-            var meta = ParseMetadata();
-            return handler.Handle(command, meta);
+            return handler.Handle((dynamic)envelope.Payload, envelope.Meta);
         }
 
         public override async Task OnConnected()
@@ -52,13 +48,14 @@ namespace Conreign.Api.Hubs
             var connection = await _client.Connect(Guid.Parse(Context.ConnectionId));
             var handler = new GameHandler(connection);
             var subscription = handler.Events.Subscribe(new ConnectionObserver(this, Context.ConnectionId));
-            _handlers[Context.ConnectionId] = new GameHubConnection(handler, subscription);
+            Handlers[Context.ConnectionId] = new GameHubConnection(handler, subscription);
+            await base.OnConnected();
         }
 
         public override Task OnDisconnected(bool stopCalled)
         {
             GameHubConnection hubConnection;
-            var removed = _handlers.TryRemove(Context.ConnectionId, out hubConnection);
+            var removed = Handlers.TryRemove(Context.ConnectionId, out hubConnection);
             if (!removed)
             {
                 return Task.CompletedTask;
@@ -68,27 +65,10 @@ namespace Conreign.Api.Hubs
             return base.OnDisconnected(stopCalled);
         }
 
-        private Metadata ParseMetadata()
-        {
-            return new Metadata
-            {
-                AccessToken = ParseAccessToken()
-            };
-        }
-
-        private string ParseAccessToken()
-        {
-            var authorizationHeader = Context.Headers.Get("Authorization");
-            var accessToken = authorizationHeader?.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase) == true
-                ? authorizationHeader.Split(' ').Skip(1).First()
-                : null;
-            return accessToken;
-        }
-
         private IGameHandler GetHandlerSafely()
         {
             GameHubConnection connection;
-            var exists = _handlers.TryGetValue(Context.ConnectionId, out connection);
+            var exists = Handlers.TryGetValue(Context.ConnectionId, out connection);
             if (!exists)
             {
                 throw new InvalidOperationException($"Handler was not found for connection id: {Context.ConnectionId}.");
@@ -109,7 +89,7 @@ namespace Conreign.Api.Hubs
 
             public void OnNext(IClientEvent value)
             {
-                _hub.Clients.Client(_connectionId).OnNext(value);
+                _hub.Clients.Client(_connectionId).OnNext(new MessageEnvelope { Payload = value });
             }
 
             public void OnError(Exception error)

@@ -8,8 +8,8 @@ namespace Conreign.Core.Client
     {
         Guid Id { get; }
         IObservable<IClientEvent> Events { get; }
-
-        Task<LoginResult> Authenticate(string accessToken);
         Task<LoginResult> Login();
+        Task<LoginResult> Authenticate(string accessToken);
     }
+
 }

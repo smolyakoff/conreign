@@ -1,0 +1,59 @@
+// Typography
+$base-font-family: 'Arvo';
+$heading-font-family: $base-font-family;
+
+// Font Sizes
+$base-font-size: 1em;
+$large-font-size: $base-font-size * 1.2;
+$small-font-size: $base-font-size * 0.8;
+$heading-1-font-size: $base-font-size * 2;
+$heading-2-font-size: $base-font-size * 1.8;
+$heading-3-font-size: $base-font-size * 1.5;
+
+// Line height
+$base-line-height: 1.5;
+$heading-line-height: 1.2;
+
+// Other Sizes
+$base-border-radius: 3px;
+$base-spacing: $base-line-height * 1em;
+$small-spacing: $base-spacing / 2;
+$large-spacing: $base-spacing * 2;
+$base-z-index: 0;
+
+// Colors
+$brand: #fff8c2;
+$brand-accent: #ffde58;
+$brand-bright: #fe9d3b;
+
+$brand-secondary-dark: #0b132b;
+$brand-secondary: #1c2541;
+$brand-secondary-light: #3a506b;
+
+$white: #fff;
+$light-gray: #ddd;
+
+// Font Colors
+$base-font-color: $white;
+$link-color: $brand;
+$link-color-accent: $brand-accent;
+
+// Border
+$base-border-color: $brand-bright;
+$base-border: 2px solid $base-border-color;
+
+// Shadow
+$base-shadow-color: $brand-bright;
+$base-shadow: inset 0 0 12px $base-shadow-color;
+
+// Background Colors
+$base-background-color: $brand-secondary;
+$secondary-background-color: tint($base-border-color, 75%);
+
+// Forms
+$form-box-shadow: inset 0 1px 3px rgba(#000, 0.06);
+$form-box-shadow-focus: $form-box-shadow, 0 0 5px adjust-color($link-color, $lightness: -5%, $alpha: -0.3);
+
+// Animations
+$base-duration: 150ms;
+$base-timing: ease;

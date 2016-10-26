@@ -1,4 +1,5 @@
 Microsoft.Orleans.OrleansSQLUtils
+Microsoft.Orleans.OrleansCodeGenerator.Build
 Serilog.Sinks.Literate
 Microsoft.Owin.Cors
 Microsoft.AspNet.SignalR.SelfHost

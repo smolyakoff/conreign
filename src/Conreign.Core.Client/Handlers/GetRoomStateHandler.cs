@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Conreign.Core.Client.Messages;
+using Conreign.Core.Contracts.Client.Messages;
 using Conreign.Core.Contracts.Gameplay.Data;
 using MediatR;
 

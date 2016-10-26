@@ -58,22 +58,10 @@
     <Compile Include="Handlers\LoginHandler.cs" />
     <Compile Include="Handlers\UpdateGameOptionsHandler.cs" />
     <Compile Include="IGameConnection.cs" />
-    <Compile Include="Messages\CancelFleetCommand.cs" />
-    <Compile Include="Messages\EndTurnCommand.cs" />
-    <Compile Include="Messages\GetRoomStateCommand.cs" />
-    <Compile Include="Messages\JoinRoomCommand.cs" />
-    <Compile Include="Messages\LaunchFleetCommand.cs" />
-    <Compile Include="Messages\LoginCommand.cs" />
-    <Compile Include="Messages\LoginCommandResponse.cs" />
-    <Compile Include="Messages\WriteCommand.cs" />
-    <Compile Include="Messages\SkipAuthenticationAttribute.cs" />
-    <Compile Include="Messages\StartGameCommand.cs" />
-    <Compile Include="Messages\UpdateGameOptionsCommand.cs" />
-    <Compile Include="Messages\UpdatePlayerOptionsCommand.cs" />
+    <Compile Include="IGameClient.cs" />
     <Compile Include="Exceptions\ConnectionException.cs" />
-    <Compile Include="GameClient.cs" />
+    <Compile Include="OrleansGameClient.cs" />
     <Compile Include="Exceptions\GameClientException.cs" />
-    <Compile Include="Messages\Metadata.cs" />
     <Compile Include="OrleansGameConnection.cs" />
     <Compile Include="LoginResult.cs" />
     <Compile Include="HandlerContext.cs" />
@@ -1619,6 +1607,15 @@
     </When>
   </Choose>
   <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And ($(TargetFrameworkVersion) == 'v1.4' Or $(TargetFrameworkVersion) == 'v1.5')">
+      <ItemGroup>
+        <Reference Include="System.Security.Cryptography.Cng">
+          <HintPath>..\..\packages\System.Security.Cryptography.Cng\ref\netstandard1.4\System.Security.Cryptography.Cng.dll</HintPath>
+          <Private>False</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v1.6'">
       <ItemGroup>
         <Reference Include="System.Security.Cryptography.Cng">
@@ -1630,7 +1627,7 @@
     </When>
   </Choose>
   <Choose>
-    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v1.6'">
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And ($(TargetFrameworkVersion) == 'v1.4' Or $(TargetFrameworkVersion) == 'v1.5' Or $(TargetFrameworkVersion) == 'v1.6')">
       <ItemGroup>
         <Reference Include="System.Security.Cryptography.Csp">
           <HintPath>..\..\packages\System.Security.Cryptography.Csp\ref\netstandard1.3\System.Security.Cryptography.Csp.dll</HintPath>

@@ -37,7 +37,7 @@ namespace Conreign.Core.Gameplay.AI
         public Guid UserId { get; }
         public IPlayer Player { get; set; }
         public IUser User { get; }
-        public ILogger Logger { get; }
+        public ILogger Logger { get; set; }
 
         public void Complete()
         {

@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using Conreign.Client;
 using Conreign.Core.Client;
-using Conreign.Core.Client.Messages;
+using Conreign.Core.Contracts.Client;
+using Conreign.Core.Contracts.Client.Messages;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Gameplay.Data;
 using Conreign.Core.Contracts.Gameplay.Events;
@@ -24,8 +27,8 @@ namespace Conreign.Experiments
                 .WriteTo.LiterateConsole()
                 .MinimumLevel.Debug()
                 .CreateLogger();
-            //Simulate();
-            TestHandler();
+            Simulate();
+            //TestHandler();
             Console.WriteLine("Press a key to exit...");
             Console.ReadLine();
         }
@@ -38,17 +41,17 @@ namespace Conreign.Experiments
         private static void Simulate()
         {
             const int rooms = 3;
-            const int players = 3;
+            const int players = 5;
             var tasks = Enumerable.Range(0, rooms)
                 .Select(i => $"conreign-bots-{i}")
-                .SelectMany((roomId, i) => Enumerable.Range(0, players).Select(k => RunBot(roomId, k, players)))
+                .SelectMany((roomId, i) => Enumerable.Range(0, players).Select(k => RunSignalRBot(roomId, k, players)))
                 .ToArray();
             Task.WaitAll(tasks);
         }
 
         private static async Task RunHandler()
         {
-            var client = await GameClient.Initialize("OrleansClientConfiguration.xml");
+            var client = await OrleansGameClient.Initialize("OrleansClientConfiguration.xml");
             using (var connection = await client.Connect(Guid.NewGuid()))
             {
                 var handler = new GameHandler(connection);
@@ -84,38 +87,54 @@ namespace Conreign.Experiments
             }
         }
 
-        private static async Task RunBot(string roomId, int n, int total)
+        private static async Task RunSignalRBot(string roomId, int i, int total)
         {
-            var isLeader = n == 0;
-            var client = await GameClient.Initialize("OrleansClientConfiguration.xml");
+            ServicePointManager.DefaultConnectionLimit = 500;
+            var options = new SignalRGameClientOptions {ConnectionUri = "http://localhost:9000"};
+            var client = new SignalRGameClient(options);
             using (var connection = await client.Connect(Guid.NewGuid()))
             {
-                var name = isLeader ? "Leader" : $"Bot-{n}";
-                Console.WriteLine($"Connection id: {connection.Id}");
-                var options = new NaiveBotBattleStrategyOptions(0.8, 0.2, 1);
-                var behaviours = new List<IBotBehaviour>
+                await RunBot(connection, roomId, i, total);
+            }
+        }
+
+        private static async Task RunOrleansBot(string roomId, int i, int total)
+        {
+            var client = await OrleansGameClient.Initialize("OrleansClientConfiguration.xml");
+            using (var connection = await client.Connect(Guid.NewGuid()))
+            {
+                await RunBot(connection, roomId, i, total);
+            }
+        }
+
+        private static async Task RunBot(IGameConnection connection, string roomId, int i, int total)
+        {
+            var isLeader = i == 0;
+            var name = isLeader ? "Leader" : $"Bot-{i}";
+            Console.WriteLine($"Connection id: {connection.Id}");
+            var options = new NaiveBotBattleStrategyOptions(0.8, 0.2, 1);
+            var behaviours = new List<IBotBehaviour>
                 {
                     new LogBehaviour(),
                     new JoinRoomBehaviour(roomId, name, isLeader ? TimeSpan.Zero : TimeSpan.FromSeconds(0.5)),
                     new BattleBehaviour(new NaiveBotBattleStrategy(options)),
                     new StopOnGameEndBehaviour()
                 };
-                if (isLeader)
-                {
-                    behaviours.Add(new StartGameBehaviour(total));
-                }
-                var loginResult = await connection.Login();
-                var bot = Bot.Create(connection.Id, name, loginResult.UserId, loginResult.User, behaviours);
-                connection.Events
-                    .SelectMany(async e =>
-                    {
-                        await bot.Handle(e);
-                        return Unit.Default;
-                    })
-                    .Subscribe();
-                await bot.Start();
-                await bot.Completion;
+            if (isLeader)
+            {
+                behaviours.Add(new StartGameBehaviour(total));
             }
+            var loginResult = await connection.Login();
+            var bot = Bot.Create(connection.Id, name, loginResult.UserId, loginResult.User, behaviours);
+            connection.Events
+                .SelectMany(async e =>
+                {
+                    await bot.Handle(e);
+                    return Unit.Default;
+                })
+                .Subscribe(u => {}, e => Log.Error(e, $"Exception: {e.Message}"), () => Log.Information("Client stream complete"));
+            await bot.Start();
+            await bot.Completion;
         }
 
         private static void Write(object data)

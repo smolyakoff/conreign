@@ -1,5 +1,5 @@
 ﻿using System;
-using Conreign.Core.Client.Messages;
+using Conreign.Core.Contracts.Client;
 using Conreign.Core.Contracts.Gameplay;
 
 namespace Conreign.Core.Client

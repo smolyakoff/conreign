@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Conreign.Core.Contracts.Client;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Exceptions;
 using Conreign.Core.Contracts.Gameplay;
@@ -95,7 +96,7 @@ namespace Conreign.Core.Gameplay
             var data = new GameData
             {
                 Players = _state.Players,
-                Events = _hub.GetEvents(userId).ToList(),
+                Events = _hub.GetEvents(userId).Select(x => new MessageEnvelope {Payload = x}).ToList(),
                 LeaderUserId = _hub.LeaderUserId,
                 Map = _state.Map,
                 MovingFleets = playerState.MovingFleets,

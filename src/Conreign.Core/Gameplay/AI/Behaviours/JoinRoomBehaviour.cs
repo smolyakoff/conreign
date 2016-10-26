@@ -25,6 +25,7 @@ namespace Conreign.Core.Gameplay.AI.Behaviours
         {
             await Task.Delay(_delay);
             context.Player = await context.User.JoinRoom(_roomId, context.ConnectionId);
+            context.Logger = context.Logger.ForContext("RoomId", _roomId);
             await context.Player.UpdateOptions(new PlayerOptionsData
             {
                 Nickname = _name,

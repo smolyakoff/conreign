@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using AutoMapper;
 using Conreign.Core.Client.Handlers;
 using Conreign.Core.Client.Handlers.Decorators;
-using Conreign.Core.Client.Messages;
+using Conreign.Core.Contracts.Client;
 using Conreign.Core.Contracts.Communication;
 using MediatR;
 using SimpleInjector;
@@ -15,11 +16,10 @@ namespace Conreign.Core.Client
 {
     public class GameHandler : IGameHandler
     {
-        private static readonly Type HandlerType = typeof(IAsyncRequestHandler<,>);
+        private static readonly Type HandlerInterfaceType = typeof(IAsyncRequestHandler<,>);
         private const string HandlerContextKey = "ConreignClientContext";
         private readonly IGameConnection _connection;
         private readonly Container _container;
-        private readonly Mediator _mediator;
         private readonly ActionBlock<WorkItem> _processor;
         private bool _isDisposed;
 
@@ -33,11 +33,13 @@ namespace Conreign.Core.Client
             _container = new Container();
             var mapperConfiguration = new MapperConfiguration(x => x.AddProfile<MappingProfile>());
             _container.Options.DefaultScopedLifestyle = new ExecutionContextScopeLifestyle();
+            _container.RegisterSingleton<IMediator, Mediator>();
+            _container.RegisterSingleton(new SingleInstanceFactory(_container.GetInstance));
+            _container.RegisterSingleton(new MultiInstanceFactory(_container.GetAllInstances));
             _container.Register(() => (IHandlerContext) CallContext.GetData(HandlerContextKey), Lifestyle.Scoped);
             _container.RegisterSingleton(mapperConfiguration.CreateMapper());
-            _container.Register(HandlerType, new [] {typeof(LoginHandler).Assembly}, Lifestyle.Scoped);
-            _container.RegisterDecorator(HandlerType, typeof(AuthenticationDecorator<,>), Lifestyle.Scoped);
-            _mediator = new Mediator(type => _container.GetInstance(type), type => _container.GetAllInstances(type));
+            _container.Register(HandlerInterfaceType, new []{ typeof(LoginHandler).Assembly }, Lifestyle.Scoped);
+            _container.RegisterDecorator(HandlerInterfaceType, typeof(AuthenticationDecorator<,>), Lifestyle.Scoped);
             _processor = new ActionBlock<WorkItem>(Process);
         }
 
@@ -67,6 +69,7 @@ namespace Conreign.Core.Client
             {
                 return;
             }
+            _container.Dispose();
             _connection.Dispose();
             _isDisposed = true;
         }
@@ -84,17 +87,19 @@ namespace Conreign.Core.Client
             var traceId = Guid.NewGuid().ToString();
             var context = new HandlerContext(_connection, workItem.Metadata, traceId);
             CallContext.SetData(HandlerContextKey, context);
-            using (_container.BeginExecutionContextScope())
+            try
             {
-                try
+                _container.Verify();
+                using (var scope = _container.BeginExecutionContextScope())
                 {
-                    var result = await _mediator.SendAsync(workItem.Request);
+                    var mediator = scope.GetInstance<IMediator>();
+                    var result = await mediator.SendAsync(workItem.Request);
                     workItem.CompletionSource.SetResult(result);
                 }
-                catch (Exception ex)
-                {
-                    workItem.CompletionSource.SetException(ex);
-                }
+            }
+            catch (Exception ex)
+            {
+                workItem.CompletionSource.SetException(ex);
             }
         }
 
