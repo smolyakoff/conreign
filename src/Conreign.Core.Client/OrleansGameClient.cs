@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Conreign.Core.Client.Exceptions;
+using Conreign.Core.Contracts.Client;
 using Orleans;
 using Polly;
 
@@ -42,10 +43,10 @@ namespace Conreign.Core.Client
             return Task.FromResult(client);
         }
 
-        public async Task<IGameConnection> Connect(Guid connectionId)
+        public async Task<IClientConnection> Connect(Guid connectionId)
         {
             EnsureIsNotDisposed();
-            return await OrleansGameConnection.Initialize(_factory, connectionId);
+            return await OrleansClientConnection.Initialize(_factory, connectionId);
         }
 
         public void Dispose()

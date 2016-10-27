@@ -13,14 +13,14 @@ using Microsoft.AspNet.SignalR.Client;
 
 namespace Conreign.Client
 {
-    public sealed class SignalRGameConnection : IGameConnection
+    public sealed class SignalRClientConnection : IClientConnection
     {
         private readonly Subject<IClientEvent> _subject;
         private readonly GameObjectContext _context;
         private readonly IDisposable _disposable;
         private bool _isDisposed;
 
-        internal SignalRGameConnection(HubConnection connection, IHubProxy hub)
+        internal SignalRClientConnection(HubConnection connection, IHubProxy hub)
         {
             if (connection == null)
             {

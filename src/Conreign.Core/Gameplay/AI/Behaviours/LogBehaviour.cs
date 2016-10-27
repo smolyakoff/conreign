@@ -5,9 +5,14 @@ namespace Conreign.Core.Gameplay.AI.Behaviours
 {
     public class LogBehaviour : IBotBehaviour<IClientEvent>
     {
-        public Task Handle(IClientEvent @event, BotContext context)
+        public Task Handle(IBotNotification<IClientEvent> notification)
         {
-            context.Logger.Debug("[{ReadableId}-{UserId}]: Received {@Event}", context.ReadableId, context.UserId, @event);
+            var context = notification.Context;
+            var @event = notification.Event;
+            context.Logger.Debug("[{ReadableId}-{UserId}]: Received {@Event}", 
+                context.ReadableId, 
+                context.UserId == null ? "Anonymous" : context.UserId.ToString(), 
+                @event);
             return Task.CompletedTask;
         }
     }

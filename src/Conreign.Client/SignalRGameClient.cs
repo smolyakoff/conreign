@@ -7,6 +7,7 @@ using System.Runtime.Serialization.Formatters;
 using System.Text;
 using System.Threading.Tasks;
 using Conreign.Core.Client;
+using Conreign.Core.Contracts.Client;
 using Microsoft.AspNet.SignalR.Client;
 using Microsoft.AspNet.SignalR.Client.Transports;
 using Newtonsoft.Json;
@@ -37,7 +38,7 @@ namespace Conreign.Client
     public class SignalRGameClient : IGameClient
     {
         private readonly SignalRGameClientOptions _options;
-        private readonly ConcurrentDictionary<Guid, Task<IGameConnection>> _connections;
+        private readonly ConcurrentDictionary<Guid, Task<IClientConnection>> _connections;
 
         public SignalRGameClient(SignalRGameClientOptions options)
         {
@@ -46,10 +47,10 @@ namespace Conreign.Client
                 throw new ArgumentNullException(nameof(options));
             }
             _options = options;
-            _connections = new ConcurrentDictionary<Guid, Task<IGameConnection>>();
+            _connections = new ConcurrentDictionary<Guid, Task<IClientConnection>>();
         }
 
-        public Task<IGameConnection> Connect(Guid connectionId)
+        public Task<IClientConnection> Connect(Guid connectionId)
         {
             return _connections.GetOrAdd(connectionId, async id =>
             {
@@ -60,7 +61,7 @@ namespace Conreign.Client
                     ConnectionId = connectionId.ToString(),
                 };
                 var gameHub = hubConnection.CreateHubProxy("GameHub");
-                var connection = new SignalRGameConnection(hubConnection, gameHub);
+                var connection = new SignalRClientConnection(hubConnection, gameHub);
                 await hubConnection.Start(new ServerSentEventsTransport());
                 return connection;
             });

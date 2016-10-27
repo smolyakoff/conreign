@@ -25,8 +25,10 @@ namespace Conreign.Core.Gameplay.AI.Behaviours
             _strategy = strategy;
         }
 
-        public async Task Handle(TurnCalculationEnded @event, BotContext context)
+        public async Task Handle(IBotNotification<TurnCalculationEnded> notification)
         {
+            var context = notification.Context;
+            var @event = notification.Event;
             if ( _ended || context.Player == null)
             {
                 return;
@@ -35,8 +37,9 @@ namespace Conreign.Core.Gameplay.AI.Behaviours
             await Think(context);
         }
 
-        public async Task Handle(GameStarted @event, BotContext context)
+        public async Task Handle(IBotNotification<GameStarted> notification)
         {
+            var context = notification.Context;
             if (context.Player == null)
             {
                 return;
@@ -46,8 +49,10 @@ namespace Conreign.Core.Gameplay.AI.Behaviours
             await Think(context);
         }
 
-        public Task Handle(PlayerDead @event, BotContext context)
+        public Task Handle(IBotNotification<PlayerDead> notification)
         {
+            var context = notification.Context;
+            var @event = notification.Event;
             if (@event.UserId != context.UserId)
             {
                 return Task.CompletedTask;
@@ -56,7 +61,7 @@ namespace Conreign.Core.Gameplay.AI.Behaviours
             return Task.CompletedTask;
         }
 
-        public Task Handle(GameEnded @event, BotContext context)
+        public Task Handle(IBotNotification<GameEnded> notification)
         {
             _ended = true;
             return Task.CompletedTask;
@@ -64,8 +69,12 @@ namespace Conreign.Core.Gameplay.AI.Behaviours
 
         private async Task Think(BotContext context)
         {
+            if (context.UserId == null)
+            {
+                throw new InvalidOperationException("Expected to be authenticated already.");
+            }
             var map = new ReadOnlyMap(new Map(_map));
-            var fleets = _strategy.ChooseFleetsToLaunch(context.UserId, map);
+            var fleets = _strategy.ChooseFleetsToLaunch(context.UserId.Value, map);
             var tasks = fleets.Select(x => context.Player.LaunchFleet(x));
             await Task.WhenAll(tasks);
             await context.Player.EndTurn();

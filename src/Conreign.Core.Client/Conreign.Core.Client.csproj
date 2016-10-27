@@ -60,13 +60,10 @@
     <Compile Include="Handlers\LaunchFleetHandler.cs" />
     <Compile Include="Handlers\LoginHandler.cs" />
     <Compile Include="Handlers\UpdateGameOptionsHandler.cs" />
-    <Compile Include="IGameConnection.cs" />
-    <Compile Include="IGameClient.cs" />
     <Compile Include="Exceptions\ConnectionException.cs" />
     <Compile Include="OrleansGameClient.cs" />
     <Compile Include="Exceptions\GameClientException.cs" />
-    <Compile Include="OrleansGameConnection.cs" />
-    <Compile Include="LoginResult.cs" />
+    <Compile Include="OrleansClientConnection.cs" />
     <Compile Include="HandlerContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

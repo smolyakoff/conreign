@@ -1,7 +1,7 @@
 using System;
 using Conreign.Core.Contracts.Gameplay;
 
-namespace Conreign.Core.Client
+namespace Conreign.Core.Contracts.Client
 {
     public class LoginResult
     {

@@ -8,7 +8,7 @@ namespace Conreign.Core.Client
     {
         private readonly Metadata _metadata;
 
-        public HandlerContext(IGameConnection connection, Metadata metadata, string traceId)
+        public HandlerContext(IClientConnection connection, Metadata metadata, string traceId)
         {
             if (connection == null)
             {
@@ -31,6 +31,6 @@ namespace Conreign.Core.Client
         public Guid? UserId { get; set; }
         public IUser User { get; set; }
         public string TraceId { get; }
-        public IGameConnection Connection { get; }
+        public IClientConnection Connection { get; }
     }
 }

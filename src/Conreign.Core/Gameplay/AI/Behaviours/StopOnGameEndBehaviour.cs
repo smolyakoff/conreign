@@ -1,14 +1,13 @@
-﻿
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Conreign.Core.Contracts.Gameplay.Events;
 
 namespace Conreign.Core.Gameplay.AI.Behaviours
 {
     public class StopOnGameEndBehaviour : IBotBehaviour<GameEnded>
     {
-        public Task Handle(GameEnded @event, BotContext context)
+        public Task Handle(IBotNotification<GameEnded> notification)
         {
-            context.Complete();
+            notification.Context.Complete();
             return Task.CompletedTask;
         }
     }

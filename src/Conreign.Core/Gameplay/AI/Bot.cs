@@ -3,105 +3,99 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+using Conreign.Core.Contracts.Client;
 using Conreign.Core.Contracts.Communication;
-using Conreign.Core.Contracts.Gameplay;
 using Conreign.Core.Gameplay.AI.Behaviours;
+using Conreign.Core.Gameplay.AI.Events;
+using MediatR;
+using SimpleInjector;
+using SimpleInjector.Extensions;
 
 namespace Conreign.Core.Gameplay.AI
 {
-    public class Bot : IEventHandler<IClientEvent>
+    public class Bot : IDisposable
     {
         private readonly BotContext _context;
-        private readonly Dictionary<Type, List<IBotBehaviour>> _behaviours;
         private ActionBlock<IClientEvent> _processor;
+        private readonly IDisposable _subscription;
+        private bool _isDisposed;
+        private readonly DispatcherBehaviour _dispatcher;
 
-        public static Bot Create(Guid connectionId, string readableId, Guid userId, IUser user, IEnumerable<IBotBehaviour> behaviours)
+        public Bot(string readableId, IClientConnection connection, params IBotBehaviour[] behaviours)
         {
             if (string.IsNullOrEmpty(readableId))
             {
                 throw new ArgumentException("Readable id cannot be null or empty.", nameof(readableId));
             }
-            if (user == null)
+            if (connection == null)
             {
-                throw new ArgumentNullException(nameof(user));
+                throw new ArgumentNullException(nameof(connection));
             }
-            if (behaviours == null)
-            {
-                throw new ArgumentNullException(nameof(behaviours));
-            }
-            var groups = behaviours
-                .ToList()
-                .SelectMany(b =>
-                {
-                    var types = b
-                        .GetType()
-                        .GetInterfaces()
-                        .Select(t =>
-                        {
-                            var type = t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IBotBehaviour<>)
-                                ? t.GetGenericArguments()[0]
-                                : null;
-                            return new
-                            {
-                                Type = type,
-                                Behaviour = b
-                            };
-                        });
-                    return types;
-                })
-                .Where(x => x.Type != null)
-                .GroupBy(x => x.Type)
-                .ToList();
-            var behaviors = groups
-                .ToDictionary(x => x.Key, x => x.Select(y => y.Behaviour).ToList());
-            return new Bot(connectionId, readableId, userId, user, behaviors);
-        }
-
-        private Bot(Guid connectionId, string readableId, Guid userId, IUser user, Dictionary<Type, List<IBotBehaviour>> behaviours)
-        {
-            _processor = _processor = new ActionBlock<IClientEvent>(Process);
-            _context = new BotContext(connectionId, readableId, userId, user, _processor.Complete);
-            _behaviours = behaviours;
+            _processor = new ActionBlock<IClientEvent>(Process);
+            _context = new BotContext(readableId, connection, _processor.Complete, Handle);
+            _subscription = connection.Events.Subscribe(Handle);
+            _dispatcher = new DispatcherBehaviour(behaviours);
         }
 
         public Task Completion => _processor.Completion;
 
-        public Task Handle(IClientEvent @event)
+        public void Start()
         {
-            return @event == null 
-                ? Task.CompletedTask 
-                : _processor.SendAsync(@event);
-        }
-
-        public Task Start()
-        {
+            EnsureIsNotDisposed();
             if (_processor.Completion.IsCompleted)
             {
                 _processor = new ActionBlock<IClientEvent>(Process);
             }
-            return Handle(new BotStarted());
+            Handle(new BotStarted());
         }
 
-        public Task Stop()
+        public void Stop()
         {
-            return Handle(new BotStopped());
+            EnsureIsNotDisposed();
+            Handle(new BotStopped());
         }
 
-        private async Task Process(IClientEvent @event)
+        public void Dispose()
         {
-            var type = @event.GetType();
-            var tasks = _behaviours
-                .Where(x => x.Key.IsAssignableFrom(type))
-                .SelectMany(x => x.Value)
-                .Select(b =>
-                {
-                    dynamic behaviour = b;
-                    return (Task)behaviour.Handle((dynamic)@event, _context);
-                })
-                .ToList();
-            foreach (var task in tasks)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_isDisposed)
             {
-                await task;
+                return;
+            }
+            if (!disposing)
+            {
+                return;
+            }
+            _subscription?.Dispose();
+            _processor?.Complete();
+            _processor = null;
+            _isDisposed = true;
+        }
+
+        private Task Process(IClientEvent @event)
+        {
+            return _dispatcher.Handle(new BotNotification<IClientEvent>(@event, _context));
+        }
+
+        private void Handle(IClientEvent @event)
+        {
+            if (@event == null)
+            {
+                return;
+            }
+            _processor.Post(@event);
+        }
+
+        private void EnsureIsNotDisposed()
+        {
+            if (_isDisposed)
+            {
+                throw new ObjectDisposedException($"Bot[${_context.Connection.Id}]");
             }
         }
     }

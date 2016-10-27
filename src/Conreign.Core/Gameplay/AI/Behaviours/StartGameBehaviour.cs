@@ -14,8 +14,9 @@ namespace Conreign.Core.Gameplay.AI.Behaviours
             _targetPlayersCount = targetPlayersCount;
         }
 
-        public async Task Handle(PlayerJoined @event, BotContext context)
+        public async Task Handle(IBotNotification<PlayerJoined> notification)
         {
+            var context = notification.Context;
             if (_started || context.Player == null)
             {
                 return;
@@ -34,12 +35,8 @@ namespace Conreign.Core.Gameplay.AI.Behaviours
             {
                 return;
             }
-            if (_started)
-            {
-                return;
-            }
             _started = true;
-            await Task.Delay(1000);
+            //await Task.Delay(1000);
             await context.Player.StartGame();
         }
     }

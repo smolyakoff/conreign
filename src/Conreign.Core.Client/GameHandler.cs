@@ -10,12 +10,12 @@ namespace Conreign.Core.Client
 {
     public class GameHandler : IGameHandler
     {
-        private readonly IGameConnection _connection;
+        private readonly IClientConnection _connection;
         private readonly IMediator _mediator;
         private readonly ActionBlock<WorkItem> _processor;
         private bool _isDisposed;
 
-        public GameHandler(IGameConnection connection)
+        public GameHandler(IClientConnection connection)
         {
             if (connection == null)
             {
@@ -28,7 +28,7 @@ namespace Conreign.Core.Client
             _processor = new ActionBlock<WorkItem>(Process);
         }
 
-        public GameHandler(IGameConnection connection, IMediator mediator)
+        public GameHandler(IClientConnection connection, IMediator mediator)
         {
             if (connection == null)
             {

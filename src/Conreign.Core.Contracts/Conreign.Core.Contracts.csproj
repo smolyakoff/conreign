@@ -36,6 +36,9 @@
     <Compile Include="Auth\Errors\AuthenticationError.cs" />
     <Compile Include="Auth\IAuthGrain.cs" />
     <Compile Include="Auth\IAuthService.cs" />
+    <Compile Include="Client\IGameClient.cs" />
+    <Compile Include="Client\IClientConnection.cs" />
+    <Compile Include="Client\LoginResult.cs" />
     <Compile Include="Client\MessageEnvelope.cs" />
     <Compile Include="Client\Messages\AuthenticateCommand.cs" />
     <Compile Include="Client\Messages\CancelFleetCommand.cs" />

@@ -107,7 +107,7 @@ namespace Conreign.Experiments
             }
         }
 
-        private static async Task RunBot(IGameConnection connection, string roomId, int i, int total)
+        private static async Task RunBot(IClientConnection connection, string roomId, int i, int total)
         {
             var isLeader = i == 0;
             var name = isLeader ? "Leader" : $"Bot-{i}";
@@ -115,6 +115,7 @@ namespace Conreign.Experiments
             var options = new NaiveBotBattleStrategyOptions(0.8, 0.2, 1);
             var behaviours = new List<IBotBehaviour>
                 {
+                    new LoginBehaviour(),
                     new LogBehaviour(),
                     new JoinRoomBehaviour(roomId, name, isLeader ? TimeSpan.Zero : TimeSpan.FromSeconds(0.5)),
                     new BattleBehaviour(new NaiveBotBattleStrategy(options)),
@@ -124,17 +125,11 @@ namespace Conreign.Experiments
             {
                 behaviours.Add(new StartGameBehaviour(total));
             }
-            var loginResult = await connection.Login();
-            var bot = Bot.Create(connection.Id, name, loginResult.UserId, loginResult.User, behaviours);
-            connection.Events
-                .SelectMany(async e =>
-                {
-                    await bot.Handle(e);
-                    return Unit.Default;
-                })
-                .Subscribe(u => {}, e => Log.Error(e, $"Exception: {e.Message}"), () => Log.Information("Client stream complete"));
-            await bot.Start();
-            await bot.Completion;
+            using (var bot = new Bot(name, connection, behaviours.ToArray()))
+            {
+                bot.Start();
+                await bot.Completion;
+            }
         }
 
         private static void Write(object data)

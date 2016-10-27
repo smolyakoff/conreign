@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using Conreign.Core.Contracts.Communication;
 
-namespace Conreign.Core.Client
+namespace Conreign.Core.Contracts.Client
 {
-    public interface IGameConnection : IDisposable
+    public interface IClientConnection : IDisposable
     {
         Guid Id { get; }
         IObservable<IClientEvent> Events { get; }

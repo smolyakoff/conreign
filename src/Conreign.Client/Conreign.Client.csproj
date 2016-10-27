@@ -45,7 +45,7 @@
     <Compile Include="Proxies\PlayerProxy.cs" />
     <Compile Include="GameObjectContextExtensions.cs" />
     <Compile Include="SignalRGameClient.cs" />
-    <Compile Include="SignalRGameConnection.cs" />
+    <Compile Include="SignalRClientConnection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SignalRGameClientOptions.cs" />
     <Compile Include="Proxies\UserProxy.cs" />

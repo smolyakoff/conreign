@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Conreign.Core.Contracts.Gameplay.Data;
+using Conreign.Core.Gameplay.AI.Behaviours.Events;
 
 namespace Conreign.Core.Gameplay.AI.Behaviours
 {
-    public class JoinRoomBehaviour : IBotBehaviour<BotStarted>
+    public class JoinRoomBehaviour : IBotBehaviour<BotAuthenticated>
     {
         private readonly string _roomId;
         private readonly string _name;
@@ -21,10 +22,11 @@ namespace Conreign.Core.Gameplay.AI.Behaviours
             _delay = delay;
         }
 
-        public async Task Handle(BotStarted @event, BotContext context)
+        public async Task Handle(IBotNotification<BotAuthenticated> notification)
         {
+            var context = notification.Context;
             await Task.Delay(_delay);
-            context.Player = await context.User.JoinRoom(_roomId, context.ConnectionId);
+            context.Player = await context.User.JoinRoom(_roomId, context.Connection.Id);
             context.Logger = context.Logger.ForContext("RoomId", _roomId);
             await context.Player.UpdateOptions(new PlayerOptionsData
             {

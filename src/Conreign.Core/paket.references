@@ -1,3 +1,6 @@
+System.Reactive.Linq
+SimpleInjector
+MediatR
 Microsoft.Tpl.Dataflow
 Serilog
 JWT

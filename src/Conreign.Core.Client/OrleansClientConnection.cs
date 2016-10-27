@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Conreign.Core.Client.Exceptions;
 using Conreign.Core.Contracts.Auth;
+using Conreign.Core.Contracts.Client;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Gameplay;
 using Conreign.Core.Contracts.Presence;
@@ -12,21 +13,21 @@ using Orleans.Streams;
 
 namespace Conreign.Core.Client
 {
-    public class OrleansGameConnection : IGameConnection
+    public class OrleansClientConnection : IClientConnection
     {
         private readonly IGrainFactory _factory;
         private StreamSubscriptionHandle<IClientEvent> _stream;
         private bool _isDisposed;
         private readonly ISubject<IClientEvent> _subject;
 
-        internal static async Task<OrleansGameConnection> Initialize(IGrainFactory grainFactory, Guid connectionId)
+        internal static async Task<OrleansClientConnection> Initialize(IGrainFactory grainFactory, Guid connectionId)
         {
             var universe = grainFactory.GetGrain<IUniverseGrain>(default(long));
             await universe.Ping();
             var stream = GrainClient.GetStreamProvider(StreamConstants.ProviderName)
                 .GetStream<IClientEvent>(connectionId, StreamConstants.ClientNamespace);
             var existingHandles = await stream.GetAllSubscriptionHandles();
-            var connection = new OrleansGameConnection(connectionId, grainFactory);
+            var connection = new OrleansClientConnection(connectionId, grainFactory);
             var handle = existingHandles.Count > 0 
                 ? existingHandles[0] 
                 : await stream.SubscribeAsync(connection.OnNext, connection.OnError, connection.OnCompleted);
@@ -38,7 +39,7 @@ namespace Conreign.Core.Client
             return connection;
         }
 
-        private OrleansGameConnection(Guid connectionId, IGrainFactory factory)
+        private OrleansClientConnection(Guid connectionId, IGrainFactory factory)
         {
             Id = connectionId;
             _subject = new Subject<IClientEvent>();
