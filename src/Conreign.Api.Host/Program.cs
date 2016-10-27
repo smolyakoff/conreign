@@ -25,6 +25,7 @@ namespace Conreign.Api.Host
             catch (Exception ex)
             {
                 Log.Logger.Fatal(ex, "Api server cannot start. {Message}", ex.Message);
+                Console.ReadLine();
             }
         }
 

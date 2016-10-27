@@ -7,25 +7,25 @@ using MediatR;
 
 namespace Conreign.Core.Client.Handlers
 {
-    internal class CancelFleetHandler : IAsyncRequestHandler<CancelFleetCommand, Unit>
+    internal class CancelFleetHandler : ICommandHandler<CancelFleetCommand, Unit>
     {
-        private readonly IHandlerContext _context;
         private readonly IMapper _mapper;
 
-        public CancelFleetHandler(IHandlerContext context, IMapper mapper)
+        public CancelFleetHandler(IMapper mapper)
         {
-            if (context == null)
+            if (mapper == null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw new ArgumentNullException(nameof(mapper));
             }
-            _context = context;
             _mapper = mapper;
         }
 
-        public async Task<Unit> Handle(CancelFleetCommand message)
+        public async Task<Unit> Handle(CommandEnvelope<CancelFleetCommand, Unit> message)
         {
-            var player = await _context.User.JoinRoom(message.RoomId, _context.Connection.Id);
-            var cancelation = _mapper.Map<CancelFleetCommand, FleetCancelationData>(message);
+            var command = message.Command;
+            var context = message.Context;
+            var player = await context.User.JoinRoom(command.RoomId, context.Connection.Id);
+            var cancelation = _mapper.Map<CancelFleetCommand, FleetCancelationData>(command);
             await player.CancelFleet(cancelation);
             return Unit.Value;
         }

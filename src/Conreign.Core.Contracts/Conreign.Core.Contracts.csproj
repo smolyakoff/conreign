@@ -53,7 +53,6 @@
     <Compile Include="Client\Metadata.cs" />
     <Compile Include="Client\Serialization\MessageEnvelopeJsonConverter.cs" />
     <Compile Include="Client\Serialization\MessageTypeSerializer.cs" />
-    <Compile Include="Client\Serialization\WrapToEnvelopeJsonConverter.cs" />
     <Compile Include="Common\ValidationErrorDetails.cs" />
     <Compile Include="Common\ValidationFailure.cs" />
     <Compile Include="Communication\Events\Connected.cs" />

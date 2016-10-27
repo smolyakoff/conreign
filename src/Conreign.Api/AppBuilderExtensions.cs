@@ -26,8 +26,7 @@ namespace Conreign.Api
                 throw new ArgumentNullException(nameof(options));
             }
             var container = new Container();
-            var apiPackage = new ConreignApi(options);
-            apiPackage.RegisterServices(container);
+            container.RegisterConreignApi(options);
             var hubConfiguration = new HubConfiguration
             {
                 EnableDetailedErrors = true

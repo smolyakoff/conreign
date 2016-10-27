@@ -42,15 +42,18 @@
     <Content Include="app.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ContainerExtensions.cs" />
     <Compile Include="GameHandler.cs" />
     <Compile Include="Handlers\CancelFleetHandler.cs" />
     <Compile Include="Handlers\Decorators\AuthenticationDecorator.cs" />
     <Compile Include="Handlers\EndTurnHandler.cs" />
     <Compile Include="Handlers\GetRoomStateHandler.cs" />
-    <Compile Include="Handlers\MappingProfile.cs" />
+    <Compile Include="Handlers\HandlersMappingProfile.cs" />
+    <Compile Include="CommandEnvelope.cs" />
     <Compile Include="Handlers\StartGameHandler.cs" />
     <Compile Include="Handlers\UpdatePlayerOptionsHandler.cs" />
     <Compile Include="Handlers\WriteHandler.cs" />
+    <Compile Include="ICommandHandler.cs" />
     <Compile Include="IGameHandler.cs" />
     <Compile Include="IHandlerContext.cs" />
     <Compile Include="Handlers\JoinRoomHandler.cs" />

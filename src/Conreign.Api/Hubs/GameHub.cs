@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Conreign.Core.Client;
 using Conreign.Core.Contracts.Client;
 using Conreign.Core.Contracts.Communication;
+using MediatR;
 using Microsoft.AspNet.SignalR;
 
 namespace Conreign.Api.Hubs
@@ -12,14 +13,20 @@ namespace Conreign.Api.Hubs
     {
         private static readonly ConcurrentDictionary<string, GameHubConnection> Handlers = new ConcurrentDictionary<string, GameHubConnection>();
         private readonly OrleansGameClient _client;
+        private readonly IMediator _mediator;
 
-        public GameHub(OrleansGameClient client)
+        public GameHub(OrleansGameClient client, IMediator mediator)
         {
             if (client == null)
             {
                 throw new ArgumentNullException(nameof(client));
             }
+            if (mediator == null)
+            {
+                throw new ArgumentNullException(nameof(mediator));
+            }
             _client = client;
+            _mediator = mediator;
         }
 
         public async Task<MessageEnvelope> Send(MessageEnvelope envelope)
@@ -46,7 +53,7 @@ namespace Conreign.Api.Hubs
         public override async Task OnConnected()
         {
             var connection = await _client.Connect(Guid.Parse(Context.ConnectionId));
-            var handler = new GameHandler(connection);
+            var handler = new GameHandler(connection, _mediator);
             var subscription = handler.Events.Subscribe(new ConnectionObserver(this, Context.ConnectionId));
             Handlers[Context.ConnectionId] = new GameHubConnection(handler, subscription);
             await base.OnConnected();

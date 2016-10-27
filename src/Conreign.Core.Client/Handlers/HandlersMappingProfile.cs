@@ -4,9 +4,9 @@ using Conreign.Core.Contracts.Gameplay.Data;
 
 namespace Conreign.Core.Client.Handlers
 {
-    internal class MappingProfile : Profile
+    internal class HandlersMappingProfile : Profile
     {
-        public MappingProfile()
+        public HandlersMappingProfile()
         {
             CreateMap<CancelFleetCommand, FleetCancelationData>();
             CreateMap<WriteCommand, TextMessageData>();

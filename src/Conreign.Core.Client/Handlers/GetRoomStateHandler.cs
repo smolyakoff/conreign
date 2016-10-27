@@ -6,22 +6,13 @@ using MediatR;
 
 namespace Conreign.Core.Client.Handlers
 {
-    public class GetRoomStateHandler : IAsyncRequestHandler<GetRoomStateCommand, IRoomData>
+    internal class GetRoomStateHandler : ICommandHandler<GetRoomStateCommand, IRoomData>
     {
-        private readonly IHandlerContext _context;
-
-        public GetRoomStateHandler(IHandlerContext context)
+        public async Task<IRoomData> Handle(CommandEnvelope<GetRoomStateCommand, IRoomData> message)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-            _context = context;
-        }
-
-        public async Task<IRoomData> Handle(GetRoomStateCommand message)
-        {
-            var player = await _context.User.JoinRoom(message.RoomId, _context.Connection.Id);
+            var context = message.Context;
+            var command = message.Command;
+            var player = await context.User.JoinRoom(command.RoomId, context.Connection.Id);
             return await player.GetState();
         }
     }

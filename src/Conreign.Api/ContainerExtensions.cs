@@ -10,25 +10,24 @@ using SimpleInjector;
 
 namespace Conreign.Api
 {
-    public class ConreignApi
+    public static class ContainerExtensions
     {
-        private readonly ConreignApiOptions _options;
-
-        public ConreignApi(ConreignApiOptions options)
+        public static Container RegisterConreignApi(this Container container, ConreignApiOptions options)
         {
+            if (container == null)
+            {
+                throw new ArgumentNullException(nameof(container));
+            }
             if (options == null)
             {
                 throw new ArgumentNullException(nameof(options));
             }
-            _options = options;
-        }
-
-        public void RegisterServices(Container container)
-        {
             container.Register(() => Log.Logger, Lifestyle.Singleton);
-            container.Register(() => OrleansGameClient.Initialize(_options.OrleansClientConfigFilePath).Result, Lifestyle.Singleton);
+            container.Register(() => OrleansGameClient.Initialize(options.OrleansClientConfigFilePath).Result, Lifestyle.Singleton);
             container.RegisterCollection<HubPipelineModule>(new[] {Assembly.GetExecutingAssembly()});
             RegisterHubs(container);
+            container.RegisterClientMediator();
+            return container;
         }
 
         private static void RegisterHubs(Container container)

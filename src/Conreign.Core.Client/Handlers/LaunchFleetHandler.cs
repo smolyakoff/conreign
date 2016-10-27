@@ -1,27 +1,17 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Conreign.Core.Contracts.Client.Messages;
 using MediatR;
 
 namespace Conreign.Core.Client.Handlers
 {
-    internal class LaunchFleetHandler : IAsyncRequestHandler<LaunchFleetCommand, Unit>
+    internal class LaunchFleetHandler : ICommandHandler<LaunchFleetCommand, Unit>
     {
-        private readonly IHandlerContext _context;
-
-        public LaunchFleetHandler(IHandlerContext context)
+        public async Task<Unit> Handle(CommandEnvelope<LaunchFleetCommand, Unit> message)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-            _context = context;
-        }
-
-        public async Task<Unit> Handle(LaunchFleetCommand message)
-        {
-            var player = await _context.User.JoinRoom(message.RoomId, _context.Connection.Id);
-            await player.LaunchFleet(message.Fleet);
+            var context = message.Context;
+            var command = message.Command;
+            var player = await context.User.JoinRoom(command.RoomId, context.Connection.Id);
+            await player.LaunchFleet(command.Fleet);
             return Unit.Value;
         }
     }

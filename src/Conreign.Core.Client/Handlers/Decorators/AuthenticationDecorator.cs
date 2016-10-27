@@ -1,33 +1,37 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using Conreign.Core.Contracts.Client.Messages;
 using MediatR;
 
 namespace Conreign.Core.Client.Handlers.Decorators
 {
-    public class AuthenticationDecorator<TCommand, TResponse> : IAsyncRequestHandler<TCommand, TResponse> where TCommand : IAsyncRequest<TResponse>
+    internal class AuthenticationDecorator<TCommand, TResponse> : ICommandHandler<TCommand, TResponse> where TCommand : IAsyncRequest<TResponse>
     {
-        private readonly IHandlerContext _context;
-        private readonly IAsyncRequestHandler<TCommand, TResponse> _next;
+        private readonly IAsyncRequestHandler<CommandEnvelope<TCommand, TResponse>, TResponse> _next;
         private readonly bool _skipAuthentication;
 
-        public AuthenticationDecorator(IHandlerContext context, IAsyncRequestHandler<TCommand, TResponse> next)
+        public AuthenticationDecorator(IAsyncRequestHandler<CommandEnvelope<TCommand, TResponse>, TResponse> next)
         {
-            _context = context;
+            if (next == null)
+            {
+                throw new ArgumentNullException(nameof(next));
+            }
             _next = next;
             _skipAuthentication = typeof(TCommand).GetCustomAttribute<SkipAuthenticationAttribute>() != null;
         }
 
-        public async Task<TResponse> Handle(TCommand command)
+        public async Task<TResponse> Handle(CommandEnvelope<TCommand, TResponse> message)
         {
+            var context = message.Context;
             if (_skipAuthentication)
             {
-                return await _next.Handle(command);
+                return await _next.Handle(message);
             }
-            var loginResult = await _context.Connection.Authenticate(_context.AccessToken);
-            _context.UserId = loginResult.UserId;
-            _context.User = loginResult.User;
-            return await _next.Handle(command);
+            var loginResult = await context.Connection.Authenticate(context.AccessToken);
+            context.UserId = loginResult.UserId;
+            context.User = loginResult.User;
+            return await _next.Handle(message);
         }
     }
 }
