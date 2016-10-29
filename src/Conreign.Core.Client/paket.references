@@ -1,9 +1,0 @@
-System.Reactive.Core
-System.Reactive.Linq
-Microsoft.Tpl.Dataflow
-MediatR
-Polly
-AutoMapper
-SimpleInjector
-SimpleInjector.Extensions.ExecutionContextScoping
-Microsoft.Orleans.Client content: none

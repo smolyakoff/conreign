@@ -1,7 +1,0 @@
-System.Reactive.Core
-System.Reactive.Linq
-Microsoft.Tpl.Dataflow
-MediatR
-AutoMapper
-SimpleInjector
-SimpleInjector.Extensions.ExecutionContextScoping
