@@ -48,7 +48,7 @@ namespace Conreign.Client.Orleans
             {
                 var policy = Policy
                     .Handle<Exception>()
-                    .WaitAndRetry(5, attempt => TimeSpan.FromSeconds(attempt*3));
+                    .WaitAndRetry(5, attempt => TimeSpan.FromSeconds(attempt*5));
                 var result = policy.ExecuteAndCapture(() => GrainClient.Initialize(configFilePath));
                 if (result.Outcome == OutcomeType.Failure)
                 {

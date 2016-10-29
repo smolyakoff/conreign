@@ -1,6 +1,6 @@
 System.Reactive.Core
 System.Reactive.Linq
+System.IdentityModel.Tokens.Jwt
 Serilog
 MediatR
 Microsoft.AspNet.SignalR.Client
-System.IdentityModel.Tokens.Jwt

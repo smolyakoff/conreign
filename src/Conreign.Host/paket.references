@@ -1,6 +1,3 @@
-﻿Microsoft.Orleans.OrleansRuntime
-Microsoft.Orleans.OrleansCodeGenerator
+﻿MongoDB.Driver
+Microsoft.Orleans.Server
 Microsoft.Orleans.OrleansSQLUtils
-Microsoft.Orleans.OrleansProviders
-Microsoft.Extensions.DependencyInjection
-MongoDB.Driver

@@ -11,27 +11,22 @@ nuget Microsoft.Tpl.Dataflow
 nuget System.Reactive.Core
 nuget System.Reactive.Linq
 nuget System.IdentityModel.Tokens.Jwt
-nuget Polly
-nuget FluentValidation
 
 nuget Serilog.Sinks.Literate
+nuget Polly
+nuget FluentValidation
+nuget JWT
+nuget AutoMapper
+nuget SimpleInjector
+nuget MediatR
+
 nuget MongoDB.Driver
 nuget Microsoft.Orleans.OrleansCodeGenerator.Build
-nuget Microsoft.Orleans.OrleansRuntime
+nuget Microsoft.Orleans.Server
 nuget Microsoft.Orleans.OrleansSQLUtils
 nuget Microsoft.Orleans.Client
 
-nuget Microsoft.Extensions.DependencyInjection 1.0.0-rc1-final
-nuget Microsoft.Extensions.DependencyInjection.Abstractions 1.0.0-rc1-final
-
-nuget SimpleInjector
-nuget SimpleInjector.Extensions.ExecutionContextScoping
-nuget MediatR
-nuget Autofac.Owin
-nuget Autofac.SignalR
 nuget Microsoft.Owin.Cors
 nuget Microsoft.AspNet.SignalR.Core
 nuget Microsoft.AspNet.SignalR.Client
 nuget Microsoft.AspNet.SignalR.SelfHost
-nuget JWT
-nuget AutoMapper

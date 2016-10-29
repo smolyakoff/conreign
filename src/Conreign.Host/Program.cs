@@ -19,7 +19,6 @@ namespace Conreign.Host
                 new AppDomainSetup {AppDomainInitializer = InitializeSilo});
             Console.WriteLine("Orleans silo is running... Press any key to terminate.");
             Console.ReadLine();
-
             domain.DoCallBack(ShutdownSilo);
         }
 

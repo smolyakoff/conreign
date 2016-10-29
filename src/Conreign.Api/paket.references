@@ -1,6 +1,4 @@
 Serilog
 SimpleInjector
-Newtonsoft.Json
 MediatR
 Microsoft.AspNet.SignalR.Core
-Microsoft.AspNet.SignalR.Client

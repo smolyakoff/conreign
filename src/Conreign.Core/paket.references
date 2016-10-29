@@ -1,8 +1,7 @@
 System.Reactive.Linq
-SimpleInjector
-MediatR
 Microsoft.Tpl.Dataflow
 Serilog
+SimpleInjector
 JWT
 FluentValidation
 Microsoft.Orleans.OrleansCodeGenerator.Build
