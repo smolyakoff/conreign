@@ -24,7 +24,7 @@ namespace Conreign.Core.Gameplay.AI.Behaviours
 
             if (_currentCount == null)
             {
-                var game =  await context.Player.GetState();
+                var game = await context.Player.GetState();
                 _currentCount = game.Players.Count;
             }
             else

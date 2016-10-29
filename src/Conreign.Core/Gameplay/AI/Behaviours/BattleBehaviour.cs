@@ -3,18 +3,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using Conreign.Core.Contracts.Gameplay.Data;
 using Conreign.Core.Contracts.Gameplay.Events;
+using Conreign.Core.Gameplay.AI.Battle;
 
 namespace Conreign.Core.Gameplay.AI.Behaviours
 {
     public class BattleBehaviour :
-        IBotBehaviour<TurnCalculationEnded>, 
-        IBotBehaviour<GameStarted>, 
+        IBotBehaviour<TurnCalculationEnded>,
+        IBotBehaviour<GameStarted>,
         IBotBehaviour<PlayerDead>,
         IBotBehaviour<GameEnded>
     {
-        private MapData _map;
-        private bool _ended;
         private readonly IBotBattleStrategy _strategy;
+        private bool _ended;
+        private MapData _map;
 
         public BattleBehaviour(IBotBattleStrategy strategy)
         {
@@ -25,16 +26,10 @@ namespace Conreign.Core.Gameplay.AI.Behaviours
             _strategy = strategy;
         }
 
-        public async Task Handle(IBotNotification<TurnCalculationEnded> notification)
+        public Task Handle(IBotNotification<GameEnded> notification)
         {
-            var context = notification.Context;
-            var @event = notification.Event;
-            if ( _ended || context.Player == null)
-            {
-                return;
-            }
-            _map = @event.Map;
-            await Think(context);
+            _ended = true;
+            return Task.CompletedTask;
         }
 
         public async Task Handle(IBotNotification<GameStarted> notification)
@@ -61,10 +56,16 @@ namespace Conreign.Core.Gameplay.AI.Behaviours
             return Task.CompletedTask;
         }
 
-        public Task Handle(IBotNotification<GameEnded> notification)
+        public async Task Handle(IBotNotification<TurnCalculationEnded> notification)
         {
-            _ended = true;
-            return Task.CompletedTask;
+            var context = notification.Context;
+            var @event = notification.Event;
+            if (_ended || context.Player == null)
+            {
+                return;
+            }
+            _map = @event.Map;
+            await Think(context);
         }
 
         private async Task Think(BotContext context)

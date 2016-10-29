@@ -19,8 +19,8 @@ namespace Conreign.Core.Gameplay
 {
     public class Game : IGame
     {
-        private readonly GameState _state;
         private readonly IBattleStrategy _battleStrategy;
+        private readonly GameState _state;
         private readonly IUserTopic _topic;
         private Hub _hub;
         private Map _map;
@@ -49,34 +49,6 @@ namespace Conreign.Core.Gameplay
         public bool IsEnded => _state.IsEnded;
         public bool IsAnybodyThinking => _state.PlayerStates.Values.Any(x => x.TurnStatus == TurnStatus.Thinking);
         public int Turn => _state.Turn;
-
-        public Task Initialize(InitialGameData data)
-        {
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
-            if (_state.IsStarted)
-            {
-                throw new InvalidOperationException("Expected game to be not started.");
-            }
-            _state.IsEnded = false;
-            _state.IsStarted = true;
-            _state.Map = data.Map;
-            _state.Hub = new HubState
-            {
-                Members = data.HubMembers
-                    .ToDictionary(x => x.Key, x => new HubMemberState {ConnectionIds = x.Value}),
-                JoinOrder = data.HubJoinOrder
-            };
-            _state.Players = data.Players;
-            _state.PlayerStates = data.Players
-                .ToDictionary(x => x.UserId, x => new PlayerGameState());
-            _state.Turn = 0;
-            _map = new Map(_state.Map);
-            _hub = new Hub(_state.Hub, _topic);
-            return Task.CompletedTask;
-        }
 
         public Task Connect(Guid userId, Guid connectionId)
         {
@@ -111,11 +83,6 @@ namespace Conreign.Core.Gameplay
                 TurnStatus = playerState.TurnStatus
             };
             return Task.FromResult<IRoomData>(data);
-        }
-
-        private PresenceStatus GetPresenceStatus(Guid userId)
-        {
-            return _hub.HasMemberOnline(userId) ? PresenceStatus.Online : PresenceStatus.Offline;
         }
 
         public Task LaunchFleet(Guid userId, FleetData fleet)
@@ -164,6 +131,49 @@ namespace Conreign.Core.Gameplay
             return _hub.NotifyEverybody(new TurnEnded(userId));
         }
 
+        public Task Notify(ISet<Guid> userIds, params IEvent[] events)
+        {
+            return _hub.Notify(userIds, events);
+        }
+
+        public Task NotifyEverybody(params IEvent[] events)
+        {
+            return _hub.NotifyEverybody(events);
+        }
+
+        public Task NotifyEverybodyExcept(ISet<Guid> userIds, params IEvent[] events)
+        {
+            return _hub.NotifyEverybodyExcept(userIds, events);
+        }
+
+        public Task Initialize(InitialGameData data)
+        {
+            if (data == null)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+            if (_state.IsStarted)
+            {
+                throw new InvalidOperationException("Expected game to be not started.");
+            }
+            _state.IsEnded = false;
+            _state.IsStarted = true;
+            _state.Map = data.Map;
+            _state.Hub = new HubState
+            {
+                Members = data.HubMembers
+                    .ToDictionary(x => x.Key, x => new HubMemberState {ConnectionIds = x.Value}),
+                JoinOrder = data.HubJoinOrder
+            };
+            _state.Players = data.Players;
+            _state.PlayerStates = data.Players
+                .ToDictionary(x => x.UserId, x => new PlayerGameState());
+            _state.Turn = 0;
+            _map = new Map(_state.Map);
+            _hub = new Hub(_state.Hub, _topic);
+            return Task.CompletedTask;
+        }
+
         public async Task CalculateTurn()
         {
             EnsureGameIsInProgress();
@@ -196,19 +206,9 @@ namespace Conreign.Core.Gameplay
             _state.Turn += 1;
         }
 
-        public Task Notify(ISet<Guid> userIds, params IEvent[] events)
+        private PresenceStatus GetPresenceStatus(Guid userId)
         {
-            return _hub.Notify(userIds, events);
-        }
-
-        public Task NotifyEverybody(params IEvent[] events)
-        {
-            return _hub.NotifyEverybody(events);
-        }
-
-        public Task NotifyEverybodyExcept(ISet<Guid> userIds, params IEvent[] events)
-        {
-            return _hub.NotifyEverybodyExcept(userIds, events);
+            return _hub.HasMemberOnline(userId) ? PresenceStatus.Online : PresenceStatus.Offline;
         }
 
 
@@ -242,7 +242,7 @@ namespace Conreign.Core.Gameplay
             var @event = new GameEnded(
                 _state.RoomId,
                 _state.PlayerStates.ToDictionary(x => x.Key, x => x.Value.Statistics));
-            return this.NotifyEverybody(@event);
+            return NotifyEverybody(@event);
         }
 
         private bool PlayerShouldDie(Guid userId)

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
-using Conreign.Core.Client;
+using Conreign.Client.Handler;
+using Conreign.Client.Orleans;
 using Conreign.Core.Contracts.Client;
 using Conreign.Core.Contracts.Communication;
 using MediatR;
@@ -11,11 +12,13 @@ namespace Conreign.Api.Hubs
 {
     public class GameHub : Hub<IObserver<MessageEnvelope>>
     {
-        private static readonly ConcurrentDictionary<string, GameHubConnection> Handlers = new ConcurrentDictionary<string, GameHubConnection>();
-        private readonly OrleansGameClient _client;
+        private static readonly ConcurrentDictionary<string, GameHubConnection> Handlers =
+            new ConcurrentDictionary<string, GameHubConnection>();
+
+        private readonly OrleansClient _client;
         private readonly IMediator _mediator;
 
-        public GameHub(OrleansGameClient client, IMediator mediator)
+        public GameHub(OrleansClient client, IMediator mediator)
         {
             if (client == null)
             {
@@ -36,7 +39,7 @@ namespace Conreign.Api.Hubs
                 throw new ArgumentNullException(nameof(envelope));
             }
             var handler = GetHandlerSafely();
-            var result = await handler.Handle((dynamic)envelope.Payload, envelope.Meta);
+            var result = await handler.Handle((dynamic) envelope.Payload, envelope.Meta);
             return new MessageEnvelope {Payload = result};
         }
 
@@ -47,13 +50,13 @@ namespace Conreign.Api.Hubs
                 throw new ArgumentNullException(nameof(envelope));
             }
             var handler = GetHandlerSafely();
-            return handler.Handle((dynamic)envelope.Payload, envelope.Meta);
+            return handler.Handle((dynamic) envelope.Payload, envelope.Meta);
         }
 
         public override async Task OnConnected()
         {
             var connection = await _client.Connect(Guid.Parse(Context.ConnectionId));
-            var handler = new GameHandler(connection, _mediator);
+            var handler = new ClientHandler(connection, _mediator);
             var subscription = handler.Events.Subscribe(new ConnectionObserver(this, Context.ConnectionId));
             Handlers[Context.ConnectionId] = new GameHubConnection(handler, subscription);
             await base.OnConnected();
@@ -72,7 +75,7 @@ namespace Conreign.Api.Hubs
             return base.OnDisconnected(stopCalled);
         }
 
-        private IGameHandler GetHandlerSafely()
+        private IClientHandler GetHandlerSafely()
         {
             GameHubConnection connection;
             var exists = Handlers.TryGetValue(Context.ConnectionId, out connection);
@@ -85,8 +88,8 @@ namespace Conreign.Api.Hubs
 
         private class ConnectionObserver : IObserver<IClientEvent>
         {
-            private readonly GameHub _hub;
             private readonly string _connectionId;
+            private readonly GameHub _hub;
 
             public ConnectionObserver(GameHub hub, string connectionId)
             {
@@ -96,7 +99,7 @@ namespace Conreign.Api.Hubs
 
             public void OnNext(IClientEvent value)
             {
-                _hub.Clients.Client(_connectionId).OnNext(new MessageEnvelope { Payload = value });
+                _hub.Clients.Client(_connectionId).OnNext(new MessageEnvelope {Payload = value});
             }
 
             public void OnError(Exception error)
@@ -112,13 +115,13 @@ namespace Conreign.Api.Hubs
 
         private class GameHubConnection
         {
-            public GameHubConnection(GameHandler handler, IDisposable subscription)
+            public GameHubConnection(ClientHandler handler, IDisposable subscription)
             {
                 Handler = handler;
                 Subscription = subscription;
             }
 
-            public GameHandler Handler { get; }
+            public ClientHandler Handler { get; }
             public IDisposable Subscription { get; }
         }
     }

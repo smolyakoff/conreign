@@ -43,7 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ContainerExtensions.cs" />
-    <Compile Include="GameHandler.cs" />
+    <Compile Include="ClientCommandHandler.cs" />
     <Compile Include="Handlers\CancelFleetHandler.cs" />
     <Compile Include="Handlers\Decorators\AuthenticationDecorator.cs" />
     <Compile Include="Handlers\EndTurnHandler.cs" />
@@ -54,15 +54,12 @@
     <Compile Include="Handlers\UpdatePlayerOptionsHandler.cs" />
     <Compile Include="Handlers\WriteHandler.cs" />
     <Compile Include="ICommandHandler.cs" />
-    <Compile Include="IGameHandler.cs" />
     <Compile Include="IHandlerContext.cs" />
     <Compile Include="Handlers\JoinRoomHandler.cs" />
     <Compile Include="Handlers\LaunchFleetHandler.cs" />
     <Compile Include="Handlers\LoginHandler.cs" />
     <Compile Include="Handlers\UpdateGameOptionsHandler.cs" />
-    <Compile Include="Exceptions\ConnectionException.cs" />
-    <Compile Include="OrleansGameClient.cs" />
-    <Compile Include="Exceptions\GameClientException.cs" />
+    <Compile Include="OrleansClient.cs" />
     <Compile Include="OrleansClientConnection.cs" />
     <Compile Include="HandlerContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

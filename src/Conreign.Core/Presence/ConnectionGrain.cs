@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using Conreign.Core.Communication;
 using Conreign.Core.Contracts.Communication;
@@ -10,13 +9,6 @@ namespace Conreign.Core.Presence
     public class ConnectionGrain : Grain<ConnectionState>, IConnectionGrain
     {
         private Connection _connection;
-
-        public override async Task OnActivateAsync()
-        {
-            State.ConnectionId = this.GetPrimaryKey();
-            _connection = new Connection(State, this);
-            await base.OnActivateAsync();
-        }
 
         public Task Connect(string topicId)
         {
@@ -32,7 +24,14 @@ namespace Conreign.Core.Presence
         public Task<ITopic> Create(string id)
         {
             var topic = new Topic(GetStreamProvider(StreamConstants.ProviderName), id);
-            return Task.FromResult((ITopic)topic);
+            return Task.FromResult((ITopic) topic);
+        }
+
+        public override async Task OnActivateAsync()
+        {
+            State.ConnectionId = this.GetPrimaryKey();
+            _connection = new Connection(State, this);
+            await base.OnActivateAsync();
         }
     }
 }

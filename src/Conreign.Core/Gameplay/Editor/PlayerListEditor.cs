@@ -9,8 +9,8 @@ namespace Conreign.Core.Gameplay.Editor
 {
     public class PlayerListEditor
     {
-        private readonly List<PlayerData> _state;
         private readonly PlayerOptionsValidator _optionsValidator;
+        private readonly List<PlayerData> _state;
 
         public PlayerListEditor(List<PlayerData> state)
         {
@@ -22,11 +22,6 @@ namespace Conreign.Core.Gameplay.Editor
             _optionsValidator = new PlayerOptionsValidator();
         }
 
-        public bool Contains(Guid userId)
-        {
-            return _state.Exists(x => x.UserId == userId);
-        }
-
         public int Count => _state.Count;
 
         public PlayerData this[Guid userId]
@@ -36,6 +31,11 @@ namespace Conreign.Core.Gameplay.Editor
                 EnsurePlayerExists(userId);
                 return _state.Find(x => x.UserId == userId);
             }
+        }
+
+        public bool Contains(Guid userId)
+        {
+            return _state.Exists(x => x.UserId == userId);
         }
 
         public PlayerData Add(Guid userId)

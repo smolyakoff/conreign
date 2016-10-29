@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR.Hubs;
 using Serilog;
 
@@ -18,7 +17,8 @@ namespace Conreign.Api.Infrastructure
             _logger = logger.ForContext(GetType());
         }
 
-        protected override void OnIncomingError(ExceptionContext exceptionContext, IHubIncomingInvokerContext invokerContext)
+        protected override void OnIncomingError(ExceptionContext exceptionContext,
+            IHubIncomingInvokerContext invokerContext)
         {
             _logger.Error(exceptionContext.Error, $"Exception occurred: {exceptionContext.Error.Message}");
             base.OnIncomingError(exceptionContext, invokerContext);

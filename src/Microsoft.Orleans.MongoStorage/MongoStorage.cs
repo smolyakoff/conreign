@@ -24,21 +24,6 @@ namespace Microsoft.Orleans.Storage
         private MongoStorageOptions _options;
         private Guid _serviceId;
 
-        public static void EnsureInitialized()
-        {
-            if (_isInitialized)
-            {
-                return;
-            }
-            _isInitialized = true;
-            var conventions = new ConventionPack
-            {
-                new DictionaryRepresentationConvention(DictionaryRepresentation.ArrayOfArrays),
-            };
-            ConventionRegistry.Register("Orleans", conventions, x => true);
-            BsonSerializer.RegisterSerializationProvider(new OrleansSerializerProvider());
-        }
-
         public string Name { get; private set; }
 
         public Logger Log { get; private set; }
@@ -164,6 +149,21 @@ namespace Microsoft.Orleans.Storage
                 LogError($"Error while deleting. {meta} Error={ex.Message}", MongoStorageCode.ErrorDelete, ex);
                 throw;
             }
+        }
+
+        public static void EnsureInitialized()
+        {
+            if (_isInitialized)
+            {
+                return;
+            }
+            _isInitialized = true;
+            var conventions = new ConventionPack
+            {
+                new DictionaryRepresentationConvention(DictionaryRepresentation.ArrayOfArrays)
+            };
+            ConventionRegistry.Register("Orleans", conventions, x => true);
+            BsonSerializer.RegisterSerializationProvider(new OrleansSerializerProvider());
         }
 
         private void EnsureNotClosed()

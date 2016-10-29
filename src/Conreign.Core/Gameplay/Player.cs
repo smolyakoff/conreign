@@ -10,10 +10,10 @@ using Conreign.Core.Utility;
 
 namespace Conreign.Core.Gameplay
 {
-    public class Player : IPlayer, 
+    public class Player : IPlayer,
         IEventHandler<GameStarted.Server>,
         IEventHandler<GameEnded>,
-        IEventHandler<Connected>, 
+        IEventHandler<Connected>,
         IEventHandler<Disconnected>
     {
         private readonly PlayerState _state;
@@ -37,6 +37,34 @@ namespace Conreign.Core.Gameplay
                 throw new ArgumentException("Room should be initialized", nameof(state));
             }
             _state = state;
+        }
+
+        public Task Handle(Connected @event)
+        {
+            return _state.Room.Connect(_state.UserId, @event.ConnectionId);
+        }
+
+        public Task Handle(Disconnected @event)
+        {
+            return _state.Room.Disconnect(_state.UserId, @event.ConnectionId);
+        }
+
+        public Task Handle(GameEnded @event)
+        {
+            if (_state.Game != null)
+            {
+                _state.Game = null;
+            }
+            return Task.CompletedTask;
+        }
+
+        public Task Handle(GameStarted.Server @event)
+        {
+            if (_state.Game == null)
+            {
+                _state.Game = @event.Game;
+            }
+            return Task.CompletedTask;
         }
 
         public Task UpdateOptions(PlayerOptionsData options)
@@ -92,34 +120,6 @@ namespace Conreign.Core.Gameplay
         {
             var state = await _state.Room.GetState(_state.UserId);
             return state;
-        }
-
-        public Task Handle(Connected @event)
-        {
-            return _state.Room.Connect(_state.UserId, @event.ConnectionId);
-        }
-
-        public Task Handle(Disconnected @event)
-        {
-            return _state.Room.Disconnect(_state.UserId, @event.ConnectionId);
-        }
-
-        public Task Handle(GameStarted.Server @event)
-        {
-            if (_state.Game == null)
-            {
-                _state.Game = @event.Game;
-            }
-            return Task.CompletedTask;
-        }
-
-        public Task Handle(GameEnded @event)
-        {
-            if (_state.Game != null)
-            {
-                _state.Game = null;
-            }
-            return Task.CompletedTask;
         }
 
         private ILobby EnsureIsInLobby()

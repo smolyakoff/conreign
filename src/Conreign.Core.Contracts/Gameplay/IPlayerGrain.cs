@@ -6,7 +6,7 @@ using Orleans;
 
 namespace Conreign.Core.Contracts.Gameplay
 {
-    public interface IPlayerGrain : 
+    public interface IPlayerGrain :
         IGrainWithGuidCompoundKey,
         IPlayer,
         IEventHandler<GameStarted.Server>,

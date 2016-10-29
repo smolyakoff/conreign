@@ -36,7 +36,10 @@
     <Compile Include="Auth\Errors\AuthenticationError.cs" />
     <Compile Include="Auth\IAuthGrain.cs" />
     <Compile Include="Auth\IAuthService.cs" />
-    <Compile Include="Client\IGameClient.cs" />
+    <Compile Include="Client\Exceptions\ClientException.cs" />
+    <Compile Include="Client\Exceptions\ConnectionException.cs" />
+    <Compile Include="Client\IClient.cs" />
+    <Compile Include="Client\IClientHandler.cs" />
     <Compile Include="Client\IClientConnection.cs" />
     <Compile Include="Client\LoginResult.cs" />
     <Compile Include="Client\MessageEnvelope.cs" />

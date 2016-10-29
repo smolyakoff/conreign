@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Conreign.Core.Contracts.Communication;
-using Conreign.Core.Contracts.Gameplay.Events;
 using Conreign.Core.Contracts.Presence;
 using Conreign.Core.Contracts.Presence.Events;
 using Conreign.Core.Utility;
@@ -27,6 +26,17 @@ namespace Conreign.Core.Presence
             }
             _state = state;
             _topic = topic;
+        }
+
+        public Guid? LeaderUserId
+        {
+            get
+            {
+                return _state.Members
+                    .Select(x => x.Key)
+                    .OrderBy(x => _state.JoinOrder.IndexOf(x))
+                    .FirstOrDefault();
+            }
         }
 
         public async Task Connect(Guid userId, Guid connectionId)
@@ -106,8 +116,8 @@ namespace Conreign.Core.Presence
 
         public bool HasMemberOnline(Guid userId)
         {
-            return _state.Members.ContainsKey(userId) && 
-                _state.Members[userId].ConnectionIds.Count > 0;
+            return _state.Members.ContainsKey(userId) &&
+                   _state.Members[userId].ConnectionIds.Count > 0;
         }
 
         public IEnumerable<IClientEvent> GetEvents(Guid userId)
@@ -115,17 +125,6 @@ namespace Conreign.Core.Presence
             return _state.Events
                 .Where(x => x.Recipients.Contains(userId))
                 .Select(x => x.Event);
-        }
-
-        public Guid? LeaderUserId
-        {
-            get
-            {
-                return _state.Members
-                    .Select(x => x.Key)
-                    .OrderBy(x => _state.JoinOrder.IndexOf(x))
-                    .FirstOrDefault();
-            }
         }
 
         private IEnumerable<IClientEvent> Join(Guid userId)
@@ -140,7 +139,6 @@ namespace Conreign.Core.Presence
                 UserId = userId
             };
             yield return statusChanged;
-
         }
 
         private static IEnumerable<IClientEvent> Leave(Guid userId)
@@ -165,7 +163,7 @@ namespace Conreign.Core.Presence
             {
                 yield break;
             }
-            var leaderChanged = new LeaderChanged { UserId = currentLeader };
+            var leaderChanged = new LeaderChanged {UserId = currentLeader};
             yield return leaderChanged;
         }
     }

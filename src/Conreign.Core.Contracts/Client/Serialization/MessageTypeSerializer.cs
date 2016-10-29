@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Conreign.Core.Contracts.Client.Messages;
 using Conreign.Core.Contracts.Communication;
@@ -66,8 +65,8 @@ namespace Conreign.Core.Contracts.Client.Serialization
             {
                 // Return response types for commands
                 var @interface = type
-                  .GetInterfaces()
-                  .First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IAsyncRequest<>));
+                    .GetInterfaces()
+                    .First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IAsyncRequest<>));
                 var responseType = @interface.GetGenericArguments()[0];
                 if (responseType.IsInterface || responseType.IsAbstract)
                 {

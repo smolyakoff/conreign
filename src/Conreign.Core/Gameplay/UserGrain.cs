@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Conreign.Core.Auth;
 using Conreign.Core.Communication;
-using Conreign.Core.Contracts.Communication;
-using Conreign.Core.Contracts.Communication.Events;
 using Conreign.Core.Contracts.Gameplay;
 using Conreign.Core.Contracts.Presence;
 using Orleans;
@@ -16,11 +13,6 @@ namespace Conreign.Core.Gameplay
     public class UserGrain : Grain<Guid>, IUserGrain
     {
         private readonly Dictionary<string, IPlayer> _players = new Dictionary<string, IPlayer>();
-
-        public override async Task OnActivateAsync()
-        {
-            await base.OnActivateAsync();
-        }
 
         public async Task<IPlayer> JoinRoom(string roomId, Guid connectionId)
         {
@@ -36,6 +28,11 @@ namespace Conreign.Core.Gameplay
             await connection.Connect(topicId);
             _players[roomId] = player;
             return player;
+        }
+
+        public override async Task OnActivateAsync()
+        {
+            await base.OnActivateAsync();
         }
     }
 }

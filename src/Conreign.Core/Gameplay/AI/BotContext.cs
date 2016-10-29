@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.Remoting.Channels;
 using Conreign.Core.Contracts.Client;
 using Conreign.Core.Contracts.Gameplay;
 using Conreign.Core.Gameplay.AI.Events;

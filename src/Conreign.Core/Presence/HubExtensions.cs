@@ -44,7 +44,7 @@ namespace Conreign.Core.Presence
             {
                 throw new ArgumentNullException(nameof(events));
             }
-            return hub.NotifyEverybodyExcept(new HashSet<Guid> { userId }, events);
+            return hub.NotifyEverybodyExcept(new HashSet<Guid> {userId}, events);
         }
     }
 }

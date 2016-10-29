@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Conreign.Core.Contracts.Gameplay.Data;
 using Conreign.Core.Gameplay;
 using Xunit;
@@ -13,7 +12,8 @@ namespace Conreign.Core.Tests.Gameplay
         [InlineData(6, 4, 1, 2, 3, 0)]
         [InlineData(4, 4, 1, 3, 0, 3)]
         [InlineData(3, 10, 2, 1, 2, 9)]
-        public void CalculateRoute__Generates_Contiguous_Path(int width, int height, int fromX, int fromY, int toX, int toY)
+        public void CalculateRoute__Generates_Contiguous_Path(int width, int height, int fromX, int fromY, int toX,
+            int toY)
         {
             var state = new MapData
             {

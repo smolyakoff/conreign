@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Conreign.Core.Auth.Serialization;
 using Conreign.Core.Contracts.Auth;
 using Conreign.Core.Contracts.Auth.Errors;
 using Conreign.Core.Contracts.Exceptions;
@@ -12,8 +13,8 @@ namespace Conreign.Core.Auth
 {
     public class AuthService : IAuthService
     {
-        private readonly AuthOptions _options;
         private readonly ILogger _logger;
+        private readonly AuthOptions _options;
 
         public AuthService(AuthOptions options)
         {
@@ -54,7 +55,7 @@ namespace Conreign.Core.Auth
             }
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString())
             };
             var identity = new ClaimsIdentity(claims);
             return Task.FromResult(identity);

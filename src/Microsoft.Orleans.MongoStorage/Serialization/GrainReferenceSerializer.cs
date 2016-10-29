@@ -20,7 +20,8 @@ namespace Microsoft.Orleans.Storage.Serialization
             "Cast",
             BindingFlags.Static | BindingFlags.Public);
 
-        public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, GrainReference value)
+        public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args,
+            GrainReference value)
         {
             if (value == null)
             {
@@ -71,11 +72,12 @@ namespace Microsoft.Orleans.Storage.Serialization
                 .FirstOrDefault(x => x != null);
             if (grainInterfaceType == null)
             {
-                throw new InvalidOperationException($"Failed to resolve grain interface type. Serialized type was: {interfaceName}.");
+                throw new InvalidOperationException(
+                    $"Failed to resolve grain interface type. Serialized type was: {interfaceName}.");
             }
             var deserialize = DeserializationMethod.MakeGenericMethod(grainInterfaceType);
-            var grainInterface = deserialize.Invoke(null, new object[]{ grainReference });
-            return (GrainReference)grainInterface;
+            var grainInterface = deserialize.Invoke(null, new object[] {grainReference});
+            return (GrainReference) grainInterface;
         }
 
         private static IEnumerable<Type> LookupGrainInterfaces(string serializedName, Type nominalType)

@@ -52,13 +52,17 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Conreign.Client\Conreign.Client.csproj">
-      <Project>{519df8d9-9c48-4403-aafe-27d78f22c4ad}</Project>
-      <Name>Conreign.Client</Name>
+    <ProjectReference Include="..\Conreign.Client.Handler\Conreign.Client.Handler.csproj">
+      <Project>{beef0347-534c-4987-9bb4-b7b038d71505}</Project>
+      <Name>Conreign.Client.Handler</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Conreign.Core.Client\Conreign.Core.Client.csproj">
-      <Project>{27e2fbdd-0197-44a8-98f5-8c45de87f964}</Project>
-      <Name>Conreign.Core.Client</Name>
+    <ProjectReference Include="..\Conreign.Client.Orleans\Conreign.Client.Orleans.csproj">
+      <Project>{628c9319-88ce-44ec-955d-f0fadd9c7cd3}</Project>
+      <Name>Conreign.Client.Orleans</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Conreign.Client.SignalR\Conreign.Client.SignalR.csproj">
+      <Project>{f7b51b22-239c-4507-a0b7-b9f7199c060f}</Project>
+      <Name>Conreign.Client.SignalR</Name>
     </ProjectReference>
     <ProjectReference Include="..\Conreign.Core.Contracts\Conreign.Core.Contracts.csproj">
       <Project>{00409622-346B-4926-B745-E5F595BD3BB7}</Project>

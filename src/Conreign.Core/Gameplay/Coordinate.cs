@@ -14,10 +14,11 @@ namespace Conreign.Core.Gameplay
             {
                 throw new ArgumentOutOfRangeException(nameof(height), "Height should be 1 or greater.");
             }
-            var maxPosition = width * height - 1;
+            var maxPosition = width*height - 1;
             if (position < 0 || position > maxPosition)
             {
-                throw new ArgumentOutOfRangeException(nameof(position), $"Expected position to be between 0 and {maxPosition}. Got: {position}.");
+                throw new ArgumentOutOfRangeException(nameof(position),
+                    $"Expected position to be between 0 and {maxPosition}. Got: {position}.");
             }
             Position = position;
             Width = width;
@@ -44,14 +45,14 @@ namespace Conreign.Core.Gameplay
             }
             Width = width;
             Height = height;
-            Position = x + y * width;
+            Position = x + y*width;
         }
 
         public long Position { get; }
         public int Width { get; }
         public int Height { get; }
-        public int X => (int)(Position % Width);
-        public int Y => (int)(Position / Width);
+        public int X => (int) (Position%Width);
+        public int Y => (int) (Position/Width);
 
         public Coordinate Move(int x, int y)
         {
@@ -79,7 +80,10 @@ namespace Conreign.Core.Gameplay
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
             return obj is Coordinate && Equals((Coordinate) obj);
         }
 

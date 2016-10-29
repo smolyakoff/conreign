@@ -2,6 +2,23 @@
 {
     public class UniformRandomPlanetGeneratorOptions
     {
+        public UniformRandomPlanetGeneratorOptions(
+            int minProductionRate,
+            int maxProductionRate,
+            int minShips,
+            int maxShips,
+            int minPower,
+            int maxPower)
+        {
+            // TODO: argument checks
+            MinProductionRate = minProductionRate;
+            MaxProductionRate = maxProductionRate;
+            MinShips = minShips;
+            MaxShips = maxShips;
+            MinPower = minPower;
+            MaxPower = maxPower;
+        }
+
         public static UniformRandomPlanetGeneratorOptions NeutralPlanetDefaults { get; }
             = new UniformRandomPlanetGeneratorOptions(
                 minProductionRate: 3,
@@ -19,23 +36,6 @@
                 maxShips: 40,
                 minPower: 70,
                 maxPower: 95);
-
-        public UniformRandomPlanetGeneratorOptions(
-            int minProductionRate,
-            int maxProductionRate,
-            int minShips,
-            int maxShips,
-            int minPower,
-            int maxPower)
-        {
-            // TODO: argument checks
-            MinProductionRate = minProductionRate;
-            MaxProductionRate = maxProductionRate;
-            MinShips = minShips;
-            MaxShips = maxShips;
-            MinPower = minPower;
-            MaxPower = maxPower;
-        }
 
         public int MinProductionRate { get; }
         public int MaxProductionRate { get; }

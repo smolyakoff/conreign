@@ -9,25 +9,17 @@ using Conreign.Core.Contracts.Gameplay.Events;
 using Conreign.Core.Gameplay.Battle;
 using Conreign.Core.Presence;
 using Orleans;
-using Orleans.Concurrency;
 
 namespace Conreign.Core.Gameplay
 {
     public class GameGrain : Grain<GameState>, IGameGrain
     {
-        private static readonly TimeSpan TickInterval = TimeSpan.FromSeconds(5);
         private const int TurnLengthInTicks = 12;
+        private static readonly TimeSpan TickInterval = TimeSpan.FromSeconds(5);
 
         private Game _game;
-        private IDisposable _timer;
         private int _tick;
-
-        public override Task OnActivateAsync()
-        {
-            var topic = Topic.Room(GetStreamProvider(StreamConstants.ProviderName), this.GetPrimaryKeyString());
-            _game = new Game(State, topic, new CoinBattleStrategy());
-            return base.OnActivateAsync();
-        }
+        private IDisposable _timer;
 
         public async Task Initialize(InitialGameData data)
         {
@@ -84,6 +76,13 @@ namespace Conreign.Core.Gameplay
         public Task Disconnect(Guid userId, Guid connectionId)
         {
             return _game.Disconnect(userId, connectionId);
+        }
+
+        public override Task OnActivateAsync()
+        {
+            var topic = Topic.Room(GetStreamProvider(StreamConstants.ProviderName), this.GetPrimaryKeyString());
+            _game = new Game(State, topic, new CoinBattleStrategy());
+            return base.OnActivateAsync();
         }
 
         private async Task Tick(object arg)

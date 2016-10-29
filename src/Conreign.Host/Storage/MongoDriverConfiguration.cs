@@ -1,5 +1,4 @@
 ﻿using System;
-using Conreign.Core.Communication;
 using Conreign.Core.Gameplay;
 using Conreign.Core.Presence;
 using MongoDB.Bson.Serialization;
@@ -7,7 +6,7 @@ using MongoDB.Bson.Serialization;
 namespace Conreign.Host.Storage
 {
     // TODO: move to a separate storage specific library
-    public static  class MongoDriverConfiguration
+    public static class MongoDriverConfiguration
     {
         private static bool _isInitialized;
 

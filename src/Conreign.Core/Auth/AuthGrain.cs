@@ -11,13 +11,6 @@ namespace Conreign.Core.Auth
     {
         private AuthService _authService;
 
-        public override Task OnActivateAsync()
-        {
-            var options = new AuthOptions {JwtSecret = "conreign!"};
-            _authService = new AuthService(options);
-            return base.OnActivateAsync();
-        }
-
         public Task<ClaimsIdentity> Authenticate(string accessToken)
         {
             return _authService.Authenticate(accessToken);
@@ -26,6 +19,13 @@ namespace Conreign.Core.Auth
         public Task<string> Login()
         {
             return _authService.Login();
+        }
+
+        public override Task OnActivateAsync()
+        {
+            var options = new AuthOptions {JwtSecret = "conreign!"};
+            _authService = new AuthService(options);
+            return base.OnActivateAsync();
         }
     }
 }

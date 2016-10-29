@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Conreign.Core.Auth
+namespace Conreign.Core.Auth.Serialization
 {
     public class SecondsSinceEpochConverter : DateTimeConverterBase
     {

@@ -17,12 +17,12 @@ namespace Conreign.Core.Gameplay
 {
     public class Lobby : ILobby, IEventHandler<GameEnded>
     {
+        private readonly IGameFactory _gameFactory;
         private readonly LobbyState _state;
         private readonly IUserTopic _topic;
         private Hub _hub;
         private MapEditor _mapEditor;
         private PlayerListEditor _playerListEditor;
-        private readonly IGameFactory _gameFactory;
 
         public Lobby(LobbyState state, IUserTopic topic, IGameFactory gameFactory)
         {
@@ -48,6 +48,12 @@ namespace Conreign.Core.Gameplay
             Initialize();
         }
 
+        public Task Handle(GameEnded @event)
+        {
+            Reset();
+            return Task.CompletedTask;
+        }
+
         public Task Notify(ISet<Guid> userIds, params IEvent[] events)
         {
             return _hub.Notify(userIds, events);
@@ -71,7 +77,8 @@ namespace Conreign.Core.Gameplay
                 Events = _hub.GetEvents(userId).Select(x => new MessageEnvelope {Payload = x}).ToList(),
                 Players = _state.Players,
                 PlayerStatuses = _state.Players
-                    .ToDictionary(x => x.UserId,  x => _hub.HasMemberOnline(x.UserId) ? PresenceStatus.Online : PresenceStatus.Offline),
+                    .ToDictionary(x => x.UserId,
+                        x => _hub.HasMemberOnline(x.UserId) ? PresenceStatus.Online : PresenceStatus.Offline),
                 Map = _state.MapEditor.Map,
                 LeaderUserId = _hub.LeaderUserId,
                 NeutralPlanetsCount = _state.MapEditor.NeutralPlanetsCount
@@ -169,12 +176,6 @@ namespace Conreign.Core.Gameplay
         public Task Disconnect(Guid userId, Guid connectionId)
         {
             return _hub.Disconnect(userId, connectionId);
-        }
-
-        public Task Handle(GameEnded @event)
-        {
-            Reset();
-            return Task.CompletedTask;
         }
 
         private void Reset()

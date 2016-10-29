@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
-using Conreign.Core.Contracts.Common;
 using Conreign.Core.Contracts.Exceptions;
+using Conreign.Core.Contracts.Validation;
 using FluentValidation;
 using FluentValidation.Results;
-using ValidationFailure = Conreign.Core.Contracts.Common.ValidationFailure;
+using ValidationFailure = Conreign.Core.Contracts.Validation.ValidationFailure;
 
 namespace Conreign.Core.Utility
 {
@@ -25,7 +25,7 @@ namespace Conreign.Core.Utility
             {
                 return;
             }
-            throw UserException.Create<ValidationError, ValidationErrorDetails>(ValidationError.BadInput, results.ToConreignValidationErrorDetails());
+            throw UserException.Create(ValidationError.BadInput, results.ToConreignValidationErrorDetails());
         }
 
         public static void EnsureIsValid<T, TValidator>(this T value) where TValidator : IValidator<T>, new()

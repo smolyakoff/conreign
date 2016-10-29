@@ -1,7 +1,6 @@
 ﻿using System;
 using Orleans;
 using Orleans.Runtime;
-using Orleans.Serialization;
 
 namespace Microsoft.Orleans.Storage
 {

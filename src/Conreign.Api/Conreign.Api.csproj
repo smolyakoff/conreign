@@ -53,9 +53,13 @@
     <None Include="paket.references" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Conreign.Core.Client\Conreign.Core.Client.csproj">
-      <Project>{27e2fbdd-0197-44a8-98f5-8c45de87f964}</Project>
-      <Name>Conreign.Core.Client</Name>
+    <ProjectReference Include="..\Conreign.Client.Handler\Conreign.Client.Handler.csproj">
+      <Project>{beef0347-534c-4987-9bb4-b7b038d71505}</Project>
+      <Name>Conreign.Client.Handler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Conreign.Client.Orleans\Conreign.Client.Orleans.csproj">
+      <Project>{628c9319-88ce-44ec-955d-f0fadd9c7cd3}</Project>
+      <Name>Conreign.Client.Orleans</Name>
     </ProjectReference>
     <ProjectReference Include="..\Conreign.Core.Contracts\Conreign.Core.Contracts.csproj">
       <Project>{00409622-346b-4926-b745-e5f595bd3bb7}</Project>

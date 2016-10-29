@@ -6,7 +6,6 @@ namespace Conreign.Core.Contracts.Gameplay.Events
     [Serializable]
     public class GameStarted : IClientEvent
     {
-
         [Serializable]
         public class Server : IServerEvent
         {

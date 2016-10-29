@@ -4,7 +4,7 @@ using System.Linq;
 using Conreign.Core.Contracts.Gameplay.Data;
 using Conreign.Core.Utility;
 
-namespace Conreign.Core.Gameplay.AI
+namespace Conreign.Core.Gameplay.AI.Battle
 {
     public class NaiveBotBattleStrategy : IBotBattleStrategy
     {
@@ -46,7 +46,7 @@ namespace Conreign.Core.Gameplay.AI
                 .SelectMany(source =>
                 {
                     var otherPlanets = allPlanets
-                        .Except(new [] {source}, planetComparer);
+                        .Except(new[] {source}, planetComparer);
                     return GetCandidates(map, source, otherPlanets, myTopPlanet, topPlanet);
                 })
                 .OrderByDescending(Rank)
@@ -72,8 +72,8 @@ namespace Conreign.Core.Gameplay.AI
         }
 
         private IEnumerable<Candidate> GetCandidates(
-            ReadOnlyMap map, 
-            ReadOnlyPlanetData source, 
+            ReadOnlyMap map,
+            ReadOnlyPlanetData source,
             IEnumerable<ReadOnlyPlanetData> otherPlanets,
             ReadOnlyPlanetData myTopPlanet,
             ReadOnlyPlanetData topPlanet)
@@ -104,8 +104,8 @@ namespace Conreign.Core.Gameplay.AI
         private int ShouldLaunchAttackShips(ReadOnlyMap map, ReadOnlyPlanetData source, ReadOnlyPlanetData destination)
         {
             var distance = map.CalculateDistance(source.Name, destination.Name);
-            var enemyExpectedPower = (destination.Ships + destination.ProductionRate * distance) * destination.Power;
-            var requiredShips = (int)Math.Ceiling((enemyExpectedPower/source.Power) * _options.ClevernessFactor);
+            var enemyExpectedPower = (destination.Ships + destination.ProductionRate*distance)*destination.Power;
+            var requiredShips = (int) Math.Ceiling((enemyExpectedPower/source.Power)*_options.ClevernessFactor);
             var enoughShips = source.Ships >= requiredShips;
             if (!enoughShips)
             {
@@ -116,27 +116,28 @@ namespace Conreign.Core.Gameplay.AI
             {
                 return requiredShips;
             }
-            var addition = (int)Math.Floor(difference - _options.RiskFactor * difference);
+            var addition = (int) Math.Floor(difference - _options.RiskFactor*difference);
             return requiredShips + addition;
         }
 
-        private int ShouldLaunchReinforcementShips(ReadOnlyMap map, ReadOnlyPlanetData source, ReadOnlyPlanetData destination)
+        private int ShouldLaunchReinforcementShips(ReadOnlyMap map, ReadOnlyPlanetData source,
+            ReadOnlyPlanetData destination)
         {
-            var stupidPower = (1 - source.Power) * (1 - _options.ClevernessFactor);
-            var powerRatio = (source.Power + stupidPower) / destination.Power;
+            var stupidPower = (1 - source.Power)*(1 - _options.ClevernessFactor);
+            var powerRatio = (source.Power + stupidPower)/destination.Power;
             var shouldLaunch = powerRatio < 1;
             if (!shouldLaunch)
             {
                 return 0;
             }
-            var ships = (int)Math.Floor(source.Ships*_options.RiskFactor);
+            var ships = (int) Math.Floor(source.Ships*_options.RiskFactor);
             return ships;
         }
 
         private bool IsVisible(ReadOnlyMap map, ReadOnlyPlanetData source, ReadOnlyPlanetData destination)
         {
             var distance = map.CalculateDistance(source.Name, destination.Name);
-            return distance < map.MaxDistance * _options.VisionFactor;
+            return distance < map.MaxDistance*_options.VisionFactor;
         }
 
         private static double Rank(Candidate candidate)
@@ -149,13 +150,13 @@ namespace Conreign.Core.Gameplay.AI
         private static double RankAttackFleet(Candidate candidate)
         {
             var destination = candidate.Destination;
-            return RankPlanet(destination) / RankPlanet(candidate.TopPlanet);
+            return RankPlanet(destination)/RankPlanet(candidate.TopPlanet);
         }
 
         private static double RankReinforcementsFleet(Candidate candidate)
         {
             var destination = candidate.Destination;
-            return RankPlanet(destination) / RankPlanet(candidate.MyTopPlanet);
+            return RankPlanet(destination)/RankPlanet(candidate.MyTopPlanet);
         }
 
         private static double RankPlanet(ReadOnlyPlanetData planet)

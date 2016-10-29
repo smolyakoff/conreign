@@ -12,6 +12,6 @@ namespace Conreign.Core.Contracts.Communication.Events
             ConnectionId = connectionId;
         }
 
-        public Guid ConnectionId { get;  }
+        public Guid ConnectionId { get; }
     }
 }

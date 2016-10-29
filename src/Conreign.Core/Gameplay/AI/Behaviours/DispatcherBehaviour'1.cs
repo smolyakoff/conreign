@@ -52,7 +52,7 @@ namespace Conreign.Core.Gameplay.AI.Behaviours
                     dynamic behaviour = b;
                     var notificationType = typeof(BotNotification<>).MakeGenericType(@event.GetType());
                     dynamic concreteNotification = Activator.CreateInstance(notificationType, @event, context);
-                    return (Task)behaviour.Handle(concreteNotification);
+                    return (Task) behaviour.Handle(concreteNotification);
                 })
                 .ToList();
             foreach (var task in tasks)

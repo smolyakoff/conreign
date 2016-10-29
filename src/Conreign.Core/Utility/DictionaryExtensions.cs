@@ -6,7 +6,7 @@ namespace Conreign.Core.Utility
     public static class DictionaryExtensions
     {
         public static TValue GetOrCreateDefault<TKey, TValue>(
-            this IDictionary<TKey, TValue> dictionary, 
+            this IDictionary<TKey, TValue> dictionary,
             TKey key,
             Func<TValue> defaultValueAccessor)
         {
@@ -22,7 +22,8 @@ namespace Conreign.Core.Utility
             return dictionary[key];
         }
 
-        public static TValue GetOrCreateDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key) where TValue : new()
+        public static TValue GetOrCreateDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
+            where TValue : new()
         {
             if (dictionary == null)
             {

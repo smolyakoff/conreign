@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Conreign.Core.Gameplay.AI
+namespace Conreign.Core.Gameplay.AI.Battle
 {
     public class NaiveBotBattleStrategyOptions
     {
@@ -8,7 +8,8 @@ namespace Conreign.Core.Gameplay.AI
         {
             if (visionFactor <= 0 || visionFactor > 1)
             {
-                throw new ArgumentOutOfRangeException(nameof(visionFactor), $"Vision factor should be from 0 to 1. Got: {visionFactor}.");
+                throw new ArgumentOutOfRangeException(nameof(visionFactor),
+                    $"Vision factor should be from 0 to 1. Got: {visionFactor}.");
             }
             if (riskFactor <= 0 || riskFactor > 1)
             {

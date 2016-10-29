@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Runtime.Serialization.Formatters;
 using Conreign.Api.Configuration;
 using Conreign.Api.Infrastructure;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using Owin;
 using SimpleInjector;
 

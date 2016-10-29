@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Conreign.Core.Contracts.Common
+namespace Conreign.Core.Contracts.Validation
 {
     [Serializable]
     public enum ValidationError

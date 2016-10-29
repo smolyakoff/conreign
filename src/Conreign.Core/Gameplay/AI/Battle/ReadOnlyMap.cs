@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Conreign.Core.Gameplay.AI
+namespace Conreign.Core.Gameplay.AI.Battle
 {
     public class ReadOnlyMap : IEnumerable<ReadOnlyPlanetData>
     {
@@ -33,6 +33,11 @@ namespace Conreign.Core.Gameplay.AI
             return _map.Select(x => new ReadOnlyPlanetData(x)).GetEnumerator();
         }
 
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _map.Select(x => new ReadOnlyPlanetData(x)).GetEnumerator();
+        }
+
         public long CalculateDistance(string from, string to)
         {
             return _map.CalculateDistance(from, to);
@@ -46,11 +51,6 @@ namespace Conreign.Core.Gameplay.AI
         public long GetPlanetPositionByName(string name)
         {
             return _map.GetPlanetPositionByName(name);
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return _map.Select(x => new ReadOnlyPlanetData(x)).GetEnumerator();
         }
     }
 }

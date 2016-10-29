@@ -8,11 +8,11 @@ namespace Conreign.Core.Contracts.Gameplay.Events
     [Serializable]
     public class GameTicked : IClientEvent
     {
-        public int Tick { get; }
-
         public GameTicked(int tick)
         {
             Tick = tick;
         }
+
+        public int Tick { get; }
     }
 }

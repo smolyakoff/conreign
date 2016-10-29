@@ -11,10 +11,10 @@ namespace Conreign.Core.Gameplay.AI
     public class Bot : IDisposable
     {
         private readonly BotContext _context;
-        private ActionBlock<IClientEvent> _processor;
+        private readonly DispatcherBehaviour _dispatcher;
         private readonly IDisposable _subscription;
         private bool _isDisposed;
-        private readonly DispatcherBehaviour _dispatcher;
+        private ActionBlock<IClientEvent> _processor;
 
         public Bot(string readableId, IClientConnection connection, params IBotBehaviour[] behaviours)
         {
@@ -34,6 +34,12 @@ namespace Conreign.Core.Gameplay.AI
 
         public Task Completion => _processor.Completion;
 
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
         public void Start()
         {
             EnsureIsNotDisposed();
@@ -48,12 +54,6 @@ namespace Conreign.Core.Gameplay.AI
         {
             EnsureIsNotDisposed();
             Handle(new BotStopped());
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)

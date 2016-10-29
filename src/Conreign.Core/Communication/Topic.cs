@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Utility;
@@ -12,21 +11,11 @@ namespace Conreign.Core.Communication
 {
     public class Topic : IUserTopic
     {
-        private readonly IStreamProvider _provider;
-        private readonly IAsyncStream<IServerEvent> _parentStream;
         private readonly Dictionary<Guid, IAsyncStream<IServerEvent>> _childrenStreams;
         private readonly Dictionary<Guid, IAsyncStream<IClientEvent>> _clientStreams;
         private readonly string _id;
-
-        public static Topic Room(IStreamProvider provider, string roomId)
-        {
-            return new Topic(provider, TopicIds.Room(roomId));
-        }
-
-        public static Topic Player(IStreamProvider provider, Guid userId, string roomId)
-        {
-            return new Topic(provider, TopicIds.Player(userId, roomId));
-        }
+        private readonly IAsyncStream<IServerEvent> _parentStream;
+        private readonly IStreamProvider _provider;
 
         public Topic(IStreamProvider provider, string id)
         {
@@ -43,15 +32,6 @@ namespace Conreign.Core.Communication
             _parentStream = provider.GetStream<IServerEvent>(default(Guid), id);
             _childrenStreams = new Dictionary<Guid, IAsyncStream<IServerEvent>>();
             _clientStreams = new Dictionary<Guid, IAsyncStream<IClientEvent>>();
-        }
-
-        public Task<StreamSubscriptionHandle<IServerEvent>> EnsureIsSubscribedOnce<T>(T handler) where T : Grain, IEventHandler
-        {
-            if (handler == null)
-            {
-                throw new ArgumentNullException(nameof(handler));
-            }
-            return handler.EnsureIsSubscribedOnce(_parentStream);
         }
 
         public async Task Send(params IServerEvent[] events)
@@ -71,7 +51,7 @@ namespace Conreign.Core.Communication
             var serverEvents = events.OfType<IServerEvent>();
             var clientEvents = events.OfType<IClientEvent>();
             var serverStreams = userIds
-                    .Select(id => _childrenStreams.GetOrCreateDefault(id, () => CreateUserStream(id)));
+                .Select(id => _childrenStreams.GetOrCreateDefault(id, () => CreateUserStream(id)));
             var serverTasks = serverEvents
                 .SelectMany(@event => serverStreams.Select(s => s.OnNextAsync(@event)))
                 .ToList();
@@ -82,6 +62,26 @@ namespace Conreign.Core.Communication
                 .SelectMany(@event => clientStreams.Select(s => s.OnNextAsync(@event)))
                 .ToList();
             await Task.WhenAll(clientTasks);
+        }
+
+        public static Topic Room(IStreamProvider provider, string roomId)
+        {
+            return new Topic(provider, TopicIds.Room(roomId));
+        }
+
+        public static Topic Player(IStreamProvider provider, Guid userId, string roomId)
+        {
+            return new Topic(provider, TopicIds.Player(userId, roomId));
+        }
+
+        public Task<StreamSubscriptionHandle<IServerEvent>> EnsureIsSubscribedOnce<T>(T handler)
+            where T : Grain, IEventHandler
+        {
+            if (handler == null)
+            {
+                throw new ArgumentNullException(nameof(handler));
+            }
+            return handler.EnsureIsSubscribedOnce(_parentStream);
         }
 
         private IAsyncStream<IServerEvent> CreateUserStream(Guid userId)

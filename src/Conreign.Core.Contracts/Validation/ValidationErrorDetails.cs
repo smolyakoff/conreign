@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Orleans.Concurrency;
 
-namespace Conreign.Core.Contracts.Common
+namespace Conreign.Core.Contracts.Validation
 {
     [Serializable]
     [Immutable]

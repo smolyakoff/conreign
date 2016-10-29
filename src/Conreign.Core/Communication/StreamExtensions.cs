@@ -10,8 +10,9 @@ namespace Conreign.Core.Communication
 {
     public static class StreamExtensions
     {
-        public static async Task<StreamSubscriptionHandle<TEvent>> EnsureIsSubscribedOnce<T, TEvent>(this T handler, IAsyncStream<TEvent> stream)
-            where T : Grain, IEventHandler 
+        public static async Task<StreamSubscriptionHandle<TEvent>> EnsureIsSubscribedOnce<T, TEvent>(this T handler,
+            IAsyncStream<TEvent> stream)
+            where T : Grain, IEventHandler
             where TEvent : IEvent
         {
             if (handler == null)

@@ -3,7 +3,8 @@ using System.Collections.Generic;
 
 namespace Conreign.Core.Utility
 {
-    public class PropertyComparer<TObject, TProperty> : IEqualityComparer<TObject> where TProperty : IEquatable<TProperty>
+    public class PropertyComparer<TObject, TProperty> : IEqualityComparer<TObject>
+        where TProperty : IEquatable<TProperty>
     {
         private readonly Func<TObject, TProperty> _selector;
 

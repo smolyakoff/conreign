@@ -1,4 +1,5 @@
 ﻿using System;
+using Conreign.Core.Auth.Serialization;
 using Newtonsoft.Json;
 
 namespace Conreign.Core.Auth

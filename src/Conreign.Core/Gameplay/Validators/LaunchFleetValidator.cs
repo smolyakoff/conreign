@@ -6,8 +6,8 @@ namespace Conreign.Core.Gameplay.Validators
 {
     internal class LaunchFleetValidator : AbstractValidator<FleetData>
     {
-        private readonly Guid _senderId;
         private readonly Map _map;
+        private readonly Guid _senderId;
 
         public LaunchFleetValidator(Guid senderId, Map map)
         {

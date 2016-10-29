@@ -2,20 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Reactive;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Conreign.Client;
-using Conreign.Core.Client;
+using Conreign.Client.Handler;
+using Conreign.Client.Orleans;
+using Conreign.Client.SignalR;
 using Conreign.Core.Contracts.Client;
 using Conreign.Core.Contracts.Client.Messages;
-using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Gameplay.Data;
-using Conreign.Core.Contracts.Gameplay.Events;
 using Conreign.Core.Gameplay.AI;
+using Conreign.Core.Gameplay.AI.Battle;
 using Conreign.Core.Gameplay.AI.Behaviours;
 using Serilog;
-using Serilog.Events;
 
 namespace Conreign.Experiments
 {
@@ -51,10 +48,10 @@ namespace Conreign.Experiments
 
         private static async Task RunHandler()
         {
-            var client = await OrleansGameClient.Initialize("OrleansClientConfiguration.xml");
+            var client = await OrleansClient.Initialize("OrleansClientConfiguration.xml");
             using (var connection = await client.Connect(Guid.NewGuid()))
             {
-                var handler = new GameHandler(connection);
+                var handler = new ClientHandler(connection);
                 handler.Events.Subscribe(Write);
                 var meta = new Metadata();
                 var loginResponse = await handler.Handle(new LoginCommand(), meta);
@@ -90,8 +87,8 @@ namespace Conreign.Experiments
         private static async Task RunSignalRBot(string roomId, int i, int total)
         {
             ServicePointManager.DefaultConnectionLimit = 500;
-            var options = new SignalRGameClientOptions {ConnectionUri = "http://localhost:9000"};
-            var client = new SignalRGameClient(options);
+            var options = new SignalRClientOptions {ConnectionUri = "http://localhost:9000"};
+            var client = new SignalRClient(options);
             using (var connection = await client.Connect(Guid.NewGuid()))
             {
                 await RunBot(connection, roomId, i, total);
@@ -100,7 +97,7 @@ namespace Conreign.Experiments
 
         private static async Task RunOrleansBot(string roomId, int i, int total)
         {
-            var client = await OrleansGameClient.Initialize("OrleansClientConfiguration.xml");
+            var client = await OrleansClient.Initialize("OrleansClientConfiguration.xml");
             using (var connection = await client.Connect(Guid.NewGuid()))
             {
                 await RunBot(connection, roomId, i, total);
@@ -114,13 +111,13 @@ namespace Conreign.Experiments
             Console.WriteLine($"Connection id: {connection.Id}");
             var options = new NaiveBotBattleStrategyOptions(0.8, 0.2, 1);
             var behaviours = new List<IBotBehaviour>
-                {
-                    new LoginBehaviour(),
-                    new LogBehaviour(),
-                    new JoinRoomBehaviour(roomId, name, isLeader ? TimeSpan.Zero : TimeSpan.FromSeconds(0.5)),
-                    new BattleBehaviour(new NaiveBotBattleStrategy(options)),
-                    new StopOnGameEndBehaviour()
-                };
+            {
+                new LoginBehaviour(),
+                new LogBehaviour(),
+                new JoinRoomBehaviour(roomId, name, isLeader ? TimeSpan.Zero : TimeSpan.FromSeconds(0.5)),
+                new BattleBehaviour(new NaiveBotBattleStrategy(options)),
+                new StopOnGameEndBehaviour()
+            };
             if (isLeader)
             {
                 behaviours.Add(new StartGameBehaviour(total));

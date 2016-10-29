@@ -22,7 +22,8 @@ namespace Conreign.Core.Contracts.Client.Serialization
             return typeof(MessageEnvelope) == objectType;
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
+            JsonSerializer serializer)
         {
             if (reader.TokenType == JsonToken.Null)
             {
@@ -37,12 +38,13 @@ namespace Conreign.Core.Contracts.Client.Serialization
             var typeToken = jObject.GetValue("type", StringComparison.OrdinalIgnoreCase);
             if (typeToken == null || typeToken.Type != JTokenType.String)
             {
-                throw new InvalidOperationException($"Expected to get type string field from json object, but got {typeToken}.");
+                throw new InvalidOperationException(
+                    $"Expected to get type string field from json object, but got {typeToken}.");
             }
             var payloadType = MessageTypeSerializer.Deserialize(typeToken.Value<string>());
             var payloadToken = jObject.GetValue("payload", StringComparison.OrdinalIgnoreCase);
-            dynamic payload = payloadToken == null 
-                ? Activator.CreateInstance(payloadType) 
+            dynamic payload = payloadToken == null
+                ? Activator.CreateInstance(payloadType)
                 : serializer.Deserialize(payloadToken.CreateReader(), payloadType);
             var metaToken = jObject.GetValue("meta", StringComparison.OrdinalIgnoreCase);
             var meta = metaToken == null ? new Metadata() : serializer.Deserialize<Metadata>(metaToken.CreateReader());

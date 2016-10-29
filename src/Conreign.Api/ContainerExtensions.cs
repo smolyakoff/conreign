@@ -2,7 +2,8 @@
 using System.Linq;
 using System.Reflection;
 using Conreign.Api.Configuration;
-using Conreign.Core.Client;
+using Conreign.Client.Handler;
+using Conreign.Client.Orleans;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using Serilog;
@@ -23,7 +24,8 @@ namespace Conreign.Api
                 throw new ArgumentNullException(nameof(options));
             }
             container.Register(() => Log.Logger, Lifestyle.Singleton);
-            container.Register(() => OrleansGameClient.Initialize(options.OrleansClientConfigFilePath).Result, Lifestyle.Singleton);
+            container.Register(() => OrleansClient.Initialize(options.OrleansClientConfigFilePath).Result,
+                Lifestyle.Singleton);
             container.RegisterCollection<HubPipelineModule>(new[] {Assembly.GetExecutingAssembly()});
             RegisterHubs(container);
             container.RegisterClientMediator();

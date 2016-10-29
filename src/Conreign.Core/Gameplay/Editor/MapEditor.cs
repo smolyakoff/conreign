@@ -9,14 +9,15 @@ namespace Conreign.Core.Gameplay.Editor
 {
     public class MapEditor
     {
-        private readonly MapEditorState _state;
-
-        private readonly IPlanetGenerator _playerPlanetGenerator;
-        private readonly IPlanetGenerator _neutralPlanetGenerator;
         private readonly Map _map;
         private readonly IEnumerator<string> _namesEnumerator;
+        private readonly IPlanetGenerator _neutralPlanetGenerator;
 
-        public MapEditor(MapEditorState state, IPlanetGenerator playerPlanetGenerator, IPlanetGenerator neutralPlanetGenerator)
+        private readonly IPlanetGenerator _playerPlanetGenerator;
+        private readonly MapEditorState _state;
+
+        public MapEditor(MapEditorState state, IPlanetGenerator playerPlanetGenerator,
+            IPlanetGenerator neutralPlanetGenerator)
         {
             if (state == null)
             {
@@ -105,11 +106,10 @@ namespace Conreign.Core.Gameplay.Editor
         {
             _namesEnumerator.MoveNext();
             var name = _namesEnumerator.Current;
-            var planet = index < _state.Players.Count 
-                ? _playerPlanetGenerator.Generate(name, _state.Players[index]) 
+            var planet = index < _state.Players.Count
+                ? _playerPlanetGenerator.Generate(name, _state.Players[index])
                 : _neutralPlanetGenerator.Generate(name, null);
             return new KeyValuePair<long, PlanetData>(coordinate, planet);
         }
     }
 }
-

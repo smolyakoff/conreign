@@ -8,8 +8,8 @@ namespace Conreign.Core.Gameplay
 {
     public class Map : IEnumerable<PlanetData>
     {
-        private readonly MapData _state;
         private readonly Random _random = new Random();
+        private readonly MapData _state;
 
         public Map(MapData state)
         {
@@ -23,7 +23,7 @@ namespace Conreign.Core.Gameplay
         public int Width => _state.Width;
         public int Height => _state.Height;
         public long FreeCellsCount => CellsCount - _state.Planets.Count;
-        public long CellsCount => (long)_state.Width*_state.Height;
+        public long CellsCount => (long) _state.Width*_state.Height;
 
         public long MaxDistance
         {
@@ -74,6 +74,16 @@ namespace Conreign.Core.Gameplay
 
         public PlanetData this[string name] => GetPlanetByName(name);
 
+        public IEnumerator<PlanetData> GetEnumerator()
+        {
+            return _state.Planets.Values.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _state.Planets.Values.GetEnumerator();
+        }
+
         public bool ContainsPlanet(long coordinate)
         {
             return _state.Planets.ContainsKey(coordinate);
@@ -111,7 +121,8 @@ namespace Conreign.Core.Gameplay
             {
                 throw new InvalidOperationException($"Planet {name} was not found");
             }
-            return planet;;
+            return planet;
+            ;
         }
 
         public long CalculateDistance(string from, string to)
@@ -127,7 +138,7 @@ namespace Conreign.Core.Gameplay
             var source = GetPlanetCoordinateByName(from);
             var destination = GetPlanetCoordinateByName(to);
             var current = source;
-            var path = new List<long> { current.Position };
+            var path = new List<long> {current.Position};
             while (current != destination)
             {
                 var distanceX = Math.Abs(destination.X - current.X);
@@ -231,18 +242,9 @@ namespace Conreign.Core.Gameplay
         {
             if (coordinate >= CellsCount)
             {
-                throw new ArgumentOutOfRangeException(nameof(coordinate), $"Expected coordinate to be between 0 and {CellsCount-1}.");
+                throw new ArgumentOutOfRangeException(nameof(coordinate),
+                    $"Expected coordinate to be between 0 and {CellsCount - 1}.");
             }
-        }
-
-        public IEnumerator<PlanetData> GetEnumerator()
-        {
-            return _state.Planets.Values.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return _state.Planets.Values.GetEnumerator();
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Conreign.Core.Communication;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Communication.Events;
 using Conreign.Core.Contracts.Presence;

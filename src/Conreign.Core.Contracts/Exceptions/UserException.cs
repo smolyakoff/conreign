@@ -21,7 +21,8 @@ namespace Conreign.Core.Contracts.Exceptions
             return new UserException<T>(type, message);
         }
 
-        public static UserException<T, TDetails> Create<T, TDetails>(T type, TDetails details, string message = null) where T : struct
+        public static UserException<T, TDetails> Create<T, TDetails>(T type, TDetails details, string message = null)
+            where T : struct
         {
             return new UserException<T, TDetails>(type, details, message);
         }

@@ -10,15 +10,15 @@ namespace Conreign.Host
     {
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            var grains = typeof (ConnectionGrain).Assembly.DefinedTypes
+            var grains = typeof(ConnectionGrain).Assembly.DefinedTypes
                 .Where(t => t.IsClass)
-                .Where(t => typeof (Grain).IsAssignableFrom(t))
+                .Where(t => typeof(Grain).IsAssignableFrom(t))
                 .ToList();
             foreach (var grain in grains)
             {
                 var interfaces = grain.GetInterfaces()
-                    .Where(t => typeof (IGrain).IsAssignableFrom(t))
-                    .Where(t => t != typeof (IGrain))
+                    .Where(t => typeof(IGrain).IsAssignableFrom(t))
+                    .Where(t => t != typeof(IGrain))
                     .Where(t => !t.Name.EndsWith("Key"));
                 services.AddTransient(grain, grain);
                 foreach (var @interface in interfaces)

@@ -9,11 +9,11 @@ namespace Conreign.Core.Contracts.Gameplay.Events
     [Immutable]
     public class PlayerUpdated : IClientEvent
     {
-        public PlayerData Player { get; }
-
         public PlayerUpdated(PlayerData player)
         {
             Player = player;
         }
+
+        public PlayerData Player { get; }
     }
 }

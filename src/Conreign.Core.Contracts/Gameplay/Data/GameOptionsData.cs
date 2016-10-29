@@ -25,7 +25,8 @@ namespace Conreign.Core.Contracts.Gameplay.Data
             {
                 return true;
             }
-            return MapWidth == other.MapWidth && MapHeight == other.MapHeight && NeutralPlanetsCount == other.NeutralPlanetsCount;
+            return MapWidth == other.MapWidth && MapHeight == other.MapHeight &&
+                   NeutralPlanetsCount == other.NeutralPlanetsCount;
         }
 
         public override bool Equals(object obj)

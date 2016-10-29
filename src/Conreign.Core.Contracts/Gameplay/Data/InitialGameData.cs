@@ -10,7 +10,7 @@ namespace Conreign.Core.Contracts.Gameplay.Data
     {
         public InitialGameData(
             Guid initiatorId,
-            MapData map, 
+            MapData map,
             List<PlayerData> players,
             Dictionary<Guid, HashSet<Guid>> hubMembers,
             List<Guid> hubJoinOrder)

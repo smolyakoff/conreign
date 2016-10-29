@@ -15,14 +15,14 @@ namespace Conreign.Core.Contracts.Exceptions
             Type = type;
         }
 
-        public T Type { get; }
-
         protected UserException(
             SerializationInfo info,
             StreamingContext context) : base(info, context)
         {
-            Type = (T)info.GetValue("Type", typeof(T));
+            Type = (T) info.GetValue("Type", typeof(T));
         }
+
+        public T Type { get; }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {

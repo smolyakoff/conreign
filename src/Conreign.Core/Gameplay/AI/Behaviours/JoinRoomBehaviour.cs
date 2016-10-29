@@ -7,9 +7,9 @@ namespace Conreign.Core.Gameplay.AI.Behaviours
 {
     public class JoinRoomBehaviour : IBotBehaviour<BotAuthenticated>
     {
-        private readonly string _roomId;
-        private readonly string _name;
         private readonly TimeSpan _delay;
+        private readonly string _name;
+        private readonly string _roomId;
 
         public JoinRoomBehaviour(string roomId, string name, TimeSpan delay)
         {

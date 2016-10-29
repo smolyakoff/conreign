@@ -1,7 +1,7 @@
 ﻿using JWT;
 using Newtonsoft.Json;
 
-namespace Conreign.Core.Auth
+namespace Conreign.Core.Auth.Serialization
 {
     internal class JsonNetSerializer : IJsonSerializer
     {

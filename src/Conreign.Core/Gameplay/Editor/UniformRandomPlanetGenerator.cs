@@ -24,7 +24,7 @@ namespace Conreign.Core.Gameplay.Editor
             {
                 throw new ArgumentException("Name cannot be null or empty.", nameof(name));
             }
-            var power = _random.Next(_options.MinPower, _options.MaxPower) / 100.0;
+            var power = _random.Next(_options.MinPower, _options.MaxPower)/100.0;
             var ships = _random.Next(_options.MinShips, _options.MaxShips);
             var production = _random.Next(_options.MinProductionRate, _options.MaxProductionRate);
             return new PlanetData
@@ -33,7 +33,7 @@ namespace Conreign.Core.Gameplay.Editor
                 OwnerId = ownerId,
                 Power = power,
                 Ships = ships,
-                ProductionRate = production,
+                ProductionRate = production
             };
         }
     }

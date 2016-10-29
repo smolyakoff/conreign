@@ -19,7 +19,7 @@ namespace Conreign.Core.Gameplay.Battle
             var totalPower = attacker.Power + defender.Power;
             var attackerShips = attacker.Ships;
             var defenderShips = defender.Ships;
-            var attackerWinThreshold = attacker.Power/totalPower; 
+            var attackerWinThreshold = attacker.Power/totalPower;
 
             while (attackerShips > 0 && defenderShips > 0)
             {

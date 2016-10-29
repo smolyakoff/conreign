@@ -9,9 +9,9 @@ namespace Conreign.Core.Gameplay.AI.Behaviours
         {
             var context = notification.Context;
             var @event = notification.Event;
-            context.Logger.Debug("[{ReadableId}-{UserId}]: Received {@Event}", 
-                context.ReadableId, 
-                context.UserId == null ? "Anonymous" : context.UserId.ToString(), 
+            context.Logger.Debug("[{ReadableId}-{UserId}]: Received {@Event}",
+                context.ReadableId,
+                context.UserId == null ? "Anonymous" : context.UserId.ToString(),
                 @event);
             return Task.CompletedTask;
         }

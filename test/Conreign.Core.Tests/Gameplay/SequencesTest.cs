@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Conreign.Core.Gameplay;
 using Conreign.Core.Gameplay.Editor;
 using Xunit;
 

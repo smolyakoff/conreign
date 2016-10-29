@@ -11,5 +11,4 @@ namespace Conreign.Core.Contracts.Client
         Task<LoginResult> Login();
         Task<LoginResult> Authenticate(string accessToken);
     }
-
 }

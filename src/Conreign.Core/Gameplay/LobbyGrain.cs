@@ -7,9 +7,7 @@ using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Gameplay;
 using Conreign.Core.Contracts.Gameplay.Data;
 using Conreign.Core.Contracts.Gameplay.Events;
-using Conreign.Core.Utility;
 using Orleans;
-using Orleans.Concurrency;
 using Orleans.Streams;
 
 namespace Conreign.Core.Gameplay
@@ -18,21 +16,6 @@ namespace Conreign.Core.Gameplay
     {
         private Lobby _lobby;
         private StreamSubscriptionHandle<IServerEvent> _subscription;
-
-        public override async Task OnActivateAsync()
-        {
-            InitializeState();
-            var topic = Topic.Room(GetStreamProvider(StreamConstants.ProviderName), this.GetPrimaryKeyString());
-            _lobby = new Lobby(State, topic, this);
-            _subscription = await topic.EnsureIsSubscribedOnce(this);
-            await base.OnActivateAsync();
-        }
-
-        public override async Task OnDeactivateAsync()
-        {
-            await _subscription.UnsubscribeAsync();
-            await base.OnDeactivateAsync();
-        }
 
         public Task<IRoomData> GetState(Guid userId)
         {
@@ -86,11 +69,6 @@ namespace Conreign.Core.Gameplay
             return game;
         }
 
-        private void InitializeState()
-        {
-            State.RoomId = this.GetPrimaryKeyString();
-        }
-
         public async Task<IGame> CreateGame(Guid userId)
         {
             var game = GrainFactory.GetGrain<IGameGrain>(this.GetPrimaryKeyString());
@@ -100,7 +78,7 @@ namespace Conreign.Core.Gameplay
                 players: State.Players,
                 hubMembers: State.Hub.Members.ToDictionary(x => x.Key, x => x.Value.ConnectionIds),
                 hubJoinOrder: State.Hub.JoinOrder
-            );
+                );
             await game.Initialize(command);
             return game;
         }
@@ -108,6 +86,26 @@ namespace Conreign.Core.Gameplay
         public Task Handle(GameEnded @event)
         {
             return _lobby.Handle(@event);
+        }
+
+        public override async Task OnActivateAsync()
+        {
+            InitializeState();
+            var topic = Topic.Room(GetStreamProvider(StreamConstants.ProviderName), this.GetPrimaryKeyString());
+            _lobby = new Lobby(State, topic, this);
+            _subscription = await topic.EnsureIsSubscribedOnce(this);
+            await base.OnActivateAsync();
+        }
+
+        public override async Task OnDeactivateAsync()
+        {
+            await _subscription.UnsubscribeAsync();
+            await base.OnDeactivateAsync();
+        }
+
+        private void InitializeState()
+        {
+            State.RoomId = this.GetPrimaryKeyString();
         }
     }
 }
