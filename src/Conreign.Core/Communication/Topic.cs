@@ -18,11 +18,6 @@ namespace Conreign.Core.Communication
         private readonly Dictionary<Guid, IAsyncStream<IClientEvent>> _clientStreams;
         private readonly string _id;
 
-        public static Topic Global(IStreamProvider provider)
-        {
-            return new Topic(provider, TopicIds.Global);
-        }
-
         public static Topic Room(IStreamProvider provider, string roomId)
         {
             return new Topic(provider, TopicIds.Room(roomId));

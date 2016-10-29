@@ -15,14 +15,10 @@ namespace Conreign.Core.Gameplay
     [StatelessWorker]
     public class UserGrain : Grain<Guid>, IUserGrain
     {
-        private static bool _universeActivated;
-        private Topic _globalTopic;
         private readonly Dictionary<string, IPlayer> _players = new Dictionary<string, IPlayer>();
 
         public override async Task OnActivateAsync()
         {
-            await EnsureUniverseActivated();
-            _globalTopic = Topic.Global(GetStreamProvider(StreamConstants.ProviderName));
             await base.OnActivateAsync();
         }
 
@@ -33,23 +29,13 @@ namespace Conreign.Core.Gameplay
                 return _players[roomId];
             }
             var userId = this.GetPrimaryKey();
+            var connection = GrainFactory.GetGrain<IConnectionGrain>(connectionId);
+            var topicId = TopicIds.Player(userId, roomId);
             var player = GrainFactory.GetGrain<IPlayerGrain>(userId, roomId, null);
-            var @event = new Connected(connectionId, TopicIds.Player(userId, roomId));
-            await player.Handle(@event);
-            await _globalTopic.Send(@event);
+            await player.Listen();
+            await connection.Connect(topicId);
             _players[roomId] = player;
             return player;
-        }
-
-        private async Task EnsureUniverseActivated()
-        {
-            if (_universeActivated)
-            {
-                return;
-            }
-            var universe = GrainFactory.GetGrain<IUniverseGrain>(default(long));
-            await universe.Ping();
-            _universeActivated = true;
         }
     }
 }

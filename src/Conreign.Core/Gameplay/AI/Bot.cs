@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Conreign.Core.Contracts.Client;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Gameplay.AI.Behaviours;
 using Conreign.Core.Gameplay.AI.Events;
-using MediatR;
-using SimpleInjector;
-using SimpleInjector.Extensions;
 
 namespace Conreign.Core.Gameplay.AI
 {

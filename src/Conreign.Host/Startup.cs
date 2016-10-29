@@ -10,7 +10,7 @@ namespace Conreign.Host
     {
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            var grains = typeof (UniverseGrain).Assembly.DefinedTypes
+            var grains = typeof (ConnectionGrain).Assembly.DefinedTypes
                 .Where(t => t.IsClass)
                 .Where(t => typeof (Grain).IsAssignableFrom(t))
                 .ToList();

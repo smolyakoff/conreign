@@ -102,14 +102,14 @@ namespace Conreign.Core.Gameplay
             await _player.Handle(@event);
         }
 
+        public Task Listen()
+        {
+            return Task.CompletedTask;
+        }
+
         public Task Handle(GameEnded @event)
         {
             return _player.Handle(@event);
-        }
-
-        public Task Ping()
-        {
-            return Task.CompletedTask;
         }
     }
 }

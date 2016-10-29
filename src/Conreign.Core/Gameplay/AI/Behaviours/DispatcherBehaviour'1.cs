@@ -12,6 +12,7 @@ namespace Conreign.Core.Gameplay.AI.Behaviours
 
         public DispatcherBehaviour(IEnumerable<IBotBehaviour> behaviours)
         {
+            // TODO: beautify code
             var groups = behaviours
                 .ToList()
                 .SelectMany(b =>

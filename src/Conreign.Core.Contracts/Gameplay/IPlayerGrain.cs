@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Communication.Events;
 using Conreign.Core.Contracts.Gameplay.Events;
@@ -13,5 +14,6 @@ namespace Conreign.Core.Contracts.Gameplay
         IEventHandler<Connected>,
         IEventHandler<Disconnected>
     {
+        Task Listen();
     }
 }

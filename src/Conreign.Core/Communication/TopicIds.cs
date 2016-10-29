@@ -4,8 +4,6 @@ namespace Conreign.Core.Communication
 {
     public static class TopicIds
     {
-        public const string Global = "conreign/global";
-
         public static string Room(string roomId)
         {
             return $"conreign/rooms/{roomId}";

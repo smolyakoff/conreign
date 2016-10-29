@@ -56,8 +56,8 @@
     <Compile Include="Client\Metadata.cs" />
     <Compile Include="Client\Serialization\MessageEnvelopeJsonConverter.cs" />
     <Compile Include="Client\Serialization\MessageTypeSerializer.cs" />
-    <Compile Include="Common\ValidationErrorDetails.cs" />
-    <Compile Include="Common\ValidationFailure.cs" />
+    <Compile Include="Validation\ValidationErrorDetails.cs" />
+    <Compile Include="Validation\ValidationFailure.cs" />
     <Compile Include="Communication\Events\Connected.cs" />
     <Compile Include="Communication\Events\Disconnected.cs" />
     <Compile Include="Communication\IClientEvent.cs" />
@@ -68,14 +68,13 @@
     <Compile Include="Communication\IEventHandler%271.cs" />
     <Compile Include="Communication\IEventHandler.cs" />
     <Compile Include="Communication\IHub.cs" />
-    <Compile Include="Communication\IPingable.cs" />
     <Compile Include="Communication\IServerEvent.cs" />
     <Compile Include="Communication\ITopic.cs" />
     <Compile Include="Communication\ITopicFactory.cs" />
     <Compile Include="Exceptions\UserException%271.cs" />
     <Compile Include="Exceptions\UserException%272.cs" />
     <Compile Include="Exceptions\UserException.cs" />
-    <Compile Include="Common\ValidationError.cs" />
+    <Compile Include="Validation\ValidationError.cs" />
     <Compile Include="Gameplay\Data\AttackOutcome.cs" />
     <Compile Include="Gameplay\Data\Defaults.cs" />
     <Compile Include="Gameplay\Data\GameData.cs" />
@@ -102,6 +101,8 @@
     <Compile Include="Gameplay\Events\TurnEnded.cs" />
     <Compile Include="Gameplay\Data\TextMessageData.cs" />
     <Compile Include="Presence\Events\LeaderChanged.cs" />
+    <Compile Include="Presence\IConnection.cs" />
+    <Compile Include="Presence\IConnectionGrain.cs" />
     <Compile Include="Presence\PresenceStatus.cs" />
     <Compile Include="Gameplay\Events\ChatMessageReceived.cs" />
     <Compile Include="Gameplay\Data\FleetData.cs" />
@@ -119,8 +120,6 @@
     <Compile Include="Gameplay\IPlayer.cs" />
     <Compile Include="Gameplay\Data\IRoomData.cs" />
     <Compile Include="Gameplay\IUserGrain.cs" />
-    <Compile Include="Presence\IUniverse.cs" />
-    <Compile Include="Presence\IUniverseGrain.cs" />
     <Compile Include="Presence\Events\UserStatusChanged.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Gameplay\Data\RoomMode.cs" />

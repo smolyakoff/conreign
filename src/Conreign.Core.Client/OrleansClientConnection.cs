@@ -22,8 +22,6 @@ namespace Conreign.Core.Client
 
         internal static async Task<OrleansClientConnection> Initialize(IGrainFactory grainFactory, Guid connectionId)
         {
-            var universe = grainFactory.GetGrain<IUniverseGrain>(default(long));
-            await universe.Ping();
             var stream = GrainClient.GetStreamProvider(StreamConstants.ProviderName)
                 .GetStream<IClientEvent>(connectionId, StreamConstants.ClientNamespace);
             var existingHandles = await stream.GetAllSubscriptionHandles();
@@ -126,8 +124,8 @@ namespace Conreign.Core.Client
 
         private void Disconnect()
         {
-            var universe = _factory.GetGrain<IUniverseGrain>(default(long));
-            universe.Disconnect(Id);
+            var universe = _factory.GetGrain<IConnectionGrain>(Id);
+            universe.Disconnect();
         }
     }
 }

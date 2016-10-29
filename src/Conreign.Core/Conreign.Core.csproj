@@ -62,6 +62,7 @@
     <Compile Include="Gameplay\AI\BotNotification%271.cs" />
     <Compile Include="Gameplay\AI\Events\IBotEvent.cs" />
     <Compile Include="Gameplay\AI\IBotNotification%271.cs" />
+    <Compile Include="Presence\ConnectionState.cs" />
     <Compile Include="Presence\HubMemberState.cs" />
     <Compile Include="Utility\PropertyComparer%272.cs" />
     <Compile Include="Gameplay\AI\Battle\ReadOnlyMap.cs" />
@@ -102,9 +103,8 @@
     <Compile Include="Presence\HubExtensions.cs" />
     <Compile Include="Presence\HubState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Presence\Universe.cs" />
-    <Compile Include="Presence\UniverseGrain.cs" />
-    <Compile Include="Presence\UniverseState.cs" />
+    <Compile Include="Presence\Connection.cs" />
+    <Compile Include="Presence\ConnectionGrain.cs" />
     <Compile Include="Utility\DictionaryExtensions.cs" />
     <Compile Include="Utility\EnumerableExtensions.cs" />
     <Compile Include="Utility\ResetableEnumerator%271.cs" />
