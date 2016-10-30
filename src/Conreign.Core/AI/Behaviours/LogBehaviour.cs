@@ -1,8 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Conreign.Core.Contracts.Communication;
-using Orleans;
 
-namespace Conreign.Core.Gameplay.AI.Behaviours
+namespace Conreign.Core.AI.Behaviours
 {
     public class LogBehaviour : IBotBehaviour<IClientEvent>
     {

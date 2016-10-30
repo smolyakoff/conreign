@@ -19,7 +19,8 @@ namespace Conreign.Core.AI.LoadTest
                 throw new ArgumentNullException(nameof(options));
             }
             _options = options;
-            _battleStrategy = new NaiveBotBattleStrategy();
+            var battleStrategyOptions = new NaiveBotBattleStrategyOptions(0.8, 0.2, 1);
+            _battleStrategy = new NaiveBotBattleStrategy(battleStrategyOptions);
         }
 
         public Bot Create(IClientConnection connection)
@@ -34,7 +35,7 @@ namespace Conreign.Core.AI.LoadTest
                 throw new InvalidOperationException($"Expected to create maximum of {total} bots.");
             }
             var roomIndex = _i/_options.BotsPerRoomCount;
-            var room = $"{_options.RoomPrefix}conreign-load-test-{roomIndex}";
+            var room = $"conreign-load-test-{roomIndex}";
             var k = _i%_options.BotsPerRoomCount;
             var isLeader = _i % _options.BotsPerRoomCount == 0;
             var name = isLeader ? "leader" : $"bot-{k}";
@@ -42,6 +43,7 @@ namespace Conreign.Core.AI.LoadTest
             var behaviours = new List<IBotBehaviour>
                             {
                                 new LoginBehaviour(),
+                                new LogBehaviour(),
                                 new JoinRoomBehaviour(room, isLeader ? TimeSpan.Zero : _options.JoinRoomDelay),
                                 new BattleBehaviour(_battleStrategy),
                                 new StopOnGameEndBehaviour()

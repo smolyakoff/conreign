@@ -49,6 +49,8 @@ Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "Conreign.Api.Azure", "src\C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Api.Host.Azure", "src\Conreign.Api.Host.Azure\Conreign.Api.Host.Azure.csproj", "{A29CEA9B-0EA4-487F-838E-25CB696276DF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.LoadTest", "src\Conreign.LoadTest\Conreign.LoadTest.csproj", "{434AFA37-5C10-42CA-922F-F9772FDC8574}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +113,10 @@ Global
 		{A29CEA9B-0EA4-487F-838E-25CB696276DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A29CEA9B-0EA4-487F-838E-25CB696276DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A29CEA9B-0EA4-487F-838E-25CB696276DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{434AFA37-5C10-42CA-922F-F9772FDC8574}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{434AFA37-5C10-42CA-922F-F9772FDC8574}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{434AFA37-5C10-42CA-922F-F9772FDC8574}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{434AFA37-5C10-42CA-922F-F9772FDC8574}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -132,6 +138,7 @@ Global
 		{5D54B9E4-56B3-4083-BEA1-BB3EA25069C1} = {461F0F71-2CB8-4368-ADEE-329687A05CE3}
 		{287775A1-6A4A-4B0C-A3BD-C56BCCE90D31} = {461F0F71-2CB8-4368-ADEE-329687A05CE3}
 		{A29CEA9B-0EA4-487F-838E-25CB696276DF} = {461F0F71-2CB8-4368-ADEE-329687A05CE3}
+		{434AFA37-5C10-42CA-922F-F9772FDC8574} = {420E0885-10E8-44C7-899B-FF39004DEADE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8

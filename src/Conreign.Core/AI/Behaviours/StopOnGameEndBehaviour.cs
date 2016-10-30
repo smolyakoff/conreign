@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Conreign.Core.Contracts.Gameplay.Events;
-using Orleans;
 
 namespace Conreign.Core.AI.Behaviours
 {

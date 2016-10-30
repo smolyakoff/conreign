@@ -12,8 +12,11 @@ nuget System.Reactive.Core
 nuget System.Reactive.Linq
 nuget System.IdentityModel.Tokens.Jwt
 
+nuget Serilog.Sinks.Trace
 nuget Serilog.Sinks.Literate
+nuget Serilog.Sinks.File
 nuget Serilog.Sinks.AzureTableStorage
+nuget Serilog.Sinks.Seq
 nuget Polly
 nuget FluentValidation
 nuget JWT

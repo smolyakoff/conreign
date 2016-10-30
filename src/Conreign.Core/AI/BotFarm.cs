@@ -2,25 +2,24 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Conreign.Core.AI.Events;
 using Conreign.Core.Contracts.Client;
 using Serilog;
-using Serilog.Context;
 
 namespace Conreign.Core.AI
 {
-    public class BotFarm
+    public class BotFarm : IDisposable
     {
         private readonly string _id;
         private readonly IClient _client;
         private readonly IBotFactory _botFactory;
-        private readonly BotFarmOptions _options;
+        private List<Bot> _bots;
+        private bool _isDisposed;
+        private IDisposable _logSubscription;
         private readonly ILogger _logger;
-        private const string OperationDescription = "BotFarm.Run";
 
-        public BotFarm(string id, IClient client, IBotFactory botFactory, BotFarmOptions options)
+        public BotFarm(string id, IClient client, IBotFactory botFactory)
         {
             if (client == null)
             {
@@ -30,10 +29,6 @@ namespace Conreign.Core.AI
             {
                 throw new ArgumentNullException(nameof(botFactory));
             }
-            if (options == null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
             if (string.IsNullOrEmpty(id))
             {
                 throw new ArgumentException("Id cannot be null or empty.", nameof(id));
@@ -41,92 +36,95 @@ namespace Conreign.Core.AI
             _id = id;
             _client = client;
             _botFactory = botFactory;
-            _options = options;
+            _bots = new List<Bot>();
+            Completion = Task.FromResult(0);
             _logger = Log.Logger.ForContext("BotFarmId", id);
         }
 
-        public async Task Run(CancellationToken? cancellationToken = null)
+        public async Task Start()
         {
-            IDisposable logSubscription = null;
-            var bots = new List<Bot>();
-            try
+            EnsureIsNotDisposed();
+            _logger.Information("[{BotFarmId}] Farm is starting...");
+            while (_botFactory.CanCreate)
             {
-                cancellationToken = cancellationToken ?? CancellationToken.None;
-                _logger.Information("[BotFarm:{BotFarmId}] Farm is starting...");
-                while (_botFactory.CanCreate)
-                {
-                    var connectionId = Guid.NewGuid();
-                    var connection = await _client.Connect(connectionId);
-                    var bot = _botFactory.Create(connection);
-                    bots.Add(bot);
-                    _logger.Information(
-                        "[BotFarm:{BotFarmId}] Bot {BotId} is connected. Connection id is {ConnectionId}.",
-                        _id,
-                        bot.Id,
-                        connectionId);
-                }
-                logSubscription = bots
-                    .Select(x => x.Events.Catch<IBotEvent, Exception>(e =>
-                    {
-                        OnError(e);
-                        return Observable.Empty<IBotEvent>();
-                    }))
-                    .Merge()
-                    .Subscribe(OnNext, OnError, OnCompleted);
-                var tasks = new List<Task>();
-                foreach (var bot in bots)
-                {
-                    tasks.Add(Task.Run(async () =>
-                    {
-                        _logger.Information("[BotFarm:{BotFarmId}] Started {BotId}.", _id, bot.Id);
-                        try
-                        {
-                            await bot.Run(cancellationToken);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.Error(ex, "[BotFarm:{BotFarmId}] Bot stopped with an error: {ErrorMessage}.", _id, ex.Message);
-                            throw;
-                        }
-                        finally
-                        {
-                            _logger.Information("[BotFarm:{BotFarmId}] Stopped {BotId}.", _id, bot.Id);
-                        }
-                        
-                    }));
-                    await Task.Delay(_options.StartupDelay, cancellationToken.Value);
-                }
-                _logger.Information("[BotFarm:{BotFarmId}] Farm is started.");
-                using (LogContext.PushProperty("BotFarmId", _id))
-                using (_logger.BeginTimedOperation(OperationDescription))
-                {
-                    await Task.WhenAll(tasks);
-                }
+                var connectionId = Guid.NewGuid();
+                var connection = await _client.Connect(connectionId);
+                var bot = _botFactory.Create(connection);
+                _bots.Add(bot);
+                _logger.Information("[{BotFarmId}] Bot {BotId} is connected. Connection id is {ConnectionId}.",
+                    _id,
+                    bot.Id,
+                    connectionId);
             }
-            finally
+            Completion = Task.WhenAll(_bots.Select(x => x.Completion));
+            _logSubscription = _bots.Select(x => x.Events).Merge().Subscribe(OnNext, OnError, OnCompleted);
+            foreach (var bot in _bots)
             {
-                foreach (var bot in bots)
-                {
-                    bot.Dispose();
-                    bot.Connection.Dispose();
-                }
-                logSubscription?.Dispose();
+                bot.Start();
+            }
+            _logger.Information("[{BotFarmId}] Farm is started.");
+        }
+
+        public void Stop()
+        {
+            EnsureIsNotDisposed();
+            _logger.Information("[{BotFarmId}] Farm stop requested...");
+            foreach (var bot in _bots)
+            {
+                bot.Stop();
+            }
+        }
+
+        public Task Completion { get; private set; }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        public virtual void Dispose(bool disposing)
+        {
+            if (_isDisposed)
+            {
+                return;
+            }
+            if (!disposing)
+            {
+                return;
+            }
+            foreach (var bot in _bots)
+            {
+                bot.Dispose();
+                bot.Connection.Dispose();
+            }
+            _logSubscription.Dispose();
+            _logSubscription = null;
+            _bots = null;
+            _isDisposed = true;
+        }
+
+        private void EnsureIsNotDisposed()
+        {
+            if (_isDisposed)
+            {
+                throw new ObjectDisposedException("BotFarm");
             }
         }
 
         private void OnCompleted()
         {
-            _logger.Information("[BotFarm:{BotFarmId}] Event stream completed.", _id);
-        }
-
-        private void OnNext(IBotEvent @event)
-        {
-            _logger.Debug("[BotFarm:{BotFarmId}]. Event: {@Event}.", _id, @event);
+            _logger.Information("[{BotFarmId}] Event stream completed.", _id);
         }
 
         private void OnError(Exception ex)
         {
-            _logger.Error(ex, "[BotFarm:{BotFarmId}] Error: {Message}", _id, ex.Message);
+            _logger.Error(ex, "[{BotFarmId}] Error: {Message}", _id, ex.Message);
+        }
+
+        private void OnNext(IBotEvent @event)
+        {
+            _logger.Debug("[{BotFarmId}]. Event: {@Event}.", _id, @event);
         }
     }
 }

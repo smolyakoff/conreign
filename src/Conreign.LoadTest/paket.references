@@ -1,7 +1,3 @@
-System.ComponentModel.TypeConverter copy_local: true
-Microsoft.Extensions.Configuration.Binder
-Microsoft.Extensions.Configuration.CommandLine
-Microsoft.Extensions.Configuration.Json
 Serilog.Sinks.Literate
 Serilog.Sinks.File
-Serilog.Sinks.ElasticSearch
+Serilog.Sinks.Seq 

@@ -36,6 +36,11 @@
     <Compile Include="..\Common\TaskCompleted.cs">
       <Link>TaskCompleted.cs</Link>
     </Compile>
+    <Compile Include="AI\Behaviours\StopBehaviour.cs" />
+    <Compile Include="AI\IBotFactory.cs" />
+    <Compile Include="AI\LoadTest\LoadTestBotFactory.cs" />
+    <Compile Include="AI\BotFarm.cs" />
+    <Compile Include="AI\LoadTest\LoadTestBotOptions.cs" />
     <Compile Include="Auth\AuthGrain.cs" />
     <Compile Include="Auth\AuthOptions.cs" />
     <Compile Include="Auth\AuthService.cs" />
@@ -45,33 +50,33 @@
     <Compile Include="Communication\EventObserver%272.cs" />
     <Compile Include="Communication\Topic.cs" />
     <Compile Include="Communication\TopicIds.cs" />
-    <Compile Include="Gameplay\AI\Behaviours\BattleBehaviour.cs" />
-    <Compile Include="Gameplay\AI\Behaviours\Events\BotAuthenticated.cs" />
-    <Compile Include="Gameplay\AI\Behaviours\LoginBehaviour.cs" />
-    <Compile Include="Gameplay\AI\Behaviours\DispatcherBehaviour%271.cs" />
-    <Compile Include="Gameplay\AI\Events\BotStarted.cs" />
-    <Compile Include="Gameplay\AI\Events\BotStopped.cs" />
-    <Compile Include="Gameplay\AI\Behaviours\StopOnGameEndBehaviour.cs" />
-    <Compile Include="Gameplay\AI\Behaviours\IBotBehaviour%271.cs" />
-    <Compile Include="Gameplay\AI\Behaviours\IBotBehaviour.cs" />
-    <Compile Include="Gameplay\AI\Behaviours\JoinRoomBehaviour.cs" />
-    <Compile Include="Gameplay\AI\Behaviours\LogBehaviour.cs" />
-    <Compile Include="Gameplay\AI\Behaviours\StartGameBehaviour.cs" />
-    <Compile Include="Gameplay\AI\BotContext.cs" />
-    <Compile Include="Gameplay\AI\Bot.cs" />
-    <Compile Include="Gameplay\AI\Battle\IBotBattleStrategy.cs" />
-    <Compile Include="Gameplay\AI\Battle\NaiveBotBattleStrategyOptions.cs" />
+    <Compile Include="AI\Behaviours\BattleBehaviour.cs" />
+    <Compile Include="AI\Behaviours\Events\BotAuthenticated.cs" />
+    <Compile Include="AI\Behaviours\LoginBehaviour.cs" />
+    <Compile Include="AI\Behaviours\DispatcherBehaviour%271.cs" />
+    <Compile Include="AI\Events\BotStarted.cs" />
+    <Compile Include="AI\Events\BotStopped.cs" />
+    <Compile Include="AI\Behaviours\StopOnGameEndBehaviour.cs" />
+    <Compile Include="AI\Behaviours\IBotBehaviour%271.cs" />
+    <Compile Include="AI\Behaviours\IBotBehaviour.cs" />
+    <Compile Include="AI\Behaviours\JoinRoomBehaviour.cs" />
+    <Compile Include="AI\Behaviours\LogBehaviour.cs" />
+    <Compile Include="AI\Behaviours\StartGameBehaviour.cs" />
+    <Compile Include="AI\BotContext.cs" />
+    <Compile Include="AI\Bot.cs" />
+    <Compile Include="AI\Battle\IBotBattleStrategy.cs" />
+    <Compile Include="AI\Battle\NaiveBotBattleStrategyOptions.cs" />
     <Compile Include="Communication\StreamExtensions.cs" />
-    <Compile Include="Gameplay\AI\BotNotification%271.cs" />
-    <Compile Include="Gameplay\AI\Events\IBotEvent.cs" />
-    <Compile Include="Gameplay\AI\IBotNotification%271.cs" />
+    <Compile Include="AI\BotNotification%271.cs" />
+    <Compile Include="AI\Events\IBotEvent.cs" />
+    <Compile Include="AI\IBotNotification%271.cs" />
     <Compile Include="Presence\ConnectionState.cs" />
     <Compile Include="Presence\HubMemberState.cs" />
     <Compile Include="Properties\orleans.codegen.cs" />
     <Compile Include="Utility\PropertyComparer%272.cs" />
-    <Compile Include="Gameplay\AI\Battle\ReadOnlyMap.cs" />
-    <Compile Include="Gameplay\AI\Battle\ReadOnlyPlanetData.cs" />
-    <Compile Include="Gameplay\AI\Battle\NaiveBotBattleStrategy.cs" />
+    <Compile Include="AI\Battle\ReadOnlyMap.cs" />
+    <Compile Include="AI\Battle\ReadOnlyPlanetData.cs" />
+    <Compile Include="AI\Battle\NaiveBotBattleStrategy.cs" />
     <Compile Include="Gameplay\Battle\BattleFleet.cs" />
     <Compile Include="Gameplay\Battle\BattleOutcome.cs" />
     <Compile Include="Gameplay\Battle\CoinBattleStrategy.cs" />
@@ -301,6 +306,15 @@
       <ItemGroup>
         <Reference Include="Serilog">
           <HintPath>..\..\packages\Serilog\lib\net46\Serilog.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v1.1'">
+      <ItemGroup>
+        <Reference Include="Serilog">
+          <HintPath>..\..\packages\Serilog\lib\netstandard1.0\Serilog.dll</HintPath>
           <Private>True</Private>
           <Paket>True</Paket>
         </Reference>

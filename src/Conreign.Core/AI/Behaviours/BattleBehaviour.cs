@@ -1,12 +1,12 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Conreign.Core.AI.Battle;
 using Conreign.Core.Contracts.Gameplay.Data;
 using Conreign.Core.Contracts.Gameplay.Events;
-using Conreign.Core.Gameplay.AI.Battle;
-using Orleans;
+using Conreign.Core.Gameplay;
 
-namespace Conreign.Core.Gameplay.AI.Behaviours
+namespace Conreign.Core.AI.Behaviours
 {
     public class BattleBehaviour :
         IBotBehaviour<TurnCalculationEnded>,
@@ -66,7 +66,13 @@ namespace Conreign.Core.Gameplay.AI.Behaviours
                 return;
             }
             _map = @event.Map;
+            context.Logger.Verbose("[{ReadableId}-{UserId}] Started thinking.", 
+                context.ReadableId, 
+                context.UserId);
             await Think(context);
+            context.Logger.Verbose("[{ReadableId}-{UserId}] Finished thinking.",
+                context.ReadableId,
+                context.UserId);
         }
 
         private async Task Think(BotContext context)

@@ -4,13 +4,9 @@ using System.Threading.Tasks;
 using Conreign.Client.Handler;
 using Conreign.Client.Orleans;
 using Conreign.Core.Contracts.Client;
-using Conreign.Core.Contracts.Client.Exceptions;
-using Conreign.Core.Contracts.Client.Messages;
 using Conreign.Core.Contracts.Communication;
 using MediatR;
 using Microsoft.AspNet.SignalR;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Conreign.Api.Hubs
 {
@@ -21,7 +17,6 @@ namespace Conreign.Api.Hubs
 
         private readonly OrleansClient _client;
         private readonly IMediator _mediator;
-        private readonly JsonSerializer _errorSerializer;
 
         public GameHub(OrleansClient client, IMediator mediator)
         {
@@ -35,10 +30,6 @@ namespace Conreign.Api.Hubs
             }
             _client = client;
             _mediator = mediator;
-            _errorSerializer = JsonSerializer.Create(new JsonSerializerSettings
-            {
-                TypeNameHandling = TypeNameHandling.All
-            });
         }
 
         public async Task<MessageEnvelope> Send(MessageEnvelope envelope)
@@ -47,7 +38,8 @@ namespace Conreign.Api.Hubs
             {
                 throw new ArgumentNullException(nameof(envelope));
             }
-            var result = await Handle((dynamic)envelope.Payload, envelope.Meta);
+            var handler = GetHandlerSafely();
+            var result = await handler.Handle((dynamic)envelope.Payload, envelope.Meta);
             return new MessageEnvelope { Payload = result };
         }
 
@@ -57,24 +49,8 @@ namespace Conreign.Api.Hubs
             {
                 throw new ArgumentNullException(nameof(envelope));
             }
-            return Handle((dynamic)envelope.Payload, envelope.Meta);
-        }
-
-        private async Task<T> Handle<T>(IAsyncRequest<T> command, Metadata metadata)
-        {
             var handler = GetHandlerSafely();
-            try
-            {
-                var result = await handler.Handle(command, metadata);
-                return result;
-            }
-            catch (UserException ex)
-            {
-                var error = ex.ToUserError();
-                var jError = JObject.FromObject(error, _errorSerializer);
-                jError["$nettype"] = jError["$type"];
-                throw new HubException(error.Message, jError);
-            }
+            return handler.Handle((dynamic)envelope.Payload, envelope.Meta);
         }
 
         public override async Task OnConnected()
