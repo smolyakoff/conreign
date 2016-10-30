@@ -39,8 +39,8 @@ namespace Conreign.Api.Hubs
                 throw new ArgumentNullException(nameof(envelope));
             }
             var handler = GetHandlerSafely();
-            var result = await handler.Handle((dynamic) envelope.Payload, envelope.Meta);
-            return new MessageEnvelope {Payload = result};
+            var result = await handler.Handle((dynamic)envelope.Payload, envelope.Meta);
+            return new MessageEnvelope { Payload = result };
         }
 
         public Task Post(MessageEnvelope envelope)
@@ -50,7 +50,7 @@ namespace Conreign.Api.Hubs
                 throw new ArgumentNullException(nameof(envelope));
             }
             var handler = GetHandlerSafely();
-            return handler.Handle((dynamic) envelope.Payload, envelope.Meta);
+            return handler.Handle((dynamic)envelope.Payload, envelope.Meta);
         }
 
         public override async Task OnConnected()

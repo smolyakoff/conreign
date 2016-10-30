@@ -1,0 +1,3 @@
+Serilog.Sinks.Literate
+Serilog.Sinks.File
+Serilog.Sinks.Seq 

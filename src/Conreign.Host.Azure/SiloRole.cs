@@ -14,9 +14,9 @@ namespace Conreign.Host.Azure
         public override void Run()
         {
             var config = new ClusterConfiguration();
-            config.AddMemoryStorageProvider();
+            config.AddMemoryStorageProvider("Default");
+            config.AddMemoryStorageProvider("PubSubStore");
             config.AddSimpleMessageStreamProvider(StreamConstants.ProviderName);
-
             _silo = new AzureSilo {DataConnectionConfigurationSettingName = "OrleansSystemStorageConnectionString"};
             var started = _silo.Start(config);
             if (!started)

@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 using Conreign.Client.Handler;
 using Conreign.Client.Orleans;
 using Conreign.Client.SignalR;
+using Conreign.Core.AI;
+using Conreign.Core.AI.Battle;
+using Conreign.Core.AI.Behaviours;
 using Conreign.Core.Contracts.Client;
 using Conreign.Core.Contracts.Client.Messages;
 using Conreign.Core.Contracts.Gameplay.Data;
-using Conreign.Core.Gameplay.AI;
-using Conreign.Core.Gameplay.AI.Battle;
-using Conreign.Core.Gameplay.AI.Behaviours;
 using Orleans.Runtime.Configuration;
 using Serilog;
 
@@ -90,7 +90,13 @@ namespace Conreign.Experiments
         private static async Task RunSignalRBot(string roomId, int i, int total)
         {
             ServicePointManager.DefaultConnectionLimit = 500;
-            var options = new SignalRClientOptions {ConnectionUri = "http://localhost:9000"};
+            var options = new SignalRClientOptions
+            {
+                // ConnectionUri = "http://localhost:9000",
+                ConnectionUri = "http://localhost",
+                IsDebug = false,
+                // IsDebug = true
+            };
             var client = new SignalRClient(options);
             using (var connection = await client.Connect(Guid.NewGuid()))
             {
@@ -119,7 +125,7 @@ namespace Conreign.Experiments
             {
                 new LoginBehaviour(),
                 new LogBehaviour(),
-                new JoinRoomBehaviour(roomId, name, isLeader ? TimeSpan.Zero : TimeSpan.FromSeconds(0.5)),
+                new JoinRoomBehaviour(roomId,  isLeader ? TimeSpan.Zero : TimeSpan.FromSeconds(0.5)),
                 new BattleBehaviour(new NaiveBotBattleStrategy(options)),
                 new StopOnGameEndBehaviour()
             };

@@ -1,4 +1,6 @@
- Serilog.Sinks.AzureTableStorage
+Serilog.Sinks.AzureTableStorage
+Serilog.Sinks.Trace
+
 Microsoft.Orleans.OrleansAzureUtils
 Microsoft.Owin.Cors
 Microsoft.AspNet.SignalR.SelfHost

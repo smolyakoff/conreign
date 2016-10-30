@@ -25,6 +25,7 @@ namespace Conreign.Api.Host.Azure
             var storage = CloudStorageAccount.Parse("UseDevelopmentStorage=true");
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.AzureTableStorage(storage)
+                .WriteTo.Trace()
                 .CreateLogger();
 
             var endpoint = RoleEnvironment.CurrentRoleInstance.InstanceEndpoints["PublicApi"];

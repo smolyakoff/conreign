@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Conreign.Client.SignalR.Proxies;
@@ -30,8 +31,9 @@ namespace Conreign.Client.SignalR
                 throw new ArgumentNullException(nameof(hub));
             }
             _subject = new Subject<IClientEvent>();
+            Events = _subject.AsObservable();
             _context = new SignalRConnectionContext(hub, connection, new Metadata());
-            _context.HubConnection.Error += _subject.OnError;
+            //_context.HubConnection.Error += _subject.OnError;
             var disposables = new List<IDisposable>
             {
                 _context.Hub.On<MessageEnvelope>("OnNext", e => _subject.OnNext((IClientEvent) e.Payload)),
@@ -44,7 +46,7 @@ namespace Conreign.Client.SignalR
 
         public Guid Id => Guid.Parse(_context.HubConnection.ConnectionId);
 
-        public IObservable<IClientEvent> Events => _subject;
+        public IObservable<IClientEvent> Events { get; }
 
         public Task<LoginResult> Authenticate(string accessToken)
         {
@@ -76,6 +78,7 @@ namespace Conreign.Client.SignalR
                 return;
             }
             _context.HubConnection.Error -= _subject.OnError;
+            _context.HubConnection.Stop();
             _disposable.Dispose();
             _isDisposed = true;
         }

@@ -338,16 +338,51 @@ NUGET
     runtime.native.System.Security.Cryptography (4.0) - framework: >= netstandard13
       Microsoft.NETCore.Platforms (>= 1.0.1)
       Microsoft.NETCore.Targets (>= 1.0.1)
-    Serilog (2.3) - framework: >= net45, >= netstandard13
+    Serilog (2.3) - framework: >= net45, netstandard11, >= netstandard13
+      Microsoft.CSharp (>= 4.0.1) - framework: netstandard10, >= netstandard13
+      System.Collections (>= 4.0.11) - framework: netstandard10, >= netstandard13
+      System.Dynamic.Runtime (>= 4.0.11) - framework: netstandard10, >= netstandard13
+      System.Globalization (>= 4.0.11) - framework: netstandard10, >= netstandard13
+      System.Linq (>= 4.1) - framework: netstandard10, >= netstandard13
+      System.Reflection (>= 4.1) - framework: netstandard10, >= netstandard13
+      System.Reflection.Extensions (>= 4.0.1) - framework: netstandard10, >= netstandard13
+      System.Runtime (>= 4.1) - framework: netstandard10, >= netstandard13
+      System.Runtime.Extensions (>= 4.1) - framework: netstandard10, >= netstandard13
+      System.Text.RegularExpressions (>= 4.1) - framework: netstandard10, >= netstandard13
+      System.Threading (>= 4.0.11) - framework: netstandard10, >= netstandard13
+    Serilog.Formatting.Compact (1.0) - framework: >= net45, netstandard11, >= netstandard13
+      Serilog (>= 2.0) - framework: >= net45, >= netstandard11
     Serilog.Sinks.AzureTableStorage (2.0)
       Serilog (>= 2.0) - framework: >= net45
       Serilog.Sinks.PeriodicBatching (>= 2.0) - framework: >= net45
       WindowsAzure.Storage (>= 4.3) - framework: >= net45
+    Serilog.Sinks.File (3.1)
+      Serilog (>= 2.3) - framework: >= net45, >= netstandard13
+      System.IO (>= 4.1) - framework: >= netstandard13
+      System.IO.FileSystem (>= 4.0.1) - framework: >= netstandard13
+      System.IO.FileSystem.Primitives (>= 4.0.1) - framework: >= netstandard13
+      System.Text.Encoding.Extensions (>= 4.0.11) - framework: >= netstandard13
+      System.Threading.Timer (>= 4.0.1) - framework: >= netstandard13
     Serilog.Sinks.Literate (2.0)
       Serilog (>= 2.0) - framework: >= net45, >= netstandard13
       System.Console (>= 4.0) - framework: >= netstandard13
-    Serilog.Sinks.PeriodicBatching (2.1) - framework: >= net45
+    Serilog.Sinks.PeriodicBatching (2.1) - framework: >= net45, netstandard11, >= netstandard13
       Serilog (>= 2.0) - framework: >= net45, >= netstandard11
+    Serilog.Sinks.RollingFile (3.2) - framework: >= net45, >= netstandard13
+      Serilog.Sinks.File (>= 3.1) - framework: >= net45, >= netstandard13
+      System.IO (>= 4.1) - framework: >= netstandard13
+      System.IO.FileSystem.Primitives (>= 4.0.1) - framework: >= netstandard13
+      System.Runtime.InteropServices (>= 4.1) - framework: >= netstandard13
+      System.Text.Encoding.Extensions (>= 4.0.11) - framework: >= netstandard13
+    Serilog.Sinks.Seq (3.0.1)
+      Serilog (>= 2.2) - framework: >= net45, netstandard11, >= netstandard13
+      Serilog.Formatting.Compact (>= 1.0) - framework: >= net45, netstandard11, >= netstandard13
+      Serilog.Sinks.PeriodicBatching (>= 2.0) - framework: >= net45, netstandard11, >= netstandard13
+      Serilog.Sinks.RollingFile (>= 3.0) - framework: >= net45, >= netstandard13
+      System.Net.Http (>= 4.1) - framework: netstandard11, >= netstandard13
+    Serilog.Sinks.Trace (2.0)
+      Serilog (>= 2.0) - framework: >= net45, >= netstandard13
+      System.Diagnostics.TraceSource (>= 4.0) - framework: >= netstandard13
     SimpleInjector (3.2.4)
       NETStandard.Library (>= 1.6) - framework: >= netstandard10
       System.ComponentModel (>= 4.0.1) - framework: >= netstandard10
@@ -489,7 +524,7 @@ NUGET
       Microsoft.NETCore.Platforms (>= 1.0.1) - framework: dnxcore50, >= netstandard10
       Microsoft.NETCore.Targets (>= 1.0.1) - framework: dnxcore50, >= netstandard10
       System.Runtime (>= 4.1) - framework: dnxcore50, >= netstandard10
-    System.Diagnostics.TraceSource (4.0) - framework: >= netstandard15
+    System.Diagnostics.TraceSource (4.0) - framework: >= netstandard13
       Microsoft.NETCore.Platforms (>= 1.0.1) - framework: >= netstandard13
       runtime.native.System (>= 4.0) - framework: >= netstandard13
       System.Collections (>= 4.0.11) - framework: >= netstandard13

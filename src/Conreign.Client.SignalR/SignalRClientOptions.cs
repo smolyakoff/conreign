@@ -3,5 +3,6 @@
     public class SignalRClientOptions
     {
         public string ConnectionUri { get; set; }
+        public bool IsDebug { get; set; }
     }
 }
