@@ -7,7 +7,7 @@ using Conreign.Core.Utility;
 
 namespace Conreign.Core.Gameplay.Editor
 {
-    public class MapEditor
+    public sealed class MapEditor
     {
         private readonly Map _map;
         private readonly IEnumerator<string> _namesEnumerator;

@@ -1,14 +1,22 @@
-﻿namespace Conreign.Api.Configuration
+﻿using System;
+using Conreign.Client.Orleans;
+using Orleans.Runtime.Configuration;
+
+namespace Conreign.Api.Configuration
 {
     public class ConreignApiOptions
     {
-        public ConreignApiOptions()
+        public ConreignApiOptions(IOrleansClientInitializer orleansClientInitializer)
         {
+            if (orleansClientInitializer == null)
+            {
+                throw new ArgumentNullException(nameof(orleansClientInitializer));
+            }
+            OrleansClientInitializer = orleansClientInitializer;
             Path = string.Empty;
-            OrleansClientConfigFilePath = "OrleansClientConfiguration.xml";
         }
 
         public string Path { get; set; }
-        public string OrleansClientConfigFilePath { get; set; }
+        public IOrleansClientInitializer OrleansClientInitializer { get; }
     }
 }

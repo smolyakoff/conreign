@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Conreign.Core.Contracts.Communication;
+using Orleans;
 
 namespace Conreign.Core.Gameplay.AI.Behaviours
 {
@@ -13,7 +14,7 @@ namespace Conreign.Core.Gameplay.AI.Behaviours
                 context.ReadableId,
                 context.UserId == null ? "Anonymous" : context.UserId.ToString(),
                 @event);
-            return Task.CompletedTask;
+            return TaskCompleted.Completed;
         }
     }
 }

@@ -24,7 +24,7 @@ namespace Conreign.Api
                 throw new ArgumentNullException(nameof(options));
             }
             container.Register(() => Log.Logger, Lifestyle.Singleton);
-            container.Register(() => OrleansClient.Initialize(options.OrleansClientConfigFilePath).Result,
+            container.Register(() => OrleansClient.Initialize(options.OrleansClientInitializer).Result,
                 Lifestyle.Singleton);
             container.RegisterCollection<HubPipelineModule>(new[] {Assembly.GetExecutingAssembly()});
             RegisterHubs(container);

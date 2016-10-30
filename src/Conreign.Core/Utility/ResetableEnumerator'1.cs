@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Conreign.Core.Utility
 {
-    public class ResetableEnumerator<T> : IEnumerator<T>
+    public sealed class ResetableEnumerator<T> : IEnumerator<T>
     {
         private readonly Func<IEnumerable<T>> _reset;
         private IEnumerator<T> _current;
@@ -19,6 +20,8 @@ namespace Conreign.Core.Utility
             _current = reset().GetEnumerator();
         }
 
+        [SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")]
+        [SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")]
         public void Dispose()
         {
             _current.Dispose();

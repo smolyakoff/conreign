@@ -7,6 +7,7 @@ using Conreign.Core.Contracts.Gameplay.Data;
 using Conreign.Core.Contracts.Gameplay.Events;
 using Conreign.Core.Gameplay.Validators;
 using Conreign.Core.Utility;
+using Orleans;
 
 namespace Conreign.Core.Gameplay
 {
@@ -55,7 +56,7 @@ namespace Conreign.Core.Gameplay
             {
                 _state.Game = null;
             }
-            return Task.CompletedTask;
+            return TaskCompleted.Completed;
         }
 
         public Task Handle(GameStarted.Server @event)
@@ -64,7 +65,7 @@ namespace Conreign.Core.Gameplay
             {
                 _state.Game = @event.Game;
             }
-            return Task.CompletedTask;
+            return TaskCompleted.Completed;
         }
 
         public Task UpdateOptions(PlayerOptionsData options)

@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Conreign.Core.Contracts.Gameplay.Events;
+using Orleans;
 
 namespace Conreign.Core.Gameplay.AI.Behaviours
 {
@@ -8,7 +9,7 @@ namespace Conreign.Core.Gameplay.AI.Behaviours
         public Task Handle(IBotNotification<GameEnded> notification)
         {
             notification.Context.Complete();
-            return Task.CompletedTask;
+            return TaskCompleted.Completed;
         }
     }
 }

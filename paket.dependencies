@@ -13,6 +13,7 @@ nuget System.Reactive.Linq
 nuget System.IdentityModel.Tokens.Jwt
 
 nuget Serilog.Sinks.Literate
+nuget Serilog.Sinks.AzureTableStorage
 nuget Polly
 nuget FluentValidation
 nuget JWT
@@ -24,9 +25,11 @@ nuget MongoDB.Driver
 nuget Microsoft.Orleans.OrleansCodeGenerator.Build
 nuget Microsoft.Orleans.Server
 nuget Microsoft.Orleans.OrleansSQLUtils
+nuget Microsoft.Orleans.OrleansAzureUtils
 nuget Microsoft.Orleans.Client
 
+nuget Microsoft.Owin.Host.SystemWeb
 nuget Microsoft.Owin.Cors
-nuget Microsoft.AspNet.SignalR.Core
+nuget Microsoft.Owin.Diagnostics
 nuget Microsoft.AspNet.SignalR.Client
 nuget Microsoft.AspNet.SignalR.SelfHost

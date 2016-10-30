@@ -1,3 +1,4 @@
+System.Reactive.Core
 System.Reactive.Linq
 Microsoft.Tpl.Dataflow
 Serilog

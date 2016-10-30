@@ -14,6 +14,7 @@ using Conreign.Core.Gameplay.Battle;
 using Conreign.Core.Gameplay.Validators;
 using Conreign.Core.Presence;
 using Conreign.Core.Utility;
+using Orleans;
 
 namespace Conreign.Core.Gameplay
 {
@@ -102,7 +103,7 @@ namespace Conreign.Core.Gameplay
             state.WaitingFleets.Add(fleet);
             var planet = _map.GetPlanetByNameOrNull(fleet.From);
             planet.Ships -= fleet.Ships;
-            return Task.CompletedTask;
+            return TaskCompleted.Completed;
         }
 
         public Task CancelFleet(Guid userId, FleetCancelationData fleetCancelation)
@@ -118,7 +119,7 @@ namespace Conreign.Core.Gameplay
             var validator = new CancelFleetValidator(waitingFleets.Count);
             fleetCancelation.EnsureIsValid(validator);
             waitingFleets.RemoveAt(fleetCancelation.Index);
-            return Task.CompletedTask;
+            return TaskCompleted.Completed;
         }
 
         public Task EndTurn(Guid userId)
@@ -171,7 +172,7 @@ namespace Conreign.Core.Gameplay
             _state.Turn = 0;
             _map = new Map(_state.Map);
             _hub = new Hub(_state.Hub, _topic);
-            return Task.CompletedTask;
+            return TaskCompleted.Completed;
         }
 
         public async Task CalculateTurn()
@@ -235,7 +236,7 @@ namespace Conreign.Core.Gameplay
                 .Count(x => x.Statistics.DeathTurn == null);
             if (alivePlayerCount > 1)
             {
-                return Task.CompletedTask;
+                return TaskCompleted.Completed;
             }
             _state.IsEnded = true;
             _state.IsStarted = false;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices.ComTypes;
 using Conreign.Api.Configuration;
 using Conreign.Api.Infrastructure;
 using Microsoft.AspNet.SignalR;
@@ -22,6 +23,14 @@ namespace Conreign.Api
             }
             var container = new Container();
             container.RegisterConreignApi(options);
+            var hubConfiguration = ConfigureSignalR(container);
+            builder.UseWelcomePage("/");
+            builder.MapSignalR(options.Path, hubConfiguration);
+            return builder;
+        }
+
+        private static HubConfiguration ConfigureSignalR(Container container)
+        {
             var hubConfiguration = new HubConfiguration
             {
                 EnableDetailedErrors = true
@@ -32,8 +41,8 @@ namespace Conreign.Api
             {
                 pipeline.AddModule(module);
             }
-            builder.MapSignalR(options.Path, hubConfiguration);
-            return builder;
+
+            return hubConfiguration;
         }
     }
 }

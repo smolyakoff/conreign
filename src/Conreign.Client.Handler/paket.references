@@ -1,5 +1,4 @@
 System.Reactive.Core
-Microsoft.Tpl.Dataflow
 MediatR
 SimpleInjector
 AutoMapper

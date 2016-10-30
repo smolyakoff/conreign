@@ -68,7 +68,7 @@ namespace Conreign.Api.Hubs
             var removed = Handlers.TryRemove(Context.ConnectionId, out hubConnection);
             if (!removed)
             {
-                return Task.CompletedTask;
+                return TaskCompleted.Completed;
             }
             hubConnection.Subscription.Dispose();
             hubConnection.Handler.Dispose();

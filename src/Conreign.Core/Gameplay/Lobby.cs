@@ -12,6 +12,7 @@ using Conreign.Core.Contracts.Gameplay.Events;
 using Conreign.Core.Contracts.Presence;
 using Conreign.Core.Gameplay.Editor;
 using Conreign.Core.Presence;
+using Orleans;
 
 namespace Conreign.Core.Gameplay
 {
@@ -51,7 +52,7 @@ namespace Conreign.Core.Gameplay
         public Task Handle(GameEnded @event)
         {
             Reset();
-            return Task.CompletedTask;
+            return TaskCompleted.Completed;
         }
 
         public Task Notify(ISet<Guid> userIds, params IEvent[] events)

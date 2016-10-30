@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Threading.Tasks;
 using Conreign.Core.Contracts.Client;
 using Conreign.Core.Contracts.Client.Exceptions;
@@ -11,11 +10,13 @@ namespace Conreign.Client.Orleans
     public sealed class OrleansClient : IClient, IDisposable
     {
         private readonly IGrainFactory _factory;
+        private readonly IOrleansClientInitializer _initializer;
         private bool _isDisposed;
 
-        private OrleansClient(IGrainFactory factory)
+        private OrleansClient(IGrainFactory factory, IOrleansClientInitializer initializer)
         {
             _factory = factory;
+            _initializer = initializer;
         }
 
         public async Task<IClientConnection> Connect(Guid connectionId)
@@ -26,37 +27,26 @@ namespace Conreign.Client.Orleans
 
         public void Dispose()
         {
-            if (_isDisposed || !GrainClient.IsInitialized)
-            {
-                return;
-            }
             _isDisposed = true;
-            GrainClient.Uninitialize();
+            _initializer.Uninitialize();
         }
 
-        public static Task<OrleansClient> Initialize(string configFilePath)
+        public static Task<OrleansClient> Initialize(IOrleansClientInitializer initializer)
         {
-            if (string.IsNullOrEmpty(configFilePath))
+            if (initializer == null)
             {
-                throw new ArgumentException("Config file path cannot be null or empty.", nameof(configFilePath));
+                throw new ArgumentNullException(nameof(initializer));
             }
-            if (!File.Exists(configFilePath))
-            {
-                throw new ArgumentException($"Orleans client config not found at: {Path.GetFullPath(configFilePath)}.");
-            }
-            if (!GrainClient.IsInitialized)
-            {
-                var policy = Policy
+            var policy = Policy
                     .Handle<Exception>()
-                    .WaitAndRetry(5, attempt => TimeSpan.FromSeconds(attempt*5));
-                var result = policy.ExecuteAndCapture(() => GrainClient.Initialize(configFilePath));
-                if (result.Outcome == OutcomeType.Failure)
-                {
-                    throw new ConnectionException($"Failed to connect to the cluster: {result.FinalException.Message}",
-                        result.FinalException);
-                }
+                    .WaitAndRetry(5, attempt => TimeSpan.FromSeconds(attempt * 5));
+            var result = policy.ExecuteAndCapture(initializer.Initialize);
+            if (result.Outcome == OutcomeType.Failure)
+            {
+                throw new ConnectionException($"Failed to connect to the cluster: {result.FinalException.Message}",
+                    result.FinalException);
             }
-            var client = new OrleansClient(GrainClient.GrainFactory);
+            var client = new OrleansClient(GrainClient.GrainFactory, initializer);
             return Task.FromResult(client);
         }
 

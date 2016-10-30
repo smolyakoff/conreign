@@ -16,7 +16,7 @@ namespace Conreign.Client.Orleans
     public class OrleansClientConnection : IClientConnection
     {
         private readonly IGrainFactory _factory;
-        private readonly ISubject<IClientEvent> _subject;
+        private readonly Subject<IClientEvent> _subject;
         private bool _isDisposed;
         private StreamSubscriptionHandle<IClientEvent> _stream;
 
@@ -94,13 +94,13 @@ namespace Conreign.Client.Orleans
         private Task OnNext(IClientEvent @event, StreamSequenceToken token)
         {
             _subject.OnNext(@event);
-            return Task.CompletedTask;
+            return TaskCompleted.Completed;
         }
 
         private Task OnError(Exception exception)
         {
             _subject.OnError(exception);
-            return Task.CompletedTask;
+            return TaskCompleted.Completed;
         }
 
         private async Task OnCompleted()

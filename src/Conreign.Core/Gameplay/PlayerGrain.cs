@@ -75,7 +75,7 @@ namespace Conreign.Core.Gameplay
 
         public Task Listen()
         {
-            return Task.CompletedTask;
+            return TaskCompleted.Completed;
         }
 
         public Task Handle(GameEnded @event)
@@ -108,7 +108,7 @@ namespace Conreign.Core.Gameplay
             {
                 State.Lobby = GrainFactory.GetGrain<ILobbyGrain>(roomId);
             }
-            return Task.CompletedTask;
+            return TaskCompleted.Completed;
         }
     }
 }

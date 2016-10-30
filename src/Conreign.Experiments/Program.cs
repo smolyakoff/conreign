@@ -12,6 +12,7 @@ using Conreign.Core.Contracts.Gameplay.Data;
 using Conreign.Core.Gameplay.AI;
 using Conreign.Core.Gameplay.AI.Battle;
 using Conreign.Core.Gameplay.AI.Behaviours;
+using Orleans.Runtime.Configuration;
 using Serilog;
 
 namespace Conreign.Experiments
@@ -48,7 +49,9 @@ namespace Conreign.Experiments
 
         private static async Task RunHandler()
         {
-            var client = await OrleansClient.Initialize("OrleansClientConfiguration.xml");
+            var config = ClientConfiguration.LoadFromFile("OrleansClientConfiguration.xml");
+            var host = new OrleansClientInitializer(config);
+            var client = await OrleansClient.Initialize(host);
             using (var connection = await client.Connect(Guid.NewGuid()))
             {
                 var handler = new ClientHandler(connection);
@@ -97,7 +100,9 @@ namespace Conreign.Experiments
 
         private static async Task RunOrleansBot(string roomId, int i, int total)
         {
-            var client = await OrleansClient.Initialize("OrleansClientConfiguration.xml");
+            var config = ClientConfiguration.LoadFromFile("OrleansClientConfiguration.xml");
+            var host = new OrleansClientInitializer(config);
+            var client = await OrleansClient.Initialize(host);
             using (var connection = await client.Connect(Guid.NewGuid()))
             {
                 await RunBot(connection, roomId, i, total);

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
 using Conreign.Client.Handler.Handlers.Common;
 using Conreign.Core.Contracts.Client;
 using Conreign.Core.Contracts.Communication;
@@ -13,7 +12,6 @@ namespace Conreign.Client.Handler
     {
         private readonly IClientConnection _connection;
         private readonly IMediator _mediator;
-        private readonly ActionBlock<WorkItem> _processor;
         private bool _isDisposed;
 
         public ClientHandler(IClientConnection connection)
@@ -26,7 +24,6 @@ namespace Conreign.Client.Handler
             container.RegisterClientMediator();
             _connection = connection;
             _mediator = container.GetInstance<IMediator>();
-            _processor = new ActionBlock<WorkItem>(Process);
         }
 
         public ClientHandler(IClientConnection connection, IMediator mediator)
@@ -41,7 +38,6 @@ namespace Conreign.Client.Handler
             }
             _connection = connection;
             _mediator = mediator;
-            _processor = new ActionBlock<WorkItem>(Process);
         }
 
         public IObservable<IClientEvent> Events => _connection.Events;
@@ -57,10 +53,11 @@ namespace Conreign.Client.Handler
             {
                 throw new ArgumentNullException(nameof(metadata));
             }
-            var source = new TaskCompletionSource<object>();
-            var workItem = new WorkItem(source, command, typeof(T), metadata);
-            _processor.Post(workItem);
-            var result = await source.Task;
+            var traceId = Guid.NewGuid().ToString();
+            var context = new HandlerContext(_connection, metadata, traceId);
+            var envelopeType = typeof(CommandEnvelope<,>).MakeGenericType(command.GetType(), typeof(T));
+            var envelope = Activator.CreateInstance(envelopeType, command, context);
+            var result = await _mediator.SendAsync((dynamic)envelope);
             return (T) result;
         }
 
@@ -70,7 +67,6 @@ namespace Conreign.Client.Handler
             {
                 return;
             }
-            _processor.Complete();
             _connection.Dispose();
             _isDisposed = true;
         }
@@ -81,41 +77,6 @@ namespace Conreign.Client.Handler
             {
                 throw new ObjectDisposedException("GameHandler");
             }
-        }
-
-        private async Task Process(WorkItem workItem)
-        {
-            try
-            {
-                var traceId = Guid.NewGuid().ToString();
-                var context = new HandlerContext(_connection, workItem.Metadata, traceId);
-                var envelopeType = typeof(CommandEnvelope<,>).MakeGenericType(workItem.Request.GetType(),
-                    workItem.ResponseType);
-                var envelope = Activator.CreateInstance(envelopeType, workItem.Request, context);
-                var result = await _mediator.SendAsync((dynamic) envelope);
-                workItem.CompletionSource.SetResult(result);
-            }
-            catch (Exception ex)
-            {
-                workItem.CompletionSource.SetException(ex);
-            }
-        }
-
-        private class WorkItem
-        {
-            public WorkItem(TaskCompletionSource<object> completionSource, object request, Type responseType,
-                Metadata metadata)
-            {
-                CompletionSource = completionSource;
-                Request = request;
-                Metadata = metadata;
-                ResponseType = responseType;
-            }
-
-            public TaskCompletionSource<object> CompletionSource { get; }
-            public object Request { get; }
-            public Type ResponseType { get; }
-            public Metadata Metadata { get; }
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Conreign.Core.Contracts.Gameplay.Data;
 using Conreign.Core.Contracts.Gameplay.Events;
 using Conreign.Core.Gameplay.AI.Battle;
+using Orleans;
 
 namespace Conreign.Core.Gameplay.AI.Behaviours
 {
@@ -29,7 +30,7 @@ namespace Conreign.Core.Gameplay.AI.Behaviours
         public Task Handle(IBotNotification<GameEnded> notification)
         {
             _ended = true;
-            return Task.CompletedTask;
+            return TaskCompleted.Completed;
         }
 
         public async Task Handle(IBotNotification<GameStarted> notification)
@@ -50,10 +51,10 @@ namespace Conreign.Core.Gameplay.AI.Behaviours
             var @event = notification.Event;
             if (@event.UserId != context.UserId)
             {
-                return Task.CompletedTask;
+                return TaskCompleted.Completed;
             }
             _ended = true;
-            return Task.CompletedTask;
+            return TaskCompleted.Completed;
         }
 
         public async Task Handle(IBotNotification<TurnCalculationEnded> notification)
