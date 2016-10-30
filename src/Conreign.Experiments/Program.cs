@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 using Conreign.Client.Handler;
 using Conreign.Client.Orleans;
 using Conreign.Client.SignalR;
-using Conreign.Core.AI;
-using Conreign.Core.AI.Battle;
-using Conreign.Core.AI.Behaviours;
 using Conreign.Core.Contracts.Client;
 using Conreign.Core.Contracts.Client.Messages;
 using Conreign.Core.Contracts.Gameplay.Data;
+using Conreign.Core.Gameplay.AI;
+using Conreign.Core.Gameplay.AI.Battle;
+using Conreign.Core.Gameplay.AI.Behaviours;
 using Orleans.Runtime.Configuration;
 using Serilog;
 
@@ -25,11 +25,15 @@ namespace Conreign.Experiments
                 .WriteTo.LiterateConsole()
                 .MinimumLevel.Debug()
                 .CreateLogger();
-            //Simulate();
-            //TestHandler().Wait();
-            TestSignalR().Wait();
+            Simulate();
+            //TestHandler();
             Console.WriteLine("Press a key to exit...");
             Console.ReadLine();
+        }
+
+        private static void TestHandler()
+        {
+            RunHandler().Wait();
         }
 
         private static void Simulate()
@@ -43,27 +47,7 @@ namespace Conreign.Experiments
             Task.WaitAll(tasks);
         }
 
-        private static async Task TestSignalR()
-        {
-            try
-            {
-                var options = new SignalRClientOptions("http://localhost:9000")
-                {
-                    IsDebug = false
-                };
-                var client = new SignalRClient(options);
-                using (var connection = await client.Connect(Guid.NewGuid()))
-                {
-                    var loginResult = await connection.Login();
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Logger.Error(ex, "SignalR client error: {Message}", ex.Message);
-            }
-        }
-
-        private static async Task TestHandler()
+        private static async Task RunHandler()
         {
             var config = ClientConfiguration.LoadFromFile("OrleansClientConfiguration.xml");
             var host = new OrleansClientInitializer(config);
@@ -106,10 +90,7 @@ namespace Conreign.Experiments
         private static async Task RunSignalRBot(string roomId, int i, int total)
         {
             ServicePointManager.DefaultConnectionLimit = 500;
-            var options = new SignalRClientOptions("http://localhost")
-            {
-                IsDebug = false
-            };
+            var options = new SignalRClientOptions {ConnectionUri = "http://localhost:9000"};
             var client = new SignalRClient(options);
             using (var connection = await client.Connect(Guid.NewGuid()))
             {
@@ -133,12 +114,13 @@ namespace Conreign.Experiments
             var isLeader = i == 0;
             var name = isLeader ? "Leader" : $"Bot-{i}";
             Console.WriteLine($"Connection id: {connection.Id}");
-            var options = new RankingBotBattleStrategyOptions(0.8, 0.2, 1);
+            var options = new NaiveBotBattleStrategyOptions(0.8, 0.2, 1);
             var behaviours = new List<IBotBehaviour>
             {
                 new LoginBehaviour(),
-                new JoinRoomBehaviour(roomId,  isLeader ? TimeSpan.Zero : TimeSpan.FromSeconds(0.5)),
-                new BattleBehaviour(new RankingBotBattleStrategy(options)),
+                new LogBehaviour(),
+                new JoinRoomBehaviour(roomId, name, isLeader ? TimeSpan.Zero : TimeSpan.FromSeconds(0.5)),
+                new BattleBehaviour(new NaiveBotBattleStrategy(options)),
                 new StopOnGameEndBehaviour()
             };
             if (isLeader)
@@ -147,7 +129,8 @@ namespace Conreign.Experiments
             }
             using (var bot = new Bot(name, connection, behaviours.ToArray()))
             {
-                await bot.Run();
+                bot.Start();
+                await bot.Completion;
             }
         }
 

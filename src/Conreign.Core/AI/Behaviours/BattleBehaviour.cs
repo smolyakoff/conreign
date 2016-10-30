@@ -1,13 +1,12 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Conreign.Core.AI.Battle;
 using Conreign.Core.Contracts.Gameplay.Data;
 using Conreign.Core.Contracts.Gameplay.Events;
-using Conreign.Core.Gameplay;
-using Serilog;
+using Conreign.Core.Gameplay.AI.Battle;
+using Orleans;
 
-namespace Conreign.Core.AI.Behaviours
+namespace Conreign.Core.Gameplay.AI.Behaviours
 {
     public class BattleBehaviour :
         IBotBehaviour<TurnCalculationEnded>,
@@ -67,10 +66,7 @@ namespace Conreign.Core.AI.Behaviours
                 return;
             }
             _map = @event.Map;
-            using (context.Logger.BeginTimedOperation("Bot.Think"))
-            {
-                await Think(context);
-            };
+            await Think(context);
         }
 
         private async Task Think(BotContext context)

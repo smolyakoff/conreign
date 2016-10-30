@@ -16,9 +16,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{B075363C-E3AD-45C0-9387-1735127D03DE}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		build.bat = build.bat
+		build.fsx = build.fsx
+		config.json = config.json
 		paket.dependencies = paket.dependencies
 		paket.lock = paket.lock
-		versions.json = versions.json
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Orleans.MongoStorage", "src\Microsoft.Orleans.MongoStorage\Microsoft.Orleans.MongoStorage.csproj", "{BA953785-1EFC-461E-9227-AD3E4C07EE7C}"
@@ -46,35 +48,6 @@ EndProject
 Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "Conreign.Api.Azure", "src\Conreign.Api.Azure\Conreign.Api.Azure.ccproj", "{287775A1-6A4A-4B0C-A3BD-C56BCCE90D31}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Api.Host.Azure", "src\Conreign.Api.Host.Azure\Conreign.Api.Host.Azure.csproj", "{A29CEA9B-0EA4-487F-838E-25CB696276DF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.LoadTest", "src\Conreign.LoadTest\Conreign.LoadTest.csproj", "{434AFA37-5C10-42CA-922F-F9772FDC8574}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Cluster", "src\Conreign.Cluster\Conreign.Cluster.csproj", "{93FBA3E0-25AD-498F-A17E-B79BE6410CFB}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Utility.Configuration", "src\Conreign.Utility.Configuration\Conreign.Utility.Configuration.csproj", "{33D5CDCB-B448-4D96-A956-5BC731BEF3FA}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{7F373F25-6B85-4A02-9AEF-D643EFF04378}"
-	ProjectSection(SolutionItems) = preProject
-		config\api.config.json = config\api.config.json
-		config\api.emulator.config.json = config\api.emulator.config.json
-		config\api.production.config.json = config\api.production.config.json
-		config\cli.config.json = config\cli.config.json
-		config\load-test-2x4.production.config.json = config\load-test-2x4.production.config.json
-		config\load-test-4x4.production.config.json = config\load-test-4x4.production.config.json
-		config\silo.config.json = config\silo.config.json
-		config\silo.emulator.config.json = config\silo.emulator.config.json
-		config\silo.production.config.json = config\silo.production.config.json
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{E7B4CE72-E772-4EF0-9E83-C66EFB25C425}"
-	ProjectSection(SolutionItems) = preProject
-		tools\azure.fsx = tools\azure.fsx
-		tools\build.fsx = tools\build.fsx
-		tools\config.fsx = tools\config.fsx
-		do.bat = do.bat
-		tools\do.fsx = tools\do.fsx
-		tools\vars.fsx = tools\vars.fsx
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -138,18 +111,6 @@ Global
 		{A29CEA9B-0EA4-487F-838E-25CB696276DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A29CEA9B-0EA4-487F-838E-25CB696276DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A29CEA9B-0EA4-487F-838E-25CB696276DF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{434AFA37-5C10-42CA-922F-F9772FDC8574}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{434AFA37-5C10-42CA-922F-F9772FDC8574}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{434AFA37-5C10-42CA-922F-F9772FDC8574}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{434AFA37-5C10-42CA-922F-F9772FDC8574}.Release|Any CPU.Build.0 = Release|Any CPU
-		{93FBA3E0-25AD-498F-A17E-B79BE6410CFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{93FBA3E0-25AD-498F-A17E-B79BE6410CFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{93FBA3E0-25AD-498F-A17E-B79BE6410CFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{93FBA3E0-25AD-498F-A17E-B79BE6410CFB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{33D5CDCB-B448-4D96-A956-5BC731BEF3FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{33D5CDCB-B448-4D96-A956-5BC731BEF3FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{33D5CDCB-B448-4D96-A956-5BC731BEF3FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{33D5CDCB-B448-4D96-A956-5BC731BEF3FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -171,9 +132,6 @@ Global
 		{5D54B9E4-56B3-4083-BEA1-BB3EA25069C1} = {461F0F71-2CB8-4368-ADEE-329687A05CE3}
 		{287775A1-6A4A-4B0C-A3BD-C56BCCE90D31} = {461F0F71-2CB8-4368-ADEE-329687A05CE3}
 		{A29CEA9B-0EA4-487F-838E-25CB696276DF} = {461F0F71-2CB8-4368-ADEE-329687A05CE3}
-		{434AFA37-5C10-42CA-922F-F9772FDC8574} = {420E0885-10E8-44C7-899B-FF39004DEADE}
-		{93FBA3E0-25AD-498F-A17E-B79BE6410CFB} = {420E0885-10E8-44C7-899B-FF39004DEADE}
-		{33D5CDCB-B448-4D96-A956-5BC731BEF3FA} = {420E0885-10E8-44C7-899B-FF39004DEADE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8

@@ -53,11 +53,8 @@ namespace Conreign.Client.Handler
             {
                 throw new ArgumentNullException(nameof(metadata));
             }
-            if (string.IsNullOrEmpty(metadata.TraceId))
-            {
-                metadata.TraceId = Guid.NewGuid().ToString();
-            }
-            var context = new HandlerContext(_connection, metadata);
+            var traceId = Guid.NewGuid().ToString();
+            var context = new HandlerContext(_connection, metadata, traceId);
             var envelopeType = typeof(CommandEnvelope<,>).MakeGenericType(command.GetType(), typeof(T));
             var envelope = Activator.CreateInstance(envelopeType, command, context);
             var result = await _mediator.SendAsync((dynamic)envelope);

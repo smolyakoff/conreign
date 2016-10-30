@@ -1,7 +1,4 @@
-System.ComponentModel.TypeConverter copy_local: true
-Microsoft.WindowsAzure.ConfigurationManager
-Serilog.Sinks.Trace
-Serilog.Sinks.ElasticSearch
+ Serilog.Sinks.AzureTableStorage
 Microsoft.Orleans.OrleansAzureUtils
 Microsoft.Owin.Cors
 Microsoft.AspNet.SignalR.SelfHost

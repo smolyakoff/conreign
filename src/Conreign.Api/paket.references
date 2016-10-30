@@ -1,11 +1,6 @@
-Serilog.Sinks.ElasticSearch
-Serilog.Sinks.Literate
+Serilog
 SimpleInjector
 MediatR
 Microsoft.Orleans.Core
 Microsoft.Owin.Diagnostics
 Microsoft.AspNet.SignalR.Core
-System.ComponentModel.TypeConverter copy_local: true
-Microsoft.Extensions.Configuration.Binder
-Microsoft.Extensions.Configuration.Json
-Microsoft.WindowsAzure.ConfigurationManager

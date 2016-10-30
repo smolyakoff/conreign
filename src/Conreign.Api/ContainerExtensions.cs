@@ -13,22 +13,18 @@ namespace Conreign.Api
 {
     public static class ContainerExtensions
     {
-        public static Container RegisterConreignApi(this Container container, IOrleansClientInitializer initializer, ConreignApiConfiguration configuration)
+        public static Container RegisterConreignApi(this Container container, ConreignApiOptions options)
         {
             if (container == null)
             {
                 throw new ArgumentNullException(nameof(container));
             }
-            if (initializer == null)
+            if (options == null)
             {
-                throw new ArgumentNullException(nameof(initializer));
+                throw new ArgumentNullException(nameof(options));
             }
-            if (configuration == null)
-            {
-                throw new ArgumentNullException(nameof(configuration));
-            }
-            container.Register(() => Log.Logger.ForContext("ApplicationId", "Conreign.Api"), Lifestyle.Singleton);
-            container.Register(() => OrleansClient.Initialize(initializer).Result,
+            container.Register(() => Log.Logger, Lifestyle.Singleton);
+            container.Register(() => OrleansClient.Initialize(options.OrleansClientInitializer).Result,
                 Lifestyle.Singleton);
             container.RegisterCollection<HubPipelineModule>(new[] {Assembly.GetExecutingAssembly()});
             RegisterHubs(container);
