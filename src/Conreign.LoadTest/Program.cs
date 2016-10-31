@@ -29,7 +29,7 @@ namespace Conreign.LoadTest
             {
                 BotOptions = new LoadTestBotOptions
                 {
-                    RoomsCount = 20,
+                    RoomsCount = 10,
                     BotsPerRoomCount = 5
                 }
             };
@@ -44,8 +44,7 @@ namespace Conreign.LoadTest
             var factory = new LoadTestBotFactory(testOptions.BotOptions);
             using (var farm = new BotFarm($"Farm-{Process.GetCurrentProcess().Id}", client, factory))
             {
-                await farm.Start();
-                await farm.Completion;
+                await farm.Run();
             }
         }
     }

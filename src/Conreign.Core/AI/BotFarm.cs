@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Conreign.Core.AI.Events;
 using Conreign.Core.Contracts.Client;
@@ -18,6 +19,7 @@ namespace Conreign.Core.AI
         private bool _isDisposed;
         private IDisposable _logSubscription;
         private readonly ILogger _logger;
+        private CancellationTokenSource _disposalCancellationTokenSource;
 
         public BotFarm(string id, IClient client, IBotFactory botFactory)
         {
@@ -37,45 +39,48 @@ namespace Conreign.Core.AI
             _client = client;
             _botFactory = botFactory;
             _bots = new List<Bot>();
-            Completion = Task.FromResult(0);
             _logger = Log.Logger.ForContext("BotFarmId", id);
         }
 
-        public async Task Start()
+        public async Task Run(CancellationToken? cancellationToken = null)
         {
             EnsureIsNotDisposed();
+            cancellationToken = cancellationToken ?? CancellationToken.None;
+            _disposalCancellationTokenSource = new CancellationTokenSource();
+            var token = CancellationTokenSource.CreateLinkedTokenSource(
+                cancellationToken.Value,
+                _disposalCancellationTokenSource.Token).Token;
             _logger.Information("[{BotFarmId}] Farm is starting...");
-            while (_botFactory.CanCreate)
+            Task[] tasks;
+            using (_logger.BeginTimedOperation("Creating bot factory"))
             {
-                var connectionId = Guid.NewGuid();
-                var connection = await _client.Connect(connectionId);
-                var bot = _botFactory.Create(connection);
-                _bots.Add(bot);
-                _logger.Information("[{BotFarmId}] Bot {BotId} is connected. Connection id is {ConnectionId}.",
-                    _id,
-                    bot.Id,
-                    connectionId);
-            }
-            Completion = Task.WhenAll(_bots.Select(x => x.Completion));
-            _logSubscription = _bots.Select(x => x.Events).Merge().Subscribe(OnNext, OnError, OnCompleted);
-            foreach (var bot in _bots)
-            {
-                bot.Start();
+                while (_botFactory.CanCreate)
+                {
+                    var connectionId = Guid.NewGuid();
+                    var connection = await _client.Connect(connectionId);
+                    var bot = _botFactory.Create(connection);
+                    _bots.Add(bot);
+                    _logger.Information("[{BotFarmId}] Bot {BotId} is connected. Connection id is {ConnectionId}.",
+                        _id,
+                        bot.Id,
+                        connectionId);
+                }
+                _logSubscription = _bots
+                    .Select(x => x.Events.Catch<IBotEvent, Exception>(e =>
+                    {
+                        OnError(e);
+                        return Observable.Empty<IBotEvent>();
+                    }))
+                    .Merge()
+                    .Subscribe(OnNext, OnError, OnCompleted);
+                tasks = _bots.Select(x => x.Run(token)).ToArray();
             }
             _logger.Information("[{BotFarmId}] Farm is started.");
-        }
-
-        public void Stop()
-        {
-            EnsureIsNotDisposed();
-            _logger.Information("[{BotFarmId}] Farm stop requested...");
-            foreach (var bot in _bots)
+            using (_logger.BeginTimedOperation("Running bot factory"))
             {
-                bot.Stop();
+                await Task.WhenAll(tasks);
             }
         }
-
-        public Task Completion { get; private set; }
 
         public void Dispose()
         {
@@ -93,6 +98,7 @@ namespace Conreign.Core.AI
             {
                 return;
             }
+            _disposalCancellationTokenSource.Cancel();
             foreach (var bot in _bots)
             {
                 bot.Dispose();
@@ -117,14 +123,14 @@ namespace Conreign.Core.AI
             _logger.Information("[{BotFarmId}] Event stream completed.", _id);
         }
 
-        private void OnError(Exception ex)
-        {
-            _logger.Error(ex, "[{BotFarmId}] Error: {Message}", _id, ex.Message);
-        }
-
         private void OnNext(IBotEvent @event)
         {
             _logger.Debug("[{BotFarmId}]. Event: {@Event}.", _id, @event);
+        }
+
+        private void OnError(Exception ex)
+        {
+            _logger.Error(ex, "[{BotFarmId}] Error: {Message}", _id, ex.Message);
         }
     }
 }

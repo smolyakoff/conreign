@@ -26,10 +26,10 @@ namespace Conreign.Core.AI.Behaviours
             }
             catch (Exception ex)
             {
-                context.Logger.Error(ex, "[Bot:{BotId}:{UserId}] Failed to handle {EventType}: {Message}",
-                    context.BotId,
+                context.Logger.Error(ex, "[{ReadableId}-{UserId}]: Failed to handle {EventType}: {Message}",
+                    context.ReadableId,
                     context.UserId,
-                    notification.Event.GetType().Name,
+                    notification.Event.GetType(),
                     ex.Message);
                 context.Complete(ex);
             }

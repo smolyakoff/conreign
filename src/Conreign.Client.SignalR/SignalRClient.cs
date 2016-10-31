@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Conreign.Core.Contracts.Client;
 using Conreign.Core.Contracts.Client.Exceptions;
 using Microsoft.AspNet.SignalR.Client;
-using Microsoft.AspNet.SignalR.Client.Transports;
 using Polly;
 using Polly.Retry;
 using Serilog;

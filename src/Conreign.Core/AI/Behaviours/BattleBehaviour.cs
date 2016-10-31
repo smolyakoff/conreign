@@ -5,6 +5,7 @@ using Conreign.Core.AI.Battle;
 using Conreign.Core.Contracts.Gameplay.Data;
 using Conreign.Core.Contracts.Gameplay.Events;
 using Conreign.Core.Gameplay;
+using Serilog;
 
 namespace Conreign.Core.AI.Behaviours
 {
@@ -66,13 +67,10 @@ namespace Conreign.Core.AI.Behaviours
                 return;
             }
             _map = @event.Map;
-            context.Logger.Verbose("[{ReadableId}-{UserId}] Started thinking.", 
-                context.ReadableId, 
-                context.UserId);
-            await Think(context);
-            context.Logger.Verbose("[{ReadableId}-{UserId}] Finished thinking.",
-                context.ReadableId,
-                context.UserId);
+            using (context.Logger.BeginTimedOperation("Bot thinking"))
+            {
+                await Think(context);
+            };
         }
 
         private async Task Think(BotContext context)

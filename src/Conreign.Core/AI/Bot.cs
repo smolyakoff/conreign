@@ -2,23 +2,31 @@
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Conreign.Core.AI.Behaviours;
 using Conreign.Core.AI.Events;
 using Conreign.Core.Contracts.Client;
 using Conreign.Core.Contracts.Communication;
+using Serilog;
+using SerilogMetrics;
 
 namespace Conreign.Core.AI
 {
     public class Bot : IDisposable
     {
         private readonly BotContext _context;
-        private readonly DispatcherBehaviour _dispatcher;
+        private readonly IBotBehaviour<IClientEvent> _entryBehaviour;
         private readonly IDisposable _subscription;
         private Subject<IBotEvent> _subject;
         private bool _isDisposed;
         private ActionBlock<IClientEvent> _processor;
+        private Exception _exception;
+        private CancellationTokenSource _cancellationTokenSource;
+        private CancellationToken _cancellationToken;
+        private IGaugeMeasure _queueGauge;
+        private readonly ICounterMeasure _receivedEventsCounter;
 
         public Bot(string readableId, IClientConnection connection, params IBotBehaviour[] behaviours)
         {
@@ -30,7 +38,6 @@ namespace Conreign.Core.AI
             {
                 throw new ArgumentNullException(nameof(connection));
             }
-            _processor = CreateProcessor();
             _context = new BotContext(readableId, connection, Complete, Notify);
             _subscription = connection.Events.Subscribe(OnClientEvent, OnClientException, OnClientCompleted);
             var allBehaviours = behaviours.ToList();
@@ -38,51 +45,48 @@ namespace Conreign.Core.AI
             {
                 allBehaviours.Add(new StopBehaviour());
             }
-            _dispatcher = new DispatcherBehaviour(allBehaviours);
-            _subject = new Subject<IBotEvent>();
-            Events = _subject.AsObservable();
+            
+            var dispatcher = new DispatcherBehaviour(allBehaviours);
+            var retry = new RetryBehaviour(dispatcher);
+            var errorHandling = new ErrorHandlingBehaviour(retry);
+            var diagnostics = new DiagnosticsBehaviour(errorHandling);
+            _entryBehaviour = diagnostics;
+            Events = Observable.Empty<IBotEvent>();
+            _receivedEventsCounter = _context.Logger.CountOperation("BotReceivedEvents");
         }
 
         public string Id => _context.ReadableId;
-        public Task Completion => _processor.Completion;
         public IClientConnection Connection => _context.Connection;
-        public bool IsStarted { get; private set; }
-        public bool IsStopped => !IsStarted;
         public IObservable<IBotEvent> Events { get; private set; }
+
+        public async Task Run(CancellationToken? cancellationToken = null)
+        {
+            EnsureIsNotDisposed();
+            cancellationToken = cancellationToken ?? CancellationToken.None;
+            _cancellationTokenSource = new CancellationTokenSource();
+            _cancellationToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken.Value, _cancellationTokenSource.Token).Token;
+            var processorOptions = new ExecutionDataflowBlockOptions
+            {
+                BoundedCapacity = 100
+            };
+            _processor = new ActionBlock<IClientEvent>(Process, processorOptions);
+            _subject?.Dispose();
+            _subject = new Subject<IBotEvent>();
+            _queueGauge = _context.Logger.GaugeOperation("Bot processing queue size", "items", () => _processor.InputCount);
+            _receivedEventsCounter.Reset();
+            Events = _subject.AsObservable();
+            Notify(new BotStarted());
+            await _processor.Completion;
+            if (_exception != null)
+            {
+                throw _exception;
+            }
+        }
 
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
-        }
-
-        public void Start()
-        {
-            EnsureIsNotDisposed();
-            if (IsStarted)
-            {
-                return;
-            }
-            IsStarted = true;
-            if (_processor.Completion.IsCompleted)
-            {
-                _processor = CreateProcessor();
-                _subject.Dispose();
-                _subject = new Subject<IBotEvent>();
-                Events = _subject.AsObservable();
-            }
-            Notify(new BotStarted());
-        }
-
-        public void Stop()
-        {
-            EnsureIsNotDisposed();
-            if (IsStopped)
-            {
-                return;
-            }
-            IsStarted = false;
-            Notify(new BotStopped());
         }
 
         protected virtual void Dispose(bool disposing)
@@ -95,8 +99,11 @@ namespace Conreign.Core.AI
             {
                 return;
             }
+            _cancellationTokenSource.Cancel();
+            _subject?.Dispose();
             _subscription?.Dispose();
             _processor?.Complete();
+            _subject = null;
             _processor = null;
             _isDisposed = true;
         }
@@ -108,19 +115,32 @@ namespace Conreign.Core.AI
 
         private void OnClientException(Exception exception)
         {
-            _subject.OnError(exception);
+            _exception = exception;
+            Complete();
         }
 
         private void OnClientCompleted()
         {
-            _subject.OnError(new InvalidOperationException("Client stream unexpectedly completed."));
+            if (_isDisposed)
+            {
+                return;
+            }
+            _exception = new InvalidOperationException("Client stream unexpectedly completed.");
             Complete();
         }
 
-        private void Complete()
+        private void Complete(Exception exception = null)
         {
             _processor.Complete();
-            _subject.OnCompleted();
+            _exception = _exception ?? exception;
+            if (_exception == null)
+            {
+                _subject.OnCompleted();
+            }
+            else
+            {
+                _subject.OnError(_exception);
+            }
         }
 
         private void Notify(IBotEvent @event)
@@ -133,20 +153,37 @@ namespace Conreign.Core.AI
         {
             if (@event == null)
             {
+                _context.Logger.Error("[{ReadableId}-{UserId}]: Received null event.", _context.ReadableId, _context.UserId);
                 return;
             }
-            _context.Logger.Debug("[{ReadableId}-{UserId}] Processor queue length is {QueueLength}.", 
-                _context.ReadableId, 
-                _context.UserId, 
-                _processor.InputCount);
+            _receivedEventsCounter.Increment();
+            _queueGauge.Write();
+            _context.Logger.Debug("[{ReadableId}-{UserId}]: Received {@Event}",
+                _context.ReadableId,
+                _context.UserId,
+                @event);
             var posted = _processor.Post(@event);
             if (!posted)
             {
-                _context.Logger.Warning("[{ReadableId}-{UserId}] Failed to handle event of type {EventType}.",
+                _context.Logger.Warning("[{ReadableId}-{UserId}] Failed to handle event of type {EventType}. Queue length exceeded.",
                     _context.ReadableId, 
                     _context.UserId, 
                     @event.GetType().Name);
+                _exception = new InvalidOperationException("Queue is too large");
+                Complete();
             }
+        }
+
+        private async Task Process(IClientEvent @event)
+        {
+            if (_cancellationToken.IsCancellationRequested)
+            {
+                _context.Logger.Warning("[{ReadableId}-{UserId}] Bot execution cancelled.");
+                _exception = new TaskCanceledException("Bot execution was cancelled.");
+                Complete();
+                return;
+            }
+            await _entryBehaviour.Handle(new BotNotification<IClientEvent>(@event, _context));
         }
 
         private void EnsureIsNotDisposed()
@@ -154,33 +191,6 @@ namespace Conreign.Core.AI
             if (_isDisposed)
             {
                 throw new ObjectDisposedException($"Bot[${_context.Connection.Id}]");
-            }
-        }
-
-        private ActionBlock<IClientEvent> CreateProcessor()
-        {
-            var options = new ExecutionDataflowBlockOptions
-            {
-                BoundedCapacity = 100
-            };
-            return new ActionBlock<IClientEvent>(Process, options);
-        }
-
-        private async Task Process(IClientEvent @event)
-        {
-            try
-            {
-                await _dispatcher.Handle(new BotNotification<IClientEvent>(@event, _context));
-            }
-            catch (Exception ex)
-            {
-                _context.Logger.Error(ex, 
-                    "Failed to handle [{ReadableId}-{UserId}] event with {Message}.", 
-                    _context.ReadableId, 
-                    _context.UserId, 
-                    ex.Message);
-                //TODO: not an error, just a problem :)
-                //_subject.OnError(ex);
             }
         }
     }
