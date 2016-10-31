@@ -25,15 +25,11 @@ namespace Conreign.Experiments
                 .WriteTo.LiterateConsole()
                 .MinimumLevel.Debug()
                 .CreateLogger();
-            Simulate();
-            //TestHandler();
+            //Simulate();
+            //TestHandler().Wait();
+            TestSignalR().Wait();
             Console.WriteLine("Press a key to exit...");
             Console.ReadLine();
-        }
-
-        private static void TestHandler()
-        {
-            RunHandler().Wait();
         }
 
         private static void Simulate()
@@ -47,7 +43,28 @@ namespace Conreign.Experiments
             Task.WaitAll(tasks);
         }
 
-        private static async Task RunHandler()
+        private static async Task TestSignalR()
+        {
+            try
+            {
+                var options = new SignalRClientOptions
+                {
+                    ConnectionUri = "http://localhost:9000",
+                    IsDebug = false
+                };
+                var client = new SignalRClient(options);
+                using (var connection = await client.Connect(Guid.NewGuid()))
+                {
+                    var loginResult = await connection.Login();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error(ex, "SignalR client error: {Message}", ex.Message);
+            }
+        }
+
+        private static async Task TestHandler()
         {
             var config = ClientConfiguration.LoadFromFile("OrleansClientConfiguration.xml");
             var host = new OrleansClientInitializer(config);
@@ -124,7 +141,6 @@ namespace Conreign.Experiments
             var behaviours = new List<IBotBehaviour>
             {
                 new LoginBehaviour(),
-                new LogBehaviour(),
                 new JoinRoomBehaviour(roomId,  isLeader ? TimeSpan.Zero : TimeSpan.FromSeconds(0.5)),
                 new BattleBehaviour(new NaiveBotBattleStrategy(options)),
                 new StopOnGameEndBehaviour()
@@ -135,8 +151,7 @@ namespace Conreign.Experiments
             }
             using (var bot = new Bot(name, connection, behaviours.ToArray()))
             {
-                bot.Start();
-                await bot.Completion;
+                await bot.Run();
             }
         }
 

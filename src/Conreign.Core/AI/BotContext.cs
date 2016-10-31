@@ -8,10 +8,10 @@ namespace Conreign.Core.AI
 {
     public class BotContext
     {
-        private readonly Action _complete;
+        private readonly Action<Exception> _complete;
         private readonly Action<IBotEvent> _notify;
 
-        internal BotContext(string readableId, IClientConnection connection, Action complete, Action<IBotEvent> notify)
+        internal BotContext(string readableId, IClientConnection connection, Action<Exception> complete, Action<IBotEvent> notify)
         {
             if (connection == null)
             {
@@ -46,9 +46,9 @@ namespace Conreign.Core.AI
             _notify(@event);
         }
 
-        public void Complete()
+        public void Complete(Exception exception = null)
         {
-            _complete();
+            _complete(exception);
         }
     }
 }

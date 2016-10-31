@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Conreign.Core.Contracts.Exceptions;
+using Conreign.Core.Contracts.Client.Exceptions;
 using Conreign.Core.Contracts.Validation;
 using FluentValidation;
 using FluentValidation.Results;

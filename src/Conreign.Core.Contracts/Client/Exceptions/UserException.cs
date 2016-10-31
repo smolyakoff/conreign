@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Conreign.Core.Contracts.Exceptions
+namespace Conreign.Core.Contracts.Client.Exceptions
 {
     [Serializable]
-    public abstract class UserException : Exception
+    public abstract class UserException : ClientException
     {
         internal UserException(string message) : base(message)
         {

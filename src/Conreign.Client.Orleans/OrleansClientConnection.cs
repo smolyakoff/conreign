@@ -111,7 +111,6 @@ namespace Conreign.Client.Orleans
                 _isDisposed = true;
             }
             await _stream.UnsubscribeAsync();
-            _subject.OnCompleted();
         }
 
         private void EnsureIsNotDisposed()

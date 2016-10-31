@@ -43,7 +43,6 @@ namespace Conreign.Core.AI.LoadTest
             var behaviours = new List<IBotBehaviour>
                             {
                                 new LoginBehaviour(),
-                                new LogBehaviour(),
                                 new JoinRoomBehaviour(room, isLeader ? TimeSpan.Zero : _options.JoinRoomDelay),
                                 new BattleBehaviour(_battleStrategy),
                                 new StopOnGameEndBehaviour()

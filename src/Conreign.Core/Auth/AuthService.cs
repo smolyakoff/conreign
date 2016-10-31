@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Conreign.Core.Auth.Serialization;
 using Conreign.Core.Contracts.Auth;
 using Conreign.Core.Contracts.Auth.Errors;
-using Conreign.Core.Contracts.Exceptions;
+using Conreign.Core.Contracts.Client.Exceptions;
 using JWT;
 using Serilog;
 

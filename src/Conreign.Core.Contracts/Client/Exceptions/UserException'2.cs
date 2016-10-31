@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Conreign.Core.Contracts.Exceptions
+namespace Conreign.Core.Contracts.Client.Exceptions
 {
     [Serializable]
     public class UserException<T, TDetails> : UserException<T> where T : struct

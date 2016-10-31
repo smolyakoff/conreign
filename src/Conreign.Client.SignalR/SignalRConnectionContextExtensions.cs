@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Conreign.Core.Contracts.Client;
+using Conreign.Core.Contracts.Client.Exceptions;
+using Conreign.Core.Contracts.Client.Messages;
 using MediatR;
+using Microsoft.AspNet.SignalR.Client;
+using Newtonsoft.Json.Linq;
 
 namespace Conreign.Client.SignalR
 {
@@ -22,13 +26,36 @@ namespace Conreign.Client.SignalR
                 Meta = context.Metadata,
                 Payload = command
             };
-            if (typeof(T) != typeof(Unit))
+            try
             {
-                var response = await context.Hub.Invoke<MessageEnvelope>("Send", envelope).ConfigureAwait(false);
-                return (T) response.Payload;
+                if (typeof(T) != typeof(Unit))
+                {
+                    var response = await context.Hub.Invoke<MessageEnvelope>("Send", envelope).ConfigureAwait(false);
+                    return (T) response.Payload;
+                }
+                await context.Hub.Invoke("Post", envelope);
+                return default(T);
             }
-            await context.Hub.Invoke("Post", envelope);
-            return default(T);
+            catch (HubException ex)
+            {
+                var jError =  ex.ErrorData as JObject;
+                if (jError == null)
+                {
+                    throw new ServerErrorException(ex);
+                }
+                var typeToken = jError["$nettype"];
+                if (typeToken == null)
+                {
+                    throw new ServerErrorException(ex);
+                }
+                var type = Type.GetType(typeToken.ToString());
+                var error = jError.ToObject(type) as UserError;
+                if (error == null)
+                {
+                    throw new ServerErrorException(ex);
+                }
+                throw error.ToUserException();
+            }
         }
     }
 }

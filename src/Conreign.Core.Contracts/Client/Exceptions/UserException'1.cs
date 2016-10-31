@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Conreign.Core.Contracts.Exceptions
+namespace Conreign.Core.Contracts.Client.Exceptions
 {
     [Serializable]
-    public class UserException<T> : Exception where T : struct
+    public class UserException<T> : UserException where T : struct
     {
         public UserException(T type, string message = null) : base(message ?? $"[{type.GetType().Name}]: {type}.")
         {
