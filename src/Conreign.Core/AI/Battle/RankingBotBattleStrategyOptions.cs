@@ -2,9 +2,9 @@
 
 namespace Conreign.Core.AI.Battle
 {
-    public class NaiveBotBattleStrategyOptions
+    public class RankingBotBattleStrategyOptions
     {
-        public NaiveBotBattleStrategyOptions(double visionFactor, double riskFactor, double clevernessFactor)
+        public RankingBotBattleStrategyOptions(double visionFactor, double riskFactor, double clevernessFactor)
         {
             if (visionFactor <= 0 || visionFactor > 1)
             {

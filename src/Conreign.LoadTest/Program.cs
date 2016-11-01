@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
 using Conreign.Client.SignalR;
@@ -29,7 +28,7 @@ namespace Conreign.LoadTest
             {
                 BotOptions = new LoadTestBotOptions
                 {
-                    RoomsCount = 10,
+                    RoomsCount = 50,
                     BotsPerRoomCount = 5
                 }
             };

@@ -6,7 +6,7 @@ namespace Conreign.LoadTest
     {
         public LoadTestOptions()
         {
-            ConnectionUri = "http://localhost";
+            ConnectionUri = "http://localhost:3000";
             BotOptions = new LoadTestBotOptions();
         }
 
