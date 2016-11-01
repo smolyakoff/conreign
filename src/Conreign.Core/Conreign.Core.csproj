@@ -36,6 +36,7 @@
     <Compile Include="..\Common\TaskCompleted.cs">
       <Link>TaskCompleted.cs</Link>
     </Compile>
+    <Compile Include="AI\Battle\NaiveBotBattleStrategy.cs" />
     <Compile Include="AI\Behaviours\ErrorHandlingBehaviour.cs" />
     <Compile Include="AI\Behaviours\RetryBehaviour.cs" />
     <Compile Include="AI\Behaviours\StopBehaviour.cs" />
@@ -67,7 +68,7 @@
     <Compile Include="AI\BotContext.cs" />
     <Compile Include="AI\Bot.cs" />
     <Compile Include="AI\Battle\IBotBattleStrategy.cs" />
-    <Compile Include="AI\Battle\NaiveBotBattleStrategyOptions.cs" />
+    <Compile Include="AI\Battle\RankingBotBattleStrategyOptions.cs" />
     <Compile Include="Communication\StreamExtensions.cs" />
     <Compile Include="AI\BotNotification%271.cs" />
     <Compile Include="AI\Events\IBotEvent.cs" />
@@ -78,7 +79,7 @@
     <Compile Include="Utility\PropertyComparer%272.cs" />
     <Compile Include="AI\Battle\ReadOnlyMap.cs" />
     <Compile Include="AI\Battle\ReadOnlyPlanetData.cs" />
-    <Compile Include="AI\Battle\NaiveBotBattleStrategy.cs" />
+    <Compile Include="AI\Battle\RankingBotBattleStrategy.cs" />
     <Compile Include="Gameplay\Battle\BattleFleet.cs" />
     <Compile Include="Gameplay\Battle\BattleOutcome.cs" />
     <Compile Include="Gameplay\Battle\CoinBattleStrategy.cs" />

@@ -19,8 +19,7 @@ namespace Conreign.Core.AI.LoadTest
                 throw new ArgumentNullException(nameof(options));
             }
             _options = options;
-            var battleStrategyOptions = new NaiveBotBattleStrategyOptions(0.8, 0.2, 1);
-            _battleStrategy = new NaiveBotBattleStrategy(battleStrategyOptions);
+            _battleStrategy = new NaiveBotBattleStrategy();
         }
 
         public Bot Create(IClientConnection connection)

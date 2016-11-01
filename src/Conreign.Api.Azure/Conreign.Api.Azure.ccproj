@@ -34,6 +34,7 @@
   <!-- Items for the project -->
   <ItemGroup>
     <ServiceDefinition Include="ServiceDefinition.csdef" />
+    <None Include="ServiceDefinition.Debug.csdef" />
     <ServiceConfiguration Include="ServiceConfiguration.Local.cscfg" />
     <ServiceConfiguration Include="ServiceConfiguration.Production.cscfg" />
   </ItemGroup>
@@ -69,4 +70,19 @@
     <CloudExtensionsDir Condition=" '$(CloudExtensionsDir)' == '' ">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Windows Azure Tools\2.9\</CloudExtensionsDir>
   </PropertyGroup>
   <Import Project="$(CloudExtensionsDir)Microsoft.WindowsAzure.targets" />
+
+  <!-- Service Definition Transform -->
+   <UsingTask TaskName="TransformXml" AssemblyFile="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Web\Microsoft.Web.Publishing.Tasks.dll" />
+  <PropertyGroup>
+    <ServiceDefinitionTransform>ServiceDefinition.$(Configuration).csdef</ServiceDefinitionTransform>
+  </PropertyGroup>
+  <Target Name="TransformServiceDefinition" BeforeTargets="ResolveServiceDefinition" Condition="exists('$(ServiceDefinitionTransform)')">
+    <!-- Generate transformed service config in the intermediate directory -->
+    <TransformXml Source="@(ServiceDefinition)" Destination="$(IntermediateOutputPath)%(Filename)%(Extension)" Transform="$(ServiceDefinitionTransform)" />
+    <!--Force build process to use the transformed configuration file from now on.-->
+    <ItemGroup>
+      <ServiceDefinition Remove="ServiceDefinition.csdef" />
+      <ServiceDefinition Include="$(IntermediateOutputPath)ServiceDefinition.csdef" />
+    </ItemGroup>
+  </Target>
 </Project>

@@ -137,12 +137,12 @@ namespace Conreign.Experiments
             var isLeader = i == 0;
             var name = isLeader ? "Leader" : $"Bot-{i}";
             Console.WriteLine($"Connection id: {connection.Id}");
-            var options = new NaiveBotBattleStrategyOptions(0.8, 0.2, 1);
+            var options = new RankingBotBattleStrategyOptions(0.8, 0.2, 1);
             var behaviours = new List<IBotBehaviour>
             {
                 new LoginBehaviour(),
                 new JoinRoomBehaviour(roomId,  isLeader ? TimeSpan.Zero : TimeSpan.FromSeconds(0.5)),
-                new BattleBehaviour(new NaiveBotBattleStrategy(options)),
+                new BattleBehaviour(new RankingBotBattleStrategy(options)),
                 new StopOnGameEndBehaviour()
             };
             if (isLeader)
