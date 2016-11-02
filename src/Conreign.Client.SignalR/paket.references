@@ -1,6 +1,7 @@
 System.Reactive.Linq
 System.IdentityModel.Tokens.Jwt
 Serilog
+SerilogMetrics
 Polly
 MediatR
 Microsoft.AspNet.SignalR.Client

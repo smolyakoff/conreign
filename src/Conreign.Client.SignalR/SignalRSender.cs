@@ -9,9 +9,6 @@ using Newtonsoft.Json.Linq;
 using Polly;
 using Polly.Retry;
 using Serilog;
-using Serilog.Context;
-using Serilog.Core;
-using Serilog.Core.Enrichers;
 using Serilog.Events;
 
 namespace Conreign.Client.SignalR
@@ -23,7 +20,6 @@ namespace Conreign.Client.SignalR
         private readonly Metadata _metadata;
         private readonly ILogger _logger;
         private readonly RetryPolicy _retryPolicy;
-        private const string OperationDescription = "SignaR.Send";
 
         public SignalRSender(IHubProxy hub, HubConnection hubConnection, Metadata metadata)
         {
@@ -48,51 +44,42 @@ namespace Conreign.Client.SignalR
                 .WaitAndRetryAsync(3, (retry) => TimeSpan.FromSeconds(retry*2));
         }
 
-        public async Task<T> Send<T>(IAsyncRequest<T> command)
+        public Task<T> Send<T>(IAsyncRequest<T> command)
         {
             if (command == null)
             {
                 throw new ArgumentNullException(nameof(command));
             }
-            var meta = new Metadata
-            {
-                AccessToken = _metadata.AccessToken,
-                TraceId = Guid.NewGuid().ToString()
-            };
             var envelope = new MessageEnvelope
             {
-                Meta = meta,
+                Meta = new Metadata
+                {
+                    AccessToken = _metadata.AccessToken,
+                    TraceId = Guid.NewGuid().ToString()
+                },
                 Payload = command
             };
-            var diagnosticProperties = new ILogEventEnricher[]
+            return _retryPolicy.ExecuteAsync(async () =>
             {
-                new PropertyEnricher("ConnectionId", _hubConnection.ConnectionId),
-                new PropertyEnricher("TraceId", meta.TraceId),
-                new PropertyEnricher("CommandType", command.GetType().Name)
-            };
-            using (LogContext.PushProperties(diagnosticProperties))
-            {
-                var result = await _retryPolicy.ExecuteAsync(async () =>
+                try
                 {
-                    try
+                    var id = DiagnosticConstants.SendOperationId(envelope.Payload.GetType());
+                    using (_logger.BeginTimedOperation(DiagnosticConstants.SendOperationDescription, id))
                     {
-                        using (_logger.BeginTimedOperation(OperationDescription))
-                        {
-                            return await SendInternal<T>(envelope);
-                        }
+                        return await SendInternal<T>(envelope);
                     }
-                    catch (Exception ex)
-                    {
-                        var level = ex is UserException ? LogEventLevel.Warning : LogEventLevel.Error;
-                        _logger.Write(level, ex, "[SignalRClient:{ConnectionId}:{TraceId}] {ErrorMessage}",
-                            _hubConnection.ConnectionId,
-                            envelope.Meta.TraceId,
-                            ex.Message);
-                        throw;
-                    }
-                });
-                return result;
-            }
+                }
+                catch (Exception ex)
+                {
+                    var level = ex is UserException ? LogEventLevel.Warning : LogEventLevel.Error;
+                    _logger.Write(level, ex, "[SignalRClient:{ConnectionId}:{TraceId}] {ErrorMessage}",
+                        _hubConnection.ConnectionId,
+                        envelope.Meta.TraceId,
+                        ex.Message);
+                    throw;
+                }
+                
+            });
         }
 
         private async Task<T> SendInternal<T>(MessageEnvelope envelope)

@@ -1,6 +1,5 @@
 ﻿using System;
 using Conreign.Client.Orleans;
-using Orleans.Runtime.Configuration;
 
 namespace Conreign.Api.Configuration
 {

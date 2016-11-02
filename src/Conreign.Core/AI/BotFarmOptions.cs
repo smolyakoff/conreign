@@ -6,7 +6,7 @@ namespace Conreign.Core.AI
     {
         public BotFarmOptions()
         {
-            StartupDelay = TimeSpan.FromSeconds(1);
+            StartupDelay = TimeSpan.FromSeconds(2);
         }
 
         public TimeSpan StartupDelay { get; set; }

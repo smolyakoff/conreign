@@ -34,7 +34,7 @@ namespace Conreign.Core.AI.LoadTest
                 throw new InvalidOperationException($"Expected to create maximum of {total} bots.");
             }
             var roomIndex = _i/_options.BotsPerRoomCount;
-            var room = $"conreign-load-test-{roomIndex}";
+            var room = $"{_options.RoomPrefix}conreign-load-test-{roomIndex}";
             var k = _i%_options.BotsPerRoomCount;
             var isLeader = _i % _options.BotsPerRoomCount == 0;
             var name = isLeader ? "leader" : $"bot-{k}";

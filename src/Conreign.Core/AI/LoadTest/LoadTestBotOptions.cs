@@ -6,6 +6,7 @@ namespace Conreign.Core.AI.LoadTest
     {
         public LoadTestBotOptions()
         {
+            RoomPrefix = string.Empty;
             RoomsCount = 1;
             BotsPerRoomCount = 3;
             NeutralPlanetsCount = 8;
@@ -14,6 +15,7 @@ namespace Conreign.Core.AI.LoadTest
             JoinRoomDelay = TimeSpan.FromSeconds(1);
         }
 
+        public string RoomPrefix { get; set; }
         public int RoomsCount { get; set; }
         public int BotsPerRoomCount { get; set; }
         public int NeutralPlanetsCount { get; set; }
