@@ -15,13 +15,16 @@ namespace Conreign.Client.SignalR
 {
     public sealed class SignalRClientConnection : IClientConnection
     {
-        private readonly SignalRConnectionContext _context;
+        private readonly HubConnection _connection;
+        private readonly IHubProxy _hub;
+        private readonly SignalRSender _sender;
         private readonly IDisposable _disposable;
         private readonly Subject<IClientEvent> _subject;
         private bool _isDisposed;
 
         internal SignalRClientConnection(HubConnection connection, IHubProxy hub)
         {
+
             if (connection == null)
             {
                 throw new ArgumentNullException(nameof(connection));
@@ -30,21 +33,23 @@ namespace Conreign.Client.SignalR
             {
                 throw new ArgumentNullException(nameof(hub));
             }
+            _connection = connection;
+            _hub = hub;
             _subject = new Subject<IClientEvent>();
             Events = _subject.AsObservable();
-            _context = new SignalRConnectionContext(hub, connection, new Metadata());
-            _context.HubConnection.Error += OnConnectionError;
+            _sender = new SignalRSender(hub, connection, new Metadata());
+            connection.Error += OnConnectionError;
             var disposables = new List<IDisposable>
             {
-                _context.Hub.On<MessageEnvelope>("OnNext", e => _subject.OnNext((IClientEvent) e.Payload)),
-                _context.Hub.On<Exception>("OnError", _subject.OnError),
-                _context.Hub.On("OnCompleted", _subject.OnCompleted),
+                hub.On<MessageEnvelope>("OnNext", e => _subject.OnNext((IClientEvent) e.Payload)),
+                hub.On<Exception>("OnError", _subject.OnError),
+                hub.On("OnCompleted", _subject.OnCompleted),
                 connection
             };
             _disposable = new CompositeDisposable(disposables);
         }
 
-        public Guid Id => Guid.Parse(_context.HubConnection.ConnectionId);
+        public Guid Id => Guid.Parse(_connection.ConnectionId);
 
         public IObservable<IClientEvent> Events { get; }
 
@@ -57,9 +62,12 @@ namespace Conreign.Client.SignalR
             EnsureIsNotDisposed();
             var token = new JwtSecurityToken(accessToken);
             var userId = Guid.Parse(token.Subject);
-            var meta = new Metadata {AccessToken = accessToken};
-            var context = new SignalRConnectionContext(_context.Hub, _context.HubConnection, meta);
-            var result = new LoginResult(new UserProxy(context), userId, accessToken);
+            var meta = new Metadata
+            {
+                AccessToken = accessToken
+            };
+            var sender = new SignalRSender(_hub, _connection, meta);
+            var result = new LoginResult(new UserProxy(sender), userId, accessToken);
             return Task.FromResult(result);
         }
 
@@ -67,7 +75,7 @@ namespace Conreign.Client.SignalR
         {
             EnsureIsNotDisposed();
             var login = new LoginCommand();
-            var response = await _context.Send(login);
+            var response = await _sender.Send(login);
             return await Authenticate(response.AccessToken);
         }
 
@@ -77,8 +85,8 @@ namespace Conreign.Client.SignalR
             {
                 return;
             }
-            _context.HubConnection.Error -= OnConnectionError;
-            _context.HubConnection.Stop();
+            _connection.Error -= OnConnectionError;
+            _connection.Stop();
             _disposable.Dispose();
             _isDisposed = true;
         }

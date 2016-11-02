@@ -7,9 +7,9 @@ namespace Conreign.Client.SignalR.Proxies
 {
     internal class UserProxy : IUser
     {
-        private readonly SignalRConnectionContext _context;
+        private readonly SignalRSender _context;
 
-        public UserProxy(SignalRConnectionContext context)
+        public UserProxy(SignalRSender context)
         {
             if (context == null)
             {

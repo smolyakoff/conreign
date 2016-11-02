@@ -8,10 +8,10 @@ namespace Conreign.Client.SignalR.Proxies
 {
     internal class PlayerProxy : IPlayer
     {
-        private readonly SignalRConnectionContext _context;
+        private readonly SignalRSender _context;
         private readonly string _roomId;
 
-        public PlayerProxy(SignalRConnectionContext context, string roomId)
+        public PlayerProxy(SignalRSender context, string roomId)
         {
             if (context == null)
             {

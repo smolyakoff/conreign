@@ -21,6 +21,7 @@ namespace Conreign.Core.AI
         private readonly IDisposable _subscription;
         private Subject<IBotEvent> _subject;
         private bool _isDisposed;
+        private bool _completed;
         private ActionBlock<IClientEvent> _processor;
         private Exception _exception;
         private CancellationTokenSource _cancellationTokenSource;
@@ -69,6 +70,7 @@ namespace Conreign.Core.AI
             {
                 BoundedCapacity = 100
             };
+            _completed = false;
             _processor = new ActionBlock<IClientEvent>(Process, processorOptions);
             _subject?.Dispose();
             _subject = new Subject<IBotEvent>();
@@ -142,6 +144,7 @@ namespace Conreign.Core.AI
             {
                 _subject.OnError(_exception);
             }
+            _completed = true;
         }
 
         private void Notify(IBotEvent @event)
@@ -167,8 +170,7 @@ namespace Conreign.Core.AI
             if (_cancellationToken.IsCancellationRequested)
             {
                 _context.Logger.Warning("[Bot:{BotId}:{UserId}] Bot execution cancelled.");
-                _exception = new TaskCanceledException("Bot execution was cancelled.");
-                Complete();
+                Complete(new TaskCanceledException("Bot execution was cancelled."));
                 return;
             }
             var posted = _processor.Post(@event);
@@ -178,13 +180,16 @@ namespace Conreign.Core.AI
                     _context.BotId, 
                     _context.UserId, 
                     @event.GetType().Name);
-                _exception = new InvalidOperationException("Bot queue is too large.");
-                Complete();
+                Complete(new InvalidOperationException("Bot queue is too large."));
             }
         }
 
         private async Task Process(IClientEvent @event)
         {
+            if (_completed)
+            {
+                return;
+            }
             await _entryBehaviour.Handle(new BotNotification<IClientEvent>(@event, _context));
         }
 

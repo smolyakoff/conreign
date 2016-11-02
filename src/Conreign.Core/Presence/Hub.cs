@@ -114,7 +114,7 @@ namespace Conreign.Core.Presence
             return Notify(ids, events);
         }
 
-        public bool HasMemberOnline(Guid userId)
+        public bool IsOnline(Guid userId)
         {
             return _state.Members.ContainsKey(userId) &&
                    _state.Members[userId].ConnectionIds.Count > 0;

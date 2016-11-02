@@ -47,7 +47,7 @@ namespace Conreign.Core.Gameplay
         public async Task EndTurn(Guid userId)
         {
             await _game.EndTurn(userId);
-            if (!_game.IsAnybodyThinking)
+            if (!_game.IsOnlinePlayersThinking)
             {
                 await CalculateTurnInternal();
             }

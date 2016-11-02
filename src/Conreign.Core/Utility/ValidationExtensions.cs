@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Conreign.Core.Contracts.Client.Exceptions;
 using Conreign.Core.Contracts.Validation;
@@ -25,7 +26,9 @@ namespace Conreign.Core.Utility
             {
                 return;
             }
-            throw UserException.Create(ValidationError.BadInput, results.ToConreignValidationErrorDetails());
+            var messages = results.Errors.Select(x => $"[{x.PropertyName}:{x.ErrorCode}] {x.ErrorMessage}");
+            var message = string.Join(Environment.NewLine, messages);
+            throw UserException.Create(ValidationError.BadInput, results.ToConreignValidationErrorDetails(), message);
         }
 
         public static void EnsureIsValid<T, TValidator>(this T value) where TValidator : IValidator<T>, new()

@@ -79,7 +79,7 @@ namespace Conreign.Core.Gameplay
                 Players = _state.Players,
                 PlayerStatuses = _state.Players
                     .ToDictionary(x => x.UserId,
-                        x => _hub.HasMemberOnline(x.UserId) ? PresenceStatus.Online : PresenceStatus.Offline),
+                        x => _hub.IsOnline(x.UserId) ? PresenceStatus.Online : PresenceStatus.Offline),
                 Map = _state.MapEditor.Map,
                 LeaderUserId = _hub.LeaderUserId,
                 NeutralPlanetsCount = _state.MapEditor.NeutralPlanetsCount
@@ -200,7 +200,7 @@ namespace Conreign.Core.Gameplay
 
         private void EnsureUserIsOnline(Guid userId)
         {
-            if (!_hub.HasMemberOnline(userId))
+            if (!_hub.IsOnline(userId))
             {
                 throw new InvalidOperationException($"User ${userId} is not a online at {_state.RoomId}.");
             }

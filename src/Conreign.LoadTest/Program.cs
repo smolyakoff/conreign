@@ -38,10 +38,8 @@ namespace Conreign.LoadTest
             var clientOptions = new SignalRClientOptions(testOptions.ConnectionUri);
             var client = new SignalRClient(clientOptions);
             var factory = new LoadTestBotFactory(testOptions.BotOptions);
-            using (var farm = new BotFarm($"Farm-{Process.GetCurrentProcess().Id}", client, factory))
-            {
-                await farm.Run();
-            }
+            var farm = new BotFarm($"Farm-{Process.GetCurrentProcess().Id}", client, factory, new BotFarmOptions());
+            await farm.Run();
         }
     }
 }

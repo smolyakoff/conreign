@@ -48,7 +48,10 @@ namespace Conreign.Core.Gameplay
         }
 
         public bool IsEnded => _state.IsEnded;
-        public bool IsAnybodyThinking => _state.PlayerStates.Values.Any(x => x.TurnStatus == TurnStatus.Thinking);
+        public bool IsOnlinePlayersThinking => _state.PlayerStates
+            .Where(kv => _hub.IsOnline(kv.Key))
+            .Select(kv => kv.Value)
+            .Any(p => p.TurnStatus == TurnStatus.Thinking);
         public int Turn => _state.Turn;
 
         public Task Connect(Guid userId, Guid connectionId)
@@ -209,7 +212,7 @@ namespace Conreign.Core.Gameplay
 
         private PresenceStatus GetPresenceStatus(Guid userId)
         {
-            return _hub.HasMemberOnline(userId) ? PresenceStatus.Online : PresenceStatus.Offline;
+            return _hub.IsOnline(userId) ? PresenceStatus.Online : PresenceStatus.Offline;
         }
 
 
@@ -379,7 +382,7 @@ namespace Conreign.Core.Gameplay
 
         private void EnsureUserIsOnline(Guid userId)
         {
-            if (!_hub.HasMemberOnline(userId))
+            if (!_hub.IsOnline(userId))
             {
                 throw new InvalidOperationException("Operation is only allowed for online members.");
             }

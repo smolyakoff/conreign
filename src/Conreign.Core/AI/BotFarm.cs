@@ -74,7 +74,19 @@ namespace Conreign.Core.AI
                 var tasks = new List<Task>();
                 foreach (var bot in bots)
                 {
-                    tasks.Add(bot.Run(cancellationToken));
+                    tasks.Add(Task.Run(async () =>
+                    {
+                        _logger.Information("[BotFarm:{BotFarmId}] Started {BotId}.", _id, bot.Id);
+                        try
+                        {
+                            await bot.Run(cancellationToken);
+                        }
+                        finally
+                        {
+                            _logger.Information("[BotFarm:{BotFarmId}] Stopped {BotId}", _id, bot.Id);
+                        }
+                        
+                    }));
                     await Task.Delay(_options.StartupDelay, cancellationToken.Value);
                 }
                 _logger.Information("[BotFarm:{BotFarmId}] Farm is started.");
