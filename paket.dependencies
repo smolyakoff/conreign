@@ -4,6 +4,10 @@ redirects: on
 nuget FAKE
 nuget FAKE.SQL.X64
 nuget FSharp.Data
+nuget Microsoft.Extensions.Configuration
+nuget Microsoft.Extensions.Configuration.Binder
+nuget Microsoft.Extensions.Configuration.CommandLine
+nuget Microsoft.Extensions.Configuration.Json
 
 nuget xunit
 
@@ -17,6 +21,7 @@ nuget Serilog.Sinks.Literate
 nuget Serilog.Sinks.File
 nuget Serilog.Sinks.AzureTableStorage
 nuget Serilog.Sinks.Seq
+nuget Serilog.Sinks.ElasticSearch
 nuget SerilogMetrics
 nuget Polly
 nuget FluentValidation
