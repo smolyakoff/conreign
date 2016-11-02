@@ -4,7 +4,6 @@ using Conreign.Client.Handler.Handlers.Common;
 using MediatR;
 using Serilog;
 using Serilog.Context;
-using Serilog.Core;
 using Serilog.Core.Enrichers;
 using SerilogMetrics;
 
@@ -16,10 +15,6 @@ namespace Conreign.Client.Handler.Handlers.Decorators
         private readonly ILogger _logger;
         private readonly ICounterMeasure _received;
         private readonly ICounterMeasure _processed;
-        private const string ReceivedCounterName = "Handler.Received";
-        private const string ProcessedCounterName = "Handler.Processed";
-        private const string OperationDescription = "Handler.Handle";
-        private const int CounterResolution = 10;
 
         public DiagnosticsDecorator(IAsyncRequestHandler<CommandEnvelope<TCommand, TResponse>, TResponse> next)
         {
@@ -30,24 +25,21 @@ namespace Conreign.Client.Handler.Handlers.Decorators
             _next = next;
             _logger = Log.Logger.ForContext(GetType());
             _received = Log.Logger.CountOperation(
-                ReceivedCounterName, 
-                resolution: CounterResolution);
+                DiagnosticConstants.ReceivedCommandsCounterName, 
+                resolution: DiagnosticConstants.CommandsCounterResolution);
             _processed = Log.Logger.CountOperation(
-                ProcessedCounterName,
-                resolution: CounterResolution);
+                DiagnosticConstants.ProcessedCommandsCounterName,
+                resolution: DiagnosticConstants.CommandsCounterResolution);
         }
 
         public async Task<TResponse> Handle(CommandEnvelope<TCommand, TResponse> message)
         {
             var context = message.Context;
-            var diagnosticProperties = new ILogEventEnricher[]
-            {
+            using (LogContext.PushProperties(
                 new PropertyEnricher("TraceId", context.Metadata.TraceId),
                 new PropertyEnricher("UserId", context.UserId),
                 new PropertyEnricher("ConnectionId", context.Connection.Id),
-                new PropertyEnricher("CommandType", message.Command.GetType())
-            };
-            using (LogContext.PushProperties(diagnosticProperties))
+                new PropertyEnricher("CommandType", message.Command.GetType())))
             {
                 try
                 {
@@ -58,7 +50,8 @@ namespace Conreign.Client.Handler.Handlers.Decorators
                         message.Command.GetType().Name,
                         message.Command);
                     TResponse response;
-                    using (_logger.BeginTimedOperation(OperationDescription))
+                    var id = DiagnosticConstants.HandleOperationId(context.Metadata.TraceId, message.Command.GetType());
+                    using (_logger.BeginTimedOperation(DiagnosticConstants.HandleOperationDescription, id))
                     {
                         response = await _next.Handle(message);
                     }

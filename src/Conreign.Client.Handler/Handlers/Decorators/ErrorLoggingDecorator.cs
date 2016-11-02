@@ -14,7 +14,6 @@ namespace Conreign.Client.Handler.Handlers.Decorators
         private readonly IAsyncRequestHandler<CommandEnvelope<TCommand, TResponse>, TResponse> _next;
         private readonly ILogger _logger;
         private readonly ICounterMeasure _counter;
-        private const string ErrorsCounterName = "Handler.Errors";
 
         public ErrorLoggingDecorator(IAsyncRequestHandler<CommandEnvelope<TCommand, TResponse>, TResponse> next)
         {
@@ -24,7 +23,7 @@ namespace Conreign.Client.Handler.Handlers.Decorators
             }
             _next = next;
             _logger = Log.Logger.ForContext(GetType());
-            _counter = _logger.CountOperation(ErrorsCounterName);
+            _counter = _logger.CountOperation(DiagnosticConstants.ErrorCounterName);
         }
 
         public async Task<TResponse> Handle(CommandEnvelope<TCommand, TResponse> message)

@@ -33,7 +33,7 @@ namespace Conreign.Client.SignalR
             _subject = new Subject<IClientEvent>();
             Events = _subject.AsObservable();
             _context = new SignalRConnectionContext(hub, connection, new Metadata());
-            //_context.HubConnection.Error += _subject.OnError;
+            _context.HubConnection.Error += OnConnectionError;
             var disposables = new List<IDisposable>
             {
                 _context.Hub.On<MessageEnvelope>("OnNext", e => _subject.OnNext((IClientEvent) e.Payload)),
@@ -77,10 +77,15 @@ namespace Conreign.Client.SignalR
             {
                 return;
             }
-            _context.HubConnection.Error -= _subject.OnError;
+            _context.HubConnection.Error -= OnConnectionError;
             _context.HubConnection.Stop();
             _disposable.Dispose();
             _isDisposed = true;
+        }
+
+        private void OnConnectionError(Exception ex)
+        {
+            _subject.OnNext(new ConnectionProblemDetected(ex));
         }
 
         private void EnsureIsNotDisposed()

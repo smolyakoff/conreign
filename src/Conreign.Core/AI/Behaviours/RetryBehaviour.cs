@@ -28,10 +28,10 @@ namespace Conreign.Core.AI.Behaviours
                     (ex, time) =>
                     {
                         context.Logger.Warning(
-                            "[{ReadableId}-{UserId}]: Retrying event handler {EventType} for the {Retry} time.",
-                            context.ReadableId,
+                            "[Bot:{BotId}:{UserId}]: Retrying handler for {EventType}. Retry number is {Retry}.",
+                            context.BotId,
                             context.UserId,
-                            notification.Event.GetType(),
+                            notification.Event.GetType().Name,
                             i);
                         i++;
                     });

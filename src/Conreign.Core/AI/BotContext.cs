@@ -30,7 +30,6 @@ namespace Conreign.Core.AI
             BotId = readableId;
             Connection = connection;
             Logger = Log.Logger
-                .ForContext(GetType())
                 .ForContext("BotId", readableId)
                 .ForContext("ConnectionId", Connection.Id);
         }

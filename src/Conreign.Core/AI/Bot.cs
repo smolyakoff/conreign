@@ -25,20 +25,20 @@ namespace Conreign.Core.AI
         private Exception _exception;
         private CancellationTokenSource _cancellationTokenSource;
         private CancellationToken _cancellationToken;
-        private IGaugeMeasure _queueGauge;
-        private readonly ICounterMeasure _receivedEventsCounter;
+        private IGaugeMeasure _queueSize;
+        private readonly ICounterMeasure _received;
 
-        public Bot(string readableId, IClientConnection connection, params IBotBehaviour[] behaviours)
+        public Bot(string botId, IClientConnection connection, params IBotBehaviour[] behaviours)
         {
-            if (string.IsNullOrEmpty(readableId))
+            if (string.IsNullOrEmpty(botId))
             {
-                throw new ArgumentException("Readable id cannot be null or empty.", nameof(readableId));
+                throw new ArgumentException("Bot id cannot be null or empty.", nameof(botId));
             }
             if (connection == null)
             {
                 throw new ArgumentNullException(nameof(connection));
             }
-            _context = new BotContext(readableId, connection, Complete, Notify);
+            _context = new BotContext(botId, connection, Complete, Notify);
             _subscription = connection.Events.Subscribe(OnClientEvent, OnClientException, OnClientCompleted);
             var allBehaviours = behaviours.ToList();
             if (!behaviours.OfType<StopBehaviour>().Any())
@@ -52,10 +52,10 @@ namespace Conreign.Core.AI
             var diagnostics = new DiagnosticsBehaviour(errorHandling);
             _entryBehaviour = diagnostics;
             Events = Observable.Empty<IBotEvent>();
-            _receivedEventsCounter = _context.Logger.CountOperation("BotReceivedEvents");
+            _received = _context.Logger.CountOperation(DiagnosticsConstants.BotReceivedEventsCounterName(botId), resolution: DiagnosticsConstants.EventsCounterResolution);
         }
 
-        public string Id => _context.ReadableId;
+        public string Id => _context.BotId;
         public IClientConnection Connection => _context.Connection;
         public IObservable<IBotEvent> Events { get; private set; }
 
@@ -72,8 +72,8 @@ namespace Conreign.Core.AI
             _processor = new ActionBlock<IClientEvent>(Process, processorOptions);
             _subject?.Dispose();
             _subject = new Subject<IBotEvent>();
-            _queueGauge = _context.Logger.GaugeOperation("Bot processing queue size", "items", () => _processor.InputCount);
-            _receivedEventsCounter.Reset();
+            _queueSize = _context.Logger.GaugeOperation(DiagnosticsConstants.BotQueueSizeGaugeName(Id), "items", () => _processor.InputCount);
+            _received.Reset();
             Events = _subject.AsObservable();
             Notify(new BotStarted());
             await _processor.Completion;
@@ -131,6 +131,7 @@ namespace Conreign.Core.AI
 
         private void Complete(Exception exception = null)
         {
+            _processor.Post(new BotStopped());
             _processor.Complete();
             _exception = _exception ?? exception;
             if (_exception == null)
@@ -153,36 +154,37 @@ namespace Conreign.Core.AI
         {
             if (@event == null)
             {
-                _context.Logger.Error("[{ReadableId}-{UserId}]: Received null event.", _context.ReadableId, _context.UserId);
+                _context.Logger.Error("[Bot:{BotId}:{UserId}] Received null event.", _context.BotId, _context.UserId);
                 return;
             }
-            _receivedEventsCounter.Increment();
-            _queueGauge.Write();
-            _context.Logger.Debug("[{ReadableId}-{UserId}]: Received {@Event}",
-                _context.ReadableId,
+            _received.Increment();
+            _queueSize.Write();
+            _context.Logger.Debug("[Bot:{BotId}:{UserId}]: Received {EventType} {@Event}",
+                _context.BotId,
                 _context.UserId,
+                @event.GetType().Name,
                 @event);
+            if (_cancellationToken.IsCancellationRequested)
+            {
+                _context.Logger.Warning("[Bot:{BotId}:{UserId}] Bot execution cancelled.");
+                _exception = new TaskCanceledException("Bot execution was cancelled.");
+                Complete();
+                return;
+            }
             var posted = _processor.Post(@event);
             if (!posted)
             {
-                _context.Logger.Warning("[{ReadableId}-{UserId}] Failed to handle event of type {EventType}. Queue length exceeded.",
-                    _context.ReadableId, 
+                _context.Logger.Warning("[Bot:{BotId}:{UserId}] Failed to accept {EventType}. Queue length exceeded.",
+                    _context.BotId, 
                     _context.UserId, 
                     @event.GetType().Name);
-                _exception = new InvalidOperationException("Queue is too large");
+                _exception = new InvalidOperationException("Bot queue is too large.");
                 Complete();
             }
         }
 
         private async Task Process(IClientEvent @event)
         {
-            if (_cancellationToken.IsCancellationRequested)
-            {
-                _context.Logger.Warning("[{ReadableId}-{UserId}] Bot execution cancelled.");
-                _exception = new TaskCanceledException("Bot execution was cancelled.");
-                Complete();
-                return;
-            }
             await _entryBehaviour.Handle(new BotNotification<IClientEvent>(@event, _context));
         }
 
@@ -190,7 +192,7 @@ namespace Conreign.Core.AI
         {
             if (_isDisposed)
             {
-                throw new ObjectDisposedException($"Bot[${_context.Connection.Id}]");
+                throw new ObjectDisposedException($"Bot[${Id}]");
             }
         }
     }
