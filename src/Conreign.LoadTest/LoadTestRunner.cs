@@ -8,7 +8,6 @@ using Conreign.Core.AI;
 using Conreign.Core.AI.LoadTest;
 using Microsoft.Extensions.Configuration;
 using Serilog;
-using Serilog.Core;
 using Serilog.Events;
 using Serilog.Sinks.Elasticsearch;
 
@@ -26,27 +25,21 @@ namespace Conreign.LoadTest
 
         public static async Task Run(LoadTestOptions options)
         {
-            var loggerConfiguration = new LoggerConfiguration()
-                .WriteTo.LiterateConsole();
-            if (!string.IsNullOrEmpty(options.ElasticSearchUri))
+            var elasticOptions = new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
             {
-                var elasticOptions = new ElasticsearchSinkOptions(new Uri(options.ElasticSearchUri))
-                {
-                    AutoRegisterTemplate = true,
-                    BufferBaseFilename = "logs/elastic-buffer"
-                };
-                loggerConfiguration.WriteTo.Elasticsearch(elasticOptions);
-            }
-            Log.Logger = loggerConfiguration
+                AutoRegisterTemplate = true,
+                BufferBaseFilename = "logs/es-buffer.log"
+            };
+
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.LiterateConsole()
+                //.WriteTo.Seq("http://localhost:5341")
+                //.WriteTo.Elasticsearch(elasticOptions)
                 .MinimumLevel.Is(options.MinimumLogLevel)
-                .Enrich.FromLogContext()
                 .CreateLogger()
-                .ForContext("ApplicationId", "Conreign.LoadTest")
                 .ForContext("InstanceId", options.InstanceId);
-            Serilog.Debugging.SelfLog.Enable(msg => Trace.WriteLine(msg));
             var logger = Log.Logger;
             var botOptions = options.BotOptions;
-            logger.Information("Initialized with the following configuration: {@Configuration}", options);
             ServicePointManager.DefaultConnectionLimit = botOptions.RoomsCount*botOptions.BotsPerRoomCount*2;
             var signalrOptions = new SignalRClientOptions(options.ConnectionUri);
             var client = new SignalRClient(signalrOptions);
