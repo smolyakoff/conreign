@@ -6,6 +6,7 @@ namespace Conreign.Core.Contracts.Gameplay.Events
 {
     [Serializable]
     [Immutable]
+    [Persistent]
     public class PlayerDead : IClientEvent
     {
         public PlayerDead(Guid userId)

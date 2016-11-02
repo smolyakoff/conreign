@@ -17,7 +17,7 @@ namespace Conreign.LoadTest
                 .WriteTo.LiterateConsole(restrictedToMinimumLevel: LogEventLevel.Information)
                 //.WriteTo.File("log.txt", buffered: true, flushToDiskInterval: TimeSpan.FromSeconds(5))
                 .WriteTo.Seq("http://localhost:5341")
-                .MinimumLevel.Verbose()
+                //.MinimumLevel.Verbose()
                 .CreateLogger();
             Run().Wait();
         }
@@ -35,10 +35,7 @@ namespace Conreign.LoadTest
             ServicePointManager.DefaultConnectionLimit = testOptions.BotOptions.RoomsCount*
                                                          testOptions.BotOptions.BotsPerRoomCount*
                                                          2;
-            var clientOptions = new SignalRClientOptions
-            {
-                ConnectionUri = testOptions.ConnectionUri
-            };
+            var clientOptions = new SignalRClientOptions(testOptions.ConnectionUri);
             var client = new SignalRClient(clientOptions);
             var factory = new LoadTestBotFactory(testOptions.BotOptions);
             using (var farm = new BotFarm($"Farm-{Process.GetCurrentProcess().Id}", client, factory))

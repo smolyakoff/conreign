@@ -13,7 +13,8 @@ namespace Conreign.Api.Host
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.LiterateConsole()
                 .MinimumLevel.Debug()
-                .CreateLogger();
+                .CreateLogger()
+                .ForContext("ApplicationId", "Conreign.Api");
             try
             {
                 using (RunOwin())

@@ -41,10 +41,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConnectionProblemDetected.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Proxies\PlayerProxy.cs" />
     <Compile Include="Proxies\UserProxy.cs" />
-    <Compile Include="SerilogTextWriter.cs" />
+    <Compile Include="Logging\SerilogTextWriter.cs" />
     <Compile Include="SignalRClient.cs" />
     <Compile Include="SignalRClientConnection.cs" />
     <Compile Include="SignalRClientOptions.cs" />

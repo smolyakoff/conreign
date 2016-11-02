@@ -27,14 +27,14 @@ namespace Conreign.Core.AI
             }
             _complete = complete;
             _notify = notify;
-            ReadableId = readableId;
+            BotId = readableId;
             Connection = connection;
             Logger = Log.Logger
-                .ForContext("ReadableId", readableId)
+                .ForContext("BotId", readableId)
                 .ForContext("ConnectionId", Connection.Id);
         }
 
-        public string ReadableId { get; }
+        public string BotId { get; }
         public IClientConnection Connection { get; }
         public Guid? UserId { get; set; }
         public IUser User { get; set; }

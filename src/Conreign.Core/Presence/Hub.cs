@@ -85,9 +85,9 @@ namespace Conreign.Core.Presence
                 .SelectMany(x => x.Value.ConnectionIds)
                 .ToHashSet();
             await _topic.Broadcast(targetUserIds, targetConnectionIds, events);
-            // TODO: filter events, not all of them should be saved
             var states = events
                 .OfType<IClientEvent>()
+                .Where(e => e.IsPersistent())
                 .Select(x => new EventState
                 {
                     Recipients = new HashSet<Guid>(userIds),
@@ -165,6 +165,11 @@ namespace Conreign.Core.Presence
             }
             var leaderChanged = new LeaderChanged {UserId = currentLeader};
             yield return leaderChanged;
+        }
+
+        private bool IsPersitent(IClientEvent @event)
+        {
+            throw new NotImplementedException();
         }
     }
 }

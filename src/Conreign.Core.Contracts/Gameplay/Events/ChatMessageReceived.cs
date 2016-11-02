@@ -7,6 +7,7 @@ namespace Conreign.Core.Contracts.Gameplay.Events
 {
     [Serializable]
     [Immutable]
+    [Persistent]
     public class ChatMessageReceived : IClientEvent
     {
         public ChatMessageReceived(Guid senderId, TextMessageData message)

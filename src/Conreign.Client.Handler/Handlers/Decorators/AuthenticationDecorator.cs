@@ -30,7 +30,7 @@ namespace Conreign.Client.Handler.Handlers.Decorators
             {
                 return await _next.Handle(message);
             }
-            var loginResult = await context.Connection.Authenticate(context.AccessToken);
+            var loginResult = await context.Connection.Authenticate(context.Metadata.AccessToken);
             context.UserId = loginResult.UserId;
             context.User = loginResult.User;
             return await _next.Handle(message);

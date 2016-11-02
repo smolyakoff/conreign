@@ -40,6 +40,8 @@
     <Compile Include="AI\Behaviours\ErrorHandlingBehaviour.cs" />
     <Compile Include="AI\Behaviours\RetryBehaviour.cs" />
     <Compile Include="AI\Behaviours\StopBehaviour.cs" />
+    <Compile Include="AI\BotFarmOptions.cs" />
+    <Compile Include="AI\DiagnosticsConstants.cs" />
     <Compile Include="AI\IBotFactory.cs" />
     <Compile Include="AI\LoadTest\LoadTestBotFactory.cs" />
     <Compile Include="AI\BotFarm.cs" />

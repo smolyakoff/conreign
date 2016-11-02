@@ -3,8 +3,7 @@ using MediatR;
 
 namespace Conreign.Client.Handler.Handlers.Common
 {
-    internal class CommandEnvelope<TRequest, TResponse> : IAsyncRequest<TResponse>
-        where TRequest : IAsyncRequest<TResponse>
+    internal class CommandEnvelope<TRequest, TResponse> : IAsyncRequest<TResponse> where TRequest : IAsyncRequest<TResponse>
     {
         public CommandEnvelope(TRequest command, IHandlerContext context)
         {

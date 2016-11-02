@@ -20,8 +20,9 @@ namespace Conreign.Client.Handler
             var assembly = typeof(LoginHandler).Assembly;
             var assemblies = new List<Assembly> {assembly};
             container.Register(typeof(IAsyncRequestHandler<,>), assemblies, Lifestyle.Singleton);
-            container.RegisterDecorator(typeof(IAsyncRequestHandler<,>), typeof(AuthenticationDecorator<,>),
-                Lifestyle.Singleton);
+            container.RegisterDecorator(typeof(IAsyncRequestHandler<,>), typeof(AuthenticationDecorator<,>), Lifestyle.Singleton);
+            container.RegisterDecorator(typeof(IAsyncRequestHandler<,>), typeof(ErrorLoggingDecorator<,>), Lifestyle.Singleton);
+            container.RegisterDecorator(typeof(IAsyncRequestHandler<,>), typeof(DiagnosticsDecorator<,>), Lifestyle.Singleton);
             container.Register(() =>
             {
                 var configuration = new MapperConfiguration(cfg => cfg.AddProfiles(assemblies));

@@ -6,7 +6,6 @@ using Conreign.Core.Contracts.Client.Exceptions;
 using Microsoft.AspNet.SignalR.Client;
 using Polly;
 using Polly.Retry;
-using Serilog;
 
 namespace Conreign.Client.SignalR
 {
@@ -24,6 +23,7 @@ namespace Conreign.Client.SignalR
             }
             _options = options;
             _connections = new ConcurrentDictionary<Guid, Task<IClientConnection>>();
+            _connectionPolicy = 
             _connectionPolicy = Policy
                 .Handle<Exception>()
                 .WaitAndRetryAsync(5, attempt => TimeSpan.FromSeconds(attempt*2));
@@ -36,7 +36,7 @@ namespace Conreign.Client.SignalR
                 var hubConnection = new HubConnection(_options.ConnectionUri)
                 {
                     TraceLevel = TraceLevels.All,
-                    TraceWriter = new SerilogTextWriter(Log.Logger),
+                    TraceWriter = new SerilogTextWriter(),
                     ConnectionId = connectionId.ToString(),
                 };
                 var gameHub = hubConnection.CreateHubProxy("GameHub");

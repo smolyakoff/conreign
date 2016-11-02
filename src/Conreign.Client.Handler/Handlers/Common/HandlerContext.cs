@@ -6,9 +6,7 @@ namespace Conreign.Client.Handler.Handlers.Common
 {
     internal class HandlerContext : IHandlerContext
     {
-        private readonly Metadata _metadata;
-
-        public HandlerContext(IClientConnection connection, Metadata metadata, string traceId)
+        public HandlerContext(IClientConnection connection, Metadata metadata)
         {
             if (connection == null)
             {
@@ -18,19 +16,13 @@ namespace Conreign.Client.Handler.Handlers.Common
             {
                 throw new ArgumentNullException(nameof(metadata));
             }
-            if (string.IsNullOrEmpty(traceId))
-            {
-                throw new ArgumentException("Trace id cannot be null or empty.", nameof(traceId));
-            }
-            _metadata = metadata;
             Connection = connection;
-            TraceId = traceId;
+            Metadata = metadata;
         }
 
-        public string AccessToken => _metadata.AccessToken;
+        public Metadata Metadata { get; }
         public Guid? UserId { get; set; }
         public IUser User { get; set; }
-        public string TraceId { get; }
         public IClientConnection Connection { get; }
     }
 }

@@ -10,7 +10,7 @@ namespace Conreign.Core.AI.Behaviours
     internal sealed class DiagnosticsBehaviour : IBotBehaviour<IClientEvent>
     {
         private readonly IBotBehaviour<IClientEvent> _next;
-        private ICounterMeasure _counter;
+        private ICounterMeasure _processed;
 
         public DiagnosticsBehaviour(IBotBehaviour<IClientEvent> next)
         {
@@ -25,28 +25,28 @@ namespace Conreign.Core.AI.Behaviours
         {
             var context = notification.Context;
             var @event = notification.Event;
-            _counter = _counter ?? context.Logger.CountOperation("BotHandledEvents");
+            _processed = _processed ?? context.Logger.CountOperation(DiagnosticsConstants.BotProcessedEventsCounterName(context.BotId));
             using (LogContext.PushProperty("EventType", @event.GetType()))
             {
-                var id = $"{context.ReadableId}:{context.UserId}:{Guid.NewGuid()}";
-                context.Logger.Debug("[{ReadableId}-{UserId}]: Started to handle {EventType}.",
-                    context.ReadableId,
+                context.Logger.Debug("[Bot:{BotId}:{UserId}] Started to handle {EventType}.",
+                    context.BotId,
                     context.UserId,
-                    @event.GetType());
+                    @event.GetType().Name);
                 try
                 {
-                    using (context.Logger.BeginTimedOperation($"Bot handles client event {@event.GetType().Name}", id))
+                    var id = DiagnosticsConstants.BotHandleEventOperationId(@event.GetType());
+                    using (context.Logger.BeginTimedOperation(DiagnosticsConstants.BotHandleEventOperationDescription, id))
                     {
                         await _next.Handle(notification);
                     }
                 }
                 finally 
                 {
-                    _counter.Increment();
-                    context.Logger.Debug("[{ReadableId}-{UserId}]: Finished to handle {EventType}.",
-                        context.ReadableId,
+                    _processed.Increment();
+                    context.Logger.Debug("[Bot:{BotId}:{UserId}] Finished to handle {EventType}.",
+                        context.BotId,
                         context.UserId,
-                        @event.GetType());
+                        @event.GetType().Name);
                 }
             }
         }

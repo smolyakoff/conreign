@@ -20,16 +20,17 @@ namespace Conreign.Api.Host.Azure
 
         public override bool OnStart()
         {
-            ServicePointManager.DefaultConnectionLimit = 12;
-
+            ServicePointManager.DefaultConnectionLimit = 20;
             var storage = CloudStorageAccount.Parse("UseDevelopmentStorage=true");
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.AzureTableStorage(storage)
                 .WriteTo.Trace()
-                .CreateLogger();
+                .CreateLogger()
+                .ForContext("DeploymentId", RoleEnvironment.DeploymentId)
+                .ForContext("InstanceId", RoleEnvironment.CurrentRoleInstance.Id)
+                .ForContext("ApplicationId", "Conreign.Api");
 
             var endpoint = RoleEnvironment.CurrentRoleInstance.InstanceEndpoints["PublicApi"];
-            // Don't know why azure doesn't provide private port
             var baseUri = $"{endpoint.Protocol}://{endpoint.IPEndpoint}";
             _app = WebApp.Start<Startup>(baseUri);
             Log.Logger.Information("Conreign API is started at {BaseUri}", baseUri);

@@ -65,6 +65,8 @@
     <Compile Include="Client\Metadata.cs" />
     <Compile Include="Client\Serialization\MessageEnvelopeJsonConverter.cs" />
     <Compile Include="Client\Serialization\MessageTypeSerializer.cs" />
+    <Compile Include="Communication\EventExtensions.cs" />
+    <Compile Include="Communication\PersistentAttribute.cs" />
     <Compile Include="Validation\ValidationErrorDetails.cs" />
     <Compile Include="Validation\ValidationFailure.cs" />
     <Compile Include="Communication\Events\Connected.cs" />

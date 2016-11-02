@@ -20,7 +20,7 @@ namespace Conreign.Api.Infrastructure
         protected override void OnIncomingError(ExceptionContext exceptionContext,
             IHubIncomingInvokerContext invokerContext)
         {
-            _logger.Error(exceptionContext.Error, $"Exception occurred: {exceptionContext.Error.Message}");
+            _logger.Error(exceptionContext.Error, $"[SignalR] Exception occurred: {exceptionContext.Error.Message}");
             base.OnIncomingError(exceptionContext, invokerContext);
         }
     }
