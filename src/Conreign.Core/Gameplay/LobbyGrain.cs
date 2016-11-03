@@ -47,14 +47,16 @@ namespace Conreign.Core.Gameplay
             return _lobby.Disconnect(userId, connectionId);
         }
 
-        public Task UpdateGameOptions(Guid userId, GameOptionsData options)
+        public async Task UpdateGameOptions(Guid userId, GameOptionsData options)
         {
-            return _lobby.UpdateGameOptions(userId, options);
+            await _lobby.UpdateGameOptions(userId, options);
+            await WriteStateAsync();
         }
 
-        public Task UpdatePlayerOptions(Guid userId, PlayerOptionsData options)
+        public async Task UpdatePlayerOptions(Guid userId, PlayerOptionsData options)
         {
-            return _lobby.UpdatePlayerOptions(userId, options);
+            await _lobby.UpdatePlayerOptions(userId, options);
+            await WriteStateAsync();
         }
 
         public Task GenerateMap(Guid userId)

@@ -26,6 +26,7 @@ namespace Conreign.Core.Gameplay
             await _game.Initialize(data);
             var gameStarted = new GameStarted.Server(this.AsReference<IGameGrain>());
             await _game.NotifyEverybodyExcept(data.InitiatorId, gameStarted);
+            await WriteStateAsync();
             ScheduleTimer();
         }
 
@@ -50,6 +51,11 @@ namespace Conreign.Core.Gameplay
             if (!_game.IsOnlinePlayersThinking)
             {
                 await CalculateTurnInternal();
+            }
+            if (_game.IsEnded)
+            {
+                DeactivateOnIdle();
+                await ClearStateAsync();
             }
         }
 
@@ -80,6 +86,7 @@ namespace Conreign.Core.Gameplay
 
         public override Task OnActivateAsync()
         {
+            State.RoomId = this.GetPrimaryKeyString();
             var topic = Topic.Room(GetStreamProvider(StreamConstants.ProviderName), this.GetPrimaryKeyString());
             _game = new Game(State, topic, new CoinBattleStrategy());
             return base.OnActivateAsync();
@@ -111,6 +118,7 @@ namespace Conreign.Core.Gameplay
         {
             StopTimer();
             await _game.CalculateTurn();
+            await WriteStateAsync();
             ScheduleTimer();
         }
 

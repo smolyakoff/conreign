@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using Conreign.Core.Contracts.Communication;
 using Microsoft.WindowsAzure.ServiceRuntime;
 using Orleans.Runtime.Configuration;
@@ -13,9 +12,10 @@ namespace Conreign.Host.Azure
 
         public override void Run()
         {
+            var connectionString = RoleEnvironment.GetConfigurationSettingValue("OrleansSystemStorageConnectionString");
             var config = new ClusterConfiguration();
-            config.AddMemoryStorageProvider("Default");
             config.AddMemoryStorageProvider("PubSubStore");
+            config.AddAzureTableStorageProvider("Default", connectionString, useJsonFormat: true);
             config.AddSimpleMessageStreamProvider(StreamConstants.ProviderName);
             _silo = new AzureSilo {DataConnectionConfigurationSettingName = "OrleansSystemStorageConnectionString"};
             var started = _silo.Start(config);
