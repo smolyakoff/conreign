@@ -47,9 +47,8 @@ namespace Conreign.Experiments
         {
             try
             {
-                var options = new SignalRClientOptions
+                var options = new SignalRClientOptions("http://localhost:9000")
                 {
-                    ConnectionUri = "http://localhost:9000",
                     IsDebug = false
                 };
                 var client = new SignalRClient(options);
@@ -107,12 +106,9 @@ namespace Conreign.Experiments
         private static async Task RunSignalRBot(string roomId, int i, int total)
         {
             ServicePointManager.DefaultConnectionLimit = 500;
-            var options = new SignalRClientOptions
+            var options = new SignalRClientOptions("http://localhost")
             {
-                // ConnectionUri = "http://localhost:9000",
-                ConnectionUri = "http://localhost",
-                IsDebug = false,
-                // IsDebug = true
+                IsDebug = false
             };
             var client = new SignalRClient(options);
             using (var connection = await client.Connect(Guid.NewGuid()))
