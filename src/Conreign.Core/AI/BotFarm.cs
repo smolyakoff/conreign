@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Conreign.Core.AI.Events;
 using Conreign.Core.Contracts.Client;
 using Serilog;
+using Serilog.Context;
 
 namespace Conreign.Core.AI
 {
@@ -17,6 +18,7 @@ namespace Conreign.Core.AI
         private readonly IBotFactory _botFactory;
         private readonly BotFarmOptions _options;
         private readonly ILogger _logger;
+        private const string OperationDescription = "BotFarm.Run";
 
         public BotFarm(string id, IClient client, IBotFactory botFactory, BotFarmOptions options)
         {
@@ -81,17 +83,22 @@ namespace Conreign.Core.AI
                         {
                             await bot.Run(cancellationToken);
                         }
+                        catch (Exception ex)
+                        {
+                            _logger.Error(ex, "[BotFarm:{BotFarmId}] Bot stopped with an error: {ErrorMessage}.", _id, ex.Message);
+                            throw;
+                        }
                         finally
                         {
-                            _logger.Information("[BotFarm:{BotFarmId}] Stopped {BotId}", _id, bot.Id);
+                            _logger.Information("[BotFarm:{BotFarmId}] Stopped {BotId}.", _id, bot.Id);
                         }
                         
                     }));
                     await Task.Delay(_options.StartupDelay, cancellationToken.Value);
                 }
                 _logger.Information("[BotFarm:{BotFarmId}] Farm is started.");
-                var id = DiagnosticsConstants.BotFarmRunOperationId(_id);
-                using (_logger.BeginTimedOperation(DiagnosticsConstants.BotFarmRunOperationDescription, id))
+                using (LogContext.PushProperty("BotFarmId", _id))
+                using (_logger.BeginTimedOperation(OperationDescription))
                 {
                     await Task.WhenAll(tasks);
                 }

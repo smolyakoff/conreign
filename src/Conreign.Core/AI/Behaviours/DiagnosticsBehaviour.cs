@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using Conreign.Core.Contracts.Communication;
 using Serilog;
 using Serilog.Context;
+using Serilog.Core;
+using Serilog.Core.Enrichers;
 using SerilogMetrics;
 
 namespace Conreign.Core.AI.Behaviours
@@ -11,6 +13,9 @@ namespace Conreign.Core.AI.Behaviours
     {
         private readonly IBotBehaviour<IClientEvent> _next;
         private ICounterMeasure _processed;
+        private const string OperationDescription = "Bot.Handle";
+        private const string ProcessedCounterName = "Bot.ProcessedEvents";
+        private const int ProcessedCounterResolution = 10;
 
         public DiagnosticsBehaviour(IBotBehaviour<IClientEvent> next)
         {
@@ -25,8 +30,15 @@ namespace Conreign.Core.AI.Behaviours
         {
             var context = notification.Context;
             var @event = notification.Event;
-            _processed = _processed ?? context.Logger.CountOperation(DiagnosticsConstants.BotProcessedEventsCounterName(context.BotId));
-            using (LogContext.PushProperty("EventType", @event.GetType()))
+            _processed = _processed ?? context.Logger.CountOperation(ProcessedCounterName, resolution: ProcessedCounterResolution);
+            var diagnosticProperties = new ILogEventEnricher[]
+            {
+                new PropertyEnricher("ConnectionId", context.Connection.Id),
+                new PropertyEnricher("BotId", context.BotId),
+                new PropertyEnricher("UserId", context.UserId),
+                new PropertyEnricher("EventType", notification.Event.GetType().Name)
+            };
+            using (LogContext.PushProperties(diagnosticProperties))
             {
                 context.Logger.Debug("[Bot:{BotId}:{UserId}] Started to handle {EventType}.",
                     context.BotId,
@@ -34,8 +46,7 @@ namespace Conreign.Core.AI.Behaviours
                     @event.GetType().Name);
                 try
                 {
-                    var id = DiagnosticsConstants.BotHandleEventOperationId(@event.GetType());
-                    using (context.Logger.BeginTimedOperation(DiagnosticsConstants.BotHandleEventOperationDescription, id))
+                    using (context.Logger.BeginTimedOperation(OperationDescription))
                     {
                         await _next.Handle(notification);
                     }
