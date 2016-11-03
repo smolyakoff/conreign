@@ -5,6 +5,7 @@ using Microsoft.Owin.Hosting;
 using Microsoft.WindowsAzure.ServiceRuntime;
 using Microsoft.WindowsAzure.Storage;
 using Serilog;
+using Serilog.Sinks.Elasticsearch;
 
 namespace Conreign.Api.Host.Azure
 {
@@ -21,15 +22,18 @@ namespace Conreign.Api.Host.Azure
         public override bool OnStart()
         {
             ServicePointManager.DefaultConnectionLimit = 20;
-            var storage = CloudStorageAccount.Parse("UseDevelopmentStorage=true");
+            var elasticOptions = new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
+            {
+                AutoRegisterTemplate = true,
+                BufferBaseFilename = "logs/elastic-buffer"
+            };
             Log.Logger = new LoggerConfiguration()
-                .WriteTo.AzureTableStorage(storage)
+                .WriteTo.Elasticsearch(elasticOptions)
                 .WriteTo.Trace()
                 .CreateLogger()
                 .ForContext("DeploymentId", RoleEnvironment.DeploymentId)
                 .ForContext("InstanceId", RoleEnvironment.CurrentRoleInstance.Id)
                 .ForContext("ApplicationId", "Conreign.Api");
-
             var endpoint = RoleEnvironment.CurrentRoleInstance.InstanceEndpoints["PublicApi"];
             var baseUri = $"{endpoint.Protocol}://{endpoint.IPEndpoint}";
             _app = WebApp.Start<Startup>(baseUri);

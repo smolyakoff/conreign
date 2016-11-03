@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Conreign.Core.AI.Behaviours.Events;
-using Conreign.Core.Contracts.Gameplay.Data;
 
 namespace Conreign.Core.AI.Behaviours
 {

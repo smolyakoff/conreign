@@ -28,15 +28,16 @@ namespace Conreign.LoadTest
             var elasticOptions = new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
             {
                 AutoRegisterTemplate = true,
-                BufferBaseFilename = "logs/es-buffer.log"
+                BufferBaseFilename = "logs/elastic-buffer"
             };
 
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.LiterateConsole()
                 //.WriteTo.Seq("http://localhost:5341")
-                //.WriteTo.Elasticsearch(elasticOptions)
+                .WriteTo.Elasticsearch(elasticOptions)
                 .MinimumLevel.Is(options.MinimumLogLevel)
                 .CreateLogger()
+                .ForContext("ApplicationId", "Conreign.LoadTest")
                 .ForContext("InstanceId", options.InstanceId);
             var logger = Log.Logger;
             var botOptions = options.BotOptions;

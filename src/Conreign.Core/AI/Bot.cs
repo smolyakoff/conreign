@@ -28,6 +28,10 @@ namespace Conreign.Core.AI
         private CancellationToken _cancellationToken;
         private IGaugeMeasure _queueSize;
         private readonly ICounterMeasure _received;
+        private const string ReceivedCounterName = "Bot.EventsReceived";
+        public const string QueueSizeGaugeName = "Bot.QueueSize";
+        private const int ReceivedCounterResolution = 10;
+        private const int MaxQueueSize = 500;
 
         public Bot(string botId, IClientConnection connection, params IBotBehaviour[] behaviours)
         {
@@ -52,8 +56,8 @@ namespace Conreign.Core.AI
             var errorHandling = new ErrorHandlingBehaviour(retry);
             var diagnostics = new DiagnosticsBehaviour(errorHandling);
             _entryBehaviour = diagnostics;
+            _received = _context.Logger.CountOperation(ReceivedCounterName, resolution: ReceivedCounterResolution);
             Events = Observable.Empty<IBotEvent>();
-            _received = _context.Logger.CountOperation(DiagnosticsConstants.BotReceivedEventsCounterName(botId), resolution: DiagnosticsConstants.EventsCounterResolution);
         }
 
         public string Id => _context.BotId;
@@ -68,13 +72,13 @@ namespace Conreign.Core.AI
             _cancellationToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken.Value, _cancellationTokenSource.Token).Token;
             var processorOptions = new ExecutionDataflowBlockOptions
             {
-                BoundedCapacity = 100
+                BoundedCapacity = MaxQueueSize
             };
             _completed = false;
             _processor = new ActionBlock<IClientEvent>(Process, processorOptions);
             _subject?.Dispose();
             _subject = new Subject<IBotEvent>();
-            _queueSize = _context.Logger.GaugeOperation(DiagnosticsConstants.BotQueueSizeGaugeName(Id), "items", () => _processor.InputCount);
+            _queueSize = _context.Logger.GaugeOperation(QueueSizeGaugeName, "items", () => _processor.InputCount);
             _received.Reset();
             Events = _subject.AsObservable();
             Notify(new BotStarted());
