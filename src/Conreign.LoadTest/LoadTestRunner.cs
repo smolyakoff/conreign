@@ -26,14 +26,18 @@ namespace Conreign.LoadTest
 
         public static async Task Run(LoadTestOptions options)
         {
-            var elasticOptions = new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
+            var loggerConfiguration = new LoggerConfiguration()
+                .WriteTo.LiterateConsole();
+            if (!string.IsNullOrEmpty(options.ElasticSearchUri))
             {
-                AutoRegisterTemplate = true,
-                BufferBaseFilename = "logs/elastic-buffer"
-            };
-            Log.Logger = new LoggerConfiguration()
-                .WriteTo.LiterateConsole()
-                .WriteTo.Elasticsearch(elasticOptions)
+                var elasticOptions = new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
+                {
+                    AutoRegisterTemplate = true,
+                    BufferBaseFilename = "logs/elastic-buffer"
+                };
+                loggerConfiguration.WriteTo.Elasticsearch(elasticOptions);
+            }
+            Log.Logger = loggerConfiguration
                 .MinimumLevel.Is(options.MinimumLogLevel)
                 .CreateLogger()
                 .ForContext("ApplicationId", "Conreign.LoadTest")
