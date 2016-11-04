@@ -22,7 +22,7 @@ namespace Conreign.Utility.Configuration
             foreach (var key in _options.SettingKeys)
             {
                 var value = CloudConfigurationManager.GetSetting(key);
-                if (string.IsNullOrWhiteSpace(value))
+                if (value == null)
                 {
                     continue;
                 }

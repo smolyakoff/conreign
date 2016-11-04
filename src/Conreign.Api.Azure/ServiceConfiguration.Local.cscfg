@@ -3,15 +3,15 @@
   <Role name="Conreign.Host.Azure">
     <Instances count="1" />
     <ConfigurationSettings>
+      <Setting name="Environment" value="emulator"/>
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
-      <Setting name="OrleansSystemStorageConnectionString" value="UseDevelopmentStorage=true" />
     </ConfigurationSettings>
   </Role>
   <Role name="Conreign.Api.Host.Azure">
     <Instances count="1" />
     <ConfigurationSettings>
+      <Setting name="Environment" value="emulator"/>
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
-      <Setting name="OrleansSystemStorageConnectionString" value="UseDevelopmentStorage=true" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>

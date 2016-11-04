@@ -43,7 +43,6 @@ namespace Conreign.Api
             loggerConfiguration.WriteTo.LiterateConsole();
             var logger = loggerConfiguration
                 .MinimumLevel.Is(apiConfiguration.MinimumLogLevel)
-                .Enrich.FromLogContext()
                 .CreateLogger()
                 .ForContext("ApplicationId", "Conreign.Api");
             return new ConreignApi(orleansConfig, apiConfiguration, logger);

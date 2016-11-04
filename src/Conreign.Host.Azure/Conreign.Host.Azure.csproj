@@ -52,6 +52,14 @@
     <Compile Include="SiloRole.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\config\silo.config.json">
+      <Link>silo.config.json</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\config\silo.emulator.config.json">
+      <Link>silo.emulator.config.json</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="app.config" />
     <None Include="paket.references" />
   </ItemGroup>
@@ -70,6 +78,10 @@
     <AutoUnifyAssemblyReferences>false</AutoUnifyAssemblyReferences>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Conreign.Cluster\Conreign.Cluster.csproj">
+      <Project>{93fba3e0-25ad-498f-a17e-b79be6410cfb}</Project>
+      <Name>Conreign.Cluster</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Conreign.Core.Contracts\Conreign.Core.Contracts.csproj">
       <Project>{00409622-346b-4926-b745-e5f595bd3bb7}</Project>
       <Name>Conreign.Core.Contracts</Name>
@@ -518,11 +530,118 @@
     </When>
   </Choose>
   <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.6.2' Or $(TargetFrameworkVersion) == 'v4.6.3')">
+      <ItemGroup>
+        <Reference Include="System.Collections.NonGeneric">
+          <HintPath>..\..\packages\System.Collections.NonGeneric\ref\net46\System.Collections.NonGeneric.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And ($(TargetFrameworkVersion) == 'v1.3' Or $(TargetFrameworkVersion) == 'v1.4' Or $(TargetFrameworkVersion) == 'v1.5' Or $(TargetFrameworkVersion) == 'v1.6')">
+      <ItemGroup>
+        <Reference Include="System.Collections.NonGeneric">
+          <HintPath>..\..\packages\System.Collections.NonGeneric\ref\netstandard1.3\System.Collections.NonGeneric.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And ($(TargetFrameworkVersion) == 'v1.3' Or $(TargetFrameworkVersion) == 'v1.4' Or $(TargetFrameworkVersion) == 'v1.5' Or $(TargetFrameworkVersion) == 'v1.6')">
+      <ItemGroup>
+        <Reference Include="System.Collections.Specialized">
+          <HintPath>..\..\packages\System.Collections.Specialized\ref\netstandard1.3\System.Collections.Specialized.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And ($(TargetFrameworkVersion) == 'v1.0' Or $(TargetFrameworkVersion) == 'v1.1' Or $(TargetFrameworkVersion) == 'v1.2' Or $(TargetFrameworkVersion) == 'v1.3' Or $(TargetFrameworkVersion) == 'v1.4' Or $(TargetFrameworkVersion) == 'v1.5' Or $(TargetFrameworkVersion) == 'v1.6')">
       <ItemGroup>
         <Reference Include="System.ComponentModel">
           <HintPath>..\..\packages\System.ComponentModel\ref\netstandard1.0\System.ComponentModel.dll</HintPath>
           <Private>False</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.5'">
+      <ItemGroup>
+        <Reference Include="mscorlib">
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.5' Or $(TargetFrameworkVersion) == 'v4.6.2' Or $(TargetFrameworkVersion) == 'v4.6.3')">
+      <ItemGroup>
+        <Reference Include="System.ComponentModel.Primitives">
+          <HintPath>..\..\packages\System.ComponentModel.Primitives\ref\net45\System.ComponentModel.Primitives.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And ($(TargetFrameworkVersion) == 'v1.5' Or $(TargetFrameworkVersion) == 'v1.6')">
+      <ItemGroup>
+        <Reference Include="System.ComponentModel.Primitives">
+          <HintPath>..\..\packages\System.ComponentModel.Primitives\ref\netstandard1.0\System.ComponentModel.Primitives.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.5.1' Or $(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3')">
+      <ItemGroup>
+        <Reference Include="mscorlib">
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.5' Or $(TargetFrameworkVersion) == 'v4.5.1' Or $(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3' Or $(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1')">
+      <ItemGroup>
+        <Reference Include="System.ComponentModel.TypeConverter">
+          <HintPath>..\..\packages\System.ComponentModel.TypeConverter\ref\net45\System.ComponentModel.TypeConverter.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.6.2' Or $(TargetFrameworkVersion) == 'v4.6.3')">
+      <ItemGroup>
+        <Reference Include="System.ComponentModel.TypeConverter">
+          <HintPath>..\..\packages\System.ComponentModel.TypeConverter\ref\net462\System.ComponentModel.TypeConverter.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And ($(TargetFrameworkVersion) == 'v1.1' Or $(TargetFrameworkVersion) == 'v1.2' Or $(TargetFrameworkVersion) == 'v1.3' Or $(TargetFrameworkVersion) == 'v1.4')">
+      <ItemGroup>
+        <Reference Include="System.ComponentModel.TypeConverter">
+          <HintPath>..\..\packages\System.ComponentModel.TypeConverter\ref\netstandard1.0\System.ComponentModel.TypeConverter.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And ($(TargetFrameworkVersion) == 'v1.5' Or $(TargetFrameworkVersion) == 'v1.6')">
+      <ItemGroup>
+        <Reference Include="System.ComponentModel.TypeConverter">
+          <HintPath>..\..\packages\System.ComponentModel.TypeConverter\ref\netstandard1.5\System.ComponentModel.TypeConverter.dll</HintPath>
+          <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
       </ItemGroup>

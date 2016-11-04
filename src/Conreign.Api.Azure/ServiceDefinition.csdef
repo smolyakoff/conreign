@@ -4,7 +4,7 @@
   <WorkerRole name="Conreign.Host.Azure" vmsize="Small">
     <ConfigurationSettings>
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" />
-      <Setting name="OrleansSystemStorageConnectionString" />
+      <Setting name="Environment"/>
     </ConfigurationSettings>
     <Endpoints>
       <InternalEndpoint name="OrleansSiloEndpoint" protocol="tcp" port="11111" />
@@ -15,7 +15,7 @@
   <WorkerRole name="Conreign.Api.Host.Azure" vmsize="Small">
     <ConfigurationSettings>
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" />
-      <Setting name="OrleansSystemStorageConnectionString" />
+      <Setting name="Environment"/>
     </ConfigurationSettings>
     <Endpoints>
       <InputEndpoint name="PublicApi" protocol="http" port="80" localPort="3000"/>

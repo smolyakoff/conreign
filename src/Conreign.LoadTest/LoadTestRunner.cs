@@ -8,6 +8,7 @@ using Conreign.Core.AI;
 using Conreign.Core.AI.LoadTest;
 using Microsoft.Extensions.Configuration;
 using Serilog;
+using Serilog.Core;
 using Serilog.Events;
 using Serilog.Sinks.Elasticsearch;
 
@@ -30,15 +31,14 @@ namespace Conreign.LoadTest
                 AutoRegisterTemplate = true,
                 BufferBaseFilename = "logs/elastic-buffer"
             };
-
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.LiterateConsole()
-                //.WriteTo.Seq("http://localhost:5341")
                 .WriteTo.Elasticsearch(elasticOptions)
                 .MinimumLevel.Is(options.MinimumLogLevel)
                 .CreateLogger()
                 .ForContext("ApplicationId", "Conreign.LoadTest")
                 .ForContext("InstanceId", options.InstanceId);
+            Serilog.Debugging.SelfLog.Enable(msg => Debug.WriteLine(msg));
             var logger = Log.Logger;
             var botOptions = options.BotOptions;
             ServicePointManager.DefaultConnectionLimit = botOptions.RoomsCount*botOptions.BotsPerRoomCount*2;

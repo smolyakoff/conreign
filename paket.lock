@@ -284,6 +284,7 @@ NUGET
       System.Runtime.Extensions (>= 4.1) - framework: >= netstandard13
       System.Runtime.Handles (>= 4.0.1) - framework: >= netstandard13
       System.Runtime.InteropServices (>= 4.1) - framework: >= netstandard13
+    Microsoft.WindowsAzure.ConfigurationManager (3.2.3)
     MongoDB.Bson (2.3) - framework: >= net45, >= netstandard15
       NETStandard.Library (>= 1.6) - framework: >= netstandard15
       System.Collections.NonGeneric (>= 4.0.1) - framework: >= netstandard15

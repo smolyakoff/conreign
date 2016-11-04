@@ -4,5 +4,4 @@ Microsoft.Extensions.Configuration.CommandLine
 Microsoft.Extensions.Configuration.Json
 Serilog.Sinks.Literate
 Serilog.Sinks.File
-Serilog.Sinks.Seq
 Serilog.Sinks.ElasticSearch

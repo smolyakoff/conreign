@@ -53,6 +53,14 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\config\api.config.json">
+      <Link>api.config.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\config\api.emulator.config.json">
+      <Link>api.emulator.config.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="app.config" />
     <None Include="paket.references" />
   </ItemGroup>
@@ -359,6 +367,17 @@
     </When>
   </Choose>
   <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.0' Or $(TargetFrameworkVersion) == 'v4.5' Or $(TargetFrameworkVersion) == 'v4.5.1' Or $(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3' Or $(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1' Or $(TargetFrameworkVersion) == 'v4.6.2' Or $(TargetFrameworkVersion) == 'v4.6.3')">
+      <ItemGroup>
+        <Reference Include="Microsoft.WindowsAzure.Configuration">
+          <HintPath>..\..\packages\Microsoft.WindowsAzure.ConfigurationManager\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v2.0' Or $(TargetFrameworkVersion) == 'v3.0')">
       <ItemGroup>
         <Reference Include="Newtonsoft.Json">
@@ -467,20 +486,6 @@
         <Reference Include="Serilog">
           <HintPath>..\..\packages\Serilog\lib\netstandard1.3\Serilog.dll</HintPath>
           <Private>True</Private>
-          <Paket>True</Paket>
-        </Reference>
-      </ItemGroup>
-    </When>
-  </Choose>
-  <Choose>
-    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.5' Or $(TargetFrameworkVersion) == 'v4.5.1' Or $(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3' Or $(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1' Or $(TargetFrameworkVersion) == 'v4.6.2' Or $(TargetFrameworkVersion) == 'v4.6.3')">
-      <ItemGroup>
-        <Reference Include="Serilog.Sinks.AzureTableStorage">
-          <HintPath>..\..\packages\Serilog.Sinks.AzureTableStorage\lib\net45\Serilog.Sinks.AzureTableStorage.dll</HintPath>
-          <Private>True</Private>
-          <Paket>True</Paket>
-        </Reference>
-        <Reference Include="System.Configuration">
           <Paket>True</Paket>
         </Reference>
       </ItemGroup>
@@ -786,7 +791,7 @@
       <ItemGroup>
         <Reference Include="System.ComponentModel.TypeConverter">
           <HintPath>..\..\packages\System.ComponentModel.TypeConverter\ref\net45\System.ComponentModel.TypeConverter.dll</HintPath>
-          <Private>False</Private>
+          <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
       </ItemGroup>
@@ -795,7 +800,7 @@
       <ItemGroup>
         <Reference Include="System.ComponentModel.TypeConverter">
           <HintPath>..\..\packages\System.ComponentModel.TypeConverter\ref\net462\System.ComponentModel.TypeConverter.dll</HintPath>
-          <Private>False</Private>
+          <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
       </ItemGroup>
@@ -804,7 +809,7 @@
       <ItemGroup>
         <Reference Include="System.ComponentModel.TypeConverter">
           <HintPath>..\..\packages\System.ComponentModel.TypeConverter\ref\netstandard1.0\System.ComponentModel.TypeConverter.dll</HintPath>
-          <Private>False</Private>
+          <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
       </ItemGroup>
@@ -813,7 +818,7 @@
       <ItemGroup>
         <Reference Include="System.ComponentModel.TypeConverter">
           <HintPath>..\..\packages\System.ComponentModel.TypeConverter\ref\netstandard1.5\System.ComponentModel.TypeConverter.dll</HintPath>
-          <Private>False</Private>
+          <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
       </ItemGroup>

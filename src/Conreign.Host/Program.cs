@@ -9,6 +9,7 @@ namespace Conreign.Host
     internal class Program
     {
         private const string AppDomainName = "OrleansHost";
+        private const string ConfigFileName = "OrleansServerConfiguration.xml";
         private static SiloHost _host;
 
         public static void Main(string[] args)
@@ -23,6 +24,8 @@ namespace Conreign.Host
 
         private static void InitializeSilo(string[] args)
         {
+            //var assembly = typeof(GameGrain).Assembly;
+            //Console.WriteLine($"Loaded grain assembly: {assembly.GetName().Name}");
             var cluster = ConreignSilo.Configure(ClusterConfiguration.LocalhostPrimarySilo());
             _host = new SiloHost(Dns.GetHostName(), cluster.OrleansConfiguration);
             _host.InitializeOrleansSilo();

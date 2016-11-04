@@ -33,10 +33,7 @@ namespace Conreign.Cluster
                 .AddJsonFile($"silo.{environment}.config.json", true)
                 .AddJsonFile("silo.secrets.json", true)
                 .AddJsonFile($"silo.{environment}.secrets.json", true)
-                .AddCloudConfiguration(c => c.UseKeys(
-                    "SystemStorageConnectionString",
-                    "DataStorageConnectionString",
-                    "ElasticSearchUri"));
+                .AddCloudConfiguration(c => c.UseKeys("SystemStorageConnectionString", "ElasticSearchUri"));
             var configRoot = builder.Build();
             var options = new ConreignSiloConfiguration
             {
