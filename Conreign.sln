@@ -57,7 +57,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Utility.Configurat
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{7F373F25-6B85-4A02-9AEF-D643EFF04378}"
 	ProjectSection(SolutionItems) = preProject
+		config\api.config.json = config\api.config.json
+		config\api.emulator.config.json = config\api.emulator.config.json
 		config\silo.config.json = config\silo.config.json
+		config\silo.emulator.config.json = config\silo.emulator.config.json
 	EndProjectSection
 EndProject
 Global
