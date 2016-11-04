@@ -4,30 +4,20 @@ using Conreign.Api.Configuration;
 using Microsoft.Owin.Hosting;
 using Orleans.Runtime.Configuration;
 using Serilog;
-using Serilog.Core;
-using Serilog.Core.Enrichers;
 
 namespace Conreign.Api.Host
 {
     internal class Program
     {
-        private const string Url = "http://localhost:9000/";
+        private const string Url = "http://localhost:3000";
 
         public static ConreignApi Api { get; private set; }
 
         public static void Main(string[] args)
         {
-            try
+            using (RunOwin())
             {
-                using (RunOwin())
-                {
-                    Console.WriteLine("Press any key to stop API host.");
-                    Console.ReadLine();
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Logger.Fatal(ex, "Api server cannot start. {Message}", ex.Message);
+                Console.WriteLine("Press any key to stop API host.");
                 Console.ReadLine();
             }
         }
