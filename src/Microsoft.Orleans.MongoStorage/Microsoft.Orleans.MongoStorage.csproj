@@ -36,6 +36,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClusterConfigurationExtensions.cs" />
     <Compile Include="Keys.cs" />
     <Compile Include="ConversionExtensions.cs" />
     <Compile Include="MongoStorageCode.cs" />

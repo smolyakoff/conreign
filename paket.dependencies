@@ -4,6 +4,7 @@ redirects: on
 nuget FAKE
 nuget FAKE.SQL.X64
 nuget FSharp.Data
+nuget Microsoft.WindowsAzure.ConfigurationManager
 nuget Microsoft.Extensions.Configuration
 nuget Microsoft.Extensions.Configuration.Binder
 nuget Microsoft.Extensions.Configuration.CommandLine

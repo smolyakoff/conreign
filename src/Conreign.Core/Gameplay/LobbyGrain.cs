@@ -85,9 +85,10 @@ namespace Conreign.Core.Gameplay
             return game;
         }
 
-        public Task Handle(GameEnded @event)
+        public async Task Handle(GameEnded @event)
         {
-            return _lobby.Handle(@event);
+            await _lobby.Handle(@event);
+            DeactivateOnIdle();
         }
 
         public override async Task OnActivateAsync()

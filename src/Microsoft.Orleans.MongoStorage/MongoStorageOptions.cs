@@ -6,9 +6,8 @@ namespace Microsoft.Orleans.Storage
 {
     public class MongoStorageOptions
     {
-        private const string DefaultDatabaseName = "orleans_storage";
-
-        public const string DefaultConnectionString = "mongodb://localhost:27017";
+        public const string DefaultConnectionString = "mongodb://localhost:27017/orleans_grains";
+        public const string DefaultDatabaseName = "orleans_grains";
 
         private MongoStorageOptions()
         {
@@ -28,11 +27,13 @@ namespace Microsoft.Orleans.Storage
             }
             var options = new MongoStorageOptions();
             var connectionString = config.GetProperty(Keys.ConnectionString, DefaultConnectionString);
-            var databaseName = config.GetProperty(Keys.DatabaseName, DefaultDatabaseName);
             var collectionNamePrefix = config.GetProperty(Keys.CollectionNamePrefix, null);
             options.ConnectionString = Validator.EnsureIsValid(connectionString, Keys.ConnectionString,
                 Validations.Required, Validations.ValidMongoUrl);
-            options.DatabaseName = Validator.EnsureIsValid(databaseName, Keys.DatabaseName, Validations.Required);
+            var mongoUrl = MongoUrl.Create(options.ConnectionString);
+            options.DatabaseName = string.IsNullOrEmpty(mongoUrl.DatabaseName) 
+                ? DefaultDatabaseName 
+                : mongoUrl.DatabaseName;
             options.CollectionNamePrefix = collectionNamePrefix;
             return options;
         }
@@ -75,8 +76,6 @@ namespace Microsoft.Orleans.Storage
         private static class Keys
         {
             public const string ConnectionString = "ConnectionString";
-
-            public const string DatabaseName = "DatabaseName";
 
             public const string CollectionNamePrefix = "CollectionNamePrefix";
         }

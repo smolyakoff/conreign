@@ -1,0 +1,4 @@
+{
+  "DataStorageType": "MongoDb",
+  "DataStorageConnectionString": "mongodb://localhost:27017/conreign"
+}

@@ -64,15 +64,22 @@
     <DiagnosticsConfiguration Include="Conreign.Api.Host.AzureContent\diagnostics.wadcfgx" />
     <DiagnosticsConfiguration Include="Conreign.Host.AzureContent\diagnostics.wadcfgx" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Conreign.Api.Host.AzureContent\Microsoft.Extensions.Primitives.dll">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Conreign.Host.AzureContent\Microsoft.Extensions.Primitives.dll">
+      <SubType>Content</SubType>
+    </Content>
+  </ItemGroup>
   <!-- Import the target files for this project template -->
   <PropertyGroup>
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
     <CloudExtensionsDir Condition=" '$(CloudExtensionsDir)' == '' ">$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Windows Azure Tools\2.9\</CloudExtensionsDir>
   </PropertyGroup>
   <Import Project="$(CloudExtensionsDir)Microsoft.WindowsAzure.targets" />
-
   <!-- Service Definition Transform -->
-   <UsingTask TaskName="TransformXml" AssemblyFile="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Web\Microsoft.Web.Publishing.Tasks.dll" />
+  <UsingTask TaskName="TransformXml" AssemblyFile="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Web\Microsoft.Web.Publishing.Tasks.dll" />
   <PropertyGroup>
     <ServiceDefinitionTransform>ServiceDefinition.$(Configuration).csdef</ServiceDefinitionTransform>
   </PropertyGroup>

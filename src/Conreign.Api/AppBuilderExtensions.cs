@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Runtime.InteropServices.ComTypes;
 using Conreign.Api.Configuration;
 using Conreign.Api.Infrastructure;
+using Conreign.Client.Orleans;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using Owin;
@@ -11,21 +11,28 @@ namespace Conreign.Api
 {
     public static class AppBuilderExtensions
     {
-        public static IAppBuilder MapConreignApi(this IAppBuilder builder, ConreignApiOptions options)
+        public static IAppBuilder MapConreignApi(
+            this IAppBuilder builder, 
+            IOrleansClientInitializer initializer, 
+            ConreignApiConfiguration configuration)
         {
             if (builder == null)
             {
                 throw new ArgumentNullException(nameof(builder));
             }
-            if (options == null)
+            if (initializer == null)
             {
-                throw new ArgumentNullException(nameof(options));
+                throw new ArgumentNullException(nameof(initializer));
+            }
+            if (configuration == null)
+            {
+                throw new ArgumentNullException(nameof(configuration));
             }
             var container = new Container();
-            container.RegisterConreignApi(options);
+            container.RegisterConreignApi(initializer, configuration);
             var hubConfiguration = ConfigureSignalR(container);
             builder.UseWelcomePage("/");
-            builder.MapSignalR(options.Path, hubConfiguration);
+            builder.MapSignalR(configuration.Path, hubConfiguration);
             return builder;
         }
 

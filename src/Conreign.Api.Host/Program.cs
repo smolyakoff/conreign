@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Net;
+using Conreign.Api.Configuration;
 using Microsoft.Owin.Hosting;
+using Orleans.Runtime.Configuration;
 using Serilog;
+using Serilog.Core;
+using Serilog.Core.Enrichers;
 
 namespace Conreign.Api.Host
 {
@@ -8,13 +13,10 @@ namespace Conreign.Api.Host
     {
         private const string Url = "http://localhost:9000/";
 
+        public static ConreignApi Api { get; private set; }
+
         public static void Main(string[] args)
         {
-            Log.Logger = new LoggerConfiguration()
-                .WriteTo.LiterateConsole()
-                .MinimumLevel.Debug()
-                .CreateLogger()
-                .ForContext("ApplicationId", "Conreign.Api");
             try
             {
                 using (RunOwin())
@@ -32,9 +34,13 @@ namespace Conreign.Api.Host
 
         private static IDisposable RunOwin()
         {
-            Console.WriteLine("Starting Web API...");
+            ServicePointManager.DefaultConnectionLimit = 20;
+            var config = ConreignApiConfiguration.Load();
+            Api = ConreignApi.Configure(new ClientConfiguration(), config);
+            Log.Logger = Api.Logger;
+            Log.Logger.Information("Starting Web API...");
             var app = WebApp.Start<Startup>(Url);
-            Console.WriteLine($"Web API is running at {Url}");
+            Log.Logger.Information($"Web API is running at {Url}");
             return app;
         }
     }
