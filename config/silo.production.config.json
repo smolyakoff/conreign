@@ -1,0 +1,4 @@
+{
+  "LivenessStorageType": "AzureTable",
+  "RemindersStorageType": "AzureTable"
+}

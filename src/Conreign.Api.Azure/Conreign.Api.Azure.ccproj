@@ -59,6 +59,7 @@
   <ItemGroup>
     <Folder Include="Conreign.Api.Host.AzureContent\" />
     <Folder Include="Conreign.Host.AzureContent\" />
+    <Folder Include="Profiles" />
   </ItemGroup>
   <ItemGroup>
     <DiagnosticsConfiguration Include="Conreign.Api.Host.AzureContent\diagnostics.wadcfgx" />
@@ -71,6 +72,9 @@
     <Content Include="Conreign.Host.AzureContent\Microsoft.Extensions.Primitives.dll">
       <SubType>Content</SubType>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <PublishProfile Include="Profiles\Conreign.Production.azurePubxml" />
   </ItemGroup>
   <!-- Import the target files for this project template -->
   <PropertyGroup>

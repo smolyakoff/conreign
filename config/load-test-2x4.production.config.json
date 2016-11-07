@@ -1,0 +1,8 @@
+{
+  "ConnectionUri": "http://conreign.cloudapp.net",
+  "MinimumLogLevel": "Information",
+  "BotOptions": {
+    "RoomsCount": 2,
+    "PlayerPerRoomCount": 4
+  }
+}
