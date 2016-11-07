@@ -3,15 +3,35 @@
   <Role name="Conreign.Host.Azure">
     <Instances count="1" />
     <ConfigurationSettings>
-      <Setting name="Environment" value="emulator"/>
+      <Setting name="Environment" value="emulator" />
+      <Setting name="SystemStorageConnectionString" value="UseDevelopmentStorage=true" />
+      <Setting name="DataStorageConnectionString" value="mongodb://localhost:27017/conreign" />
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.Enabled" value="true" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountUsername" value="smolyakoff" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountEncryptedPassword" value="MIIBnQYJKoZIhvcNAQcDoIIBjjCCAYoCAQAxggFOMIIBSgIBADAyMB4xHDAaBgNVBAMME1dpbmRvd3MgQXp1cmUgVG9vbHMCEGDOccy6flCnS173OvKn+VwwDQYJKoZIhvcNAQEBBQAEggEAYSIT/QYHLVWIlLbCgofBPQq4bqecER+sCU+mh2eMdJM0MiaFgG8QHexBguAH1UDIAa5OekvuJ0888cM2yp2EuTf/YUTr0oACoN/B0UXHXUiwZvKAZVhIuvLRElkW+FUzGdI3RXNhTLANsHwqVek4kdKV8qewPSNHQqRZW8On0SE89sY3BCQF+1hLnztKXOLOigF0QtirSs1aocQIbSsm8EgKGPYbK9O/73LtU7ceDURfMDV83dFtSef+S2QWIcbc1hlZaZG7+5bzM1Gn1oeTH/hPyFqfeEAco4NTyTCRE0jWcZejD4qUlLrEZSnBtcR/KgyB62mDHW95K+zAkYVVWTAzBgkqhkiG9w0BBwEwFAYIKoZIhvcNAwcECNc9NhsdMAB9gBDGWrokGKhmhs8QfAsPMEf4" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountExpiration" value="2017-11-07T23:59:59.0000000+03:00" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteForwarder.Enabled" value="true" />
+      <Setting name="APPINSIGHTS_INSTRUMENTATIONKEY" value="6373717e-9ca0-4ff3-aeb4-f7ac805b99f3" />
     </ConfigurationSettings>
+    <Certificates>
+      <Certificate name="Microsoft.WindowsAzure.Plugins.RemoteAccess.PasswordEncryption" thumbprint="35D5A44A53F5673EB3949E54200290F6F4A2FAAD" thumbprintAlgorithm="sha1" />
+    </Certificates>
   </Role>
   <Role name="Conreign.Api.Host.Azure">
     <Instances count="1" />
     <ConfigurationSettings>
-      <Setting name="Environment" value="emulator"/>
+      <Setting name="Environment" value="emulator" />
+      <Setting name="SystemStorageConnectionString" value="UseDevelopmentStorage=true" />
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.Enabled" value="true" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountUsername" value="smolyakoff" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountEncryptedPassword" value="MIIBnQYJKoZIhvcNAQcDoIIBjjCCAYoCAQAxggFOMIIBSgIBADAyMB4xHDAaBgNVBAMME1dpbmRvd3MgQXp1cmUgVG9vbHMCEGDOccy6flCnS173OvKn+VwwDQYJKoZIhvcNAQEBBQAEggEAYSIT/QYHLVWIlLbCgofBPQq4bqecER+sCU+mh2eMdJM0MiaFgG8QHexBguAH1UDIAa5OekvuJ0888cM2yp2EuTf/YUTr0oACoN/B0UXHXUiwZvKAZVhIuvLRElkW+FUzGdI3RXNhTLANsHwqVek4kdKV8qewPSNHQqRZW8On0SE89sY3BCQF+1hLnztKXOLOigF0QtirSs1aocQIbSsm8EgKGPYbK9O/73LtU7ceDURfMDV83dFtSef+S2QWIcbc1hlZaZG7+5bzM1Gn1oeTH/hPyFqfeEAco4NTyTCRE0jWcZejD4qUlLrEZSnBtcR/KgyB62mDHW95K+zAkYVVWTAzBgkqhkiG9w0BBwEwFAYIKoZIhvcNAwcECNc9NhsdMAB9gBDGWrokGKhmhs8QfAsPMEf4" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountExpiration" value="2017-11-07T23:59:59.0000000+03:00" />
+      <Setting name="APPINSIGHTS_INSTRUMENTATIONKEY" value="6373717e-9ca0-4ff3-aeb4-f7ac805b99f3" />
     </ConfigurationSettings>
+    <Certificates>
+      <Certificate name="Microsoft.WindowsAzure.Plugins.RemoteAccess.PasswordEncryption" thumbprint="35D5A44A53F5673EB3949E54200290F6F4A2FAAD" thumbprintAlgorithm="sha1" />
+    </Certificates>
   </Role>
 </ServiceConfiguration>

@@ -238,5 +238,4 @@ paket-files
 .fake/
 
 # Project Specific
-build
-config/**/*secrets.*
+**/*.Production.cscfg

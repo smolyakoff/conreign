@@ -59,8 +59,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{7F373F
 	ProjectSection(SolutionItems) = preProject
 		config\api.config.json = config\api.config.json
 		config\api.emulator.config.json = config\api.emulator.config.json
+		config\api.production.config.json = config\api.production.config.json
+		config\load-test-2x4.production.config.json = config\load-test-2x4.production.config.json
+		config\load-test-4x4.production.config.json = config\load-test-4x4.production.config.json
 		config\silo.config.json = config\silo.config.json
 		config\silo.emulator.config.json = config\silo.emulator.config.json
+		config\silo.production.config.json = config\silo.production.config.json
 	EndProjectSection
 EndProject
 Global

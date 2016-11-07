@@ -177,6 +177,10 @@ namespace Conreign.Core.AI
                 Complete(new TaskCanceledException("Bot execution was cancelled."));
                 return;
             }
+            if (_completed)
+            {
+                return;
+            }
             var posted = _processor.Post(@event);
             if (!posted)
             {
