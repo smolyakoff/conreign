@@ -23,6 +23,7 @@
     <ConfigurationSettings>
       <Setting name="Environment" value="emulator" />
       <Setting name="SystemStorageConnectionString" value="UseDevelopmentStorage=true" />
+      <Setting name="ElasticSearchUri" value=""/>
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
       <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.Enabled" value="true" />
       <Setting name="Microsoft.WindowsAzure.Plugins.RemoteAccess.AccountUsername" value="smolyakoff" />

@@ -67,7 +67,7 @@ namespace Conreign.Core.AI.Behaviours
                 return;
             }
             _map = @event.Map;
-            using (context.Logger.BeginTimedOperation("Bot thinking"))
+            using (context.Logger.BeginTimedOperation("Bot.Think"))
             {
                 await Think(context);
             };

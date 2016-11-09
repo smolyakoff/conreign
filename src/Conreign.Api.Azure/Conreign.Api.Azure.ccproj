@@ -13,6 +13,7 @@
     <StartDevelopmentStorage>True</StartDevelopmentStorage>
     <Name>Conreign.Cloud.Api</Name>
     <UseWebProjectPorts>True</UseWebProjectPorts>
+    <PackageEnableRemoteDebugger>False</PackageEnableRemoteDebugger>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -33,10 +34,10 @@
   </PropertyGroup>
   <!-- Items for the project -->
   <ItemGroup>
+    <ServiceConfiguration Include="ServiceConfiguration.Cloud.cscfg" />
     <ServiceDefinition Include="ServiceDefinition.csdef" />
     <None Include="ServiceDefinition.Debug.csdef" />
     <ServiceConfiguration Include="ServiceConfiguration.Local.cscfg" />
-    <ServiceConfiguration Include="ServiceConfiguration.Production.cscfg" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Conreign.Api.Host.Azure\Conreign.Api.Host.Azure.csproj">
