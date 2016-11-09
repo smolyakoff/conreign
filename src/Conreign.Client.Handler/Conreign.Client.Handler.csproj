@@ -180,15 +180,6 @@
         </Reference>
       </ItemGroup>
     </When>
-    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v1.1'">
-      <ItemGroup>
-        <Reference Include="Serilog">
-          <HintPath>..\..\packages\Serilog\lib\netstandard1.0\Serilog.dll</HintPath>
-          <Private>True</Private>
-          <Paket>True</Paket>
-        </Reference>
-      </ItemGroup>
-    </When>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And ($(TargetFrameworkVersion) == 'v1.3' Or $(TargetFrameworkVersion) == 'v1.4' Or $(TargetFrameworkVersion) == 'v1.5' Or $(TargetFrameworkVersion) == 'v1.6')">
       <ItemGroup>
         <Reference Include="Serilog">
@@ -998,6 +989,15 @@
       <ItemGroup>
         <Reference Include="System.Reactive.Core">
           <HintPath>..\..\packages\System.Reactive.Core\lib\netstandard1.3\System.Reactive.Core.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetPlatformIdentifier) == 'UAP' And $(TargetPlatformVersion.StartsWith('10.0'))">
+      <ItemGroup>
+        <Reference Include="System.Reactive.Core">
+          <HintPath>..\..\packages\System.Reactive.Core\lib\uap10.0\System.Reactive.Core.dll</HintPath>
           <Private>True</Private>
           <Paket>True</Paket>
         </Reference>

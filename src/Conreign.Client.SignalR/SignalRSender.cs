@@ -48,7 +48,7 @@ namespace Conreign.Client.SignalR
                 .WaitAndRetryAsync(3, (retry) => TimeSpan.FromSeconds(retry*2));
         }
 
-        public Task<T> Send<T>(IAsyncRequest<T> command)
+        public async Task<T> Send<T>(IAsyncRequest<T> command)
         {
             if (command == null)
             {
@@ -72,7 +72,7 @@ namespace Conreign.Client.SignalR
             };
             using (LogContext.PushProperties(diagnosticProperties))
             {
-                return _retryPolicy.ExecuteAsync(async () =>
+                var result = await _retryPolicy.ExecuteAsync(async () =>
                 {
                     try
                     {
@@ -91,6 +91,7 @@ namespace Conreign.Client.SignalR
                         throw;
                     }
                 });
+                return result;
             }
         }
 

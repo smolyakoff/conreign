@@ -16,11 +16,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{B075363C-E3AD-45C0-9387-1735127D03DE}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
-		build.bat = build.bat
-		build.fsx = build.fsx
-		config.json = config.json
 		paket.dependencies = paket.dependencies
 		paket.lock = paket.lock
+		versions.json = versions.json
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Orleans.MongoStorage", "src\Microsoft.Orleans.MongoStorage\Microsoft.Orleans.MongoStorage.csproj", "{BA953785-1EFC-461E-9227-AD3E4C07EE7C}"
@@ -60,11 +58,22 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{7F373F
 		config\api.config.json = config\api.config.json
 		config\api.emulator.config.json = config\api.emulator.config.json
 		config\api.production.config.json = config\api.production.config.json
+		config\cli.config.json = config\cli.config.json
 		config\load-test-2x4.production.config.json = config\load-test-2x4.production.config.json
 		config\load-test-4x4.production.config.json = config\load-test-4x4.production.config.json
 		config\silo.config.json = config\silo.config.json
 		config\silo.emulator.config.json = config\silo.emulator.config.json
 		config\silo.production.config.json = config\silo.production.config.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{E7B4CE72-E772-4EF0-9E83-C66EFB25C425}"
+	ProjectSection(SolutionItems) = preProject
+		tools\azure.fsx = tools\azure.fsx
+		tools\build.fsx = tools\build.fsx
+		tools\config.fsx = tools\config.fsx
+		do.bat = do.bat
+		tools\do.fsx = tools\do.fsx
+		tools\vars.fsx = tools\vars.fsx
 	EndProjectSection
 EndProject
 Global

@@ -30,7 +30,7 @@ namespace Conreign.LoadTest
                 .WriteTo.LiterateConsole();
             if (!string.IsNullOrEmpty(options.ElasticSearchUri))
             {
-                var elasticOptions = new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
+                var elasticOptions = new ElasticsearchSinkOptions(new Uri(options.ElasticSearchUri))
                 {
                     AutoRegisterTemplate = true,
                     BufferBaseFilename = "logs/elastic-buffer"
@@ -39,12 +39,14 @@ namespace Conreign.LoadTest
             }
             Log.Logger = loggerConfiguration
                 .MinimumLevel.Is(options.MinimumLogLevel)
+                .Enrich.FromLogContext()
                 .CreateLogger()
                 .ForContext("ApplicationId", "Conreign.LoadTest")
                 .ForContext("InstanceId", options.InstanceId);
-            Serilog.Debugging.SelfLog.Enable(msg => Debug.WriteLine(msg));
+            Serilog.Debugging.SelfLog.Enable(msg => Trace.WriteLine(msg));
             var logger = Log.Logger;
             var botOptions = options.BotOptions;
+            logger.Information("Initialized with the following configuration: {@Configuration}", options);
             ServicePointManager.DefaultConnectionLimit = botOptions.RoomsCount*botOptions.BotsPerRoomCount*2;
             var signalrOptions = new SignalRClientOptions(options.ConnectionUri);
             var client = new SignalRClient(signalrOptions);

@@ -33,7 +33,8 @@ namespace Conreign.Api.Configuration
                 .AddJsonFile($"api.{environment}.secrets.json", true)
                 .AddCloudConfiguration(c => c.UseKeys(
                     "MinimumLogLevel",
-                    "SystemStorageConnectionString"
+                    "SystemStorageConnectionString",
+                    "ElasticSearchUri"
                 ));
             var config = new ConreignApiConfiguration
             {

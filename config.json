@@ -1,3 +1,0 @@
-{
-  "db": "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=ConreignSystem;Integrated Security=True;Pooling=False;Max Pool Size=200;Asynchronous Processing=True;MultipleActiveResultSets=True"
-}

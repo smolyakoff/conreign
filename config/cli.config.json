@@ -1,0 +1,7 @@
+{
+  "Environments": {
+    "Production": {
+      "CloudServiceName": "conreign"
+    }
+  }
+}
