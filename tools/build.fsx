@@ -6,7 +6,7 @@ open Fake
 open Fake.MSBuild
 open Fake.TraceHelper
 
-let BuildCloudService projectPath outputPath version =
+let PackageCloudService projectPath outputPath version =
     let props = 
         [
             ("Configuration", "Release");

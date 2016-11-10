@@ -1,10 +1,20 @@
-﻿namespace Conreign.LoadTest
+﻿using System;
+
+namespace Conreign.LoadTest
 {
     internal class Program
     {
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
-            LoadTestRunner.Run(args).Wait();
+            try
+            {
+                LoadTestRunner.Run(args).Wait();
+                return 0;
+            }
+            catch (Exception)
+            {
+                return 1;
+            }
         }
     }
 }

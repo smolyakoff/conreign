@@ -2,7 +2,6 @@ source https://nuget.org/api/v2
 redirects: on
 
 nuget FAKE
-nuget FAKE.SQL.X64
 nuget FSharp.Data
 
 nuget Microsoft.Extensions.Configuration
@@ -37,11 +36,9 @@ nuget MediatR
 nuget MongoDB.Driver
 nuget Microsoft.Orleans.OrleansCodeGenerator.Build
 nuget Microsoft.Orleans.Server
-nuget Microsoft.Orleans.OrleansSQLUtils
 nuget Microsoft.Orleans.OrleansAzureUtils
 nuget Microsoft.Orleans.Client
 
-nuget Microsoft.Owin.Host.SystemWeb
 nuget Microsoft.Owin.Cors
 nuget Microsoft.Owin.Diagnostics
 nuget Microsoft.AspNet.SignalR.Client

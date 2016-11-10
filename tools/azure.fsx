@@ -42,15 +42,26 @@ type AzureCredentials =
         CertificatePassword: string;
     }
 
+type Deployment = 
+    {
+        ServiceName: string;
+        Slot: string;
+    }
+
 type DeploymentOptions = 
     { 
         Credentials: AzureCredentials;
         StorageConnectionString: string;
         Label: string;
-        ServiceName: string; 
-        Slot: string;
+        Deployment: Deployment;
         ConfigurationFilePath: string;
         PackagePath: string;
+    }
+
+type StopOptions = 
+    {
+        Credentials: AzureCredentials;
+        Deployment: Deployment;
     }
 
 let ParseSlot slot = 
@@ -69,6 +80,19 @@ let SplitStoragePath (path: string) =
     let parts = path.Split('/')
     (parts.[0], String.Join("/", parts.[1..parts.Length - 1]))
 
+let CreatePercentageProgress totalSizeInBytes =
+    let threshold = 0.1;
+    let mutable lastValue = 0.0
+    let monitor = new Object()
+    let onProgress (status: TransferStatus) =
+        let percentage = ((float status.BytesTransferred) / (float totalSizeInBytes)) * 100.0
+        lock monitor (fun _ ->
+            if percentage - lastValue > threshold then
+                tracefn "[STORAGE] Uploaded %5.1f%%." percentage
+            lastValue <- percentage
+        )
+    new Progress<TransferStatus>(new Action<TransferStatus>(onProgress))
+
 let UploadFile connectionString sourcePath destinationPath = 
     let (container, path) = SplitStoragePath destinationPath
     let account = CloudStorageAccount.Parse connectionString
@@ -79,22 +103,19 @@ let UploadFile connectionString sourcePath destinationPath =
     let absoluteSourcePath = Path.GetFullPath(sourcePath)
     let sourceInfo = new FileInfo(sourcePath)
     tracefn "[STORAGE] Started to upload file: %s -> %s." absoluteSourcePath destinationPath
-    let onProgress (status: TransferStatus) =
-        let percentage = ((float status.BytesTransferred) / (float sourceInfo.Length)) * 100.0
-        tracefn "[STORAGE] Uploadeded %5.1f..." percentage
     let transferCtx = new TransferContext()
-    transferCtx.ProgressHandler <- new Progress<TransferStatus>(new Action<TransferStatus>(onProgress))
+    transferCtx.ProgressHandler <- CreatePercentageProgress sourceInfo.Length
     let uploadOptions = new UploadOptions()
     TransferManager.UploadAsync(absoluteSourcePath, blob, uploadOptions, transferCtx).Wait()
     tracefn "[STORAGE] Upload completed:  %s -> %s." absoluteSourcePath destinationPath
     blob.Uri
 
-let GetDeploymentOrNull (options: DeploymentOptions) = 
-    let client = CreateComputeManagementClient options.Credentials
-    let slot = ParseSlot options.Slot
+let GetDeploymentOrNull (creds: AzureCredentials) (svc: Deployment) = 
+    let client = CreateComputeManagementClient creds
+    let slot = ParseSlot svc.Slot
     let deployment = 
         try 
-            client.Deployments.GetBySlot(options.ServiceName, slot)
+            client.Deployments.GetBySlot(svc.ServiceName, slot)
         with 
             | :? CloudException as ex when ex.Error.Code = "ResourceNotFound" -> null
             | ex -> raise ex
@@ -102,31 +123,59 @@ let GetDeploymentOrNull (options: DeploymentOptions) =
 
 let GetPackageCloudPath name label = sprintf "artifacts/%s/%s.cspkg" name label
 
+let HandleOperationResponse prefix name (response: OperationStatusResponse) =
+    match response.Status with
+        | OperationStatus.Failed -> 
+            sprintf "%s (%s)." response.Error.Message response.Error.Code  |> traceError
+            sprintf "%s %s operation failed." prefix name |> failwith
+        | OperationStatus.InProgress ->
+            sprintf "%s %s operation is in progress." prefix name |> trace
+        | OperationStatus.Succeeded ->
+            sprintf "%s %s operation completed." prefix name |> trace
+        | x -> ignore x
+
 let Deploy (options: DeploymentOptions) =
     let client = CreateComputeManagementClient options.Credentials
-    let slot = ParseSlot options.Slot
-    let existingDeployment = GetDeploymentOrNull options
-    let destinationPath = GetPackageCloudPath options.ServiceName options.Label
-    let packageUri = UploadFile options.StorageConnectionString options.PackagePath destinationPath
+    let slot = ParseSlot options.Deployment.Slot
+    let existingDeployment = GetDeploymentOrNull options.Credentials options.Deployment
+    let destinationPath = GetPackageCloudPath options.Deployment.ServiceName options.Label
+    let isUri = Uri.IsWellFormedUriString(options.PackagePath, UriKind.Absolute)
+    let packageUri = 
+        if isUri then new Uri(options.PackagePath, UriKind.Absolute)
+        else UploadFile options.StorageConnectionString options.PackagePath destinationPath
+    let logPrefix = sprintf "[DEPLOY %s (%O)]" options.Deployment.ServiceName slot
     let formatLog fmt = 
-        let prepend msg = sprintf "[DEPLOY %s(%O)-%s] %s" options.ServiceName slot options.Label msg
+        let prepend msg = sprintf "%s %s" logPrefix msg
         Printf.ksprintf prepend fmt
-    match existingDeployment with
-        | null -> 
-            raise (new NotImplementedException("Service provisioning is not implemented"))
-        | deployment ->
-            let upgradeParams = new DeploymentUpgradeParameters()
-            upgradeParams.Configuration <- File.ReadAllText(options.ConfigurationFilePath)
-            upgradeParams.Label <- options.Label
-            upgradeParams.PackageUri <- packageUri
-            formatLog "Started deployment upgrade." |> trace
-            let response = client.Deployments.UpgradeBySlot(options.ServiceName, slot, upgradeParams)
-            match response.Status with
-                | OperationStatus.Failed -> 
-                    formatLog "%s (%s)." response.Error.Message response.Error.Code |> traceError
-                    failwith "Deployment failed."
-                | OperationStatus.InProgress ->
-                    formatLog "Deployment upgrade is in progress." |> trace
-                | OperationStatus.Succeeded ->
-                    formatLog "Deployment upgrade completed." |> trace
-                | x -> ignore x
+    formatLog "Package uri is %A." packageUri |> trace
+    let response = 
+        match existingDeployment with
+            | null -> 
+                let createParams = new DeploymentCreateParameters()
+                createParams.Configuration <- File.ReadAllText(options.ConfigurationFilePath)
+                createParams.Label <- options.Label
+                createParams.PackageUri <- packageUri
+                createParams.Name <- options.Deployment.ServiceName
+                createParams.TreatWarningsAsError <- Nullable(true)
+                createParams.StartDeployment <- Nullable(true)
+                client.Deployments.Create(options.Deployment.ServiceName, slot, createParams)
+            | deployment ->
+                let upgradeParams = new DeploymentUpgradeParameters()
+                upgradeParams.Configuration <- File.ReadAllText(options.ConfigurationFilePath)
+                upgradeParams.Label <- options.Label
+                upgradeParams.PackageUri <- packageUri
+                formatLog "Started deployment upgrade." |> trace
+                client.Deployments.UpgradeBySlot(options.Deployment.ServiceName, slot, upgradeParams)
+    HandleOperationResponse logPrefix "Deployment" response
+
+let DeleteCloudService (options: StopOptions) =
+    let client = CreateComputeManagementClient options.Credentials
+    let slot = ParseSlot options.Deployment.Slot
+    let existingDeployment = GetDeploymentOrNull options.Credentials options.Deployment
+    let logPrefix = sprintf "[AZURE %s (%O)]" options.Deployment.ServiceName slot
+    let formatLog fmt = 
+        let prepend msg = String.Join(" ", [logPrefix, msg])
+        Printf.ksprintf prepend fmt
+    if existingDeployment <> null then
+        let response = client.Deployments.DeleteBySlot(options.Deployment.ServiceName, slot)
+        HandleOperationResponse logPrefix "Delete" response

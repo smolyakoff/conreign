@@ -2,12 +2,15 @@
 using System.Diagnostics;
 using System.Net;
 using Conreign.Core.AI.LoadTest;
+using Microsoft.Extensions.Configuration;
 using Serilog.Events;
 
 namespace Conreign.LoadTest
 {
     public class LoadTestOptions
     {
+        private const string ConfigurationFileKey = "ConfigurationFileName";
+
         public LoadTestOptions()
         {
             ConnectionUri = "http://localhost:3000";
@@ -29,5 +32,24 @@ namespace Conreign.LoadTest
         public LogEventLevel MinimumLogLevel { get; set; }
         public LoadTestBotOptions BotOptions { get; set; }
         public TimeSpan Timeout { get; set; }
+
+        public static LoadTestOptions Parse(string[] args)
+        {
+            var builder = new ConfigurationBuilder();
+            builder.AddCommandLine(args);
+            var config = builder.Build();
+
+            var configFileName = config.GetValue<string>(ConfigurationFileKey, null);
+            if (configFileName != null)
+            {
+                builder = new ConfigurationBuilder();
+                builder.AddJsonFile(configFileName, false);
+                builder.AddCommandLine(args);
+                config = builder.Build();
+            }
+            var options = new LoadTestOptions();
+            config.Bind(options);
+            return options;
+        }
     }
 }

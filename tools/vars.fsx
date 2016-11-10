@@ -31,3 +31,9 @@ let BackendProjectVersion = sprintf "%s-%s__%s" Versions.Api GitHash Timestamp
 let BackendDefaultDeploymentPackagePath = BackendProjectBuildDir + "app.publish" @@ (sprintf "%s__%s.cspkg" BackendProjectName BackendProjectVersion)
 let BackendDeploymentPackagePath = getBuildParamOrDefault "BackendDeploymentPackagePath" BackendDefaultDeploymentPackagePath
 let BackendConfigurationFile = ConfigDir @@ (sprintf "backend.%s.secrets.cscfg" TargetEnvironment)
+
+let LoadTestProjectName = "Conreign.LoadTest"
+let LoadTestProjectFile = !! (SourceDir @@ LoadTestProjectName @@ "*.csproj") |> Seq.head
+let LoadTestProjectVersion = sprintf "%s-%s__%s" Versions.Loadtest GitHash Timestamp
+let LoadTestBuildDir = BuildDir @@ LoadTestProjectName
+let LoadTestArtifactPath = BuildDir @@ (sprintf "%s__%s.zip" LoadTestProjectName LoadTestProjectVersion)

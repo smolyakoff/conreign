@@ -45,7 +45,7 @@ namespace Conreign.Client.Handler.Handlers.Decorators
                 new PropertyEnricher("TraceId", context.Metadata.TraceId),
                 new PropertyEnricher("UserId", context.UserId),
                 new PropertyEnricher("ConnectionId", context.Connection.Id),
-                new PropertyEnricher("CommandType", message.Command.GetType())
+                new PropertyEnricher("CommandType", message.Command.GetType().Name)
             };
             using (LogContext.PushProperties(diagnosticProperties))
             {

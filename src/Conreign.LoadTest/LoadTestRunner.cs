@@ -6,26 +6,25 @@ using System.Threading.Tasks;
 using Conreign.Client.SignalR;
 using Conreign.Core.AI;
 using Conreign.Core.AI.LoadTest;
-using Microsoft.Extensions.Configuration;
 using Serilog;
-using Serilog.Core;
-using Serilog.Events;
 using Serilog.Sinks.Elasticsearch;
 
 namespace Conreign.LoadTest
 {
     public static class LoadTestRunner
     {
-        private const string ConfigurationFileKey = "ConfigurationFileName";
-
         public static Task Run(string[] args)
         {
-            var options = ParseOptions(args);
+            var options = LoadTestOptions.Parse(args);
             return Run(options);
         }
 
         public static async Task Run(LoadTestOptions options)
         {
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
             var loggerConfiguration = new LoggerConfiguration()
                 .WriteTo.LiterateConsole();
             if (!string.IsNullOrEmpty(options.ElasticSearchUri))
@@ -61,27 +60,12 @@ namespace Conreign.LoadTest
             catch (Exception ex)
             {
                 logger.Fatal(ex, "Load test failed: {ErrorMessage}.", ex.Message);
+                throw;
             }
-            Log.CloseAndFlush();
-        }
-
-        private static LoadTestOptions ParseOptions(string[] args)
-        {
-            var builder = new ConfigurationBuilder();
-            builder.AddCommandLine(args);
-            var config = builder.Build();
-
-            var configFileName = config.GetValue<string>(ConfigurationFileKey, null);
-            if (configFileName != null)
+            finally
             {
-                builder = new ConfigurationBuilder();
-                builder.AddJsonFile(configFileName, false);
-                builder.AddCommandLine(args);
-                config = builder.Build();
+                Log.CloseAndFlush();
             }
-            var options = new LoadTestOptions();
-            config.Bind(options);
-            return options;
         }
     }
 }
