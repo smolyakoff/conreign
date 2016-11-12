@@ -1,6 +1,6 @@
 #r "System.Threading.Tasks"
 #r "System.Net.Http"
-#r "./../packages/Microsoft.Bcl.Async/lib/portable-net45+win8+wpa81/Microsoft.Threading.Tasks.dll"
+#r "./../packages/Microsoft.Bcl.Async/lib/net40/Microsoft.Threading.Tasks.dll"
 #r "./../packages/System.IO.FileSystem.Primitives/lib/net46/System.IO.FileSystem.Primitives.dll"
 #r "./../packages/System.IO.FileSystem/lib/net46/System.IO.FileSystem.dll"
 #r "./../packages/System.Security.Cryptography.Algorithms/lib/net46/System.Security.Cryptography.Algorithms.dll"
@@ -123,7 +123,9 @@ let GetDeploymentOrNull (creds: AzureCredentials) (svc: Deployment) =
 
 let GetPackageCloudPath name label = sprintf "artifacts/%s/%s.cspkg" name label
 
-let HandleOperationResponse prefix name (response: OperationStatusResponse) =
+let HandleOperation prefix name (responseTask: Task<OperationStatusResponse>) =
+    sprintf "%s %s operation is started." prefix name |> trace
+    let response = responseTask.Result
     match response.Status with
         | OperationStatus.Failed -> 
             sprintf "%s (%s)." response.Error.Message response.Error.Code  |> traceError
@@ -148,7 +150,7 @@ let Deploy (options: DeploymentOptions) =
         let prepend msg = sprintf "%s %s" logPrefix msg
         Printf.ksprintf prepend fmt
     formatLog "Package uri is %A." packageUri |> trace
-    let response = 
+    let task = 
         match existingDeployment with
             | null -> 
                 let createParams = new DeploymentCreateParameters()
@@ -158,15 +160,15 @@ let Deploy (options: DeploymentOptions) =
                 createParams.Name <- options.Deployment.ServiceName
                 createParams.TreatWarningsAsError <- Nullable(true)
                 createParams.StartDeployment <- Nullable(true)
-                client.Deployments.Create(options.Deployment.ServiceName, slot, createParams)
+                client.Deployments.CreateAsync(options.Deployment.ServiceName, slot, createParams)
             | deployment ->
                 let upgradeParams = new DeploymentUpgradeParameters()
                 upgradeParams.Configuration <- File.ReadAllText(options.ConfigurationFilePath)
                 upgradeParams.Label <- options.Label
                 upgradeParams.PackageUri <- packageUri
                 formatLog "Started deployment upgrade." |> trace
-                client.Deployments.UpgradeBySlot(options.Deployment.ServiceName, slot, upgradeParams)
-    HandleOperationResponse logPrefix "Deployment" response
+                client.Deployments.UpgradeBySlotAsync(options.Deployment.ServiceName, slot, upgradeParams)
+    HandleOperation logPrefix "Deployment" task
 
 let DeleteCloudService (options: StopOptions) =
     let client = CreateComputeManagementClient options.Credentials
@@ -177,5 +179,7 @@ let DeleteCloudService (options: StopOptions) =
         let prepend msg = String.Join(" ", [logPrefix, msg])
         Printf.ksprintf prepend fmt
     if existingDeployment <> null then
-        let response = client.Deployments.DeleteBySlot(options.Deployment.ServiceName, slot)
-        HandleOperationResponse logPrefix "Delete" response
+        let task = client.Deployments.DeleteBySlotAsync(options.Deployment.ServiceName, slot)
+        HandleOperation logPrefix "Delete" task
+    else
+        formatLog "Nothing to delete." |> trace

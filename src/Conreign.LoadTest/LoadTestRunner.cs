@@ -7,6 +7,7 @@ using Conreign.Client.SignalR;
 using Conreign.Core.AI;
 using Conreign.Core.AI.LoadTest;
 using Serilog;
+using Serilog.Formatting.Json;
 using Serilog.Sinks.Elasticsearch;
 
 namespace Conreign.LoadTest
@@ -25,8 +26,17 @@ namespace Conreign.LoadTest
             {
                 throw new ArgumentNullException(nameof(options));
             }
-            var loggerConfiguration = new LoggerConfiguration()
-                .WriteTo.LiterateConsole();
+            var loggerConfiguration = new LoggerConfiguration();
+            if (options.LogToConsole)
+            {
+                loggerConfiguration.WriteTo.LiterateConsole();
+            }
+            if (!string.IsNullOrEmpty(options.LogFileName))
+            {
+                var formatter = new JsonFormatter(renderMessage: true, closingDelimiter: ",");
+                var logFilePath = Environment.ExpandEnvironmentVariables(options.LogFileName);
+                loggerConfiguration.WriteTo.File(formatter, logFilePath, buffered: true);
+            }
             if (!string.IsNullOrEmpty(options.ElasticSearchUri))
             {
                 var elasticOptions = new ElasticsearchSinkOptions(new Uri(options.ElasticSearchUri))
@@ -44,17 +54,18 @@ namespace Conreign.LoadTest
                 .ForContext("InstanceId", options.InstanceId);
             Serilog.Debugging.SelfLog.Enable(msg => Trace.WriteLine(msg));
             var logger = Log.Logger;
-            var botOptions = options.BotOptions;
-            logger.Information("Initialized with the following configuration: {@Configuration}", options);
-            ServicePointManager.DefaultConnectionLimit = botOptions.RoomsCount*botOptions.BotsPerRoomCount*2;
-            var signalrOptions = new SignalRClientOptions(options.ConnectionUri);
-            var client = new SignalRClient(signalrOptions);
-            var factory = new LoadTestBotFactory(botOptions);
-            var farm = new BotFarm(options.InstanceId, client, factory, new BotFarmOptions());
-            var cts = new CancellationTokenSource();
-            cts.CancelAfter(options.Timeout);
             try
             {
+                var botOptions = options.BotOptions;
+                logger.Information("Initialized with the following configuration: {@Configuration}", options);
+                ServicePointManager.DefaultConnectionLimit = botOptions.RoomsCount * botOptions.BotsPerRoomCount * 2;
+                var signalrOptions = new SignalRClientOptions(options.ConnectionUri);
+                var client = new SignalRClient(signalrOptions);
+                var factory = new LoadTestBotFactory(botOptions);
+                var farm = new BotFarm(options.InstanceId, client, factory, new BotFarmOptions());
+                var cts = new CancellationTokenSource();
+                cts.CancelAfter(options.Timeout);
+
                 await farm.Run(cts.Token);
             }
             catch (Exception ex)

@@ -4,6 +4,8 @@ redirects: on
 nuget FAKE
 nuget FSharp.Data
 
+nuget xunit
+
 nuget Microsoft.Extensions.Configuration
 nuget Microsoft.Extensions.Configuration.Binder
 nuget Microsoft.Extensions.Configuration.CommandLine
@@ -14,7 +16,7 @@ nuget Microsoft.IdentityModel.Clients.ActiveDirectory
 nuget Microsoft.WindowsAzure.ConfigurationManager
 nuget Microsoft.Azure.Storage.DataMovement
 
-nuget xunit
+nuget Azure.Batch
 
 nuget Microsoft.Tpl.Dataflow
 nuget System.Reactive.Core

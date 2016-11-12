@@ -8,6 +8,9 @@ NUGET
       System.ComponentModel.TypeConverter (>= 4.1) - framework: netstandard11, >= netstandard13
       System.Dynamic.Runtime (>= 4.0.11) - framework: netstandard11, >= netstandard13
       System.Linq.Queryable (>= 4.0.1) - framework: netstandard11, >= netstandard13
+    Azure.Batch (5.1.2)
+      Microsoft.Rest.ClientRuntime.Azure (>= 3.3.1) - framework: >= net45
+      WindowsAzure.Storage (>= 6.2) - framework: >= net45
     Elasticsearch.Net (2.4.6) - framework: >= net45, >= netstandard13
       Microsoft.CSharp (>= 4.0.1) - framework: >= netstandard13
       NETStandard.Library (>= 1.6) - framework: >= netstandard13
@@ -284,6 +287,10 @@ NUGET
       Microsoft.Owin.Host.HttpListener (>= 3.0.1)
       Microsoft.Owin.Hosting (>= 3.0.1)
       Owin (>= 1.0)
+    Microsoft.Rest.ClientRuntime (2.3.3) - framework: >= net45
+      Newtonsoft.Json (>= 6.0.8) - framework: >= net45
+    Microsoft.Rest.ClientRuntime.Azure (3.3.3) - framework: >= net45
+      Microsoft.Rest.ClientRuntime (>= 2.3.3 < 3.0) - framework: >= net45, netstandard11, >= netstandard15
     Microsoft.Tpl.Dataflow (4.5.24)
     Microsoft.Win32.Primitives (4.0.1) - framework: >= net46, netstandard13, >= netstandard13, >= netstandard15
       Microsoft.NETCore.Platforms (>= 1.0.1) - framework: >= netstandard13
@@ -872,8 +879,8 @@ NUGET
       System.Diagnostics.Contracts (>= 4.0.1)
       System.Dynamic.Runtime (>= 4.0.11)
       System.Reactive.Interfaces (>= 3.1)
-      System.Threading.Thread (>= 4.0) - framework: netcore10
-      System.Threading.ThreadPool (>= 4.0.10) - framework: netcore10
+      System.Threading.Thread (>= 4.0)
+      System.Threading.ThreadPool (>= 4.0.10)
     System.Reactive.Interfaces (3.1)
       NETStandard.Library (>= 1.6)
     System.Reactive.Linq (3.1)
@@ -1167,8 +1174,8 @@ NUGET
       System.Runtime.Extensions (>= 4.1) - framework: dnxcore50, >= netstandard13
       System.Threading (>= 4.0.11) - framework: dnxcore50, >= netstandard13
       System.Threading.Tasks (>= 4.0.11) - framework: dnxcore50, netstandard11, >= netstandard13
-    System.Threading.Thread (4.0) - framework: >= net46, >= netstandard13, >= netstandard15, netcore10
-    System.Threading.ThreadPool (4.0.10) - framework: >= netstandard15, netcore10
+    System.Threading.Thread (4.0) - framework: >= net46, >= netstandard13, >= netstandard15
+    System.Threading.ThreadPool (4.0.10) - framework: >= netstandard15
     System.Threading.Timer (4.0.1) - framework: >= net451, >= netstandard12
       Microsoft.NETCore.Platforms (>= 1.0.1) - framework: dnxcore50, >= netstandard12
       Microsoft.NETCore.Targets (>= 1.0.1) - framework: dnxcore50, >= netstandard12

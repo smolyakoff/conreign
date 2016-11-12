@@ -27,6 +27,8 @@ namespace Conreign.LoadTest
 
         public string InstanceId { get; set; }
         public string ConfigurationFileName { get; set; }
+        public string LogFileName { get; set; } = "log.json";
+        public bool LogToConsole { get; set; } = true;
         public string ConnectionUri { get; set; }
         public string ElasticSearchUri { get; set; }
         public LogEventLevel MinimumLogLevel { get; set; }
@@ -45,8 +47,9 @@ namespace Conreign.LoadTest
                 builder = new ConfigurationBuilder();
                 builder.AddJsonFile(configFileName, false);
                 builder.AddCommandLine(args);
-                config = builder.Build();
             }
+
+            config = builder.Build();
             var options = new LoadTestOptions();
             config.Bind(options);
             return options;
