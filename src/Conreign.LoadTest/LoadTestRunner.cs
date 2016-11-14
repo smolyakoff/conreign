@@ -33,7 +33,7 @@ namespace Conreign.LoadTest
             }
             if (!string.IsNullOrEmpty(options.LogFileName))
             {
-                var formatter = new JsonFormatter(renderMessage: true, closingDelimiter: ",");
+                var formatter = new JsonFormatter(renderMessage: true, closingDelimiter: $",{Environment.NewLine}");
                 var logFilePath = Environment.ExpandEnvironmentVariables(options.LogFileName);
                 loggerConfiguration.WriteTo.File(formatter, logFilePath, buffered: true);
             }
@@ -42,7 +42,9 @@ namespace Conreign.LoadTest
                 var elasticOptions = new ElasticsearchSinkOptions(new Uri(options.ElasticSearchUri))
                 {
                     AutoRegisterTemplate = true,
-                    BufferBaseFilename = "logs/elastic-buffer"
+                    BufferBaseFilename = "logs/elastic-buffer",
+                    BatchPostingLimit = 100,
+                    BufferLogShippingInterval = options.ElasticSearchFlushInterval
                 };
                 loggerConfiguration.WriteTo.Elasticsearch(elasticOptions);
             }
@@ -75,7 +77,16 @@ namespace Conreign.LoadTest
             }
             finally
             {
-                Log.CloseAndFlush();
+                try
+                {
+                    var cts = new CancellationTokenSource();
+                    cts.CancelAfter(options.LogFlushTimeout);
+                    await Task.Run(() => Log.CloseAndFlush(), cts.Token);
+                }
+                catch (TaskCanceledException)
+                {
+                    logger.Warning("Log flush timeout.");
+                }
             }
         }
     }

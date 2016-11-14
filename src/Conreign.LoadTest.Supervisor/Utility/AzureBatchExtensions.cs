@@ -47,6 +47,7 @@ namespace Conreign.LoadTest.Supervisor.Utility
 
             var job = client.JobOperations.CreateJob(jobId, poolInfo);
             job.DisplayName = $"Run load test ({jobId})";
+            job.Constraints = new JobConstraints(maxWallClockTime: options.JobTimeout);
             return job;
         }
 
@@ -104,9 +105,10 @@ namespace Conreign.LoadTest.Supervisor.Utility
                     instanceOptions.BotOptions.BotsPerRoomCount),
                 new CommandLineArgument(
                     $"{nameof(instanceOptions.BotOptions)}:{nameof(instanceOptions.BotOptions.RoomPrefix)}",
-                    taskId),
+                    $"{taskId}:"),
                 new CommandLineArgument(nameof(instanceOptions.LogToConsole), false),
                 new CommandLineArgument(nameof(instanceOptions.LogFileName), Path.Combine("%AZ_BATCH_TASK_DIR%", "log.json")),
+                new CommandLineArgument(nameof(instanceOptions.Timeout), options.InstanceTimeout)
             };
             var args = arguments.Where(x => x.Value != null).ToList();
             builder.Append($" {string.Join(" ", args)}");
@@ -120,6 +122,15 @@ namespace Conreign.LoadTest.Supervisor.Utility
             task.ApplicationPackageReferences = new List<ApplicationPackageReference> {app};
             task.DisplayName = $"Execute load test ({taskId})";
             return task;
+        }
+
+        public static async Task<string> GetLatestApplicationVersion(this BatchClient client)
+        {
+            var summary = await client.ApplicationOperations.GetApplicationSummaryAsync(ApplicationId);
+            return summary.Versions
+                .Select(v => new Version(v))
+                .OrderByDescending(x => x)
+                .FirstOrDefault()?.ToString();
         }
 
         private static PoolSpecification CreatePoolSpecification(LoadTestSupervisorOptions options, string jobId = null)

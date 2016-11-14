@@ -23,7 +23,7 @@ namespace Conreign.Client.SignalR
         private readonly Metadata _metadata;
         private readonly ILogger _logger;
         private readonly RetryPolicy _retryPolicy;
-        private const string OperationDescription = "SignaR.Send";
+        private const string OperationDescription = "SignalR.Send";
 
         public SignalRSender(IHubProxy hub, HubConnection hubConnection, Metadata metadata)
         {

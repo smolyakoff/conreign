@@ -1,6 +1,6 @@
 #r "System.Globalization"
 #r "System.IO"
-#r "./../packages/FAKE/tools/FakeLib.dll"
+#r "./../packages/build/FAKE/tools/FakeLib.dll"
 #r "./../packages/FSharp.Data/lib/net40/FSharp.Data.dll"
 
 open FSharp.Data
@@ -30,6 +30,7 @@ let BackendProjectBuildDir = BuildDir @@ BackendProjectName
 let BackendProjectVersion = sprintf "%s-%s__%s" Versions.Api GitHash Timestamp
 let BackendDefaultDeploymentPackagePath = BackendProjectBuildDir + "app.publish" @@ (sprintf "%s__%s.cspkg" BackendProjectName BackendProjectVersion)
 let BackendDeploymentPackagePath = getBuildParamOrDefault "BackendDeploymentPackagePath" BackendDefaultDeploymentPackagePath
+let BackendDeployLatestExisting = getEnvironmentVarAsBoolOrDefault "BackendDeployLatestExisting" false
 let BackendConfigurationFile = ConfigDir @@ (sprintf "backend.%s.secrets.cscfg" TargetEnvironment)
 
 let LoadTestProjectName = "Conreign.LoadTest"

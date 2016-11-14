@@ -17,4 +17,4 @@ if errorlevel 1 (
 )
 echo Starting Fake...
 
-"%SCRIPT_DIR%packages\FAKE\tools\Fake.exe" "%SCRIPT_DIR%tools\do.fsx" %*
+"%SCRIPT_DIR%packages\build\FAKE\tools\Fake.exe" "%SCRIPT_DIR%tools\do.fsx" %*

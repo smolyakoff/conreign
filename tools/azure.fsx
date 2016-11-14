@@ -1,19 +1,18 @@
 #r "System.Threading.Tasks"
 #r "System.Net.Http"
-#r "./../packages/Microsoft.Bcl.Async/lib/net40/Microsoft.Threading.Tasks.dll"
-#r "./../packages/System.IO.FileSystem.Primitives/lib/net46/System.IO.FileSystem.Primitives.dll"
-#r "./../packages/System.IO.FileSystem/lib/net46/System.IO.FileSystem.dll"
-#r "./../packages/System.Security.Cryptography.Algorithms/lib/net46/System.Security.Cryptography.Algorithms.dll"
-#r "./../packages/System.Security.Cryptography.Primitives/lib/net46/System.Security.Cryptography.Primitives.dll"
-#r "./../packages/FAKE/tools/FakeLib.dll"
-#r "./../packages/Hyak.Common/lib/net45/Hyak.Common.dll"
-#r "./../packages/Microsoft.Azure.Common/lib/net45/Microsoft.Azure.Common.dll"
-#r "./../packages/Microsoft.Azure.Common/lib/net45/Microsoft.Azure.Common.NetFramework.dll"
-#r "./../packages/WindowsAzure.Storage.7.2.0/lib/net40/Microsoft.WindowsAzure.Storage.dll"
-#r "./../packages/Microsoft.Azure.Storage.DataMovement/lib/net45/Microsoft.WindowsAzure.Storage.DataMovement.dll"
-#r "./../packages/Microsoft.IdentityModel.Clients.ActiveDirectory/lib/net45/Microsoft.IdentityModel.Clients.ActiveDirectory.dll"
-#r "./../packages/Microsoft.IdentityModel.Clients.ActiveDirectory/lib/net45/Microsoft.IdentityModel.Clients.ActiveDirectory.Platform.dll"
-#r "./../packages/Microsoft.WindowsAzure.Management.Compute/lib/portable-net45+wp8+wpa81+win/Microsoft.WindowsAzure.Management.Compute.dll"
+#r "./../packages/build/Microsoft.Bcl.Async/lib/net40/Microsoft.Threading.Tasks.dll"
+#r "./../packages/build/System.IO.FileSystem.Primitives/lib/net46/System.IO.FileSystem.Primitives.dll"
+#r "./../packages/build/System.IO.FileSystem/lib/net46/System.IO.FileSystem.dll"
+#r "./../packages/build/System.Security.Cryptography.Algorithms/lib/net46/System.Security.Cryptography.Algorithms.dll"
+#r "./../packages/build/System.Security.Cryptography.Primitives/lib/net46/System.Security.Cryptography.Primitives.dll"
+#r "./../packages/build/FAKE/tools/FakeLib.dll"
+#r "./../packages/build/Hyak.Common/lib/net45/Hyak.Common.dll"
+#r "./../packages/build/Microsoft.Azure.Common/lib/net45/Microsoft.Azure.Common.dll"
+#r "./../packages/build/Microsoft.Azure.Common/lib/net45/Microsoft.Azure.Common.NetFramework.dll"
+#r "./../packages/build/WindowsAzure.Storage/lib/net40/Microsoft.WindowsAzure.Storage.dll"
+#r "./../packages/build/Microsoft.Azure.Storage.DataMovement/lib/net45/Microsoft.WindowsAzure.Storage.DataMovement.dll"
+#r "./../packages/build/Microsoft.WindowsAzure.Management.Compute/lib/portable-net45+wp8+wpa81+win/Microsoft.WindowsAzure.Management.Compute.dll"
+
 
 open Fake
 open Fake.TraceHelper
@@ -24,8 +23,6 @@ open System.Threading.Tasks
 open System.Security.Cryptography.X509Certificates
 open Hyak.Common
 open Microsoft.Azure
-open Microsoft.IdentityModel.Clients.ActiveDirectory
-open Microsoft.IdentityModel.Clients.ActiveDirectory.Native
 open Microsoft.WindowsAzure.Storage
 open Microsoft.WindowsAzure.Storage.Blob
 open Microsoft.WindowsAzure.Storage.DataMovement
@@ -103,7 +100,7 @@ let UploadFile connectionString sourcePath destinationPath =
     let absoluteSourcePath = Path.GetFullPath(sourcePath)
     let sourceInfo = new FileInfo(sourcePath)
     tracefn "[STORAGE] Started to upload file: %s -> %s." absoluteSourcePath destinationPath
-    let transferCtx = new TransferContext()
+    let transferCtx = new SingleTransferContext()
     transferCtx.ProgressHandler <- CreatePercentageProgress sourceInfo.Length
     let uploadOptions = new UploadOptions()
     TransferManager.UploadAsync(absoluteSourcePath, blob, uploadOptions, transferCtx).Wait()
@@ -136,7 +133,7 @@ let HandleOperation prefix name (responseTask: Task<OperationStatusResponse>) =
             sprintf "%s %s operation completed." prefix name |> trace
         | x -> ignore x
 
-let Deploy (options: DeploymentOptions) =
+let DeployCloudService (options: DeploymentOptions) =
     let client = CreateComputeManagementClient options.Credentials
     let slot = ParseSlot options.Deployment.Slot
     let existingDeployment = GetDeploymentOrNull options.Credentials options.Deployment

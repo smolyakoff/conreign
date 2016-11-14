@@ -1,4 +1,4 @@
-#r "./../packages/FAKE/tools/FakeLib.dll"
+#r "./../packages/build/FAKE/tools/FakeLib.dll"
 #r "./../packages/System.ComponentModel.TypeConverter/lib/net45/System.ComponentModel.TypeConverter.dll"
 #r "./../packages/Microsoft.Extensions.Primitives/lib/netstandard1.0/Microsoft.Extensions.Primitives.dll"
 #r "./../packages/Microsoft.Extensions.Configuration.Abstractions/lib/netstandard1.0/Microsoft.Extensions.Configuration.Abstractions.dll"

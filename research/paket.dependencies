@@ -1,0 +1,5 @@
+source https://nuget.org/api/v2
+
+nuget Deedle
+nuget FsLab 1.0.1
+nuget FSharp.Data

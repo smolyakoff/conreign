@@ -31,9 +31,11 @@ namespace Conreign.LoadTest
         public bool LogToConsole { get; set; } = true;
         public string ConnectionUri { get; set; }
         public string ElasticSearchUri { get; set; }
+        public TimeSpan ElasticSearchFlushInterval { get; set; } = TimeSpan.FromSeconds(5);
         public LogEventLevel MinimumLogLevel { get; set; }
         public LoadTestBotOptions BotOptions { get; set; }
         public TimeSpan Timeout { get; set; }
+        public TimeSpan LogFlushTimeout { get; set; } = TimeSpan.FromMinutes(5);
 
         public static LoadTestOptions Parse(string[] args)
         {
