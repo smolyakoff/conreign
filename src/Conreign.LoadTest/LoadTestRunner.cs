@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
+using System.IO.Compression;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Conreign.Client.SignalR;
 using Conreign.Core.AI;
 using Conreign.Core.AI.LoadTest;
+using Ionic.Zip;
 using Serilog;
 using Serilog.Formatting.Json;
 using Serilog.Sinks.Elasticsearch;
+using CompressionLevel = Ionic.Zlib.CompressionLevel;
 
 namespace Conreign.LoadTest
 {
@@ -67,8 +71,17 @@ namespace Conreign.LoadTest
                 var farm = new BotFarm(options.InstanceId, client, factory, new BotFarmOptions());
                 var cts = new CancellationTokenSource();
                 cts.CancelAfter(options.Timeout);
-
                 await farm.Run(cts.Token);
+                logger.Information("Load test complete.");
+                if (!string.IsNullOrEmpty(options.LogFileName) && options.ZipLogFile)
+                {
+                    logger.Information("Waiting a bit for Serilog to flush.");
+                    // ReSharper disable once MethodSupportsCancellation
+                    // HACK: magic delay here, how to explicitely flush Serilog without closing?
+                    await Task.Delay(TimeSpan.FromSeconds(5));
+                    var zipPath = ZipLogFile(options.LogFileName);
+                    logger.Information("Zipped log file {LogFilePath} to {ZippedLogFilePath}", options.LogFileName, zipPath);
+                }
             }
             catch (Exception ex)
             {
@@ -88,6 +101,24 @@ namespace Conreign.LoadTest
                     logger.Warning("Log flush timeout.");
                 }
             }
+        }
+
+        private static string ZipLogFile(string logFilePath)
+        {
+            var directory = Path.GetDirectoryName(logFilePath);
+            var fileName = Path.GetFileNameWithoutExtension(logFilePath);
+            if (directory == null)
+            {
+                throw new InvalidOperationException("Log directory is null.");
+            }
+            var zipPath = Path.Combine(directory, $"{fileName}.zip");
+            using (var archive = new ZipFile(zipPath))
+            {
+                archive.CompressionLevel = CompressionLevel.BestCompression;
+                archive.AddFile(logFilePath);
+                archive.Save();
+            }
+            return zipPath;
         }
     }
 }

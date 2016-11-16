@@ -20,6 +20,7 @@ nuget Serilog.Sinks.Literate
 nuget Serilog.Sinks.AzureTableStorage
 nuget Serilog.Sinks.ElasticSearch
 nuget SerilogMetrics
+nuget DotNetZip
 nuget Polly
 nuget FluentValidation
 nuget JWT

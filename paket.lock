@@ -11,6 +11,7 @@ NUGET
     Azure.Batch (5.1.2)
       Microsoft.Rest.ClientRuntime.Azure (>= 3.3.1) - framework: >= net45
       WindowsAzure.Storage (>= 6.2) - framework: >= net45
+    DotNetZip (1.10.1)
     Elasticsearch.Net (2.4.6) - framework: >= net45, >= netstandard13
       Microsoft.CSharp (>= 4.0.1) - framework: >= netstandard13
       NETStandard.Library (>= 1.6) - framework: >= netstandard13
@@ -934,8 +935,8 @@ NUGET
       System.Diagnostics.Contracts (>= 4.0.1)
       System.Dynamic.Runtime (>= 4.0.11)
       System.Reactive.Interfaces (>= 3.1)
-      System.Threading.Thread (>= 4.0)
-      System.Threading.ThreadPool (>= 4.0.10)
+      System.Threading.Thread (>= 4.0) - framework: netcore10
+      System.Threading.ThreadPool (>= 4.0.10) - framework: netcore10
     System.Reactive.Interfaces (3.1)
       NETStandard.Library (>= 1.6)
     System.Reactive.Linq (3.1)
@@ -1233,8 +1234,8 @@ NUGET
       System.Runtime.Extensions (>= 4.3) - framework: dnxcore50, >= netstandard13
       System.Threading (>= 4.3) - framework: dnxcore50, >= netstandard13
       System.Threading.Tasks (>= 4.3) - framework: dnxcore50, netstandard11, >= netstandard13
-    System.Threading.Thread (4.3) - framework: >= net46, >= netstandard13
-    System.Threading.ThreadPool (4.3) - framework: >= netstandard15
+    System.Threading.Thread (4.3) - framework: >= net46, >= netstandard13, netcore10
+    System.Threading.ThreadPool (4.3) - framework: >= netstandard15, netcore10
     System.Threading.Timer (4.3) - framework: >= net451, >= netstandard12, >= netstandard13, >= netstandard15
       Microsoft.NETCore.Platforms (>= 1.1) - framework: dnxcore50, >= netstandard12
       Microsoft.NETCore.Targets (>= 1.1) - framework: dnxcore50, >= netstandard12
