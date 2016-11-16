@@ -137,18 +137,25 @@ namespace Conreign.LoadTest.Supervisor
         private static async Task DownloadLogs(string jobOutputDirectory, IEnumerable<CloudTask> tasks, int? maxDegreeOfParallelism)
         {
             var minProgressDelta = 500.Kilobytes().Bytes;
+            var logFileNames = new HashSet<string> {"log.zip", "log.json"};
             var logger = Log.Logger;
             var files = tasks
-                .Select(t => new
-                {
-                    TaskId = t.Id,
-                    LogFile = t.ListNodeFiles().FirstOrDefault(f => f.Name == "log.json")
-                })
-                .Where(t => t.LogFile != null)
+                .SelectMany(t => t
+                    .ListNodeFiles()
+                    .Where(x => logFileNames.Contains(x.Name))
+                    .OrderBy(x => x.Name.EndsWith("zip") ? 0 : 1)
+                    .Take(1)
+                    .Select(x => new
+                    {
+                        TaskId = t.Id,
+                        LogFile = x
+                    })
+                )
                 .ToList();
             await files.SelectAsync(async f =>
             {
-                var filePath = Path.Combine(jobOutputDirectory, $"{f.TaskId}-log.json");
+                var ext = Path.GetExtension(f.LogFile.Name);
+                var filePath = Path.Combine(jobOutputDirectory, $"{f.TaskId}-log{ext}");
                 try
                 {
                     var totalBytes = f.LogFile.Properties.ContentLength;

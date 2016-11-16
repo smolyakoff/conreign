@@ -115,7 +115,7 @@ namespace Conreign.LoadTest
             using (var archive = new ZipFile(zipPath))
             {
                 archive.CompressionLevel = CompressionLevel.BestCompression;
-                archive.AddFile(logFilePath);
+                archive.AddFile(logFilePath, string.Empty);
                 archive.Save();
             }
             return zipPath;
