@@ -39,8 +39,8 @@
     <Compile Include="AI\Battle\NaiveBotBattleStrategy.cs" />
     <Compile Include="AI\Behaviours\ErrorHandlingBehaviour.cs" />
     <Compile Include="AI\Behaviours\RetryBehaviour.cs" />
-    <Compile Include="AI\Behaviours\StopBehaviour.cs" />
     <Compile Include="AI\BotFarmOptions.cs" />
+    <Compile Include="AI\BotState.cs" />
     <Compile Include="AI\IBotFactory.cs" />
     <Compile Include="AI\LoadTest\LoadTestBotFactory.cs" />
     <Compile Include="AI\BotFarm.cs" />
@@ -77,6 +77,7 @@
     <Compile Include="Presence\ConnectionState.cs" />
     <Compile Include="Presence\HubMemberState.cs" />
     <Compile Include="Properties\orleans.codegen.cs" />
+    <Compile Include="Utility\CancellationTokenExtensions.cs" />
     <Compile Include="Utility\PropertyComparer%272.cs" />
     <Compile Include="AI\Battle\ReadOnlyMap.cs" />
     <Compile Include="AI\Battle\ReadOnlyPlanetData.cs" />

@@ -5,6 +5,14 @@ namespace Conreign.LoadTest.Supervisor
 {
     public class LoadTestSupervisorOptions
     {
+        public LoadTestSupervisorOptions()
+        {
+            InstanceOptions = new LoadTestOptions
+            {
+                Timeout = TimeSpan.FromMinutes(30)
+            };
+        }
+
         public string Name { get; set; } = $"{DateTime.UtcNow:yy-MM-dd__hh-mm-ss}";
         public string OutputDirectory { get; set; } = Environment.CurrentDirectory;
         public string ConfigurationFileName { get; set; }
@@ -20,8 +28,7 @@ namespace Conreign.LoadTest.Supervisor
         public int FileDownloadDegreeOfParallelism { get; set; } = 2;
         public TimeSpan TaskStatisticsFetchInterval { get; set; } = TimeSpan.FromSeconds(10);
         public TimeSpan JobTimeout { get; set; } = TimeSpan.FromHours(1);
-        public TimeSpan InstanceTimeout { get; set; } = TimeSpan.FromMinutes(30);
-        public LoadTestOptions InstanceOptions { get; set; } = new LoadTestOptions();
+        public LoadTestOptions InstanceOptions { get; set; }
 
         public static LoadTestSupervisorOptions Parse(string[] args)
         {

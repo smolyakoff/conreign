@@ -14,6 +14,7 @@ using SerilogMetrics;
 
 namespace Conreign.Core.AI
 {
+    // TODO: better cancellation handling, not a stateful object?
     public class Bot : IDisposable
     {
         private readonly BotContext _context;
@@ -21,10 +22,9 @@ namespace Conreign.Core.AI
         private readonly IDisposable _subscription;
         private Subject<IBotEvent> _subject;
         private bool _isDisposed;
-        private bool _completed;
+        private BotState _state;
         private ActionBlock<IClientEvent> _processor;
         private Exception _exception;
-        private CancellationTokenSource _cancellationTokenSource;
         private CancellationToken _cancellationToken;
         private IGaugeMeasure _queueSize;
         private readonly ICounterMeasure _received;
@@ -43,14 +43,10 @@ namespace Conreign.Core.AI
             {
                 throw new ArgumentNullException(nameof(connection));
             }
-            _context = new BotContext(botId, connection, Complete, Notify);
+            _state = BotState.Idle;
+            _context = new BotContext(botId, connection, Stop, Notify);
             _subscription = connection.Events.Subscribe(OnClientEvent, OnClientException, OnClientCompleted);
             var allBehaviours = behaviours.ToList();
-            if (!behaviours.OfType<StopBehaviour>().Any())
-            {
-                allBehaviours.Add(new StopBehaviour());
-            }
-            
             var dispatcher = new DispatcherBehaviour(allBehaviours);
             var retry = new RetryBehaviour(dispatcher);
             var errorHandling = new ErrorHandlingBehaviour(retry);
@@ -67,14 +63,11 @@ namespace Conreign.Core.AI
         public async Task Run(CancellationToken? cancellationToken = null)
         {
             EnsureIsNotDisposed();
-            cancellationToken = cancellationToken ?? CancellationToken.None;
-            _cancellationTokenSource = new CancellationTokenSource();
-            _cancellationToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken.Value, _cancellationTokenSource.Token).Token;
+            _cancellationToken = cancellationToken ?? CancellationToken.None;
             var processorOptions = new ExecutionDataflowBlockOptions
             {
                 BoundedCapacity = MaxQueueSize
             };
-            _completed = false;
             _processor = new ActionBlock<IClientEvent>(Process, processorOptions);
             _subject?.Dispose();
             _subject = new Subject<IBotEvent>();
@@ -82,6 +75,7 @@ namespace Conreign.Core.AI
             _received.Reset();
             Events = _subject.AsObservable();
             Notify(new BotStarted());
+            _state = BotState.Started;
             await _processor.Completion;
             if (_exception != null)
             {
@@ -105,12 +99,10 @@ namespace Conreign.Core.AI
             {
                 return;
             }
-            _cancellationTokenSource.Cancel();
-            _subject?.Dispose();
             _subscription?.Dispose();
-            _processor?.Complete();
+            Stop();
+            _subject?.Dispose();
             _subject = null;
-            _processor = null;
             _isDisposed = true;
         }
 
@@ -122,7 +114,7 @@ namespace Conreign.Core.AI
         private void OnClientException(Exception exception)
         {
             _exception = exception;
-            Complete();
+            Stop();
         }
 
         private void OnClientCompleted()
@@ -131,14 +123,18 @@ namespace Conreign.Core.AI
             {
                 return;
             }
-            _exception = new InvalidOperationException("Client stream unexpectedly completed.");
-            Complete();
+            Stop(new InvalidOperationException("Client stream unexpectedly completed."));
         }
 
-        private void Complete(Exception exception = null)
+        private void Stop(Exception exception = null)
         {
-            _processor.Post(new BotStopped());
-            _processor.Complete();
+            EnsureIsNotDisposed();
+            if (_state != BotState.Started)
+            {
+                return;
+            }
+            _processor?.Post(new BotStopped());
+            _processor?.Complete();
             _exception = _exception ?? exception;
             if (_exception == null)
             {
@@ -148,7 +144,7 @@ namespace Conreign.Core.AI
             {
                 _subject.OnError(_exception);
             }
-            _completed = true;
+            _state = BotState.Stopped;
         }
 
         private void Notify(IBotEvent @event)
@@ -159,10 +155,15 @@ namespace Conreign.Core.AI
 
         private void Handle(IClientEvent @event)
         {
+            EnsureIsNotDisposed();
             if (@event == null)
             {
                 _context.Logger.Error("[Bot:{BotId}:{UserId}] Received null event.", _context.BotId, _context.UserId);
                 return;
+            }
+            if (_state == BotState.Stopped)
+            {
+                throw new InvalidOperationException("Bot is stopped.");
             }
             _received.Increment();
             _queueSize.Write();
@@ -174,11 +175,7 @@ namespace Conreign.Core.AI
             if (_cancellationToken.IsCancellationRequested)
             {
                 _context.Logger.Warning("[Bot:{BotId}:{UserId}] Bot execution cancelled.");
-                Complete(new TaskCanceledException("Bot execution was cancelled."));
-                return;
-            }
-            if (_completed)
-            {
+                Stop(new TaskCanceledException("Bot execution was cancelled."));
                 return;
             }
             var posted = _processor.Post(@event);
@@ -188,13 +185,13 @@ namespace Conreign.Core.AI
                     _context.BotId, 
                     _context.UserId, 
                     @event.GetType().Name);
-                Complete(new InvalidOperationException("Bot queue is too large."));
+                Stop(new InvalidOperationException("Bot queue is too large."));
             }
         }
 
         private async Task Process(IClientEvent @event)
         {
-            if (_completed)
+            if (_state != BotState.Started)
             {
                 return;
             }

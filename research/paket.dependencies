@@ -1,5 +1,6 @@
 source https://nuget.org/api/v2
 
 nuget Deedle
+nuget DotNetZip
 nuget FsLab
 nuget FSharp.Data

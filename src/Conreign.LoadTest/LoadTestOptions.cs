@@ -29,6 +29,7 @@ namespace Conreign.LoadTest
         public string ConfigurationFileName { get; set; }
         public string LogFileName { get; set; } = "log.json";
         public bool LogToConsole { get; set; } = true;
+        public LogEventLevel MinimumConsoleLogLevel { get; set; } = LogEventLevel.Information;
         public bool ZipLogFile { get; set; } = true;
         public string ConnectionUri { get; set; }
         public string ElasticSearchUri { get; set; }

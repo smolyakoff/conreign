@@ -6,6 +6,7 @@ NUGET
       R.NET.Community (>= 1.6.4)
       R.NET.Community.FSharp (>= 1.6.4)
       RProvider (>= 1.1.13)
+    DotNetZip (1.10.1)
     DynamicInterop (0.7.4)
     FSharp.Charting (0.90.14)
     FSharp.Core (4.0.0.1)

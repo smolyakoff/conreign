@@ -30,10 +30,12 @@ namespace Conreign.LoadTest
             {
                 throw new ArgumentNullException(nameof(options));
             }
+            Exception finalException = null;
             var loggerConfiguration = new LoggerConfiguration();
             if (options.LogToConsole)
             {
-                loggerConfiguration.WriteTo.LiterateConsole();
+                loggerConfiguration.WriteTo
+                    .LiterateConsole(restrictedToMinimumLevel: options.MinimumConsoleLogLevel);
             }
             if (!string.IsNullOrEmpty(options.LogFileName))
             {
@@ -73,20 +75,34 @@ namespace Conreign.LoadTest
                 cts.CancelAfter(options.Timeout);
                 await farm.Run(cts.Token);
                 logger.Information("Load test complete.");
+
+            }
+            catch (Exception ex)
+            {
+                logger.Fatal(ex, "Load test failed: {ErrorMessage}.", ex.Message);
+                finalException = ex;
+            }
+            try
+            {
                 if (!string.IsNullOrEmpty(options.LogFileName) && options.ZipLogFile)
                 {
                     logger.Information("Waiting a bit for Serilog to flush.");
                     // ReSharper disable once MethodSupportsCancellation
                     // HACK: magic delay here, how to explicitely flush Serilog without closing?
                     await Task.Delay(TimeSpan.FromSeconds(5));
-                    var zipPath = ZipLogFile(options.LogFileName);
-                    logger.Information("Zipped log file {LogFilePath} to {ZippedLogFilePath}", options.LogFileName, zipPath);
+                    var zipPath = ArchiveLogFile(options.LogFileName);
+                    logger.Information("Zipped log file {LogFilePath} to {ZippedLogFilePath}", options.LogFileName,
+                        zipPath);
                 }
             }
             catch (Exception ex)
             {
-                logger.Fatal(ex, "Load test failed: {ErrorMessage}.", ex.Message);
-                throw;
+                logger.Error(ex, "Failed to archive log file: {ErrorMessage}", ex.Message);
+                if (finalException == null)
+                {
+                    throw;
+                }
+                throw new AggregateException(ex, finalException);
             }
             finally
             {
@@ -101,9 +117,13 @@ namespace Conreign.LoadTest
                     logger.Warning("Log flush timeout.");
                 }
             }
+            if (finalException != null)
+            {
+                throw finalException;
+            }
         }
 
-        private static string ZipLogFile(string logFilePath)
+        private static string ArchiveLogFile(string logFilePath)
         {
             var directory = Path.GetDirectoryName(logFilePath);
             var fileName = Path.GetFileNameWithoutExtension(logFilePath);
@@ -112,11 +132,11 @@ namespace Conreign.LoadTest
                 throw new InvalidOperationException("Log directory is null.");
             }
             var zipPath = Path.Combine(directory, $"{fileName}.zip");
-            using (var archive = new ZipFile(zipPath))
+            using (var archive = new ZipFile())
             {
                 archive.CompressionLevel = CompressionLevel.BestCompression;
                 archive.AddFile(logFilePath, string.Empty);
-                archive.Save();
+                archive.Save(zipPath);
             }
             return zipPath;
         }

@@ -4,9 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Humanizer;
 using Microsoft.Azure.Batch;
 using Microsoft.Azure.Batch.Common;
 using Serilog;
+using Serilog.Events;
 
 namespace Conreign.LoadTest.Supervisor.Utility
 {
@@ -88,6 +90,7 @@ namespace Conreign.LoadTest.Supervisor.Utility
 
         public static CloudTask CreateLoadTestTask(this LoadTestSupervisorOptions options, int index)
         {
+            var maxExecutionTime = options.InstanceOptions.Timeout + 10.Minutes();
             var taskId = $"loadtest__{options.Name}__{index}";
             var instanceOptions = options.InstanceOptions;
             var builder = new StringBuilder();
@@ -106,9 +109,9 @@ namespace Conreign.LoadTest.Supervisor.Utility
                 new CommandLineArgument(
                     $"{nameof(instanceOptions.BotOptions)}:{nameof(instanceOptions.BotOptions.RoomPrefix)}",
                     $"{taskId}:"),
-                new CommandLineArgument(nameof(instanceOptions.LogToConsole), false),
+                new CommandLineArgument(nameof(instanceOptions.MinimumConsoleLogLevel), LogEventLevel.Warning),
                 new CommandLineArgument(nameof(instanceOptions.LogFileName), Path.Combine("%AZ_BATCH_TASK_DIR%", "log.json")),
-                new CommandLineArgument(nameof(instanceOptions.Timeout), options.InstanceTimeout)
+                new CommandLineArgument(nameof(instanceOptions.Timeout), instanceOptions.Timeout)
             };
             var args = arguments.Where(x => x.Value != null).ToList();
             builder.Append($" {string.Join(" ", args)}");
@@ -119,6 +122,7 @@ namespace Conreign.LoadTest.Supervisor.Utility
                 ApplicationId = ApplicationId,
                 Version = options.ApplicationVersion
             };
+            task.Constraints = new TaskConstraints(maxWallClockTime: maxExecutionTime);
             task.ApplicationPackageReferences = new List<ApplicationPackageReference> {app};
             task.DisplayName = $"Execute load test ({taskId})";
             return task;

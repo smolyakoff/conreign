@@ -9,10 +9,15 @@ namespace Conreign.LoadTest
             try
             {
                 LoadTestRunner.Run(args).Wait();
+                Console.WriteLine("COMPLETED");
+                Console.Out.Flush();
                 return 0;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.Error.WriteLine("ERROR");
+                Console.Error.WriteLine(ex.ToString());
+                Console.Error.Flush();
                 return 1;
             }
         }

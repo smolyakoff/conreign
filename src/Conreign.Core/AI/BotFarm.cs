@@ -6,8 +6,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Conreign.Core.AI.Events;
 using Conreign.Core.Contracts.Client;
+using Conreign.Core.Utility;
 using Serilog;
 using Serilog.Context;
+using Serilog.Events;
 
 namespace Conreign.Core.AI
 {
@@ -85,7 +87,13 @@ namespace Conreign.Core.AI
                         }
                         catch (Exception ex)
                         {
-                            _logger.Error(ex, "[BotFarm:{BotFarmId}] Bot stopped with an error: {ErrorMessage}.", _id, ex.Message);
+                            var level = ex is TaskCanceledException ? LogEventLevel.Warning : LogEventLevel.Error;
+                            _logger.Write(
+                                level, 
+                                level == LogEventLevel.Warning ? null : ex, 
+                                "[BotFarm:{BotFarmId}] Bot stopped with an error: {ErrorMessage}.", 
+                                _id, 
+                                ex.Message);
                             throw;
                         }
                         finally
@@ -100,7 +108,8 @@ namespace Conreign.Core.AI
                 using (LogContext.PushProperty("BotFarmId", _id))
                 using (_logger.BeginTimedOperation(OperationDescription))
                 {
-                    await Task.WhenAll(tasks);
+                    var cancellation = cancellationToken.Value.AsTask();
+                    await Task.WhenAny(Task.WhenAll(tasks), cancellation);
                 }
             }
             finally

@@ -1,4 +1,5 @@
 #load "packages/FsLab/FsLab.fsx"
+#load "packages/DotNetZip/lib/net20/DotNetZip.dll"
 
 open System
 open System.IO
@@ -10,7 +11,7 @@ open FSharp.Data.JsonExtensions
 
 Environment.CurrentDirectory <- __SOURCE_DIRECTORY__
 
-let ConvertLogsToJsonArray (inputPaths: seq<string>) (outputPath: string) =
+let convertLogsToJsonArray (inputPaths: seq<string>) (outputPath: string) =
     use writer = new StreamWriter(outputPath)
     writer.WriteLine("[")
     let mutable recordIndex = 0
@@ -38,26 +39,64 @@ let ConvertLogsToJsonArray (inputPaths: seq<string>) (outputPath: string) =
     inputPaths |> Seq.iteri iterate
     writer.WriteLine("]")
 
-let IsDuration (log: JsonValue) =
-    let props = log?Properties
-    match props with
-        | JsonValue.Record(props) when props |> Seq.exists (fun (k, v) -> k = "TimedOperationElapsedInMs")
+let hasProperty (jsonVal: JsonValue) name =
+    match jsonVal with
+        | JsonValue.Record(props) when props |> Seq.exists (fun (k, v) -> k = "name")
             -> true
         | _ -> false
 
-let ExtractDuration (log: JsonValue)  =
+let isDuration (log: JsonValue) = hasProperty log?Properties "TimedOperationDurationInMs"
+let isCounter (log: JsonValue) = hasProperty log?Properties "CounterName"
+let isGauge (log: JsonValue) = hasProperty log?Properties "GaugeName"
+let isError (log: JsonValue) = log?Level.AsString() = "Error"
+let isWarning (log: JsonValue) = log?Level.AsString() = "Warning"
+
+let extractDuration (log: JsonValue)  =
     let props = log?Properties
     seq {
         yield log?Timestamp.AsDateTime().Ticks :> Object
         yield props?InstanceId.AsString() :> Object
         yield props?TimedOperationDescription.AsString() :> Object
+        yield match props?EventType with
+                | JsonValue.String(s) -> s :> Object
+                | _ -> String.Empty :> Object
+        yield match props?CommandType with
+                | JsonValue.String(s) -> s :> Object
+                | _ -> String.Empty :> Object
         yield props?TimedOperationElapsedInMs.AsInteger() :> Object
     }
 
-let ExtractRows (headers: seq<string>) 
-                filter 
-                (mapper: JsonValue -> seq<obj>) 
-                (inputPaths: seq<string>) 
+let extractCounter (log: JsonValue) =
+    let props = log?Properties
+    seq {
+        yield log?Timestamp.AsDateTime().Ticks :> Object
+        yield props?InstanceId.AsString() :> Object
+        yield props?CounterName.AsString() :> Object
+        yield props?CounterValue.AsInteger() :> Object
+    }
+
+let extractGauge (log: JsonValue) =
+    let props = log?Properties
+    seq {
+        yield log?Timestamp.AsDateTime().Ticks :> Object
+        yield props?InstanceId.AsString() :> Object
+        yield props?GaugeName.AsString() :> Object
+        yield props?GaugeValue.AsInteger() :> Object
+    }
+
+let extractFailure (log: JsonValue) =
+    let props = log?Properties
+    seq {
+        yield log?Timestamp.AsDateTime().Ticks :> Object
+        yield log?Level.AsString() :> Object
+        yield props?InstanceId.AsString() :> Object
+        yield log?RenderedMessage.AsString() :> Object
+    }
+
+let extractRows (headers: seq<string>)
+                filter
+                (mapper: JsonValue -> seq<obj>)
+                (inputPaths: seq<string>)
                 (outputPath: string) =
     use writer = new StreamWriter(outputPath)
     writer.WriteLine(String.Join(",", headers))
@@ -74,16 +113,52 @@ let ExtractRows (headers: seq<string>)
                 printfn "Skipped invalid json line: %O" e
     inputPaths |> Seq.iter extract
 
-let ExtractDurations (inputPaths: seq<string>) (outputPath: string)= 
-    ExtractRows ["Timestamp"; "InstanceId"; "Name"; "Ms"] IsDuration ExtractDuration inputPaths outputPath
+let extractDurations (inputPaths: seq<string>) (outputPath: string) =
+    extractRows
+        ["Timestamp"; "InstanceId"; "Name"; "EventType"; "CommandType"; "Ms"]
+        isDuration
+        extractDuration
+        inputPaths
+        outputPath
+
+let extractCounters (inputPaths: seq<string>) (outputPath: string) =
+    extractRows
+        ["Timestamp"; "InstanceId"; "Name"; "Value"]
+        isCounter
+        extractCounter
+        inputPaths
+        outputPath
+
+let extractGauges (inputPaths: seq<string>) (outputPath: string) =
+    extractRows
+        ["Timestamp"; "InstanceId"; "Name"; "Value"]
+        isGauge
+        extractGauge
+        inputPaths
+        outputPath
+
+let extractFailures (inputPaths: seq<string>) (outputPath: string) =
+    extractRows
+        ["Timestamp"; "InstanceId"; "Level"; "Message"]
+        (fun l -> isError l || isWarning l)
+        extractGauge
+        inputPaths
+        outputPath
+
+let extractZipToSameDirectory zipFilePath =
+    failwith "Not Implemented"
+    
+let processBotLogs prefix logDirectoryPath outputDirectoryPath =
+    let durationsPath = Path.Combine(outputDirectoryPath, prefix + "_durations.csv")
+    let countersPath = Path.Combine(outputDirectoryPath, prefix + "_counters.csv")
+    let gaugesPath = Path.Combine(outputDirectoryPath, prefix + "_gauges.csv")
+    let failuresPath = Path.Combine(outputDirectoryPath, prefix + "_failures.csv")
+    let logFiles = Directory.GetFiles(logDirectoryPath, "*.json")
+    extractDurations logFiles durationsPath
+    extractCounters logFiles countersPath
+    extractGauges logFiles gaugesPath
+    extractFailures logFiles failuresPath
 
 let T4x16x16 = Directory.GetFiles("logs/loadtest-16-11-14__06-49-57")
 
 ExtractDurations T4x16x16 "samples/4x16x16-durations.csv"
-
-
-//FormatLogFileToJsonArrayFile "bot-sample-raw.log.json" "bot-sample.log.json"
-
-ConvertLogsToJsonArray
-    [@"logs\loadtest-16-11-14__06-49-57\loadtest__16-11-14__06-49-57__3-log.json"]
-    "samples/4x16x16-bot.log.json"

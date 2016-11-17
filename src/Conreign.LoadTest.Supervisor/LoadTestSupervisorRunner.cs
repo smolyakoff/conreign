@@ -61,7 +61,7 @@ namespace Conreign.LoadTest.Supervisor
                     if (!options.UseAutoPool)
                     {
                         var pool = await client.GetOrCreateLoadTestPool(options);
-                        await WaitWhileNotSteady(pool);
+                        await WaitForPoolToBeReady(pool);
                     }
                     var job = client.CreateLoadTestJob(options);
                     await job.CommitAsync(cancellationToken: timeoutCts.Token);
@@ -193,7 +193,7 @@ namespace Conreign.LoadTest.Supervisor
             }, maxDegreeOfParallelism);
         }
 
-        private static async Task WaitWhileNotSteady(CloudPool pool)
+        private static async Task WaitForPoolToBeReady(CloudPool pool)
         {
             while (true)
             {
@@ -201,7 +201,15 @@ namespace Conreign.LoadTest.Supervisor
                 Log.Logger.Information("Pool {PoolId} is {AllocationState}.", pool.Id, pool.AllocationState);
                 if (pool.AllocationState == AllocationState.Steady)
                 {
-                    break;
+                    var nodes = await pool.ListComputeNodes().ToListAsync();
+                    foreach (var node in nodes)
+                    {
+                        Log.Logger.Information("Node {NodeId} is {NodeState}.", node.Id, node.State);
+                    }
+                    if (nodes.All(x => x.State == ComputeNodeState.Running || x.State == ComputeNodeState.Idle))
+                    {
+                        break;
+                    }
                 }
                 await Task.Delay(TimeSpan.FromSeconds(5));
             }
@@ -217,7 +225,7 @@ namespace Conreign.LoadTest.Supervisor
                 {
                     foreach (var task in tasks.Where(x => !completedTaskIds.Contains(x.Id)))
                     {
-                        await task.RefreshAsync(new ODATADetailLevel(selectClause: "id,stats"), null, cancellationToken);
+                        await task.RefreshAsync(new ODATADetailLevel(selectClause: "id,stats,state"), null, cancellationToken);
                         logger.Information("Task {TaskId} statistics: {@Statistics}", task.Id, task.Statistics);
                         if (task.State == TaskState.Completed)
                         {
