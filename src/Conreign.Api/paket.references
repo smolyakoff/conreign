@@ -1,5 +1,6 @@
 Serilog.Sinks.ElasticSearch
 Serilog.Sinks.Literate
+SerilogMetrics
 SimpleInjector
 MediatR
 Microsoft.Orleans.Core

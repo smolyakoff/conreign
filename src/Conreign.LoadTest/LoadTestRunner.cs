@@ -70,7 +70,10 @@ namespace Conreign.LoadTest
                 var signalrOptions = new SignalRClientOptions(options.ConnectionUri);
                 var client = new SignalRClient(signalrOptions);
                 var factory = new LoadTestBotFactory(botOptions);
-                var farm = new BotFarm(options.InstanceId, client, factory, new BotFarmOptions());
+                var farm = new BotFarm(options.InstanceId, client, factory, new BotFarmOptions
+                {
+                    GracefulStopPeriod = options.GracefulStopPeriod
+                });
                 var cts = new CancellationTokenSource();
                 cts.CancelAfter(options.Timeout);
                 await farm.Run(cts.Token);
@@ -109,7 +112,7 @@ namespace Conreign.LoadTest
                 try
                 {
                     var cts = new CancellationTokenSource();
-                    cts.CancelAfter(options.LogFlushTimeout);
+                    cts.CancelAfter(options.LogFlushPeriod);
                     await Task.Run(() => Log.CloseAndFlush(), cts.Token);
                 }
                 catch (TaskCanceledException)
@@ -134,11 +137,22 @@ namespace Conreign.LoadTest
             var zipPath = Path.Combine(directory, $"{fileName}.zip");
             using (var archive = new ZipFile())
             {
-                archive.CompressionLevel = CompressionLevel.BestCompression;
+                archive.AddProgress += ArchiveOnAddProgress;
+                archive.SaveProgress += ArchiveOnSaveProgress;
                 archive.AddFile(logFilePath, string.Empty);
                 archive.Save(zipPath);
             }
             return zipPath;
+        }
+
+        private static void ArchiveOnSaveProgress(object sender, SaveProgressEventArgs saveProgressEventArgs)
+        {
+            Log.Logger.Information("Saving to archive: {@ArchiveStatistics}", saveProgressEventArgs);
+        }
+
+        private static void ArchiveOnAddProgress(object sender, AddProgressEventArgs addProgressEventArgs)
+        {
+            Log.Logger.Information("Adding to archive: {@ArchiveStatistics}", addProgressEventArgs);
         }
     }
 }

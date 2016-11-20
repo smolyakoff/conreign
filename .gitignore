@@ -239,4 +239,5 @@ paket-files
 
 # Project Specific
 build
+logs
 config/**/*secrets.*

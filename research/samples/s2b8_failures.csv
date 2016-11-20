@@ -1,0 +1,16 @@
+Timestamp;InstanceId;Level;Message
+636152660774200451;Warning;"loadtest__s2b8__6";[SignalRClient:"32afd175-f073-4b5a-bd98-7741fd71bc58":"ba0025bc-4bf1-4d47-9138-5fd56a5844a6"] "Game loadtest__s2b8__6:conreign-load-test-3 is already in progress."
+636152660775469327;Error;"loadtest__s2b8__6";[Bot:"loadtest__s2b8__6:conreign-load-test-3_bot-7":51802054-88f2-43c3-bd05-583eb5096268] Failed to handle "BotAuthenticated": "Game loadtest__s2b8__6:conreign-load-test-3 is already in progress."
+636152660775608220;Error;"loadtest__s2b8__6";[BotFarm:"loadtest__s2b8__6"] Bot stopped with an error: "Game loadtest__s2b8__6:conreign-load-test-3 is already in progress.".
+636152661013901767;Warning;"loadtest__s2b8__3";[SignalRClient:"41f6648f-7c81-4304-8309-95d29a95eff4":"e87990ce-c3df-4d41-8702-b0ad11646eca"] "Game loadtest__s2b8__3:conreign-load-test-5 is already in progress."
+636152661014711779;Error;"loadtest__s2b8__3";[Bot:"loadtest__s2b8__3:conreign-load-test-5_bot-7":daf50f86-38d1-4cc0-891e-007e49634976] Failed to handle "BotAuthenticated": "Game loadtest__s2b8__3:conreign-load-test-5 is already in progress."
+636152661014811787;Error;"loadtest__s2b8__3";[BotFarm:"loadtest__s2b8__3"] Bot stopped with an error: "Game loadtest__s2b8__3:conreign-load-test-5 is already in progress.".
+636152661013311762;Warning;"loadtest__s2b8__2";[SignalRClient:"1dd2ceeb-348c-475e-8758-445446cbab86":"d291c689-b143-4370-a34b-984a904182de"] "Game loadtest__s2b8__2:conreign-load-test-5 is already in progress."
+636152661014331776;Error;"loadtest__s2b8__2";[Bot:"loadtest__s2b8__2:conreign-load-test-5_bot-7":c7800e32-5047-49ac-85f2-4c17df14d4ed] Failed to handle "BotAuthenticated": "Game loadtest__s2b8__2:conreign-load-test-5 is already in progress."
+636152661014611780;Error;"loadtest__s2b8__2";[BotFarm:"loadtest__s2b8__2"] Bot stopped with an error: "Game loadtest__s2b8__2:conreign-load-test-5 is already in progress.".
+636152660998692202;Warning;"loadtest__s2b8__0";[SignalRClient:"c13f3c64-0342-4ca0-8681-5b39362133c8":"39c8a395-02f3-40c0-bac3-00e8cff63186"] "Game loadtest__s2b8__0:conreign-load-test-5 is already in progress."
+636152660999004735;Error;"loadtest__s2b8__0";[Bot:"loadtest__s2b8__0:conreign-load-test-5_bot-7":e1da30bc-4ad5-4ca9-9709-6e592b87eebd] Failed to handle "BotAuthenticated": "Game loadtest__s2b8__0:conreign-load-test-5 is already in progress."
+636152660999483589;Error;"loadtest__s2b8__0";[BotFarm:"loadtest__s2b8__0"] Bot stopped with an error: "Game loadtest__s2b8__0:conreign-load-test-5 is already in progress.".
+636152661353278755;Warning;"loadtest__s2b8__5";[SignalRClient:"6d961de8-5d28-49f5-b3cd-d11134997789":"10dfa310-3974-46ff-a58d-a3668d457542"] "Game loadtest__s2b8__5:conreign-load-test-7 is already in progress."
+636152661353558767;Error;"loadtest__s2b8__5";[Bot:"loadtest__s2b8__5:conreign-load-test-7_bot-7":647a8cdf-f2c0-4062-aaf3-d23b3c5c6337] Failed to handle "BotAuthenticated": "Game loadtest__s2b8__5:conreign-load-test-7 is already in progress."
+636152661353758770;Error;"loadtest__s2b8__5";[BotFarm:"loadtest__s2b8__5"] Bot stopped with an error: "Game loadtest__s2b8__5:conreign-load-test-7 is already in progress.".

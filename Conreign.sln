@@ -80,7 +80,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.LoadTest.Superviso
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Research", "Research", "{012CCA39-8A43-4DFD-AF75-5A9BEFFC93A7}"
 	ProjectSection(SolutionItems) = preProject
-		research\.gitignore = research\.gitignore
 		research\data-preparation.fsx = research\data-preparation.fsx
 		research\notebook.fsx = research\notebook.fsx
 	EndProjectSection

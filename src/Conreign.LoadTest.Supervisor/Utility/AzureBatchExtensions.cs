@@ -78,7 +78,7 @@ namespace Conreign.LoadTest.Supervisor.Utility
                 pool.ApplicationPackageReferences = spec.ApplicationPackageReferences;
                 await pool.CommitAsync();
             }
-            if (pool.TargetDedicated == spec.TargetDedicated)
+            if (pool.TargetDedicated >= spec.TargetDedicated)
             {
                 return pool;
             }

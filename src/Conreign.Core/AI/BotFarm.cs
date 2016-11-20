@@ -102,14 +102,19 @@ namespace Conreign.Core.AI
                         }
                         
                     }));
-                    await Task.Delay(_options.StartupDelay, cancellationToken.Value);
+                    await Task.Delay(_options.BotStartInterval, cancellationToken.Value);
                 }
                 _logger.Information("[BotFarm:{BotFarmId}] Farm is started.");
                 using (LogContext.PushProperty("BotFarmId", _id))
                 using (_logger.BeginTimedOperation(OperationDescription))
                 {
-                    var cancellation = cancellationToken.Value.AsTask();
-                    await Task.WhenAny(Task.WhenAll(tasks), cancellation);
+                    var tcs = new TaskCompletionSource<object>();
+                    cancellationToken.Value.Register(async () =>
+                    {
+                        await Task.Delay(_options.GracefulStopPeriod);
+                        tcs.SetCanceled();
+                    });
+                    await Task.WhenAny(Task.WhenAll(tasks), tcs.Task);
                 }
             }
             finally

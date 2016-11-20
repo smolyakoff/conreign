@@ -37,7 +37,8 @@ namespace Conreign.LoadTest
         public LogEventLevel MinimumLogLevel { get; set; }
         public LoadTestBotOptions BotOptions { get; set; }
         public TimeSpan Timeout { get; set; }
-        public TimeSpan LogFlushTimeout { get; set; } = TimeSpan.FromMinutes(5);
+        public TimeSpan GracefulStopPeriod { get; set; } = TimeSpan.FromMinutes(10);
+        public TimeSpan LogFlushPeriod { get; set; } = TimeSpan.FromMinutes(5);
 
         public static LoadTestOptions Parse(string[] args)
         {

@@ -48,8 +48,8 @@ namespace Conreign.Core.AI
             _subscription = connection.Events.Subscribe(OnClientEvent, OnClientException, OnClientCompleted);
             var allBehaviours = behaviours.ToList();
             var dispatcher = new DispatcherBehaviour(allBehaviours);
-            var retry = new RetryBehaviour(dispatcher);
-            var errorHandling = new ErrorHandlingBehaviour(retry);
+            //var retry = new RetryBehaviour(dispatcher);
+            var errorHandling = new ErrorHandlingBehaviour(dispatcher);
             var diagnostics = new DiagnosticsBehaviour(errorHandling);
             _entryBehaviour = diagnostics;
             _received = _context.Logger.CountOperation(ReceivedCounterName, resolution: ReceivedCounterResolution);

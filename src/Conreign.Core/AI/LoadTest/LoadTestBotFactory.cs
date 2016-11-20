@@ -28,7 +28,7 @@ namespace Conreign.Core.AI.LoadTest
             {
                 throw new ArgumentNullException(nameof(connection));
             }
-            if (_i >= _options.BotsPerRoomCount*_options.RoomsCount)
+            if (!CanCreate)
             {
                 var total = _options.BotsPerRoomCount*_options.RoomsCount;
                 throw new InvalidOperationException($"Expected to create maximum of {total} bots.");

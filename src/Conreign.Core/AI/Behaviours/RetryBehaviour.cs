@@ -24,7 +24,7 @@ namespace Conreign.Core.AI.Behaviours
             var i = 0;
             var policy = Policy.Handle<Exception>()
                 .WaitAndRetryAsync(3, 
-                    retry => TimeSpan.FromSeconds(Math.Pow(2, retry)), 
+                    retry => TimeSpan.FromMilliseconds(100 * retry), 
                     (ex, time) =>
                     {
                         context.Logger.Warning(

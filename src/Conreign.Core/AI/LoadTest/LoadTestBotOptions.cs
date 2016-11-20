@@ -7,8 +7,8 @@ namespace Conreign.Core.AI.LoadTest
         public LoadTestBotOptions()
         {
             RoomPrefix = string.Empty;
-            RoomsCount = 5;
-            BotsPerRoomCount = 3;
+            RoomsCount = 16;
+            BotsPerRoomCount = 16;
             NeutralPlanetsCount = 8;
             MapWidth = 8;
             MapHeight = 8;

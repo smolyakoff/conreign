@@ -5,12 +5,16 @@ using Conreign.Client.Handler;
 using Conreign.Client.Orleans;
 using Conreign.Core.Contracts.Client;
 using Conreign.Core.Contracts.Client.Exceptions;
-using Conreign.Core.Contracts.Client.Messages;
 using Conreign.Core.Contracts.Communication;
 using MediatR;
 using Microsoft.AspNet.SignalR;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Serilog;
+using Serilog.Context;
+using Serilog.Core;
+using Serilog.Core.Enrichers;
+using SerilogMetrics;
 
 namespace Conreign.Api.Hubs
 {
@@ -20,26 +24,41 @@ namespace Conreign.Api.Hubs
             new ConcurrentDictionary<string, GameHubConnection>();
 
         private readonly OrleansClient _client;
+        private readonly GameHubCountersCollection _countersCollection;
         private readonly IMediator _mediator;
         private readonly JsonSerializer _errorSerializer;
+        private readonly ILogger _logger;
+        private readonly IGaugeMeasure _connectionsGauge;
 
-        public GameHub(OrleansClient client, IMediator mediator)
+        public GameHub(ILogger logger, OrleansClient client, GameHubCountersCollection countersCollection, IMediator mediator)
         {
+            if (logger == null)
+            {
+                throw new ArgumentNullException(nameof(logger));
+            }
             if (client == null)
             {
                 throw new ArgumentNullException(nameof(client));
+            }
+            if (countersCollection == null)
+            {
+                throw new ArgumentNullException(nameof(countersCollection));
             }
             if (mediator == null)
             {
                 throw new ArgumentNullException(nameof(mediator));
             }
+            _logger = logger;
             _client = client;
+            _countersCollection = countersCollection;
             _mediator = mediator;
             _errorSerializer = JsonSerializer.Create(new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.All
             });
+            _connectionsGauge = _logger.GaugeOperation("Hub.Connections", "connection(s)", () => Handlers.Count);
         }
+
 
         public async Task<MessageEnvelope> Send(MessageEnvelope envelope)
         {
@@ -79,24 +98,38 @@ namespace Conreign.Api.Hubs
 
         public override async Task OnConnected()
         {
-            var connection = await _client.Connect(Guid.Parse(Context.ConnectionId));
-            var handler = new ClientHandler(connection, _mediator);
-            var subscription = handler.Events.Subscribe(new ConnectionObserver(this, Context.ConnectionId));
-            Handlers[Context.ConnectionId] = new GameHubConnection(handler, subscription);
-            await base.OnConnected();
+            using (LogContext.PushProperty("ConnectionId", Context.ConnectionId))
+            {
+                var connection = await _client.Connect(Guid.Parse(Context.ConnectionId));
+                var handler = new ClientHandler(connection, _mediator);
+                var subscription = handler.Events.Subscribe(new ConnectionObserver(this, Context.ConnectionId));
+                Handlers[Context.ConnectionId] = new GameHubConnection(handler, subscription);
+                _connectionsGauge.Write();
+                await base.OnConnected();
+            }
+
         }
 
         public override Task OnDisconnected(bool stopCalled)
         {
-            GameHubConnection hubConnection;
-            var removed = Handlers.TryRemove(Context.ConnectionId, out hubConnection);
-            if (!removed)
+            var props = new ILogEventEnricher[]
             {
-                return TaskCompleted.Completed;
+                new PropertyEnricher("ConnectionId", Context.ConnectionId),
+                new PropertyEnricher("StopCalled", stopCalled),
+            };
+            using (LogContext.PushProperties(props))
+            {
+                GameHubConnection hubConnection;
+                var removed = Handlers.TryRemove(Context.ConnectionId, out hubConnection);
+                if (!removed)
+                {
+                    return TaskCompleted.Completed;
+                }
+                _connectionsGauge.Write();
+                hubConnection.Subscription.Dispose();
+                hubConnection.Handler.Dispose();
+                return base.OnDisconnected(stopCalled);
             }
-            hubConnection.Subscription.Dispose();
-            hubConnection.Handler.Dispose();
-            return base.OnDisconnected(stopCalled);
         }
 
         private IClientHandler GetHandlerSafely()
@@ -123,17 +156,32 @@ namespace Conreign.Api.Hubs
 
             public void OnNext(IClientEvent value)
             {
-                _hub.Clients.Client(_connectionId).OnNext(new MessageEnvelope {Payload = value});
+                using (LogContext.PushProperty("ConnectionId", _connectionId))
+                {
+                    _hub._countersCollection.EventsReceived.Increment();
+                    _hub.Clients.Client(_connectionId).OnNext(new MessageEnvelope { Payload = value });
+                    _hub._countersCollection.EventsDispatched.Increment();
+                }
             }
 
-            public void OnError(Exception error)
+            public void OnError(Exception exception)
             {
-                _hub.Clients.Client(_connectionId).OnError(error);
+                using (LogContext.PushProperty("ConnectionId", _connectionId))
+                {
+                    _hub._logger.Error(exception, "Stream exception received: {Message}", exception.Message);
+                    _hub._countersCollection.ErrorsReceived.Increment();
+                    _hub.Clients.Client(_connectionId).OnError(exception);
+                    _hub._countersCollection.ErrorsDispatched.Increment();
+                }
             }
 
             public void OnCompleted()
             {
-                _hub.Clients.Client(_connectionId).OnCompleted();
+                using (LogContext.PushProperty("ConnectionId", _connectionId))
+                {
+                    _hub.Clients.Client(_connectionId).OnCompleted();
+                    _hub._countersCollection.StreamsCompleted.Increment();
+                }
             }
         }
 

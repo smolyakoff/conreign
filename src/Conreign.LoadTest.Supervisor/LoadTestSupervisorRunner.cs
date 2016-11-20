@@ -206,7 +206,7 @@ namespace Conreign.LoadTest.Supervisor
                     {
                         Log.Logger.Information("Node {NodeId} is {NodeState}.", node.Id, node.State);
                     }
-                    if (nodes.All(x => x.State == ComputeNodeState.Running || x.State == ComputeNodeState.Idle))
+                    if (nodes.All(x => x.State == ComputeNodeState.Idle))
                     {
                         break;
                     }
