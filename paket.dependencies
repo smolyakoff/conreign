@@ -43,6 +43,7 @@ group Build
 	source https://nuget.org/api/v2
 
 	nuget FAKE
+	nuget FSharp.Data
 	nuget Microsoft.Azure.Storage.DataMovement
 	nuget Microsoft.WindowsAzure.Management.Libraries
 	nuget Microsoft.Bcl.Async

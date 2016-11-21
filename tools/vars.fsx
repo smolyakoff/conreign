@@ -1,7 +1,7 @@
 #r "System.Globalization"
 #r "System.IO"
 #r "./../packages/build/FAKE/tools/FakeLib.dll"
-#r "./../packages/FSharp.Data/lib/net40/FSharp.Data.dll"
+#r "./../packages/build/FSharp.Data/lib/net40/FSharp.Data.dll"
 
 open FSharp.Data
 open System

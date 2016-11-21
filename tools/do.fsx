@@ -1,5 +1,5 @@
 #r "./../packages/build/FAKE/tools/FakeLib.dll"
-#r "./../packages/WindowsAzure.Storage.7.2.0/lib/net40/Microsoft.WindowsAzure.Storage.dll"
+#r "./../packages/build/WindowsAzure.Storage/lib/net40/Microsoft.WindowsAzure.Storage.dll"
 
 #load "vars.fsx"
 #load "config.fsx"
@@ -34,7 +34,7 @@ let shouldPackageBackend =
         Uri.IsWellFormedUriString(BackendDeploymentPackagePath, UriKind.Absolute)
         File.Exists(BackendDeploymentPackagePath)
         BackendDeployLatestExisting
-    ]|> List.filter (fun x -> x) |> List.isEmpty
+    ]|> List.exists id |> not
 
 
 let ListExistingBackendPackages() = 

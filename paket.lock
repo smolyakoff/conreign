@@ -1313,6 +1313,8 @@ GROUP Build
 NUGET
   remote: https://www.nuget.org/api/v2
     FAKE (4.45.1)
+    FSharp.Data (2.3.2)
+      Zlib.Portable (>= 1.11) - framework: >= netstandard11, portable-net45+sl5+win8, portable-net45+win8, portable-net45+win8+wp8+wpa81
     Hyak.Common (1.1)
       Microsoft.Bcl (>= 1.1.9) - framework: >= net40-full, portable-net403+win+wpa81
       Microsoft.Bcl.Async (>= 1.0.168) - framework: >= net40-full, portable-net403+win+wpa81
@@ -1948,6 +1950,7 @@ NUGET
       Newtonsoft.Json (>= 6.0.8) - framework: >= net40, winv4.5, wpv8.0, wpav8.1
       Newtonsoft.Json (>= 9.0.1) - framework: >= netstandard13
       System.Spatial (>= 5.6.4) - framework: >= netstandard13
+    Zlib.Portable (1.11) - framework: >= netstandard11, portable-net45+sl5+win8, portable-net45+win8, portable-net45+win8+wp8+wpa81
 
 GROUP Test
 NUGET
