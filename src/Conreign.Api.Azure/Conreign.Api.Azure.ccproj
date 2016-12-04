@@ -66,9 +66,6 @@
     <DiagnosticsConfiguration Include="Conreign.Api.Host.AzureContent\diagnostics.wadcfgx" />
     <DiagnosticsConfiguration Include="Conreign.Host.AzureContent\diagnostics.wadcfgx" />
   </ItemGroup>
-  <ItemGroup>
-    <PublishProfile Include="Profiles\Conreign.Production.azurePubxml" />
-  </ItemGroup>
   <!-- Import the target files for this project template -->
   <PropertyGroup>
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>

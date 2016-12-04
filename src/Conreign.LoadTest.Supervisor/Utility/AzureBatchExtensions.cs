@@ -110,7 +110,7 @@ namespace Conreign.LoadTest.Supervisor.Utility
                     $"{nameof(instanceOptions.BotOptions)}:{nameof(instanceOptions.BotOptions.RoomPrefix)}",
                     $"{taskId}:"),
                 new CommandLineArgument(nameof(instanceOptions.MinimumConsoleLogLevel), LogEventLevel.Warning),
-                new CommandLineArgument(nameof(instanceOptions.LogFileName), Path.Combine("%AZ_BATCH_TASK_DIR%", "log.json")),
+                new CommandLineArgument(nameof(instanceOptions.LogFileName), Path.Combine("%AZ_BATCH_TASK_DIR%", instanceOptions.LogFileName)),
                 new CommandLineArgument(nameof(instanceOptions.Timeout), instanceOptions.Timeout)
             };
             var args = arguments.Where(x => x.Value != null).ToList();

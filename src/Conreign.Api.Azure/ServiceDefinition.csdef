@@ -7,16 +7,11 @@
       <Setting name="SystemStorageConnectionString" />
       <Setting name="DataStorageConnectionString" />
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" />
-      <Setting name="APPINSIGHTS_INSTRUMENTATIONKEY" />
     </ConfigurationSettings>
     <Endpoints>
       <InternalEndpoint name="OrleansSiloEndpoint" protocol="tcp" port="11111" />
       <InternalEndpoint name="OrleansProxyEndpoint" protocol="tcp" port="30000" />
     </Endpoints>
-    <Imports>
-      <Import moduleName="RemoteAccess" />
-      <Import moduleName="RemoteForwarder" />
-    </Imports>
   </WorkerRole>
   <!-- SignalR Front Web Role -->
   <WorkerRole name="Conreign.Api.Host.Azure" vmsize="Small">
@@ -25,13 +20,9 @@
       <Setting name="SystemStorageConnectionString" />
       <Setting name="ElasticSearchUri"/>
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" />
-      <Setting name="APPINSIGHTS_INSTRUMENTATIONKEY" />
     </ConfigurationSettings>
     <Endpoints>
       <InputEndpoint name="PublicApi" protocol="http" port="80" localPort="3000" />
     </Endpoints>
-    <Imports>
-      <Import moduleName="RemoteAccess" />
-    </Imports>
   </WorkerRole>
 </ServiceDefinition>

@@ -80,8 +80,8 @@ let extractFailure (log: JsonValue) =
     let ts = log?Timestamp.AsDateTime().Ticks
     let items = seq {
         yield ts.ToString()
-        yield log?Level.AsString()
         yield extractValueOrEmpty props "InstanceId"
+        yield log?Level.AsString()
         yield log?RenderedMessage.AsString()
     }
     (ts, items)
@@ -92,7 +92,7 @@ let extractRows (headers: seq<string>)
                 (inputPaths: seq<string>)
                 (outputPath: string) =
     use writer = new StreamWriter(outputPath)
-    writer.WriteLine(String.Join(";", headers))
+    writer.WriteLine(String.Join(",", headers))
     let parse (index: int) (line: string) =
         let json = line.TrimEnd(',')
         try
@@ -145,7 +145,7 @@ let extractRows (headers: seq<string>)
                 read (Seq.toList readers) currentRows currentIndex
             match minRowOption with
                 | Some(_, _, vals) ->
-                    writer.WriteLine(String.Join(";", vals))
+                    writer.WriteLine(String.Join(",", vals))
                 | _ -> ()
             currentRows <- outRows
             currentIndex <- outIndex
@@ -194,6 +194,7 @@ let extractZip (zipFilePath: string) =
     let outputDirectory =
         Path.Combine(directory, Path.GetFileNameWithoutExtension(zipFilePath))
     zipFile.ExtractAll(outputDirectory, ExtractExistingFileAction.OverwriteSilently)
+    outputDirectory
 
 let processBotLogs prefix logDirectoryPath outputDirectoryPath =
     let durationsPath = Path.Combine(outputDirectoryPath, prefix + "_durations.csv")
@@ -201,31 +202,42 @@ let processBotLogs prefix logDirectoryPath outputDirectoryPath =
     let gaugesPath = Path.Combine(outputDirectoryPath, prefix + "_gauges.csv")
     let failuresPath = Path.Combine(outputDirectoryPath, prefix + "_failures.csv")
     let zipFiles = Directory.GetFiles(logDirectoryPath, "*.zip")
-    zipFiles |> Seq.iter extractZip
+    let outputDirs = zipFiles |> Seq.toList |> List.map extractZip
     let logFiles = Directory.GetFiles(logDirectoryPath, "*.json", SearchOption.AllDirectories)
     extractDurations logFiles durationsPath
     extractCounters logFiles countersPath
     extractGauges logFiles gaugesPath
     extractFailures logFiles failuresPath
+    outputDirs |> List.iter (fun d -> Directory.Delete(d, true))
+
+let replaceInFile (source: string) (replacement: string) filePath =
+    let lines = File.ReadLines(filePath)
+    use ms = new MemoryStream()
+    use writer = new StreamWriter(ms)
+    lines
+    |> Seq.map (fun line -> line.Replace(source, replacement))
+    |> Seq.iter writer.WriteLine
+    writer.Flush()
+    File.WriteAllBytes(filePath, ms.ToArray())
 
 let SMPL0 = "logs/loadtest-sample-0"
-let S1B2 = "logs/loadtest-s1b2"
-let S1B4 = "logs/loadtest-s1b4"
-let S1B8 = "logs/loadtest-s1b8_2"
-let S2B2 = "logs/loadtest-s2b2_3"
-let S2B4 = "logs/loadtest-s2b4"
-let S2B8 = "logs/loadtest-s2b8"
-let S4B2 = "logs/loadtest-s4b2"
-let S4B4 = "logs/loadtest-s4b4"
-let S4B8 = "logs/loadtest-s4b8"
+let S1B2 = "logs/loadtest-s1b2_a"
+let S1B4 = "logs/loadtest-s1b4_1"
+let S1B8 = "logs/loadtest-s1b8_a"
+let S2B2 = "logs/loadtest-s2b2_a"
+let S2B4 = "logs/loadtest-s2b4_1"
+let S2B8 = "logs/loadtest-s2b8_a"
+let S4B2 = "logs/loadtest-s4b2_1"
+let S4B4 = "logs/loadtest-s4b4_1"
+let S4B8 = "logs/loadtest-s4b8_1"
 
 //processBotLogs "sample" SMPL0 "samples"
-//processBotLogs "s1b2" S1B2 "samples"
-//processBotLogs "s1b4" S1B4 "samples"
-//processBotLogs "s1b8" S1B8 "samples"
-//processBotLogs "s2b2" S2B2 "samples"
-//processBotLogs "s2b4" S2B4 "samples"
-//processBotLogs "s2b8" S2B8 "samples"
-//processBotLogs "s4b2" S4B2 "samples"
-//processBotLogs "s4b4" S4B4 "samples"
+processBotLogs "s1b2" S1B2 "samples"
+processBotLogs "s1b4" S1B4 "samples"
+processBotLogs "s1b8" S1B8 "samples"
+processBotLogs "s2b2" S2B2 "samples"
+processBotLogs "s2b4" S2B4 "samples"
+processBotLogs "s2b8" S2B8 "samples"
+processBotLogs "s4b2" S4B2 "samples"
+processBotLogs "s4b4" S4B4 "samples"
 processBotLogs "s4b8" S4B8 "samples"

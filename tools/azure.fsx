@@ -1,4 +1,3 @@
-#r "System.Threading.Tasks"
 #r "System.Net.Http"
 #r "./../packages/build/Microsoft.Bcl.Async/lib/net40/Microsoft.Threading.Tasks.dll"
 #r "./../packages/build/System.IO.FileSystem.Primitives/lib/net46/System.IO.FileSystem.Primitives.dll"
@@ -29,8 +28,8 @@ open Microsoft.WindowsAzure.Storage.DataMovement
 open Microsoft.WindowsAzure.Management.Compute
 open Microsoft.WindowsAzure.Management.Compute.Models
 
-System.Net.ServicePointManager.DefaultConnectionLimit = Environment.ProcessorCount * 8;
-System.Net.ServicePointManager.Expect100Continue = false;
+System.Net.ServicePointManager.DefaultConnectionLimit <- Environment.ProcessorCount * 8;
+System.Net.ServicePointManager.Expect100Continue <- false;
 
 type AzureCredentials = 
     {
@@ -175,7 +174,7 @@ let DeleteCloudService (options: StopOptions) =
     let formatLog fmt = 
         let prepend msg = String.Join(" ", [logPrefix, msg])
         Printf.ksprintf prepend fmt
-    if existingDeployment <> null then
+    if isNull existingDeployment then
         let task = client.Deployments.DeleteBySlotAsync(options.Deployment.ServiceName, slot)
         HandleOperation logPrefix "Delete" task
     else

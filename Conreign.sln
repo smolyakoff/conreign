@@ -73,6 +73,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{E7B4CE72
 		tools\config.fsx = tools\config.fsx
 		do.bat = do.bat
 		tools\do.fsx = tools\do.fsx
+		tools\run-loadtest.ps1 = tools\run-loadtest.ps1
 		tools\vars.fsx = tools\vars.fsx
 	EndProjectSection
 EndProject

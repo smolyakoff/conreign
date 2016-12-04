@@ -1,7 +1,12 @@
 {
+  "Azure": {
+    "SubscriptionId": null,
+    "CertificatePassword": null
+  },
   "Environments": {
     "Production": {
-      "CloudServiceName": "conreign"
+      "CloudServiceName": "conreign",
+      "StorageConnectionString": null
     }
   }
 }
