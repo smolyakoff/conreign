@@ -175,7 +175,8 @@ let DeleteCloudService (options: StopOptions) =
         let prepend msg = String.Join(" ", [logPrefix, msg])
         Printf.ksprintf prepend fmt
     if isNull existingDeployment then
+        formatLog "Nothing to delete." |> trace
+    else        
         let task = client.Deployments.DeleteBySlotAsync(options.Deployment.ServiceName, slot)
         HandleOperation logPrefix "Delete" task
-    else
-        formatLog "Nothing to delete." |> trace
+        
