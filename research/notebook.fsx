@@ -121,7 +121,7 @@ type CountersStats =
         EventsStatsSeries: Series<string, float>;
         EventsProcessedFrame: Frame<string * int, string>;
         EventsProcessedSeries: Series<TimeSpan, float>;
-        EventsPerSecSeries: Series<TimeSpan, float>;
+        AvgEventsPerSecSeries: Series<TimeSpan, float>;
     }
 
 let analyzeCounters (filePath: string) =
@@ -156,6 +156,7 @@ let analyzeCounters (filePath: string) =
     let eventsPerSecSeries =
         eventsProcessedSeries
         |> Series.diff 1
+        |> Series.windowDistInto (TimeSpan(0, 0, 5)) Stats.mean
 
     let eventsStatsSeries =
         [
@@ -175,7 +176,7 @@ let analyzeCounters (filePath: string) =
         EventsStatsSeries = eventsStatsSeries;
         EventsProcessedFrame = eventsProcessedFrame;
         EventsProcessedSeries = eventsProcessedSeries;
-        EventsPerSecSeries = eventsPerSecSeries;
+        AvgEventsPerSecSeries = eventsPerSecSeries;
     }
 
 let filePath = fullPath "samples/s1b8_failures.csv"
@@ -346,7 +347,10 @@ let toNamedScatter (k: string, s: Series<'x, 'y>) =
 
 let toNamedHistogram (k: string, s: Series<'x, 'y>) =
     let x = Series.values s
-    Graph.Histogram(x = x, name = k, histnorm = "probability density")
+    Graph.Histogram(x = x, name = k, histnorm = "percent")
+
+let toNamedBar (name: string) (s: Series<'x, 'y>) =
+    Bar(x = Series.keys s, y = Series.values s, name = name)
 
 let toScatters (s: Series<string, Series<TimeSpan, float>>) =
     s
@@ -363,7 +367,7 @@ let plotEventsProcessed cases =
 
 let plotEventsPerSec cases =
     cases
-    |> Series.mapValues (fun v -> v.Counters.EventsPerSecSeries)
+    |> Series.mapValues (fun v -> v.Counters.AvgEventsPerSecSeries)
     |> Series.trim
     |> toScatters
     |> Chart.Plot
@@ -381,7 +385,7 @@ let plotReqPercentiles cases =
     |> Chart.Plot
     |> Chart.WithLayout layout
 
-let plotHistograms cases =
+let plotReqHistograms cases =
     let overlayedLayout =
         Layout(barmode = "overlay")
     cases
@@ -392,10 +396,22 @@ let plotHistograms cases =
     |> Chart.Plot
     |> Chart.WithLayout overlayedLayout
 
+let plotStatsBars (statsSeries: Series<string, Series<string, float>>) =
+    let plot name bar =
+        bar
+        |> Chart.Plot
+        |> Chart.WithTitle name
+    statsSeries
+    |> Frame.ofColumns
+    |> Frame.rows
+    |> Series.map toNamedBar
+    |> Series.map plot
+
 type ComparisonResult =
     {
         Stats: Series<string, CaseStats>;
         StatsFrame: Frame<string, string>;
+        StatsBarCharts: Series<string, PlotlyChart>;
         EventsProcessedChart: PlotlyChart;
         EventsPerSecChart: PlotlyChart;
         ReqsPercentilesChart: PlotlyChart;
@@ -418,6 +434,7 @@ let compareCases (cases: seq<string>) =
     let statsSeries =
         stats
         |> Series.mapValues mergeStats
+    let statsBarCharts = plotStatsBars statsSeries
     let combinedStatsSeries =
         statsSeries
         |> Series.mapValues (Series.normalize (statsSeries.GetAt(0)))
@@ -429,11 +446,12 @@ let compareCases (cases: seq<string>) =
         |> Frame.sortRowsByKey
     {
         Stats = stats;
+        StatsBarCharts = statsBarCharts;
         StatsFrame = statsFrame;
         EventsProcessedChart = plotEventsProcessed stats;
         EventsPerSecChart = plotEventsPerSec stats;
         ReqsPercentilesChart = plotReqPercentiles stats;
-        ReqsHistogramsChart = plotHistograms stats;
+        ReqsHistogramsChart = plotReqHistograms stats;
     }
 
 let all = [
@@ -455,6 +473,7 @@ s1Stats.EventsProcessedChart
 s1Stats.EventsPerSecChart
 s1Stats.ReqsPercentilesChart
 s1Stats.ReqsHistogramsChart
+s1Stats.StatsBarCharts.Get("Reqs Total")
 
 let s2Stats = compareCases s2
 s2Stats.StatsFrame

@@ -241,3 +241,5 @@ processBotLogs "s2b8" S2B8 "samples"
 processBotLogs "s4b2" S4B2 "samples"
 processBotLogs "s4b4" S4B4 "samples"
 processBotLogs "s4b8" S4B8 "samples"
+
+processBotLogs "s2b8_2" "logs/loadtest-s2b8"
