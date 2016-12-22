@@ -1,7 +1,5 @@
 # Project specific
 node_modules
-lib/server/static
-lib/server/build
 
 # IDE specific
 .idea
