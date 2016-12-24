@@ -1,35 +1,28 @@
-import React, { PropTypes } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { Provider } from 'react-redux';
-import { Router, Route, IndexRoute } from 'react-router';
-import { syncHistoryWithStore } from 'react-router-redux'
+import { Router } from 'react-router';
 
-import { createApplicationStore } from './store';
-import { LayoutContainer } from './layout';
-import { HomePage } from './home';
+import rootRoute from './routes';
 
-const DevTools = process.env.NODE_ENV === 'development'
-  ? require('./dev-tools').createDevMonitor()
-  : null;
-
-export function Root({ history, state = {} }) {
-  const store = createApplicationStore({ state, DevTools });
-  const reduxHistory = syncHistoryWithStore(history, store);
-  return (
-    <Provider store={store}>
-      <div>
-        <Router history={reduxHistory}>
-          <Route path="/" component={LayoutContainer}>
-            <IndexRoute component={HomePage}/>
-          </Route>
-        </Router>
-        {DevTools ? <DevTools /> : null}
-      </div>
-    </Provider>
-  );
+export class Root extends Component {
+  render() {
+    const { store, history, DevTools } = this.props;
+    return (
+      <Provider store={store}>
+        <div className="u-full-height">
+          <Router history={history}>
+            {rootRoute}
+          </Router>
+          {DevTools ? <DevTools /> : null}
+        </div>
+      </Provider>
+    );
+  }
 }
+
 Root.propTypes = {
   history: PropTypes.object,
-  state: PropTypes.object,
+  store: PropTypes.object,
 };
 
 export default Root;

@@ -14,6 +14,8 @@ const webpackMerge = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const AddAssetToHtmlPlugin = require('add-asset-html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
+
 const git = require('git-rev-sync');
 
 const { PATHS, TASK, COMPILATION_MODE, SIZE_LIMITS } = require('./constants');
@@ -51,6 +53,10 @@ function createConfiguration(options) {
               'sass-loader',
             ]
           })
+        },
+        {
+          test: /\.svg$/,
+          loader: 'file-loader',
         }
       ]
     },
@@ -78,6 +84,7 @@ function createConfiguration(options) {
         TASK: JSON.stringify(options.task),
         BUILD_OPTIONS: JSON.stringify(options),
       }),
+      new LodashModuleReplacementPlugin(),
     ],
     performance: _.extend({}, SIZE_LIMITS, {
       hints: options.compilationMode === COMPILATION_MODE.RELEASE ? 'warning' : false,

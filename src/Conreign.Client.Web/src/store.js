@@ -1,15 +1,19 @@
-import { combineReducers, compose, createStore } from 'redux';
-import { routerReducer } from 'react-router-redux';
+import { compose, createStore } from 'redux';
 
-const reducer = combineReducers({
-  routing: routerReducer,
-});
+import reducer from './reducer';
 
 function createDebugStore({ state = {}, DevTools }) {
   const enhancer = compose(
     DevTools.instrument(),
   );
-  return createStore(reducer, state, enhancer);
+  const store = createStore(reducer, state, enhancer);
+  if (module.hot) {
+    module.hot.accept('./reducer', () => {
+      const updatedReducer = require('./reducer').default;
+      store.replaceReducer(updatedReducer);
+    })
+  }
+  return store;
 }
 
 function createReleaseStore({ state = {} }) {

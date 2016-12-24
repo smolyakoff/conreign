@@ -1,0 +1,6 @@
+@import "../theme/variables";
+
+.view-container {
+  bottom: ($nav-item-padding * 4) + ($text-line-height * 1.24em);
+}
+

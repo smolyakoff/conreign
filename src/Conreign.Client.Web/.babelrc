@@ -11,6 +11,9 @@
     ["react"]
   ],
   "sourceMaps": true,
+  "plugins": [
+    "lodash"
+  ],
   "env": {
     "development": {
       "plugins": [

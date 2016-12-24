@@ -1,0 +1,66 @@
+// n is number of stars required
+@function multiple-box-shadow($n) {
+  $value: "#{random(2000)}px #{random(2000)}px #FFF";
+
+  @for $i from 2 through $n {
+    $value: "#{$value} , #{random(2000)}px #{random(2000)}px #FFF";
+  }
+
+  @return unquote($value);
+}
+
+$shadows-small: multiple-box-shadow(700);
+$shadows-medium: multiple-box-shadow(200);
+
+
+@keyframes stars {
+  from {
+    transform: translateY(0px);
+  }
+  to {
+    transform: translateY(-2000px);
+  }
+}
+
+.sky {
+  overflow: hidden;
+
+  &__star {
+    background: transparent;
+
+    &:after {
+      content: " ";
+      position: absolute;
+      top: 2000px;
+      background: transparent;
+    }
+
+    &--small {
+      width: 1px;
+      height: 1px;
+      box-shadow: $shadows-small;
+      animation: stars 50s linear infinite;
+
+      &:after {
+        width: 1px;
+        height: 1px;
+        box-shadow: $shadows-small;
+      }
+    }
+
+    &--medium {
+      width: 2px;
+      height: 2px;
+      box-shadow: $shadows-medium;
+      animation: stars 50s linear infinite;
+
+      &:after {
+        width: 2px;
+        height: 2px;
+        box-shadow: $shadows-medium;
+      }
+    }
+  }
+}
+
+
