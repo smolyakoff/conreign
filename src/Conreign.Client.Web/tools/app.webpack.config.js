@@ -5,11 +5,16 @@ const {
   DllReferencePlugin,
   HotModuleReplacementPlugin,
   NamedModulesPlugin,
+  DefinePlugin,
+  LoaderOptionsPlugin,
+  optimize,
 } = require('webpack');
+const { UglifyJsPlugin } = optimize;
 const webpackMerge = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const AddAssetToHtmlPlugin = require('add-asset-html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const git = require('git-rev-sync');
 
 const { PATHS, TASK, COMPILATION_MODE, SIZE_LIMITS } = require('./constants');
 
@@ -59,20 +64,31 @@ function createConfiguration(options) {
       }),
       new AddAssetToHtmlPlugin({
         filepath: path.join(PATHS.BUILD, conreignLibAssets.lib.js),
-        includeSourcemap: compilationMode === COMPILATION_MODE.RELEASE,
+        includeSourcemap: false,
       }),
       new ExtractTextPlugin({
         filename: 'conreign-[name].[contenthash].css',
         disable: options.task === TASK.RUN,
       }),
+      new DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify(
+          compilationMode === COMPILATION_MODE.RELEASE ? 'production' : 'development'
+        ),
+        COMPILATION_MODE: JSON.stringify(compilationMode),
+        TASK: JSON.stringify(options.task),
+        BUILD_OPTIONS: JSON.stringify(options),
+      }),
     ],
-    performance: _.clone(SIZE_LIMITS),
+    performance: _.extend({}, SIZE_LIMITS, {
+      hints: options.compilationMode === COMPILATION_MODE.RELEASE ? 'warning' : false,
+    }),
   };
 
   if (options.task === TASK.RUN) {
     config = webpackMerge(config, {
       entry: {
         app: [
+          'react-hot-loader/patch',
           `webpack-dev-server/client?http://localhost:${options.devServerPort}`,
           'webpack/hot/only-dev-server',
         ]
@@ -83,6 +99,20 @@ function createConfiguration(options) {
       ]
     });
   }
+
+  if (compilationMode === COMPILATION_MODE.RELEASE) {
+    config = webpackMerge(config, {
+      plugins: [
+        new UglifyJsPlugin({
+          sourceMap: true,
+        }),
+        new LoaderOptionsPlugin({
+          minimize: true,
+        }),
+      ]
+    });
+  }
+
   return config;
 }
 

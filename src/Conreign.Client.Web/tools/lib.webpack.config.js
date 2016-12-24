@@ -3,15 +3,20 @@ const _ = require('lodash');
 
 const {
   DllPlugin,
+  DefinePlugin,
+  LoaderOptionsPlugin,
+  optimize,
 } = require('webpack');
+const { UglifyJsPlugin } = optimize;
+const webpackMerge = require('webpack-merge');
 const AssetsWebpackPlugin = require('assets-webpack-plugin');
 
-const { PATHS, SIZE_LIMITS } = require('./constants');
+const { PATHS, SIZE_LIMITS, COMPILATION_MODE } = require('./constants');
 const CHUNK_NAME = 'lib';
 const LIB_VARIABLE_NAME = 'conreignLib';
 
-function createConfiguration(options) {
-  const config = {
+function createConfiguration({ compilationMode }) {
+  let config = {
     entry: {
       [CHUNK_NAME]: [path.join(PATHS.SRC, 'lib.js')],
     },
@@ -29,9 +34,28 @@ function createConfiguration(options) {
         path: PATHS.BUILD,
         filename: `conreign-${CHUNK_NAME}.assets.json`,
       }),
+      new DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify(
+          compilationMode === COMPILATION_MODE.RELEASE ? 'production' : 'development'
+        ),
+      }),
     ],
-    performance: _.clone(SIZE_LIMITS),
+    performance: _.extend({}, SIZE_LIMITS, {
+      hints: compilationMode === COMPILATION_MODE.RELEASE ? 'warning' : false,
+    }),
   };
+
+  if (compilationMode === COMPILATION_MODE.RELEASE) {
+    config = webpackMerge(config, {
+      plugins: [
+        new UglifyJsPlugin(),
+        new LoaderOptionsPlugin({
+          minimize: true,
+        }),
+      ]
+    });
+  }
+
   return config;
 }
 

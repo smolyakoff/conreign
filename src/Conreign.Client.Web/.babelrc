@@ -1,11 +1,21 @@
 {
   "presets": [
     ["env", {
+      "loose": true,
       "targets": {
-        "browsers": "> 5%"
+        "browsers": "> 1%"
       },
       "modules": false,
       "useBuiltIns": true
-    }]
-  ]
+    }],
+    ["react"]
+  ],
+  "sourceMaps": true,
+  "env": {
+    "development": {
+      "plugins": [
+        "react-hot-loader/babel"
+      ]
+    }
+  }
 }
