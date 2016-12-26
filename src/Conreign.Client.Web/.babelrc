@@ -8,7 +8,8 @@
       "modules": false,
       "useBuiltIns": true
     }],
-    ["react"]
+    "react",
+    "stage-2"
   ],
   "sourceMaps": true,
   "plugins": [

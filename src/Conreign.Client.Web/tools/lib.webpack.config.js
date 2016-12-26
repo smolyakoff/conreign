@@ -7,11 +7,11 @@ const {
   LoaderOptionsPlugin,
   optimize,
 } = require('webpack');
-const { UglifyJsPlugin } = optimize;
 const webpackMerge = require('webpack-merge');
 const AssetsWebpackPlugin = require('assets-webpack-plugin');
-
 const { PATHS, SIZE_LIMITS, COMPILATION_MODE } = require('./constants');
+
+const { UglifyJsPlugin } = optimize;
 const CHUNK_NAME = 'lib';
 const LIB_VARIABLE_NAME = 'conreignLib';
 
@@ -23,7 +23,7 @@ function createConfiguration({ compilationMode }) {
     output: {
       path: PATHS.BUILD,
       filename: 'conreign-[name].[chunkhash].js',
-      library: LIB_VARIABLE_NAME
+      library: LIB_VARIABLE_NAME,
     },
     plugins: [
       new DllPlugin({
@@ -52,7 +52,7 @@ function createConfiguration({ compilationMode }) {
         new LoaderOptionsPlugin({
           minimize: true,
         }),
-      ]
+      ],
     });
   }
 

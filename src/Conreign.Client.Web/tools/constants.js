@@ -18,7 +18,7 @@ const TASK = {
 
 const ROOT = path.resolve(__dirname, '..');
 const PATHS = {
-  ROOT: ROOT,
+  ROOT,
   SRC: path.join(ROOT, 'src'),
   BUILD: path.join(ROOT, 'build'),
 };

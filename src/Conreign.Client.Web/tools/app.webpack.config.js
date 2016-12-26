@@ -9,23 +9,22 @@ const {
   LoaderOptionsPlugin,
   optimize,
 } = require('webpack');
-const { UglifyJsPlugin } = optimize;
 const webpackMerge = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const AddAssetToHtmlPlugin = require('add-asset-html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 
-const git = require('git-rev-sync');
-
+const { UglifyJsPlugin } = optimize;
 const { PATHS, TASK, COMPILATION_MODE, SIZE_LIMITS } = require('./constants');
 
 function createConfiguration(options) {
   const { compilationMode } = options;
+  // eslint-disable-next-line global-require
   const conreignLibAssets = require('./../build/conreign-lib.assets.json');
   let config = {
     entry: {
-      app: [path.join(PATHS.SRC, 'app.js')],
+      app: [path.join(PATHS.SRC, 'app')],
     },
     output: {
       path: PATHS.BUILD,
@@ -39,7 +38,13 @@ function createConfiguration(options) {
           loader: 'html-loader',
         },
         {
-          test: /\.js$/,
+          test: /\.jsx?$/,
+          enforce: 'pre',
+          loader: 'eslint-loader',
+          include: PATHS.SRC,
+        },
+        {
+          test: /\.jsx?$/,
           loader: 'babel-loader',
           include: PATHS.SRC,
         },
@@ -51,18 +56,22 @@ function createConfiguration(options) {
               'css-loader?importLoaders=1',
               'postcss-loader',
               'sass-loader',
-            ]
-          })
+            ],
+          }),
         },
         {
           test: /\.svg$/,
           loader: 'file-loader',
-        }
-      ]
+        },
+      ],
+    },
+    resolve: {
+      extensions: ['.js', '.jsx', '.json'],
     },
     plugins: [
       new DllReferencePlugin({
         context: PATHS.ROOT,
+        // eslint-disable-next-line global-require
         manifest: require('./../build/conreign-lib.manifest.json'),
       }),
       new HtmlWebpackPlugin({
@@ -98,12 +107,12 @@ function createConfiguration(options) {
           'react-hot-loader/patch',
           `webpack-dev-server/client?http://localhost:${options.devServerPort}`,
           'webpack/hot/only-dev-server',
-        ]
+        ],
       },
       plugins: [
         new HotModuleReplacementPlugin(),
         new NamedModulesPlugin(),
-      ]
+      ],
     });
   }
 
@@ -116,7 +125,7 @@ function createConfiguration(options) {
         new LoaderOptionsPlugin({
           minimize: true,
         }),
-      ]
+      ],
     });
   }
 

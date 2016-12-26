@@ -1,0 +1,17 @@
+{
+  "extends": "airbnb",
+  "parser": "babel-eslint",
+  "env": {
+    "browser": true
+  },
+  "globals": {
+    "COMPILATION_MODE": true,
+    "TASK": true
+  },
+  "rules": {
+    "linebreak-style": 0,
+    "import/no-extraneous-dependencies": ["error", {
+      "devDependencies": ["tools/**/*.js"]
+    }]
+  }
+}

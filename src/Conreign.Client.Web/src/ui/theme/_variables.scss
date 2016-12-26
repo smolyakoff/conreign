@@ -1,0 +1,20 @@
+@import "../../../node_modules/blaze/scss/mixins/_settings.global";
+
+// Sizes
+$size-names: tiny xsmall small medium large xlarge super;
+$sizes: $spacing-tiny $spacing-xsmall $spacing-small $spacing-medium $spacing-large $spacing-xlarge $spacing-super;
+
+// Colors
+$text-color: $color-white;
+$color-brand: material-color('deep-orange', '800');
+$button-brand-background-color: $color-brand;
+
+// Typography
+$text-font-family: 'Orbitron', $text-font-family;
+$text-font-family-serif: 'Orbitron', $text-font-family-serif;
+
+// Links
+$link-hover-text-decoration: none;
+
+// Inputs
+$field-background-color: transparent;

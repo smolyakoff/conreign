@@ -1,9 +1,11 @@
 const createLibWebpackConfig = require('./lib.webpack.config');
 const createAppWebpackConfig = require('./app.webpack.config');
+const constants = require('./constants');
+const loadVariables = require('./vars');
 
 module.exports = {
-  constants: require('./constants'),
-  loadVariables: require('./vars'),
+  constants,
+  loadVariables,
   createLibWebpackConfig,
   createAppWebpackConfig,
 };

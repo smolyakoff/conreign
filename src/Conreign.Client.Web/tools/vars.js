@@ -1,5 +1,6 @@
 const convict = require('convict');
 const _ = require('lodash');
+const git = require('git-rev-sync');
 
 const { COMPILATION_MODE, TRACE_LEVEL } = require('./constants');
 const packageJson = require('./../package.json');
@@ -37,8 +38,8 @@ const load = _.memoize(() => {
       format: 'port',
       default: 9000,
       env: 'PORT',
-      arg: 'port'
-    }
+      arg: 'port',
+    },
   });
   config.validate({ strict: true });
   const props = config.getProperties();
@@ -46,7 +47,7 @@ const load = _.memoize(() => {
     version: {
       main: packageJson.version,
       git: getGitVersion(),
-    }
+    },
   });
   return props;
 });

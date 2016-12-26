@@ -1,0 +1,21 @@
+@import "../../../node_modules/blaze/scss/components.typography";
+@import "../../../node_modules/blaze/scss/components.links";
+@import "../../../node_modules/blaze/scss/components.navs";
+@import "../../../node_modules/blaze/scss/components.buttons";
+@import "../../../node_modules/blaze/scss/components.inputs";
+
+// Typography
+body {
+  @extend .c-text;
+}
+
+// Links
+a {
+  @extend .c-link;
+}
+
+// Inputs
+.c-field {
+  color: $field-color;
+  box-sizing: border-box;
+}
