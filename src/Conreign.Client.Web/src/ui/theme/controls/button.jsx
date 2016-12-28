@@ -1,11 +1,11 @@
 import React, { PropTypes } from 'react';
 import block from 'bem-cn';
-import { flow } from 'lodash';
 
 import {
-  supportsThemeColors,
-  supportsThemeSizes,
-  supportsActiveState,
+  withThemeColors,
+  withActiveState,
+  withThemeSizes,
+  decorate,
 } from './decorators';
 
 const CSS_CLASS = 'c-button';
@@ -31,11 +31,12 @@ function Button({
   );
 }
 
-export default flow([
-  supportsThemeSizes(),
-  supportsActiveState(CSS_CLASS),
-  supportsThemeColors(CSS_CLASS),
+export default decorate([
+  withActiveState(CSS_CLASS),
+  withThemeColors(CSS_CLASS),
+  withThemeSizes(),
 ])(Button);
+
 
 Button.propTypes = {
   className: PropTypes.string,

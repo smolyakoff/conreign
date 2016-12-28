@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import block from 'bem-cn';
 import { values } from 'lodash';
 
-import { supportsThemeSizes } from './decorators';
+import { withThemeSizes, decorate } from './decorators';
 import { isNonEmptyString } from './util';
 
 export const TextEmphasize = {
@@ -40,6 +40,7 @@ function TextBase({
   );
 }
 
+TextBase.displayName = 'Text';
 TextBase.propTypes = {
   tagName: PropTypes.oneOf(['span', 'abbr']),
   className: PropTypes.string,
@@ -51,7 +52,6 @@ TextBase.propTypes = {
   mono: PropTypes.bool,
   kbd: PropTypes.bool,
 };
-
 TextBase.defaultProps = {
   tagName: 'span',
   highlight: false,
@@ -61,7 +61,7 @@ TextBase.defaultProps = {
   kbd: false,
 };
 
-export const Text = supportsThemeSizes()(TextBase);
+export const Text = decorate(withThemeSizes())(TextBase);
 
 function ParagraphBase({ className, children, text, ...others }) {
   return (
@@ -71,10 +71,11 @@ function ParagraphBase({ className, children, text, ...others }) {
   );
 }
 
-export const Paragraph = supportsThemeSizes()(ParagraphBase);
-
+ParagraphBase.displayName = 'Paragraph';
 ParagraphBase.propTypes = {
   className: PropTypes.string,
   children: PropTypes.node,
   text: PropTypes.string,
 };
+
+export const Paragraph = decorate(withThemeSizes())(ParagraphBase);

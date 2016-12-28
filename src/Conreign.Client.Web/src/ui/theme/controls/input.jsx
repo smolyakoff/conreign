@@ -1,10 +1,10 @@
-import { flow } from 'lodash';
 import React, { PropTypes } from 'react';
 import block from 'bem-cn';
 
 import {
-  supportsThemeColors,
-  supportsThemeSizes,
+  withThemeColors,
+  withThemeSizes,
+  decorate,
 } from './decorators';
 
 const INPUT_CLASS = 'c-field';
@@ -21,21 +21,21 @@ function InputBase({
   );
 }
 
+InputBase.displayName = 'Input';
 InputBase.propTypes = {
   tagName: PropTypes.oneOf(['input', 'textarea', 'select']),
   className: PropTypes.string,
   iconLeft: PropTypes.bool,
   iconRight: PropTypes.bool,
 };
-
 InputBase.defaultProps = {
   tagName: 'input',
   type: 'text',
 };
 
-export const Input = flow([
-  supportsThemeSizes(),
-  supportsThemeColors(INPUT_CLASS),
+export const Input = decorate([
+  withThemeSizes(),
+  withThemeColors(INPUT_CLASS),
 ])(InputBase);
 
 const INPUT_FIELD_CLASS = 'o-field';
@@ -58,18 +58,16 @@ function InputContainerBase({
   );
 }
 
+InputContainerBase.displayName = 'InputContainer';
 InputContainerBase.propTypes = {
   className: PropTypes.string,
   children: PropTypes.node,
   iconLeft: PropTypes.bool,
   iconRight: PropTypes.bool,
 };
-
 InputContainerBase.defaultProps = {
   iconLeft: false,
   iconRight: false,
 };
 
-export const InputContainer = flow([
-  supportsThemeSizes(),
-])(InputContainerBase);
+export const InputContainer = decorate(withThemeSizes())(InputContainerBase);

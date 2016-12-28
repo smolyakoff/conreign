@@ -2,7 +2,11 @@ import block from 'bem-cn';
 import React, { PropTypes } from 'react';
 
 import { Alignment } from './enums';
-import { supportsThemeColors, supportsThemeSizes } from './decorators';
+import {
+  withThemeColors,
+  withThemeSizes,
+  decorate,
+} from './decorators';
 import { isNonEmptyString } from './util';
 
 const css = block('c-nav');
@@ -54,8 +58,7 @@ function NavContentBase({ tagName, className, children, ...others }) {
   );
 }
 
-export const NavContent = supportsThemeSizes()(NavContentBase);
-
+NavContentBase.displayName = 'NavContent';
 NavContentBase.defaultProps = {
   tagName: 'li',
 };
@@ -65,6 +68,8 @@ NavContentBase.propTypes = {
   className: PropTypes.string,
   children: PropTypes.node,
 };
+
+export const NavContent = decorate(withThemeSizes())(NavContentBase);
 
 function NavItemBase({
   tagName,
@@ -87,6 +92,8 @@ function NavItemBase({
   );
 }
 
+NavItemBase.displayName = 'NavItem';
+
 NavItemBase.propTypes = {
   tagName: PropTypes.string,
   className: PropTypes.string,
@@ -100,4 +107,6 @@ NavItemBase.defaultProps = {
   active: false,
 };
 
-export const NavItem = supportsThemeColors(css('item')())(NavItemBase);
+export const NavItem = decorate(
+  withThemeColors(css('item').toString()),
+)(NavItemBase);

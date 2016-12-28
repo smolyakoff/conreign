@@ -1,6 +1,6 @@
 import cx from 'classnames';
 import React, { PropTypes } from 'react';
-import { values } from 'lodash';
+import { values, flow, each, isFunction, extend, isArray } from 'lodash';
 
 import { isNonEmptyString } from './util';
 
@@ -13,21 +13,48 @@ export const ThemeColor = {
   Error: 'error',
 };
 
-export function supportsThemeColors(blockClass) {
+export function decorate(decorators) {
+  const decoratorsList = isArray(decorators) ? decorators : [decorators];
+  const mapProps = flow(decoratorsList.map(d => d.mapProps));
+  const extenders = decoratorsList
+    .map(d => d.extendStatics)
+    .filter(isFunction);
+
   return function wrap(Control) {
-    function Colored({ className, themeColor, ...others }) {
-      const css = cx(
-        className,
-        isNonEmptyString(themeColor) ? `${blockClass}--${themeColor}` : null,
-      );
-      return <Control className={css} {...others} />;
+    function Decorated(props) {
+      const mappedProps = mapProps(props);
+      return <Control {...mappedProps} />;
     }
-    Colored.displayName = `Colored${Control.displayName || 'Control'}`;
-    Colored.propTypes = {
-      className: PropTypes.string,
-      themeColor: PropTypes.oneOf(values(ThemeColor)),
+    Decorated.displayName = `Decorated${Control.displayName || Control.name}`;
+    each(extenders, e => e(Decorated));
+    return Decorated;
+  };
+}
+
+export function withThemeColors(blockClass) {
+  function mapProps({ className, themeColor, ...others }) {
+    const css = cx(
+      className,
+      isNonEmptyString(themeColor) ? `${blockClass}--${themeColor}` : null,
+    );
+    return {
+      className: css,
+      ...others,
     };
-    return Colored;
+  }
+  function extendStatics(Control) {
+    const propTypes = Control.propTypes || {};
+    extend(propTypes, {
+      themeColor: PropTypes.oneOf(values(ThemeColor)),
+    });
+    extend(Control, {
+      propTypes,
+    });
+  }
+
+  return {
+    mapProps,
+    extendStatics,
   };
 }
 
@@ -40,48 +67,71 @@ export const ThemeSize = {
   Super: 'super',
 };
 
-export function supportsThemeSizes(blockClass = null) {
+
+export function withThemeSizes(blockClass = null) {
   function formatSizeClass(size) {
     return isNonEmptyString(blockClass)
       ? `${blockClass}--${size}`
       : `u-${size}`;
   }
-  return function wrap(Control) {
-    function Sized({ className, themeSize, ...others }) {
-      const css = cx(
-        className,
-        isNonEmptyString(themeSize)
-          ? formatSizeClass(themeSize)
-          : null,
-      );
-      return <Control className={css} {...others} />;
-    }
-    Sized.displayName = `Sized${Control.displayName || 'Control'}`;
-    Sized.propTypes = {
-      className: PropTypes.string,
-      themeSize: PropTypes.oneOf(values(ThemeSize)),
+
+  function mapProps({ className, themeSize, ...others }) {
+    const css = cx(
+      className,
+      isNonEmptyString(themeSize)
+        ? formatSizeClass(themeSize)
+        : null,
+    );
+    return {
+      className: css,
+      ...others,
     };
-    return Sized;
+  }
+
+  function extendStatics(Control) {
+    const propTypes = Control.propTypes || {};
+    extend(propTypes, {
+      themeSize: PropTypes.oneOf(values(ThemeSize)),
+    });
+    extend(Control, {
+      propTypes,
+    });
+  }
+
+  return {
+    mapProps,
+    extendStatics,
   };
 }
 
-export function supportsActiveState(blockClass) {
-  return function wrap(Control) {
-    function Activated({ className, active, ...others }) {
-      const css = cx(
-        className,
-        isNonEmptyString(active) ? `${blockClass}--active` : null,
-      );
-      return <Control className={css} {...others} />;
-    }
-    Activated.displayName = `Activated${Control.displayName || 'Control'}`;
-    Activated.propTypes = {
-      className: PropTypes.string,
+export function withActiveState(blockClass) {
+  function mapProps({ className, active, ...others }) {
+    const css = cx(
+      className,
+      isNonEmptyString(active) ? `${blockClass}--active` : null,
+    );
+    return {
+      className: css,
+      ...others,
+    };
+  }
+  function extendStatics(Control) {
+    const propTypes = Control.propTypes || {};
+    const defaultProps = Control.defaultProps || {};
+    extend(propTypes, {
       active: PropTypes.bool,
-    };
-    Activated.defaultProps = {
+    });
+    extend(defaultProps, {
       active: false,
-    };
-    return Activated;
+    });
+    extend(Control, {
+      propTypes,
+      defaultProps,
+    });
+  }
+
+  return {
+    mapProps,
+    extendStatics,
   };
 }
