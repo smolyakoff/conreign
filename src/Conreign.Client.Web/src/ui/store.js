@@ -2,7 +2,11 @@ import { compose, createStore } from 'redux';
 
 import reducer from './reducer';
 
-function createDebugStore({ state = {}, DevTools }) {
+const DevTools = COMPILATION_MODE === 'debug'
+  ? require('./dev-tools').default()
+  : null;
+
+function createDebugStore(state = {}) {
   const enhancer = compose(
     DevTools.instrument(),
   );
@@ -17,14 +21,16 @@ function createDebugStore({ state = {}, DevTools }) {
   return store;
 }
 
-function createReleaseStore({ state = {} }) {
+function createReleaseStore(state = {}) {
   return createStore(reducer, state);
 }
 
 export function createApplicationStore(options) {
-  return process.env.NODE_ENV === 'production'
+  const store = process.env.NODE_ENV === 'production'
     ? createReleaseStore(options)
     : createDebugStore(options);
+  store.DevTools = DevTools;
+  return store;
 }
 
 export default createApplicationStore;

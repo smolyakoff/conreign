@@ -4,18 +4,14 @@ import ReactDOM from 'react-dom';
 import { browserHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 
-import { createStore, createDevTools, Root } from './ui';
+import createContainer from './core';
+import { createStore, Root } from './ui';
 
 if (COMPILATION_MODE === 'debug') {
   window.React = React;
 }
 
-const state = {};
-const DevTools = createDevTools();
-const store = createStore({ state, DevTools });
-const history = syncHistoryWithStore(browserHistory, store);
-
-function render(RootComponent) {
+function render({ RootComponent, store, DevTools, history }) {
   ReactDOM.render(
     <RootComponent
       history={history}
@@ -26,8 +22,7 @@ function render(RootComponent) {
   );
 }
 
-render(Root);
-
+// Hot-Reload
 if (TASK === 'run') {
   if (module.hot) {
     // eslint-disable-next-line
@@ -51,3 +46,21 @@ if (TASK === 'run') {
     module.hot.accept('./ui/root-hot', update);
   }
 }
+
+function run() {
+  const state = {};
+  const container = createContainer(BUILD_CONFIG);
+  const store = createStore(state);
+  const history = syncHistoryWithStore(browserHistory, store);
+  render({
+    RootComponent: Root,
+    store,
+    history,
+    DevTools: store.DevTools,
+  });
+
+  const { apiClient } = container;
+  apiClient.connect();
+}
+
+run();

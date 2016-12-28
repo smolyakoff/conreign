@@ -1,5 +1,8 @@
 /* eslint-disable global-require,import/no-extraneous-dependencies */
 import 'babel-polyfill';
+import 'jquery';
+import 'ms-signalr-client';
+import 'rxjs/Rx';
 import 'react';
 import 'react-dom';
 import 'redux';

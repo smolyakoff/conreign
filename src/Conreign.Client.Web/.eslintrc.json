@@ -6,7 +6,8 @@
   },
   "globals": {
     "COMPILATION_MODE": true,
-    "TASK": true
+    "TASK": true,
+    "BUILD_CONFIG": true
   },
   "rules": {
     "linebreak-style": 0,

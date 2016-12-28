@@ -21,13 +21,13 @@ function buildWithWebpack(configFactory) {
   const options = _.extend({}, vars, { task: TASK.BUILD });
   const config = configFactory(options);
   return webpackAsync(config)
-    .then(stats => {
+    .then((stats) => {
       log(stats.toString(vars.traceLevel));
       if (stats.hasErrors()) {
-        throw new Error('Compilation failed.')
+        throw new Error('Compilation failed.');
       }
     })
-    .catch(err => {
+    .catch((err) => {
       throw new PluginError('webpack', err);
     });
 }

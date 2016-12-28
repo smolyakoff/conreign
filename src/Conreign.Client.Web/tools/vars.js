@@ -33,6 +33,13 @@ const load = _.memoize(() => {
       default: TRACE_LEVEL.MINIMAL,
       env: 'TRACE_LEVEL',
     },
+    apiServerUrl: {
+      doc: 'API server base url.',
+      format: 'url',
+      default: 'http://localhost:3000',
+      env: 'API_SERVER_URL',
+      arg: 'apiServerUrl',
+    },
     devServerPort: {
       doc: 'Development server port.',
       format: 'port',

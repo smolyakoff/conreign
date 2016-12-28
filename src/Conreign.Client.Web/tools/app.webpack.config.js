@@ -91,9 +91,11 @@ function createConfiguration(options) {
         ),
         COMPILATION_MODE: JSON.stringify(compilationMode),
         TASK: JSON.stringify(options.task),
-        BUILD_OPTIONS: JSON.stringify(options),
+        BUILD_CONFIG: JSON.stringify(options),
       }),
-      new LodashModuleReplacementPlugin(),
+      new LodashModuleReplacementPlugin({
+        collections: true,
+      }),
     ],
     performance: _.extend({}, SIZE_LIMITS, {
       hints: options.compilationMode === COMPILATION_MODE.RELEASE ? 'warning' : false,
