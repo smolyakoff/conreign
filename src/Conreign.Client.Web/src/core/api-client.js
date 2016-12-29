@@ -19,13 +19,13 @@ const connectionStateCodeMapping = {
 
 const SERVER_HUB_NAME = 'GameHub';
 
-function apiClient(options) {
+function apiClient(accessTokenProvider, options) {
   const { baseUrl } = options;
 
-  const subject = Rx.Subject.create();
   let connection = null;
   let state = ApiClientState.Disconnected;
   let hub = null;
+  const events = new Rx.Subject();
 
   function onStateChanged({ newState }) {
     state = connectionStateCodeMapping[newState];
@@ -34,18 +34,39 @@ function apiClient(options) {
   function connect() {
     connection = $.hubConnection(baseUrl, { useDefaultPath: false });
     hub = connection.createHubProxy(SERVER_HUB_NAME);
-    hub.on('OnNext', subject.onNext);
+    hub.on('OnNext', events.next.bind(events));
+    hub.on('OnError', events.error.bind(event));
+    hub.on('OnComplete', events.complete.bind(events));
     connection.stateChanged(onStateChanged);
     return Rx.Observable.fromPromise(connection.start());
   }
 
   function send(message) {
-    return Rx.Observable.fromPromise(hub.invoke('send', message));
+    const packet = {
+      type: startCase(message.type.toLowerCase()).replace(/\s/g, ''),
+      payload: message.payload,
+      meta: {
+        ...message.meta,
+        accessToken: accessTokenProvider(),
+      },
+    };
+    return Rx.Observable
+      .fromPromise(hub.invoke('send', packet))
+      .map(response => ({
+        ...response,
+        meta: {
+          ...packet.meta,
+          ...response.meta,
+        },
+      }));
   }
 
   return {
     get state() {
       return state;
+    },
+    get events() {
+      return events;
     },
     connect: once(connect),
     send,

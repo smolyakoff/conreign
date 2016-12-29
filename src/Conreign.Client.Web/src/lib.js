@@ -7,6 +7,7 @@ import 'react';
 import 'react-dom';
 import 'redux';
 import 'react-redux';
+import 'redux-observable';
 import 'react-router';
 import 'react-router-redux';
 import 'classnames';

@@ -7,6 +7,19 @@ export function joinRoom(payload) {
   };
 }
 
-export default function reducer() {
-
+function createEpic({ apiClient }) {
+  function joinRoomEpic(action$) {
+    return action$.ofType(JOIN_ROOM)
+      .mergeMap(apiClient.send);
+  }
+  return joinRoomEpic;
 }
+
+function reducer(state) {
+  return state;
+}
+
+export default {
+  createEpic,
+  reducer,
+};

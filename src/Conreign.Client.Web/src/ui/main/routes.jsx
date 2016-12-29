@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, IndexRoute } from 'react-router';
-import { LayoutContainer } from './layout';
-import { HomePage } from './home';
+import { LayoutContainer } from './../layout';
+import { HomePage } from './../home';
 
 export const route = (
   <Route path="/" component={LayoutContainer}>

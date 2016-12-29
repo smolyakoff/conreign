@@ -5,7 +5,7 @@ import { browserHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 
 import createContainer from './core';
-import { createStore, Root } from './ui';
+import { createStore, Root, connectToServer } from './ui';
 
 if (COMPILATION_MODE === 'debug') {
   window.React = React;
@@ -22,13 +22,38 @@ function render({ RootComponent, store, DevTools, history }) {
   );
 }
 
+function run() {
+  const state = {};
+  const imports = { storage: window.localStorage };
+  const container = createContainer(imports, {
+    ...BUILD_CONFIG,
+    userStorageKey: 'conreign.user',
+  });
+  const store = createStore({ state, container });
+  const history = syncHistoryWithStore(browserHistory, store);
+  const props = {
+    RootComponent: Root,
+    store,
+    history,
+    DevTools: store.DevTools,
+  };
+  render(props);
+  store.dispatch(connectToServer());
+  return props;
+}
+
+const rootProps = run();
+
 // Hot-Reload
 if (TASK === 'run') {
   if (module.hot) {
     // eslint-disable-next-line
     function update() {
-      const UpdatedRoot = require('./ui/root-hot').default;
-      render(UpdatedRoot);
+      const UpdatedRoot = require('./ui/main/root-hot').default;
+      render({
+        ...rootProps,
+        RootComponent: UpdatedRoot,
+      });
     }
 
     // HACK: react-router v3 is incompatible with hot reload, so need to hide some odd messages
@@ -42,25 +67,7 @@ if (TASK === 'run') {
       originalConsoleError(message);
     };
 
+    module.hot.accept('./ui/main/root-hot', update);
     module.hot.accept('./ui/index', update);
-    module.hot.accept('./ui/root-hot', update);
   }
 }
-
-function run() {
-  const state = {};
-  const container = createContainer(BUILD_CONFIG);
-  const store = createStore(state);
-  const history = syncHistoryWithStore(browserHistory, store);
-  render({
-    RootComponent: Root,
-    store,
-    history,
-    DevTools: store.DevTools,
-  });
-
-  const { apiClient } = container;
-  apiClient.connect();
-}
-
-run();

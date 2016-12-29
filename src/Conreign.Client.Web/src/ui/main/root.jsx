@@ -1,7 +1,9 @@
+/* eslint-disable react/forbid-prop-types */
+
 import React, { PropTypes } from 'react';
 import { Provider } from 'react-redux';
 import { Router } from 'react-router';
-import './theme';
+import './../theme';
 
 import routes from './routes';
 
@@ -18,7 +20,6 @@ export default function Root({ store, history, DevTools }) {
   );
 }
 
-/* eslint-disable react/forbid-prop-types */
 Root.propTypes = {
   history: PropTypes.object.isRequired,
   store: PropTypes.object.isRequired,
