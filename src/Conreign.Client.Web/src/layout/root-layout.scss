@@ -1,7 +1,6 @@
 @import "../theme/_variables";
 
-.view-container {
-  top: $panel-nav-top + $spacing-medium;
+.o-root-view {
   bottom: ($nav-item-padding * 4) + ($text-line-height * 1.24em);
 }
 

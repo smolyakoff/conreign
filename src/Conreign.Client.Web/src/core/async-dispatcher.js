@@ -1,5 +1,5 @@
 import Rx from 'rxjs';
-import { defaults } from 'lodash';
+import { defaults, isObject, get } from 'lodash';
 
 export const AsyncOperationState = {
   Pending: 'PENDING',
@@ -29,7 +29,7 @@ export function createCompletedAction(result, action) {
       ...action.meta,
       ...result.meta,
       $async: {
-        originalType: action.type,
+        causeType: action.type,
         states: AsyncOperationState,
         state: AsyncOperationState.Completed,
       },
@@ -41,10 +41,11 @@ export function createFailedAction(err, action) {
   return Rx.Observable.of({
     type: `${action.type}_${AsyncOperationState.Failed}`,
     payload: err,
+    error: true,
     meta: {
       ...action.meta,
       $async: {
-        originalType: action.type,
+        causeType: action.type,
         states: AsyncOperationState,
         state: AsyncOperationState.Failed,
       },
@@ -62,6 +63,14 @@ export function createAsyncActionTypes(pendingType) {
 
 function toObservable(value) {
   return value instanceof Rx.Observable ? value : Rx.Observable.of(value);
+}
+
+export function isAsyncAction(action) {
+  return isObject(get(action, 'meta.$async'));
+}
+
+export function isAsyncFailureAction(action) {
+  return isAsyncAction(action) && action.error;
 }
 
 export function asyncDispatcher(dispatch, globalOptions = {}) {

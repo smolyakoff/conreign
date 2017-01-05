@@ -7,13 +7,14 @@ import Rx from 'rxjs';
 
 import './../theme';
 import { executeRouteActions, selectPendingRouteOperations } from './../root';
-import { LayoutContainer } from './../layout';
+import { RootLayout, NavigationMenuLayout } from './../layout';
+import { ErrorPage, ERROR_PAGE_PATH } from './../errors';
 import { HomePage } from './../home';
 import { RoomPage } from './../room';
 
 
-export default function Root({ store, history, DevTools }) {
-  function onRouteChange(prevState, nextState, callback) {
+export default function RouterContainer({ store, history }) {
+  function onRouteChange(prevState, nextState, replace, callback) {
     const storeState = store.getState();
     const components = nextState.routes.map(route => route.component);
     const initializers = components
@@ -33,19 +34,20 @@ export default function Root({ store, history, DevTools }) {
     <Provider store={store}>
       <div className="u-full-height">
         <Router history={history}>
-          <Route path="/" component={LayoutContainer} onChange={onRouteChange}>
-            <IndexRoute component={HomePage} />
-            <Route path="/:roomId" component={RoomPage} />
+          <Route component={RootLayout} onChange={onRouteChange}>
+            <Route path="/" component={NavigationMenuLayout}>
+              <IndexRoute component={HomePage} />
+              <Route path="/:roomId" component={RoomPage} />
+            </Route>
+            <Route path={ERROR_PAGE_PATH} component={ErrorPage} />
           </Route>
         </Router>
-        {DevTools ? <DevTools /> : null}
       </div>
     </Provider>
   );
 }
 
-Root.propTypes = {
+RouterContainer.propTypes = {
   history: PropTypes.object.isRequired,
   store: PropTypes.object.isRequired,
-  DevTools: PropTypes.func,
 };

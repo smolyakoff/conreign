@@ -2,13 +2,12 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 
 import { PanelContainer, Panel } from './../theme';
-import NavigationMenu from './navigation-menu';
 import PageLoadingIndicator from './page-loading-indicator';
 import Footer from './footer';
 import { selectLayoutProps } from './layout';
-import './layout-container.scss';
+import './root-layout.scss';
 
-function LayoutContainer({ children, isPageLoading }) {
+function RootLayout({ children, isPageLoading }) {
   const content = isPageLoading
     ? (
       <div className="u-absolute-center">
@@ -18,8 +17,7 @@ function LayoutContainer({ children, isPageLoading }) {
     : children;
   return (
     <PanelContainer className="u-full-height">
-      <NavigationMenu className="u-centered" />
-      <Panel className="view-container">
+      <Panel className="o-root-view">
         {content}
       </Panel>
       <Footer position="bottom" />
@@ -27,7 +25,7 @@ function LayoutContainer({ children, isPageLoading }) {
   );
 }
 
-LayoutContainer.propTypes = {
+RootLayout.propTypes = {
   children: PropTypes.node,
   isPageLoading: PropTypes.bool,
 };
@@ -37,4 +35,4 @@ export default connect(
     ...ownProps,
     ...selectLayoutProps(state),
   }),
-)(LayoutContainer);
+)(RootLayout);

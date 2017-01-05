@@ -43,6 +43,7 @@ function runWebpackServer(configFactory) {
     publicPath: '/',
     contentBase: PATHS.BUILD,
     stats: vars.traceLevel,
+    historyApiFallback: true,
   });
   server.listen(vars.devServerPort);
   log(`Webpack dev server is listening on ${vars.devServerPort}.`);

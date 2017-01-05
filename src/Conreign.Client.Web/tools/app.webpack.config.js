@@ -29,6 +29,7 @@ function createConfiguration(options) {
     output: {
       path: PATHS.BUILD,
       filename: options.task === TASK.RUN ? 'conreign-[name].js' : 'conreign-[name].[chunkhash].js',
+      publicPath: '/',
     },
     devtool: compilationMode === COMPILATION_MODE.DEBUG ? 'inline-source-map' : 'source-map',
     module: {

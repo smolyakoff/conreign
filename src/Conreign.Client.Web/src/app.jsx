@@ -11,12 +11,11 @@ if (COMPILATION_MODE === 'debug') {
   window.React = React;
 }
 
-function render({ RootComponent, store, DevTools, history }) {
+function render({ RootComponent, store, history }) {
   ReactDOM.render(
     <RootComponent
       history={history}
       store={store}
-      DevTools={DevTools}
     />,
     document.getElementById('root'),
   );
@@ -38,7 +37,6 @@ function run() {
     RootComponent: RouterContainer,
     store,
     history,
-    DevTools: store.DevTools,
   };
   render(props);
   store.dispatch(listenForServerEvents());

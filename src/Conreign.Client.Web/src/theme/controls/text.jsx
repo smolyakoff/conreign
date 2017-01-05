@@ -63,7 +63,7 @@ TextBase.defaultProps = {
 
 export const Text = decorate(withThemeSizes())(TextBase);
 
-function ParagraphBase({ className, children, text, ...others }) {
+function Paragraph({ className, children, text, ...others }) {
   return (
     <p className={block('c-paragraph').mix(className)()} {...others}>
       {text || children}
@@ -71,26 +71,29 @@ function ParagraphBase({ className, children, text, ...others }) {
   );
 }
 
-ParagraphBase.displayName = 'Paragraph';
-ParagraphBase.propTypes = {
+Paragraph.displayName = 'Paragraph';
+Paragraph.propTypes = {
   className: PropTypes.string,
   children: PropTypes.node,
   text: PropTypes.string,
 };
 
-export const Paragraph = decorate(withThemeSizes())(ParagraphBase);
+export const P = decorate(withThemeSizes())(Paragraph);
+
+const heading = block('c-heading');
 
 const headings = range(1, 6).map((i) => {
   const Tag = `h${i}`;
-  function Heading({ children }) {
+  function Heading({ children, className }) {
     return (
-      <Tag className="c-heading">
+      <Tag className={heading.mix(className)}>
         {children}
       </Tag>
     );
   }
   Heading.propTypes = {
     children: PropTypes.node,
+    className: PropTypes.string,
   };
   Heading.displayName = `H${i}`;
   return Heading;
