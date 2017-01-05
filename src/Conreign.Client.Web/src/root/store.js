@@ -1,21 +1,15 @@
-import { compose, createStore, applyMiddleware } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import { createEpicMiddleware } from 'redux-observable';
+import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly';
 
 import main from './root';
 
 const { createEpic, reducer } = main;
-const DevTools = COMPILATION_MODE === 'debug'
-  ? require('./dev-tools').default()
-  : null;
 
 function createEnhancer(container) {
   const epic = createEpic(container);
   const epicMiddleware = createEpicMiddleware(epic);
-  const enhancers = [
-    applyMiddleware(epicMiddleware),
-    DevTools ? DevTools.instrument() : null,
-  ].filter(x => x);
-  return compose(...enhancers);
+  return composeWithDevTools(applyMiddleware(epicMiddleware));
 }
 
 function createDebugStore({ state = {}, container }) {
@@ -40,7 +34,6 @@ export function createApplicationStore(options) {
   const store = process.env.NODE_ENV === 'production'
     ? createReleaseStore(options)
     : createDebugStore(options);
-  store.DevTools = DevTools;
   return store;
 }
 
