@@ -75,6 +75,7 @@ namespace Conreign.Core.Gameplay
             EnsureUserIsOnline(userId);
             var state = new LobbyData
             {
+                RoomId = _state.RoomId,
                 Events = _hub.GetEvents(userId).Select(x => new MessageEnvelope {Payload = x}).ToList(),
                 Players = _state.Players,
                 PlayerStatuses = _state.Players

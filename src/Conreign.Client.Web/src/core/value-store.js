@@ -1,5 +1,6 @@
 import { defaults, isString, isUndefined } from 'lodash';
 
+
 export default class ValueStore {
   constructor(storage, options) {
     this._storage = storage;
@@ -9,10 +10,20 @@ export default class ValueStore {
   }
   get() {
     const json = this._storage.getItem(this._options.key);
-    return isString(json) ? JSON.parse(json) : undefined;
+    try {
+      return isString(json) ? JSON.parse(json) : undefined;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn(`[conreign/core/value-store] Failed to parse ${this._options.key}`);
+      return undefined;
+    }
   }
   set(value) {
-    const json = isUndefined(value) ? value : JSON.stringify(value);
+    if (isUndefined(value)) {
+      this._storage.removeItem(this._options.key);
+      return this;
+    }
+    const json = JSON.stringify(value);
     this._storage.setItem(this._options.key, json);
     return this;
   }

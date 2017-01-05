@@ -10,6 +10,7 @@ namespace Conreign.Core.Contracts.Gameplay.Data
     [Immutable]
     public class GameData : IRoomData
     {
+        public string RoomId { get; set; }
         public HashSet<Guid> DeadPlayers = new HashSet<Guid>();
         public int Turn { get; set; }
         public List<FleetData> WaitingFleets { get; set; } = new List<FleetData>();

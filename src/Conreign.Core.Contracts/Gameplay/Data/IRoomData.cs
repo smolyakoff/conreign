@@ -7,6 +7,7 @@ namespace Conreign.Core.Contracts.Gameplay.Data
 {
     public interface IRoomData
     {
+        string RoomId { get; }
         RoomMode Mode { get; }
         List<MessageEnvelope> Events { get; }
         List<PlayerData> Players { get; }

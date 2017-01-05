@@ -71,6 +71,7 @@ namespace Conreign.Core.Gameplay
             var playerState = _state.PlayerStates.GetOrCreateDefault(userId);
             var data = new GameData
             {
+                RoomId = _state.RoomId,
                 Players = _state.Players,
                 Events = _hub.GetEvents(userId).Select(x => new MessageEnvelope {Payload = x}).ToList(),
                 LeaderUserId = _hub.LeaderUserId,

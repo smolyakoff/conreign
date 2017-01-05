@@ -4,6 +4,7 @@ using Conreign.Api.Infrastructure;
 using Conreign.Client.Orleans;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
+using Newtonsoft.Json;
 using Owin;
 using SimpleInjector;
 
@@ -42,13 +43,18 @@ namespace Conreign.Api
             {
                 EnableDetailedErrors = true
             };
+            var serializerSettings = new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCaseForNonSignalRTypesResolver(),
+            };
+            var serializer = JsonSerializer.Create(serializerSettings);
+            hubConfiguration.Resolver.Register(typeof(JsonSerializer), () => serializer);
             hubConfiguration.Resolver.Register(typeof(IHubActivator), () => new SimpleInjectorHubActivator(container));
             var pipeline = hubConfiguration.Resolver.Resolve<IHubPipeline>();
             foreach (var module in container.GetAllInstances<HubPipelineModule>())
             {
                 pipeline.AddModule(module);
             }
-
             return hubConfiguration;
         }
     }

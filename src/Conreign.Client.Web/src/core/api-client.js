@@ -21,7 +21,6 @@ const SERVER_HUB_NAME = 'GameHub';
 
 function apiClient(accessTokenProvider, options) {
   const { baseUrl } = options;
-
   let connection = null;
   let state = ApiClientState.Disconnected;
   let hub = null;
@@ -35,11 +34,13 @@ function apiClient(accessTokenProvider, options) {
     connection = $.hubConnection(baseUrl, { useDefaultPath: false });
     hub = connection.createHubProxy(SERVER_HUB_NAME);
     hub.on('OnNext', events.next.bind(events));
-    hub.on('OnError', events.error.bind(event));
+    hub.on('OnError', events.error.bind(events));
     hub.on('OnComplete', events.complete.bind(events));
     connection.stateChanged(onStateChanged);
     return Rx.Observable.fromPromise(connection.start());
   }
+
+  const connectOnce = once(connect);
 
   function send(message) {
     const packet = {
@@ -50,8 +51,8 @@ function apiClient(accessTokenProvider, options) {
         accessToken: accessTokenProvider(),
       },
     };
-    return Rx.Observable
-      .fromPromise(hub.invoke('send', packet))
+    return connectOnce()
+      .mergeMap(() => hub.invoke('send', packet))
       .map(response => ({
         ...response,
         meta: {
@@ -68,7 +69,6 @@ function apiClient(accessTokenProvider, options) {
     get events() {
       return events;
     },
-    connect: once(connect),
     send,
   };
 }

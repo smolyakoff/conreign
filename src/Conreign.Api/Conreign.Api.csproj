@@ -51,6 +51,7 @@
     <Compile Include="Hubs\GameHub.cs" />
     <Compile Include="Hubs\GameHubCountersCollection.cs" />
     <Compile Include="Infrastructure\ErrorHandlingPipelineModule.cs" />
+    <Compile Include="Infrastructure\CamelCaseForNonSignalRTypesResolver.cs" />
     <Compile Include="Infrastructure\SimpleInjectorHubActivator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

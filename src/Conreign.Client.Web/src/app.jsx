@@ -5,7 +5,7 @@ import { browserHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 
 import createContainer from './core';
-import { createStore, Root, connectToServer } from './ui';
+import { createStore, RouterContainer, listenForServerEvents } from './root';
 
 if (COMPILATION_MODE === 'debug') {
   window.React = React;
@@ -24,7 +24,10 @@ function render({ RootComponent, store, DevTools, history }) {
 
 function run() {
   const state = {};
-  const imports = { storage: window.localStorage };
+  const imports = {
+    storage: window.localStorage,
+    history: browserHistory,
+  };
   const container = createContainer(imports, {
     ...BUILD_CONFIG,
     userStorageKey: 'conreign.user',
@@ -32,13 +35,13 @@ function run() {
   const store = createStore({ state, container });
   const history = syncHistoryWithStore(browserHistory, store);
   const props = {
-    RootComponent: Root,
+    RootComponent: RouterContainer,
     store,
     history,
     DevTools: store.DevTools,
   };
   render(props);
-  store.dispatch(connectToServer());
+  store.dispatch(listenForServerEvents());
   return props;
 }
 
@@ -49,7 +52,7 @@ if (TASK === 'run') {
   if (module.hot) {
     // eslint-disable-next-line
     function update() {
-      const UpdatedRoot = require('./ui/main/root-hot').default;
+      const UpdatedRoot = require('./root/router-container-hot').default;
       render({
         ...rootProps,
         RootComponent: UpdatedRoot,
@@ -67,7 +70,7 @@ if (TASK === 'run') {
       originalConsoleError(message);
     };
 
-    module.hot.accept('./ui/main/root-hot', update);
-    module.hot.accept('./ui/index', update);
+    module.hot.accept('./root/router-container-hot', update);
+    module.hot.accept('./root/index', update);
   }
 }

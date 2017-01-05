@@ -11,8 +11,9 @@ const {
   createLibWebpackConfig,
   createAppWebpackConfig,
   loadVariables,
-  constants
+  constants,
 } = require('./tools');
+
 const { PATHS, TASK, COMPILATION_MODE } = constants;
 const vars = loadVariables();
 process.env.NODE_ENV = vars.compilationMode === COMPILATION_MODE.DEBUG ? 'development' : 'production';

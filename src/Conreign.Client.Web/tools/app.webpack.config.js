@@ -95,6 +95,9 @@ function createConfiguration(options) {
       }),
       new LodashModuleReplacementPlugin({
         collections: true,
+        deburring: true,
+        unicode: true,
+        paths: true,
       }),
     ],
     performance: _.extend({}, SIZE_LIMITS, {
