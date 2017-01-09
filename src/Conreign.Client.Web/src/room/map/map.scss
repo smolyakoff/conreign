@@ -1,0 +1,29 @@
+@import "../../theme/variables";
+
+$map-border-color: transparentize($color-white, 0.9);
+$map-border: solid 1px $map-border-color;
+
+.c-map {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  border: $map-border;
+
+  &__cell {
+    position: relative;
+    box-sizing: border-box;
+    overflow: hidden;
+    border: $map-border;
+    &:after {
+      content: '';
+      display: block;
+      padding-bottom: 100%;
+    }
+  }
+
+  &__content {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+}

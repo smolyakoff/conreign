@@ -7,6 +7,7 @@ import Rx from 'rxjs';
 
 import './../theme';
 import { executeRouteActions, selectPendingRouteOperations } from './../root';
+import { login, AUTH_REDUCER_KEY } from './../auth';
 import { RootLayout, NavigationMenuLayout } from './../layout';
 import { ErrorPage, ERROR_PAGE_PATH } from './../errors';
 import { HomePage } from './../home';
@@ -14,7 +15,17 @@ import { RoomPage } from './../room';
 
 
 export default function RouterContainer({ store, history }) {
-  function onRouteChange(prevState, nextState, replace, callback) {
+  function ensureIsAuthenticated() {
+    const state = store.getState();
+    if (state[AUTH_REDUCER_KEY].user) {
+      return Rx.Observable.empty();
+    }
+    store.dispatch(executeRouteActions([login()]));
+    return Rx.Observable.from(store)
+      .first(currentState => isObject(currentState[AUTH_REDUCER_KEY].user));
+  }
+
+  function dispatchRouteActions(nextState) {
     const storeState = store.getState();
     const components = nextState.routes.map(route => route.component);
     const initializers = components
@@ -22,20 +33,39 @@ export default function RouterContainer({ store, history }) {
       .filter(isFunction);
     const actions = flatMap(initializers, init => init(nextState, storeState))
       .filter(isObject);
-    store.dispatch(executeRouteActions(actions));
-    Rx.Observable.from(store)
-      .map(() => store.getState())
+    if (actions.length === 0) {
+      return Rx.Observable.empty();
+    }
+    const stream = Rx.Observable.from(store)
       .map(selectPendingRouteOperations)
       .first(ops => ops === 0)
-      .delay(0)
-      .subscribe(() => callback(), e => callback(e));
+      .delay(0);
+    store.dispatch(executeRouteActions(actions));
+    return stream;
   }
+
+  function onRouteChange(prevState, nextState, replace, callback) {
+    dispatchRouteActions(nextState)
+      .subscribe(() => {}, callback, () => callback());
+  }
+
+  function onRouteEnter(nextState, replace, callback) {
+    ensureIsAuthenticated()
+      .mergeMap(() => dispatchRouteActions(nextState))
+      .subscribe(() => {}, callback, () => callback());
+  }
+
   return (
     <Provider store={store}>
       <div className="u-full-height">
         <Router history={history}>
-          <Route component={RootLayout} onChange={onRouteChange}>
-            <Route path="/" component={NavigationMenuLayout}>
+          <Route
+            path="/"
+            component={RootLayout}
+            onChange={onRouteChange}
+            onEnter={onRouteEnter}
+          >
+            <Route component={NavigationMenuLayout}>
               <IndexRoute component={HomePage} />
               <Route path="/:roomId" component={RoomPage} />
             </Route>

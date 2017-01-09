@@ -21,6 +21,7 @@ function reducer(state = INITIAL_STATE, action) {
   }
   return state;
 }
+reducer.$key = 'errors';
 
 const ERROR_PAGE_PREFIX = '/errors';
 export const ERROR_PAGE_PATH = `${ERROR_PAGE_PREFIX}/:statusCode`;

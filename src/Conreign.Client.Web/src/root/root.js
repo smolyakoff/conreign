@@ -1,11 +1,10 @@
-import { routerReducer } from 'react-router-redux';
 import { combineReducers } from 'redux';
 import { combineEpics } from 'redux-observable';
 import { snakeCase, get } from 'lodash';
 
 import { AsyncOperationState } from './../core';
 import errors from './../errors';
-import login from './../login';
+import auth from './../auth';
 import home from './../home';
 import room from './../room';
 
@@ -61,9 +60,9 @@ function operationsReducer(state = INITIAL_OPERATIONS_STATE, action) {
 
 const reducer = combineReducers({
   operations: operationsReducer,
-  routing: routerReducer,
-  errors: errors.reducer,
-  rooms: room.reducer,
+  [auth.reducer.$key]: auth.reducer,
+  [errors.reducer.$key]: errors.reducer,
+  [room.reducer.$key]: room.reducer,
 });
 
 function createEpic(container) {
@@ -72,7 +71,7 @@ function createEpic(container) {
   function listenForServerEventsEpic(action$) {
     return action$
       .ofType(LISTEN_FOR_SERVER_EVENTS)
-      .concat(apiClient.events)
+      .mergeMap(() => apiClient.events)
       .map(event => ({
         ...event,
         type: `HANDLE_${snakeCase(event.type).toUpperCase()}`,
@@ -100,7 +99,7 @@ function createEpic(container) {
     listenForServerEventsEpic,
     executeRouteActionsEpic,
     errors.createEpic(container),
-    login.createEpic(container),
+    auth.createEpic(container),
     home.createEpic(container),
     room.createEpic(container),
   );

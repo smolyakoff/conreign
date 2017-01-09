@@ -8,3 +8,4 @@ export * from './text';
 export * from './grid';
 export { default as Button } from './button';
 export { default as Spinner } from './spinner';
+export { ThemeSize, ThemeColor } from './decorators';

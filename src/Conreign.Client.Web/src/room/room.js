@@ -33,6 +33,7 @@ function reducer(state = {}, action) {
       return state;
   }
 }
+reducer.$key = 'rooms';
 
 export function selectRoom(state, roomId) {
   return state.rooms[roomId];

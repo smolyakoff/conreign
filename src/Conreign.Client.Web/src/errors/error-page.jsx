@@ -14,7 +14,10 @@ function ErrorPage({ error, statusCode, showStack }) {
       {
         showStack ? (
           <div className="u-letter-box--medium">
-            <code className="c-code c-code--multiline">
+            <code
+              className="c-code c-code--multiline"
+              style={{ fontSize: '0.8em' }}
+            >
               {error.stack}
             </code>
           </div>

@@ -2,7 +2,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { browserHistory } from 'react-router';
-import { syncHistoryWithStore } from 'react-router-redux';
 
 import createContainer from './core';
 import { createStore, RouterContainer, listenForServerEvents } from './root';
@@ -32,11 +31,10 @@ function run() {
     userStorageKey: 'conreign.user',
   });
   const store = createStore({ state, container });
-  const history = syncHistoryWithStore(browserHistory, store);
   const props = {
     RootComponent: RouterContainer,
     store,
-    history,
+    history: browserHistory,
   };
   render(props);
   store.dispatch(listenForServerEvents());

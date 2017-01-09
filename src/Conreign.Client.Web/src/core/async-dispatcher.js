@@ -53,11 +53,11 @@ export function createFailedAction(err, action) {
   });
 }
 
-export function createAsyncActionTypes(pendingType) {
+export function createAsyncActionTypes(originalType) {
   return {
-    [AsyncOperationState.Pending]: `${pendingType}_${AsyncOperationState.Pending}`,
-    [AsyncOperationState.Failed]: `${pendingType}_${AsyncOperationState.Failed}`,
-    [AsyncOperationState.Completed]: `${pendingType}_${AsyncOperationState.Completed}`,
+    [AsyncOperationState.Pending]: `${originalType}_${AsyncOperationState.Pending}`,
+    [AsyncOperationState.Failed]: `${originalType}_${AsyncOperationState.Failed}`,
+    [AsyncOperationState.Completed]: `${originalType}_${AsyncOperationState.Completed}`,
   };
 }
 
