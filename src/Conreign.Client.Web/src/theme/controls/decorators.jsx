@@ -1,6 +1,6 @@
 import cx from 'classnames';
 import React, { PropTypes } from 'react';
-import { values, flow, each, isFunction, extend, isArray } from 'lodash';
+import { values, flow, each, isFunction, extend, flatten } from 'lodash';
 
 import { isNonEmptyString } from './util';
 
@@ -13,8 +13,8 @@ export const ThemeColor = {
   Error: 'error',
 };
 
-export function decorate(decorators) {
-  const decoratorsList = isArray(decorators) ? decorators : [decorators];
+export function decorate(...decorators) {
+  const decoratorsList = flatten(decorators);
   const mapProps = flow(decoratorsList.map(d => d.mapProps));
   const extenders = decoratorsList
     .map(d => d.extendStatics)

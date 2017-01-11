@@ -84,6 +84,7 @@ export function GridCell({
   className,
   children,
   width,
+  gutter,
   fixedWidth,
   responsiveWidth,
   offset,
@@ -93,17 +94,25 @@ export function GridCell({
 }) {
   const b = css('cell');
   const modifiers = {
-    width,
+    width: fixedWidth ? false : width,
     offset,
     wrap,
+    'no-gutter': !gutter,
     'width-fixed': fixedWidth,
     [verticalAlignment || VerticalAlignment.Top]: isNonEmptyString(verticalAlignment),
   };
   each(responsiveWidth || {}, (rWidth, size) => {
     modifiers[`width-${rWidth}@${size}`] = true;
   });
+  let style = {};
+  if (fixedWidth) {
+    style = {
+      ...style,
+      width,
+    };
+  }
   return (
-    <div className={b(modifiers).mix(className)} {...others}>
+    <div className={b(modifiers).mix(className)} {...others} style={style}>
       {children}
     </div>
   );
@@ -132,6 +141,7 @@ GridCell.propTypes = {
   className: PropTypes.string,
   children: PropTypes.node,
   width: PropTypes.number,
+  gutter: PropTypes.bool,
   fixedWidth: PropTypes.bool,
   responsiveWidth: validateResponsiveWidth,
   offset: PropTypes.number,
@@ -142,4 +152,5 @@ GridCell.propTypes = {
 GridCell.defaultProps = {
   wrap: false,
   fixedWidth: false,
+  gutter: false,
 };

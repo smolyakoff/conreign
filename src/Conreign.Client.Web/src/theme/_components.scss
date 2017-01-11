@@ -3,6 +3,7 @@
 @import "~blaze/scss/components.navs";
 @import "~blaze/scss/components.buttons";
 @import "~blaze/scss/components.inputs";
+@import "~blaze/scss/components.progress";
 
 body {
   @extend .c-text;
@@ -54,5 +55,16 @@ a {
     top: auto;
     bottom: 0;
     animation-delay: -1.0s;
+  }
+}
+
+// Property Table
+.c-property-table {
+  border-spacing: 0;
+
+  &__property-value {
+    padding-left: $spacing-medium;
+    text-align: right;
+    width: 100%;
   }
 }

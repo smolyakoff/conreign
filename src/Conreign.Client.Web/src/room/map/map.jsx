@@ -4,7 +4,7 @@ import block from 'bem-cn';
 
 import './map.scss';
 
-function Map({ width, height, cellRenderer }) {
+function Map({ className, width, height, cellRenderer }) {
   const map = block('c-map');
 
   function cell(cellIndex) {
@@ -12,7 +12,7 @@ function Map({ width, height, cellRenderer }) {
     return (
       <div
         key={cellIndex}
-        className={map('cell')()}
+        className={map('cell').mix(className)()}
         style={{ flexBasis: widthPercentage }}
       >
         <div className={map('content')}>
@@ -36,13 +36,14 @@ function Map({ width, height, cellRenderer }) {
 }
 
 Map.propTypes = {
+  className: PropTypes.string,
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
   cellRenderer: PropTypes.func,
 };
 
 Map.defaultProps = {
-  cellRenderer: () => 'A',
+  cellRenderer: () => null,
 };
 
 export default Map;

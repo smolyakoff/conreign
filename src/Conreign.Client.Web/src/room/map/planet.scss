@@ -1,0 +1,37 @@
+@import "./../../theme/mixins";
+@import "./../../theme/variables";
+
+$icon-margin: 10%;
+
+.c-planet {
+  @include window-box--xsmall;
+  position: relative;
+  box-sizing: border-box;
+  height: 100%;
+  line-height: 1;
+
+  &__name {
+    text-shadow: 1px 1px $color-black;
+  }
+
+  &__icon {
+    position: absolute;
+    top: $icon-margin;
+    left: $icon-margin;
+    width: 100% - $icon-margin * 2;
+    height: 100% - $icon-margin * 2;
+    opacity: 0.3;
+    box-sizing: border-box;
+    filter: drop-shadow(2px 2px 5px $color-beige);
+
+  }
+
+  &__planet-properties {
+    position: absolute;
+    box-sizing: border-box;
+    bottom: $icon-margin;
+    width: 100% - $icon-margin;
+    border-spacing: 0;
+    font-size: 0.5em;
+  }
+}

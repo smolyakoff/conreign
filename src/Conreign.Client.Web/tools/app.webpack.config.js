@@ -99,6 +99,7 @@ function createConfiguration(options) {
         deburring: true,
         unicode: true,
         paths: true,
+        currying: true,
       }),
     ],
     performance: _.extend({}, SIZE_LIMITS, {
