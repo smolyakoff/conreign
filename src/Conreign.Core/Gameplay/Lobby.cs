@@ -203,7 +203,7 @@ namespace Conreign.Core.Gameplay
         {
             if (!_hub.IsOnline(userId))
             {
-                throw new InvalidOperationException($"User ${userId} is not a online at {_state.RoomId}.");
+                throw new InvalidOperationException($"User {userId} is not a online at {_state.RoomId}.");
             }
         }
 

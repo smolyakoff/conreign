@@ -2,6 +2,7 @@ import { keyBy } from 'lodash';
 import { AsyncOperationState, createAsyncActionTypes } from './../core';
 
 const GET_ROOM_STATE = 'GET_ROOM_STATE';
+const SET_MAP_SELECTION = 'SET_MAP_SELECTION';
 const GET_ROOM_STATE_ACTIONS = createAsyncActionTypes('GET_ROOM_STATE');
 const {
   [AsyncOperationState.Completed]: GET_ROOM_STATE_COMPLETED,
@@ -10,6 +11,13 @@ const {
 export function getRoomState(payload) {
   return {
     type: GET_ROOM_STATE,
+    payload,
+  };
+}
+
+export function setMapSelection(payload) {
+  return {
+    type: SET_MAP_SELECTION,
     payload,
   };
 }
@@ -44,6 +52,14 @@ function reducer(state = {}, action) {
         ...state,
         [action.payload.roomId]: mapRoomDtoToRoomState(action.payload),
       };
+    case SET_MAP_SELECTION:
+      return {
+        ...state,
+        [action.payload.roomId]: {
+          ...state[action.payload.roomId],
+          mapSelection: action.payload.selection,
+        },
+      };
     default:
       return state;
   }
@@ -52,7 +68,10 @@ reducer.$key = 'rooms';
 
 
 export function selectRoom(state, roomId) {
-  return state.rooms[roomId];
+  return {
+    ...state.rooms[roomId],
+    roomId,
+  };
 }
 
 export default {

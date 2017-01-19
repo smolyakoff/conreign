@@ -10,7 +10,12 @@ $map-border: solid 1px $map-border-color;
   border: $map-border;
 
   &__cell {
+    display: block;
+    background: none;
+    color: inherit;
+    text-align: inherit;
     position: relative;
+    outline: none;
     box-sizing: border-box;
     overflow: hidden;
     border: $map-border;
@@ -18,6 +23,12 @@ $map-border: solid 1px $map-border-color;
       content: '';
       display: block;
       padding-bottom: 100%;
+    }
+    &::-moz-focus-inner {
+      border: 0;
+    }
+    &--selection-start {
+      border-color: $color-success;
     }
   }
 
