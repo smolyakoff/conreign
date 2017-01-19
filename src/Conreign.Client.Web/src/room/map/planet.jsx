@@ -25,7 +25,7 @@ export default function Planet({
   const planet = block('c-planet');
   const style = {};
   if (color) {
-    style.backgroundColor = Color(color).alpha(0.4).string();
+    style.backgroundColor = Color(color).alpha(0.8).string();
   }
   const chosenIconName = fp.flow(
     fp.toPairs,
@@ -56,10 +56,11 @@ export default function Planet({
         className={planet('icon')()}
         alt={chosenIconName}
       />
-      <PropertyTable
-        className={planet('planet-properties')()}
-        properties={planetProperties}
-      />
+      <div className={planet('planet-properties')()}>
+        <PropertyTable
+          properties={planetProperties}
+        />
+      </div>
     </div>
   );
 }

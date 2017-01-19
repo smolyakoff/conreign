@@ -1,7 +1,7 @@
 @import "./../../theme/mixins";
 @import "./../../theme/variables";
 
-$icon-margin: 10%;
+$icon-margin: 15%;
 
 .c-planet {
   @include window-box--xsmall;
@@ -20,18 +20,19 @@ $icon-margin: 10%;
     left: $icon-margin;
     width: 100% - $icon-margin * 2;
     height: 100% - $icon-margin * 2;
-    opacity: 0.3;
     box-sizing: border-box;
     filter: drop-shadow(2px 2px 5px $color-beige);
 
   }
 
   &__planet-properties {
-    position: absolute;
+    @include window-box--small;
+    background-color: transparentize($color-black, 0.5);
     box-sizing: border-box;
-    bottom: $icon-margin;
-    width: 100% - $icon-margin;
-    border-spacing: 0;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
     font-size: 0.5em;
   }
 }

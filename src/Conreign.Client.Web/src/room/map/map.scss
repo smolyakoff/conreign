@@ -28,7 +28,7 @@ $map-border: solid 1px $map-border-color;
       border: 0;
     }
     &--selection-start {
-      border-color: $color-success;
+      border: solid 2px $color-success;
     }
   }
 
