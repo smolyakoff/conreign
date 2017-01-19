@@ -9,6 +9,9 @@ export default class NavigationMenuLayout extends Component {
   static propTypes = {
     children: PropTypes.node,
   };
+  static defaultProps = {
+    children: null,
+  };
   constructor() {
     super();
     this.state = {};

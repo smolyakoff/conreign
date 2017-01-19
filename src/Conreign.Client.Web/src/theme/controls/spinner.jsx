@@ -17,6 +17,7 @@ function Spinner({ className, size }) {
 }
 
 Spinner.defaultProps = {
+  className: null,
   size: 50,
 };
 

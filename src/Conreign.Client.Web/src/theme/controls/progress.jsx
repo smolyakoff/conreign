@@ -21,6 +21,12 @@ ProgressBar.propTypes = {
   children: PropTypes.node,
 };
 
+ProgressBar.defaultProps = {
+  value: 0,
+  className: null,
+  children: null,
+};
+
 const DecoratedProgressBar = decorate(
   withThemeColors(bar()),
 )(ProgressBar);
@@ -43,6 +49,8 @@ Progress.propTypes = {
 };
 
 Progress.defaultProps = {
+  className: null,
+  value: 0,
   rounded: false,
 };
 

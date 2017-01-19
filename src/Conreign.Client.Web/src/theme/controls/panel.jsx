@@ -15,6 +15,11 @@ PanelContainer.propTypes = {
   children: PropTypes.node,
 };
 
+PanelContainer.defaultProps = {
+  className: null,
+  children: null,
+};
+
 export function Panel({
   hasTopNav,
   hasBottomNav,
@@ -37,6 +42,8 @@ export function Panel({
 Panel.defaultProps = {
   hasTopNav: false,
   hasBottomNav: false,
+  className: null,
+  children: null,
 };
 
 Panel.propTypes = {

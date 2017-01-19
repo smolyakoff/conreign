@@ -43,6 +43,7 @@ Map.propTypes = {
 };
 
 Map.defaultProps = {
+  className: null,
   cellRenderer: () => null,
 };
 

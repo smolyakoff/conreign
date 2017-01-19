@@ -34,6 +34,8 @@ export function Nav({
 }
 
 Nav.defaultProps = {
+  className: null,
+  children: null,
   tagName: 'nav',
   inline: false,
   fixed: false,
@@ -61,6 +63,8 @@ function NavContentBase({ tagName, className, children, ...others }) {
 NavContentBase.displayName = 'NavContent';
 NavContentBase.defaultProps = {
   tagName: 'li',
+  className: null,
+  children: null,
 };
 
 NavContentBase.propTypes = {
@@ -103,6 +107,9 @@ NavItemBase.propTypes = {
 };
 
 NavItemBase.defaultProps = {
+  className: null,
+  children: null,
+  alignment: null,
   tagName: 'li',
   active: false,
 };

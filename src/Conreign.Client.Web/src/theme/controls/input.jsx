@@ -25,10 +25,9 @@ InputBase.displayName = 'Input';
 InputBase.propTypes = {
   tagName: PropTypes.oneOf(['input', 'textarea', 'select']),
   className: PropTypes.string,
-  iconLeft: PropTypes.bool,
-  iconRight: PropTypes.bool,
 };
 InputBase.defaultProps = {
+  className: null,
   tagName: 'input',
   type: 'text',
 };
@@ -66,6 +65,8 @@ InputContainerBase.propTypes = {
   iconRight: PropTypes.bool,
 };
 InputContainerBase.defaultProps = {
+  className: null,
+  children: false,
   iconLeft: false,
   iconRight: false,
 };

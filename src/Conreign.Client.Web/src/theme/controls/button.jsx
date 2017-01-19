@@ -47,6 +47,8 @@ Button.propTypes = {
 };
 
 Button.defaultProps = {
+  className: null,
+  children: null,
   fullWidth: false,
   ghost: false,
   rounded: false,

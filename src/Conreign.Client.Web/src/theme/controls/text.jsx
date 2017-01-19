@@ -15,7 +15,6 @@ export const TextEmphasizes = values(TextEmphasize);
 function TextBase({
   className,
   tagName,
-  text,
   children,
   highlight,
   emphasize,
@@ -35,7 +34,7 @@ function TextBase({
   };
   return (
     <Tag className={css(modifiers).mix(className)()} {...others}>
-      {text || children}
+      {children}
     </Tag>
   );
 }
@@ -45,7 +44,6 @@ TextBase.propTypes = {
   tagName: PropTypes.oneOf(['span', 'abbr']),
   className: PropTypes.string,
   children: PropTypes.node,
-  text: PropTypes.string,
   highlight: PropTypes.bool,
   emphasize: PropTypes.oneOf(TextEmphasizes),
   help: PropTypes.bool,
@@ -53,6 +51,8 @@ TextBase.propTypes = {
   kbd: PropTypes.bool,
 };
 TextBase.defaultProps = {
+  className: null,
+  children: null,
   tagName: 'span',
   highlight: false,
   emphasize: null,
@@ -63,10 +63,10 @@ TextBase.defaultProps = {
 
 export const Text = decorate(withThemeSizes())(TextBase);
 
-function Paragraph({ className, children, text, ...others }) {
+function Paragraph({ className, children, ...others }) {
   return (
     <p className={block('c-paragraph').mix(className)()} {...others}>
-      {text || children}
+      {children}
     </p>
   );
 }
@@ -75,7 +75,10 @@ Paragraph.displayName = 'Paragraph';
 Paragraph.propTypes = {
   className: PropTypes.string,
   children: PropTypes.node,
-  text: PropTypes.string,
+};
+Paragraph.defaultProps = {
+  className: null,
+  children: null,
 };
 
 export const P = decorate(withThemeSizes())(Paragraph);
@@ -94,6 +97,10 @@ const headings = range(1, 6).map((i) => {
   Heading.propTypes = {
     children: PropTypes.node,
     className: PropTypes.string,
+  };
+  Heading.defaultProps = {
+    children: null,
+    className: null,
   };
   Heading.displayName = `H${i}`;
   return Heading;

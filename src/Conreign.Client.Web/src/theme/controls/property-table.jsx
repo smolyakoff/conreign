@@ -20,6 +20,11 @@ Property.propTypes = {
   value: PropTypes.node,
 };
 
+Property.defaultProps = {
+  name: null,
+  value: null,
+};
+
 function PropertyTable({ properties, className }) {
   return (
     <table className={table.mix(className)()}>
@@ -39,6 +44,7 @@ PropertyTable.propTypes = {
 };
 
 PropertyTable.defaultProps = {
+  className: null,
   properties: [],
 };
 

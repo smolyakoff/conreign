@@ -52,12 +52,12 @@ LobbyPage.propTypes = {
       ships: PropTypes.number.isRequired,
       ownerId: PropTypes.string,
     })).isRequired,
-  }),
+  }).isRequired,
   players: PropTypes.objectOf(PropTypes.shape({
     userId: PropTypes.string.isRequired,
     username: PropTypes.string,
     color: PropTypes.string.isRequired,
-  })),
+  })).isRequired,
 };
 
 export default LobbyPage;

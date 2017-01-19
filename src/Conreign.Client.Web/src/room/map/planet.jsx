@@ -51,7 +51,11 @@ export default function Planet({
   return (
     <div className={planet()} style={style}>
       <span className={planet('name')()}>{name}</span>
-      <img src={ICON[chosenIconName]} className={planet('icon')()} role="presentation" />
+      <img
+        src={ICON[chosenIconName]}
+        className={planet('icon')()}
+        alt={chosenIconName}
+      />
       <PropertyTable
         className={planet('planet-properties')()}
         properties={planetProperties}
@@ -69,6 +73,7 @@ Planet.propTypes = {
 };
 
 Planet.defaultProps = {
+  color: 'transparent',
   icons: {
     0: 'moon',
     50: 'mars',

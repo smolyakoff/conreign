@@ -30,6 +30,11 @@ RootLayout.propTypes = {
   isPageLoading: PropTypes.bool,
 };
 
+RootLayout.defaultProps = {
+  children: null,
+  isPageLoading: false,
+};
+
 export default connect(
   (state, ownProps) => ({
     ...ownProps,

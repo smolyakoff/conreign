@@ -77,6 +77,10 @@ Grid.propTypes = {
 };
 
 Grid.defaultProps = {
+  className: null,
+  children: null,
+  verticalAlignment: Alignment.Top,
+  responsiveness: {},
   gutter: false,
 };
 
@@ -149,7 +153,14 @@ GridCell.propTypes = {
   verticalAlignment: PropTypes.oneOf(values(VerticalAlignment)),
 };
 
+
 GridCell.defaultProps = {
+  className: null,
+  children: null,
+  width: null,
+  responsiveWidth: {},
+  offset: null,
+  verticalAlignment: Alignment.Top,
   wrap: false,
   fixedWidth: false,
   gutter: false,

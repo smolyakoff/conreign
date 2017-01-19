@@ -10,6 +10,10 @@ Image.propTypes = {
   className: PropTypes.string,
 };
 
+Image.defaultProps = {
+  className: null,
+};
+
 export function Icon({ tagName, className, children, ...others }) {
   const Tag = tagName;
   return (
@@ -27,4 +31,6 @@ Icon.propTypes = {
 
 Icon.defaultProps = {
   tagName: 'i',
+  className: null,
+  children: null,
 };
