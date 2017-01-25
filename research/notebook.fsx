@@ -347,7 +347,7 @@ let toNamedScatter (k: string, s: Series<'x, 'y>) =
 
 let toNamedHistogram (k: string, s: Series<'x, 'y>) =
     let x = Series.values s
-    Graph.Histogram(x = x, name = k, histnorm = "percent")
+    Graph.Histogram(x = x, name = k, histnorm = "percent", nbinsx = 1000)
 
 let toNamedBar (name: string) (s: Series<'x, 'y>) =
     Bar(x = Series.keys s, y = Series.values s, name = name)

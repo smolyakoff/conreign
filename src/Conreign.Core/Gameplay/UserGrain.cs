@@ -29,10 +29,5 @@ namespace Conreign.Core.Gameplay
             _players[roomId] = player;
             return player;
         }
-
-        public override async Task OnActivateAsync()
-        {
-            await base.OnActivateAsync();
-        }
     }
 }
