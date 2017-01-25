@@ -44,15 +44,14 @@ export default function RouterContainer({ store, history }) {
     return stream;
   }
 
-  function onRouteChange(prevState, nextState, replace, callback) {
-    dispatchRouteActions(nextState)
-      .subscribe(() => {}, callback, () => callback());
+  function onRouteChange(prevState, nextState) {
+    dispatchRouteActions(nextState).subscribe();
   }
 
-  function onRouteEnter(nextState, replace, callback) {
+  function onRouteEnter(nextState) {
     ensureIsAuthenticated()
       .mergeMap(() => dispatchRouteActions(nextState))
-      .subscribe(() => {}, callback, () => callback());
+      .subscribe();
   }
 
   return (
@@ -69,8 +68,8 @@ export default function RouterContainer({ store, history }) {
               <IndexRoute component={HomePage} />
               <Route path="/:roomId" component={RoomPage} />
             </Route>
+            <Route path={ERROR_PAGE_PATH} component={ErrorPage} />
           </Route>
-          <Route path={ERROR_PAGE_PATH} component={ErrorPage} />
         </Router>
       </div>
     </Provider>
