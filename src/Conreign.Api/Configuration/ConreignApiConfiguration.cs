@@ -16,6 +16,7 @@ namespace Conreign.Api.Configuration
 
         public string Environment { get; set; }
         public string Path { get; set; }
+        public int Port { get; set; } = 3000;
         public LogEventLevel MinimumLogLevel { get; set; }
         public ClientConfiguration.GatewayProviderType SystemStorageType { get; set; }
         public string SystemStorageConnectionString { get; set; }

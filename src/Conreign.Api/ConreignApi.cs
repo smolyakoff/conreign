@@ -20,7 +20,7 @@ namespace Conreign.Api
             Logger = logger;
         }
 
-        public static ConreignApi Configure(
+        public static ConreignApi Create(
             ClientConfiguration baseOrleansConfiguration = null, 
             ConreignApiConfiguration apiConfiguration = null)
         {

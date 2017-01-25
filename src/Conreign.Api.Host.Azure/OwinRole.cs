@@ -38,7 +38,7 @@ namespace Conreign.Api.Host.Azure
             }
             var config = ConreignApiConfiguration.Load(Environment.CurrentDirectory, env);
             var clientConfiguration = new ClientConfiguration {DeploymentId = RoleEnvironment.DeploymentId};
-            Api = ConreignApi.Configure(clientConfiguration, config);
+            Api = ConreignApi.Create(clientConfiguration, config);
             Log.Logger = Api.Logger;
             ILogEventEnricher[] logProperties = {
                 new PropertyEnricher("DeploymentId", RoleEnvironment.DeploymentId),
