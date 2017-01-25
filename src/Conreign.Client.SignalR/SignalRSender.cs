@@ -48,7 +48,7 @@ namespace Conreign.Client.SignalR
                 .WaitAndRetryAsync(3, (retry) => TimeSpan.FromSeconds(retry*2));
         }
 
-        public async Task<T> Send<T>(IAsyncRequest<T> command)
+        public async Task<T> Send<T>(IRequest<T> command)
         {
             if (command == null)
             {

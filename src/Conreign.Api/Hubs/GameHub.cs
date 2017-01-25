@@ -79,7 +79,7 @@ namespace Conreign.Api.Hubs
             return Handle((dynamic)envelope.Payload, envelope.Meta);
         }
 
-        private async Task<T> Handle<T>(IAsyncRequest<T> command, Metadata metadata)
+        private async Task<T> Handle<T>(IRequest<T> command, Metadata metadata)
         {
             var handler = GetHandlerSafely();
             try

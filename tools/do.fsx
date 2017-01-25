@@ -1,5 +1,5 @@
 #r "./../packages/build/FAKE/tools/FakeLib.dll"
-#r "./../packages/build/WindowsAzure.Storage/lib/net40/Microsoft.WindowsAzure.Storage.dll"
+#r "./../packages/build/WindowsAzure.Storage/lib/net45/Microsoft.WindowsAzure.Storage.dll"
 
 #load "vars.fsx"
 #load "config.fsx"
@@ -8,6 +8,7 @@
 
 open System
 open System.IO
+open System.Reflection
 open Fake
 open Fake.MSBuildHelper
 open Fake.TargetHelper

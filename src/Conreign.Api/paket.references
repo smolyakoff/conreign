@@ -2,6 +2,7 @@ Serilog.Sinks.ElasticSearch
 Serilog.Sinks.Literate
 SerilogMetrics
 SimpleInjector
+SimpleInjector.Extensions.ExecutionContextScoping
 MediatR
 Microsoft.Orleans.Core
 Microsoft.Owin.Diagnostics

@@ -26,6 +26,7 @@ nuget FluentValidation
 nuget JWT
 nuget AutoMapper
 nuget SimpleInjector
+nuget SimpleInjector.Extensions.ExecutionContextScoping
 nuget MediatR
 
 nuget MongoDB.Driver
@@ -44,10 +45,10 @@ group Build
 
 	nuget FAKE
 	nuget FSharp.Data
+	nuget WindowsAzure.Storage 8.0.0.0
 	nuget Microsoft.Azure.Storage.DataMovement
 	nuget Microsoft.WindowsAzure.Management.Libraries
 	nuget Microsoft.Bcl.Async
-	nuget Microsoft.IdentityModel.Clients.ActiveDirectory
 
 group Test
 	source https://nuget.org/api/v2

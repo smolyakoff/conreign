@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using AutoMapper;
 using Conreign.Client.Handler.Handlers;
-using Conreign.Client.Handler.Handlers.Decorators;
+using Conreign.Client.Handler.Handlers.Behaviours;
 using MediatR;
 using SimpleInjector;
 
@@ -20,9 +20,12 @@ namespace Conreign.Client.Handler
             var assembly = typeof(LoginHandler).Assembly;
             var assemblies = new List<Assembly> {assembly};
             container.Register(typeof(IAsyncRequestHandler<,>), assemblies, Lifestyle.Singleton);
-            container.RegisterDecorator(typeof(IAsyncRequestHandler<,>), typeof(AuthenticationDecorator<,>), Lifestyle.Singleton);
-            container.RegisterDecorator(typeof(IAsyncRequestHandler<,>), typeof(ErrorLoggingDecorator<,>), Lifestyle.Singleton);
-            container.RegisterDecorator(typeof(IAsyncRequestHandler<,>), typeof(DiagnosticsDecorator<,>), Lifestyle.Singleton);
+            container.RegisterCollection(typeof(IPipelineBehavior<,>), new List<Type>
+            {
+                typeof(DiagnosticsBehaviour<,>),
+                typeof(ErrorLoggingBehaviour<,>),
+                typeof(AuthenticationBehaviour<,>)           
+            });
             container.Register(() =>
             {
                 var configuration = new MapperConfiguration(cfg => cfg.AddProfiles(assemblies));

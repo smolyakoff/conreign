@@ -30,7 +30,7 @@ namespace Conreign.Api
             }
             container.Register(() => Log.Logger.ForContext("ApplicationId", "Conreign.Api"), Lifestyle.Singleton);
             container.Register(() => OrleansClient.Initialize(initializer).Result, Lifestyle.Singleton);
-            container.Register<GameHubCountersCollection>();
+            container.Register<GameHubCountersCollection>(Lifestyle.Singleton);
             container.RegisterCollection<HubPipelineModule>(new[] {Assembly.GetExecutingAssembly()});
             RegisterHubs(container);
             container.RegisterClientMediator();
@@ -45,7 +45,7 @@ namespace Conreign.Api
                 .ToList();
             foreach (var hubType in hubTypes)
             {
-                container.Register(hubType);
+                container.Register(hubType, hubType, Lifestyle.Scoped);
             }
         }
     }

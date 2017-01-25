@@ -8,6 +8,6 @@ namespace Conreign.Core.Contracts.Client
     public interface IClientHandler : IDisposable
     {
         IObservable<IClientEvent> Events { get; }
-        Task<T> Handle<T>(IAsyncRequest<T> command, Metadata metadata);
+        Task<T> Handle<T>(IRequest<T> command, Metadata metadata);
     }
 }

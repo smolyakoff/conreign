@@ -42,7 +42,7 @@ namespace Conreign.Client.Handler
 
         public IObservable<IClientEvent> Events => _connection.Events;
 
-        public async Task<T> Handle<T>(IAsyncRequest<T> command, Metadata metadata)
+        public async Task<T> Handle<T>(IRequest<T> command, Metadata metadata)
         {
             EnsureIsNotDisposed();
             if (command == null)
@@ -60,7 +60,7 @@ namespace Conreign.Client.Handler
             var context = new HandlerContext(_connection, metadata);
             var envelopeType = typeof(CommandEnvelope<,>).MakeGenericType(command.GetType(), typeof(T));
             var envelope = Activator.CreateInstance(envelopeType, command, context);
-            var result = await _mediator.SendAsync((dynamic)envelope);
+            var result = await _mediator.Send((dynamic)envelope);
             return (T) result;
         }
 

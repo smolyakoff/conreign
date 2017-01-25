@@ -69,8 +69,8 @@ export default function RouterContainer({ store, history }) {
               <IndexRoute component={HomePage} />
               <Route path="/:roomId" component={RoomPage} />
             </Route>
-            <Route path={ERROR_PAGE_PATH} component={ErrorPage} />
           </Route>
+          <Route path={ERROR_PAGE_PATH} component={ErrorPage} />
         </Router>
       </div>
     </Provider>

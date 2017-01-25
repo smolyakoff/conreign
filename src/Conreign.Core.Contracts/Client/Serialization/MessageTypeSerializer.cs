@@ -50,7 +50,7 @@ namespace Conreign.Core.Contracts.Client.Serialization
         {
             var @interface = type
                 .GetInterfaces()
-                .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IAsyncRequest<>));
+                .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IRequest<>));
             return @interface != null;
         }
 
@@ -66,7 +66,7 @@ namespace Conreign.Core.Contracts.Client.Serialization
                 // Return response types for commands
                 var @interface = type
                     .GetInterfaces()
-                    .First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IAsyncRequest<>));
+                    .First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IRequest<>));
                 var responseType = @interface.GetGenericArguments()[0];
                 if (responseType.IsInterface || responseType.IsAbstract)
                 {

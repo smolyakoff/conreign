@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Conreign.Core.Contracts.Client.Messages
 {
-    public class AuthenticateCommand : IAsyncRequest<ClaimsIdentity>
+    public class AuthenticateCommand : IRequest<ClaimsIdentity>
     {
     }
 }

@@ -7,32 +7,26 @@ using Serilog;
 using Serilog.Events;
 using SerilogMetrics;
 
-namespace Conreign.Client.Handler.Handlers.Decorators
+namespace Conreign.Client.Handler.Handlers.Behaviours
 {
-    internal class ErrorLoggingDecorator<TCommand, TResponse> : ICommandHandler<TCommand, TResponse> where TCommand : IAsyncRequest<TResponse>
+    internal class ErrorLoggingBehaviour<TCommand, TResponse> : ICommandPipelineBehaviour<TCommand, TResponse> where TCommand : IRequest<TResponse>
     {
-        private readonly IAsyncRequestHandler<CommandEnvelope<TCommand, TResponse>, TResponse> _next;
         private readonly ILogger _logger;
         private readonly ICounterMeasure _counter;
         private const string ErrorsCounterName = "Handler.Errors";
 
-        public ErrorLoggingDecorator(IAsyncRequestHandler<CommandEnvelope<TCommand, TResponse>, TResponse> next)
+        public ErrorLoggingBehaviour()
         {
-            if (next == null)
-            {
-                throw new ArgumentNullException(nameof(next));
-            }
-            _next = next;
             _logger = Log.Logger.ForContext(GetType());
             _counter = _logger.CountOperation(ErrorsCounterName);
         }
 
-        public async Task<TResponse> Handle(CommandEnvelope<TCommand, TResponse> message)
+        public async Task<TResponse> Handle(CommandEnvelope<TCommand, TResponse> message, RequestHandlerDelegate<TResponse> next)
         {
             var context = message.Context;
             try
             {
-                return await _next.Handle(message);
+                return await next.Invoke();
             }
             catch (Exception ex)
             {

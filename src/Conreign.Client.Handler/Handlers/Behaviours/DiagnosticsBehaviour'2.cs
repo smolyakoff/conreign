@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Conreign.Client.Handler.Handlers.Common;
 using MediatR;
 using Serilog;
@@ -8,11 +7,10 @@ using Serilog.Core;
 using Serilog.Core.Enrichers;
 using SerilogMetrics;
 
-namespace Conreign.Client.Handler.Handlers.Decorators
+namespace Conreign.Client.Handler.Handlers.Behaviours
 {
-    internal class DiagnosticsDecorator<TCommand, TResponse> : ICommandHandler<TCommand, TResponse> where TCommand : IAsyncRequest<TResponse>
+    internal class DiagnosticsBehaviour<TCommand, TResponse> : ICommandPipelineBehaviour<TCommand, TResponse> where TCommand : IRequest<TResponse>
     {
-        private readonly IAsyncRequestHandler<CommandEnvelope<TCommand, TResponse>, TResponse> _next;
         private readonly ILogger _logger;
         private readonly ICounterMeasure _received;
         private readonly ICounterMeasure _processed;
@@ -21,13 +19,8 @@ namespace Conreign.Client.Handler.Handlers.Decorators
         private const string OperationDescription = "Handler.Handle";
         private const int CounterResolution = 10;
 
-        public DiagnosticsDecorator(IAsyncRequestHandler<CommandEnvelope<TCommand, TResponse>, TResponse> next)
+        public DiagnosticsBehaviour()
         {
-            if (next == null)
-            {
-                throw new ArgumentNullException(nameof(next));
-            }
-            _next = next;
             _logger = Log.Logger.ForContext(GetType());
             _received = Log.Logger.CountOperation(
                 ReceivedCounterName, 
@@ -37,7 +30,7 @@ namespace Conreign.Client.Handler.Handlers.Decorators
                 resolution: CounterResolution);
         }
 
-        public async Task<TResponse> Handle(CommandEnvelope<TCommand, TResponse> message)
+        public async Task<TResponse> Handle(CommandEnvelope<TCommand, TResponse> message, RequestHandlerDelegate<TResponse> next)
         {
             var context = message.Context;
             var diagnosticProperties = new ILogEventEnricher[]
@@ -52,7 +45,7 @@ namespace Conreign.Client.Handler.Handlers.Decorators
                 try
                 {
                     _received.Increment();
-                    _logger.Debug("[Handler:{TraceId}:{UserId}] Received {CommandType}: {@Command}", 
+                    _logger.Debug("[Handler:{TraceId}:{UserId}] Received {CommandType}: {@Command}",
                         context.Metadata.TraceId,
                         context.UserId,
                         message.Command.GetType().Name,
@@ -60,7 +53,7 @@ namespace Conreign.Client.Handler.Handlers.Decorators
                     TResponse response;
                     using (_logger.BeginTimedOperation(OperationDescription))
                     {
-                        response = await _next.Handle(message);
+                        response = await next.Invoke();
                     }
                     _logger.Debug("[Handler:{TraceId}:{UserId}] Handled {CommandType} successfully: {@Response}",
                         context.Metadata.TraceId,

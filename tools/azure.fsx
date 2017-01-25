@@ -4,11 +4,11 @@
 #r "./../packages/build/System.IO.FileSystem/lib/net46/System.IO.FileSystem.dll"
 #r "./../packages/build/System.Security.Cryptography.Algorithms/lib/net46/System.Security.Cryptography.Algorithms.dll"
 #r "./../packages/build/System.Security.Cryptography.Primitives/lib/net46/System.Security.Cryptography.Primitives.dll"
+#r "./../packages/build/WindowsAzure.Storage/lib/net45/Microsoft.WindowsAzure.Storage.dll"
 #r "./../packages/build/FAKE/tools/FakeLib.dll"
 #r "./../packages/build/Hyak.Common/lib/net45/Hyak.Common.dll"
 #r "./../packages/build/Microsoft.Azure.Common/lib/net45/Microsoft.Azure.Common.dll"
 #r "./../packages/build/Microsoft.Azure.Common/lib/net45/Microsoft.Azure.Common.NetFramework.dll"
-#r "./../packages/build/WindowsAzure.Storage/lib/net40/Microsoft.WindowsAzure.Storage.dll"
 #r "./../packages/build/Microsoft.Azure.Storage.DataMovement/lib/net45/Microsoft.WindowsAzure.Storage.DataMovement.dll"
 #r "./../packages/build/Microsoft.WindowsAzure.Management.Compute/lib/portable-net45+wp8+wpa81+win/Microsoft.WindowsAzure.Management.Compute.dll"
 
