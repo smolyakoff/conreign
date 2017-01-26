@@ -9,16 +9,25 @@ import home from './../home';
 import room from './../room';
 
 const LISTEN_FOR_SERVER_EVENTS = 'LISTEN_FOR_SERVER_EVENTS';
-const EXECUTE_PAGE_ACTIONS = 'EXECUTE_PAGE_ACTIONS';
-
+const EXECUTE_ROUTE_ACTIONS = 'EXECUTE_ROUTE_ACTIONS';
+const START_ROUTE_TRANSACTION = 'START_ROUTE_TRANSACTION';
+const END_ROUTE_TRANSACTION = 'END_ROUTE_TRANSACTION';
 
 export function listenForServerEvents() {
   return { type: LISTEN_FOR_SERVER_EVENTS };
 }
 
+export function startRouteTransaction() {
+  return { type: START_ROUTE_TRANSACTION };
+}
+
+export function endRouteTransaction() {
+  return { type: END_ROUTE_TRANSACTION };
+}
+
 export function executeRouteActions(actions) {
   return {
-    type: EXECUTE_PAGE_ACTIONS,
+    type: EXECUTE_ROUTE_ACTIONS,
     payload: actions,
   };
 }
@@ -37,24 +46,42 @@ export function isRouteLoadingAction(action) {
 }
 
 function operationsReducer(state = INITIAL_OPERATIONS_STATE, action) {
-  const asyncState = get(action, 'meta.$async.state');
-  const isRouteAction = isRouteLoadingAction(action);
-  switch (asyncState) {
-    case AsyncOperationState.Pending:
+  switch (action.type) {
+    case START_ROUTE_TRANSACTION:
       return {
         ...state,
-        routePending: isRouteAction ? state.routePending + 1 : state.routePending,
-        totalPending: state.totalPending + 1,
+        routePending: state.routePending + 1,
       };
-    case AsyncOperationState.Completed:
-    case AsyncOperationState.Failed:
+    case END_ROUTE_TRANSACTION:
       return {
         ...state,
-        routePending: isRouteAction ? positiveOrZero(state.routePending - 1) : state.routePending,
-        totalPending: positiveOrZero(state.totalPending - 1),
+        routePending: positiveOrZero(state.routePending - 1),
       };
-    default:
-      return state;
+    default: {
+      const asyncState = get(action, 'meta.$async.state');
+      const isRouteAction = isRouteLoadingAction(action);
+      switch (asyncState) {
+        case AsyncOperationState.Pending:
+          return {
+            ...state,
+            routePending: isRouteAction
+              ? state.routePending + 1
+              : state.routePending,
+            totalPending: state.totalPending + 1,
+          };
+        case AsyncOperationState.Completed:
+        case AsyncOperationState.Failed:
+          return {
+            ...state,
+            routePending: isRouteAction
+              ? positiveOrZero(state.routePending - 1)
+              : state.routePending,
+            totalPending: positiveOrZero(state.totalPending - 1),
+          };
+        default:
+          return state;
+      }
+    }
   }
 }
 
@@ -84,7 +111,7 @@ function createEpic(container) {
 
   function executeRouteActionsEpic(action$) {
     return action$
-      .ofType(EXECUTE_PAGE_ACTIONS)
+      .ofType(EXECUTE_ROUTE_ACTIONS)
       .flatMap(({ payload }) => payload)
       .map(action => ({
         ...action,
@@ -103,10 +130,6 @@ function createEpic(container) {
     home.createEpic(container),
     room.createEpic(container),
   );
-}
-
-export function selectPendingRouteOperations(state) {
-  return state.operations.routePending;
 }
 
 export default {

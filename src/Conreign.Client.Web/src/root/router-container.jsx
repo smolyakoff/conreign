@@ -6,7 +6,11 @@ import { isFunction, flatMap, isObject } from 'lodash';
 import Rx from 'rxjs';
 
 import './../theme';
-import { executeRouteActions, selectPendingRouteOperations } from './../root';
+import {
+  executeRouteActions,
+  startRouteTransaction,
+  endRouteTransaction,
+} from './../root';
 import { login, AUTH_REDUCER_KEY } from './../auth';
 import { RootLayout, NavigationMenuLayout } from './../layout';
 import { ErrorPage, ERROR_PAGE_PATH } from './../errors';
@@ -33,15 +37,10 @@ export default function RouterContainer({ store, history }) {
       .filter(isFunction);
     const actions = flatMap(initializers, init => init(nextState, storeState))
       .filter(isObject);
-    if (actions.length === 0) {
-      return Rx.Observable.empty();
+    if (actions.length !== 0) {
+      store.dispatch(executeRouteActions(actions));
     }
-    const stream = Rx.Observable.from(store)
-      .map(selectPendingRouteOperations)
-      .first(ops => ops === 0)
-      .delay(0);
-    store.dispatch(executeRouteActions(actions));
-    return stream;
+    return Rx.Observable.empty();
   }
 
   function onRouteChange(prevState, nextState) {
@@ -49,8 +48,10 @@ export default function RouterContainer({ store, history }) {
   }
 
   function onRouteEnter(nextState) {
+    store.dispatch(startRouteTransaction());
     ensureIsAuthenticated()
       .mergeMap(() => dispatchRouteActions(nextState))
+      .finally(() => store.dispatch(endRouteTransaction()))
       .subscribe();
   }
 

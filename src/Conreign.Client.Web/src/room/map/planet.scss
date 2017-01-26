@@ -16,6 +16,7 @@ $icon-margin: 15%;
 
   &__icon {
     position: absolute;
+    z-index: -1;
     top: $icon-margin;
     left: $icon-margin;
     width: 100% - $icon-margin * 2;
