@@ -69,8 +69,11 @@ reducer.$key = 'rooms';
 
 export function selectRoom(state, roomId) {
   return {
-    ...state.rooms[roomId],
+    ...state[reducer.$key][roomId],
     roomId,
+    currentUser: {
+      id: state.auth.user.sub,
+    },
   };
 }
 

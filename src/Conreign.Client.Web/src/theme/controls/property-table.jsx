@@ -7,11 +7,18 @@ const table = block('c-property-table');
 
 function Property({ name, value }) {
   return (
-    <Grid>
-      <GridCell className={table('property-name')()}>
+    <Grid gutter>
+      <GridCell
+        className={table('property-name')()}
+        gutter={false}
+        fixedWidth
+      >
         {name}
       </GridCell>
-      <GridCell className={table('property-value')()}>
+      <GridCell
+        className={table('property-value')()}
+        gutter={false}
+      >
         {value}
       </GridCell>
     </Grid>

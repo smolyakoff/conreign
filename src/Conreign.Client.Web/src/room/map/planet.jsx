@@ -1,19 +1,9 @@
 import React, { PropTypes } from 'react';
 import block from 'bem-cn';
 import Color from 'color';
-import fp from 'lodash/fp';
-
 import { Progress, PropertyTable, ThemeSize, ThemeColor } from './../../theme';
 import './planet.scss';
-import earth from './icons/earth.svg';
-import mars from './icons/mars.svg';
-import moon from './icons/moon.svg';
-
-const ICON = {
-  earth,
-  mars,
-  moon,
-};
+import { choosePlanetIcon } from './../icons';
 
 export default function Planet({
   name,
@@ -27,19 +17,13 @@ export default function Planet({
   if (color) {
     style.backgroundColor = Color(color).alpha(0.8).string();
   }
-  const chosenIconName = fp.flow(
-    fp.toPairs,
-    fp.map(([limit, iconName]) => [parseInt(limit, 10) / 100, iconName]),
-    fp.orderBy(([limit]) => limit, 'desc'),
-    fp.find(([limit]) => power >= limit),
-    fp.last,
-  )(icons);
+  const icon = choosePlanetIcon(power, icons);
 
   const planetProperties = [{
-    name: 'P',
+    name: 'R',
     value: productionRate,
   }, {
-    name: 'E',
+    name: 'P',
     value: (
       <Progress
         value={power * 100}
@@ -52,9 +36,9 @@ export default function Planet({
     <div className={planet()} style={style}>
       <span className={planet('name')()}>{name}</span>
       <img
-        src={ICON[chosenIconName]}
+        src={icon.src}
         className={planet('icon')()}
-        alt={chosenIconName}
+        alt={icon.name}
       />
       <div className={planet('planet-properties')()}>
         <PropertyTable

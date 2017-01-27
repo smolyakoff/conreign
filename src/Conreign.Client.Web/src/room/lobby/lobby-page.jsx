@@ -1,10 +1,23 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
+import { findKey, parseInt } from 'lodash';
 
 import { Grid, GridCell, ThemeSize, GridMode } from './../../theme';
 import { Map, PlanetCell, MAP_SELECTION_SHAPE } from '../map';
 import { setMapSelection } from './../room';
+import PlanetCard from './../planet-card';
 
+
+function adjustMapSelection(map, mapSelection, currentUser) {
+  if (mapSelection.start) {
+    return mapSelection;
+  }
+  const currentUserPlanetPosition = findKey(
+    map.planets,
+    p => p.ownerId === currentUser.id,
+  );
+  return { start: parseInt(currentUserPlanetPosition) };
+}
 
 function LobbyPage({
   roomId,
@@ -12,9 +25,11 @@ function LobbyPage({
   players,
   viewDimensions,
   mapSelection,
+  currentUser,
   onMapSelectionChanged,
 }) {
   const mapSize = Math.min(viewDimensions.width / 2, viewDimensions.height);
+
 
   function LobbyCell({ cellIndex }) {
     const planet = map.planets[cellIndex];
@@ -28,25 +43,38 @@ function LobbyPage({
     cellIndex: PropTypes.number.isRequired,
   };
 
+  const chosenMapSelection = adjustMapSelection(
+    map,
+    mapSelection,
+    currentUser,
+  );
+  let selectedPlanet = map.planets[chosenMapSelection.start];
+  selectedPlanet = {
+    ...selectedPlanet,
+    owner: players[selectedPlanet.ownerId],
+  };
+
   return (
     <Grid
       responsiveness={{
         [ThemeSize.Small]: GridMode.Full,
+        [ThemeSize.Medium]: GridMode.Full,
       }}
     >
       <GridCell fixedWidth width={mapSize}>
         <div className="u-window-box--small">
           <Map
+            className="u-higher"
             {...map}
             cellRenderer={LobbyCell}
-            selection={mapSelection}
+            selection={chosenMapSelection}
             onSelectionChanged={selection => onMapSelectionChanged({ selection, roomId })}
           />
         </div>
       </GridCell>
       <GridCell>
         <div className="u-window-box--small">
-          Content
+          <PlanetCard className="u-higher" {...selectedPlanet} />
         </div>
       </GridCell>
     </Grid>
@@ -81,6 +109,9 @@ LobbyPage.propTypes = {
   mapSelection: MAP_SELECTION_SHAPE,
   onMapSelectionChanged: PropTypes.func,
   players: PropTypes.objectOf(PLAYER_SHAPE).isRequired,
+  currentUser: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 LobbyPage.defaultProps = {

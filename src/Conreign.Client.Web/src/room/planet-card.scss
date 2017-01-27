@@ -1,0 +1,18 @@
+.c-planet-details {
+  &__icon-container {
+    position: relative;
+    .c-heading {
+      display: block;
+      margin: 0;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+    }
+    img {
+      min-width: 120px;
+      max-height: 120px;
+      opacity: 0.5;
+    }
+  }
+}

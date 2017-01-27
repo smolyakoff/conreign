@@ -1,6 +1,6 @@
 @import "../../theme/variables";
 
-$map-border-color: transparentize($color-white, 0.9);
+$map-border-color: $color-bg-brand;
 $map-border: solid 1px $map-border-color;
 
 .c-map {

@@ -47,11 +47,13 @@ namespace Conreign.Core.Gameplay.Editor
             var color = Sequences
                 .RandomWithPopularFirstColors
                 .FirstOrDefault(c => _state.All(p => p.Color != c));
+            var existingNicknames = _state.Select(x => x.Nickname).ToHashSet();
+            var nickname = Sequences.Nicknames.FirstOrDefault(x => !existingNicknames.Contains(x));
             var player = new PlayerData
             {
                 UserId = userId,
                 Color = color,
-                Nickname = null
+                Nickname = nickname,
             };
             _state.Add(player);
             return player;

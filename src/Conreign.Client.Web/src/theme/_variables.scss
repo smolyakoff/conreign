@@ -1,6 +1,8 @@
 @import "~blaze/scss/mixins/_settings.global";
 @import "~blaze/scss/blaze.colors.scss";
 
+@import "mixins";
+
 // Sizes
 $size-names: tiny xsmall small medium large xlarge super;
 $sizes: $spacing-tiny $spacing-xsmall $spacing-small $spacing-medium $spacing-large $spacing-xlarge $spacing-super;
@@ -8,6 +10,7 @@ $sizes: $spacing-tiny $spacing-xsmall $spacing-small $spacing-medium $spacing-la
 // Colors
 $text-color: $color-white;
 $color-brand: material-color('deep-orange', '800');
+$color-bg-brand: material-color('blue-grey', '900');
 
 // Typography
 $text-font-family: 'Orbitron', $text-font-family;
@@ -21,3 +24,8 @@ $field-background-color: transparent;
 
 // Buttons
 $button-brand-background-color: $color-brand;
+
+// Cards
+$card-background-color: $color-bg-brand;
+$card-border-radius: 0;
+$card-item-border-bottom: 0;

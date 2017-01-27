@@ -100,5 +100,18 @@ namespace Conreign.Core.Gameplay.Editor
                 yield return i;
             }
         }
+
+        public static IEnumerable<string> Nicknames
+        {
+            get
+            {
+                var i = 1;
+                while (true)
+                {
+                    yield return $"player{i++}";
+                }
+                // ReSharper disable once IteratorNeverReturns
+            }
+        }
     }
 }

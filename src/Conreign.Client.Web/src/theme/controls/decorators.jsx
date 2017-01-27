@@ -67,6 +67,31 @@ export const ThemeSize = {
   Super: 'super',
 };
 
+export const ThemeElevation = {
+  None: null,
+  High: 'high',
+  Higher: 'higher',
+  Highest: 'highest',
+};
+
+export const withThemeElevation = {
+  mapProps: ({ className, themeElevation, ...otherProps }) => ({
+    className: cx(
+      className,
+      isNonEmptyString(themeElevation) ? `u-${themeElevation}` : null,
+    ),
+    ...otherProps,
+  }),
+  extendStatics: (Control) => {
+    Control.propTypes = {
+      ...Control.propTypes,
+      themeElevation: PropTypes.oneOf(values(ThemeElevation)),
+    };
+    Control.defaultProps = {
+      ...Control.defaultProps,
+    };
+  },
+};
 
 export function withThemeSizes(blockClass = null) {
   function formatSizeClass(size) {
