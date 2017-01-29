@@ -62,10 +62,21 @@ a {
 // Property Table
 .c-property-table {
   border-spacing: 0;
+  > tbody > tr {
+    > td {
+      margin: 0;
+      vertical-align: middle;
+    }
+  }
 
-  &__property-value {
-    padding-left: $spacing-medium;
-    text-align: right;
+  &__name {
+    padding: 0 $spacing-small 0 0;
+    white-space: nowrap;
+  }
+
+  &__value {
+    padding: 0;
     width: 100%;
+    text-align: right;
   }
 }

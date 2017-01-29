@@ -6,6 +6,7 @@ import { Grid, GridCell, ThemeSize, GridMode, Box } from './../../theme';
 import { Map, PlanetCell, MAP_SELECTION_SHAPE } from '../map';
 import { setMapSelection } from './../room';
 import PlanetCard from './../planet-card';
+import GameSettingsForm from './game-settings-form';
 import Widget from './../widget';
 
 const WIDGET_HEADER_HEIGHT = 40;
@@ -31,7 +32,6 @@ function LobbyPage({
   onMapSelectionChanged,
 }) {
   const mapSize = Math.min(viewDimensions.width / 2, viewDimensions.height);
-  console.log(viewDimensions);
 
   function LobbyCell({ cellIndex }) {
     const planet = map.planets[cellIndex];
@@ -89,6 +89,9 @@ function LobbyPage({
             className="u-higher"
           >
             <PlanetCard {...selectedPlanet} />
+          </Widget>
+          <Widget header="Game Settings">
+            <GameSettingsForm />
           </Widget>
         </Box>
       </GridCell>

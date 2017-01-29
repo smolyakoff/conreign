@@ -1,27 +1,18 @@
 import React, { PropTypes } from 'react';
 import block from 'bem-cn';
 
-import { Grid, GridCell } from './grid';
-
 const table = block('c-property-table');
 
 function Property({ name, value }) {
   return (
-    <Grid gutter>
-      <GridCell
-        className={table('property-name')()}
-        gutter={false}
-        fixedWidth
-      >
+    <tr>
+      <td className={table('name')()}>
         {name}
-      </GridCell>
-      <GridCell
-        className={table('property-value')()}
-        gutter={false}
-      >
+      </td>
+      <td className={table('value')()}>
         {value}
-      </GridCell>
-    </Grid>
+      </td>
+    </tr>
   );
 }
 Property.propTypes = {
@@ -36,9 +27,11 @@ Property.defaultProps = {
 
 function PropertyTable({ properties, className }) {
   return (
-    <div className={table.mix(className)()}>
-      {properties.map(p => <Property key={p.name} {...p} />)}
-    </div>
+    <table className={table.mix(className)()}>
+      <tbody>
+        {properties.map(p => <Property key={p.name} {...p} />)}
+      </tbody>
+    </table>
   );
 }
 
