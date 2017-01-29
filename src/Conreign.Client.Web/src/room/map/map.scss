@@ -1,6 +1,7 @@
 @import "../../theme/variables";
+@import "../../theme/mixins";
 
-$map-border-color: $color-bg-brand;
+$map-border-color: material-color('grey', '900');
 $map-border: solid 1px $map-border-color;
 
 .c-map {

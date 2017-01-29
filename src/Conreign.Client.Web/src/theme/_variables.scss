@@ -26,6 +26,6 @@ $field-background-color: transparent;
 $button-brand-background-color: $color-brand;
 
 // Cards
-$card-background-color: $color-bg-brand;
+$card-background-color: transparentize($color-bg-brand, 0.8);
 $card-border-radius: 0;
 $card-item-border-bottom: 0;

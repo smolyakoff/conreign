@@ -155,14 +155,14 @@ Grid.propTypes = {
   gutter: PropTypes.bool,
   className: PropTypes.string,
   children: PropTypes.node,
-  verticalAlignment: PropTypes.oneOf(values(VerticalAlignment)),
+  verticalAlignment: PropTypes.oneOf(values(VerticalAlignment).concat(null)),
   responsiveness: validateResponsivenessConfiguration,
 };
 
 Grid.defaultProps = {
   className: null,
   children: null,
-  verticalAlignment: Alignment.Top,
+  verticalAlignment: null,
   responsiveness: {},
   gutter: false,
 };

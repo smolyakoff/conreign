@@ -1,15 +1,17 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { findKey, parseInt } from 'lodash';
+import { findKey, parseInt, isNumber } from 'lodash';
 
-import { Grid, GridCell, ThemeSize, GridMode } from './../../theme';
+import { Grid, GridCell, ThemeSize, GridMode, Box } from './../../theme';
 import { Map, PlanetCell, MAP_SELECTION_SHAPE } from '../map';
 import { setMapSelection } from './../room';
 import PlanetCard from './../planet-card';
+import Widget from './../widget';
 
+const WIDGET_HEADER_HEIGHT = 40;
 
 function adjustMapSelection(map, mapSelection, currentUser) {
-  if (mapSelection.start) {
+  if (isNumber(mapSelection.start)) {
     return mapSelection;
   }
   const currentUserPlanetPosition = findKey(
@@ -29,7 +31,7 @@ function LobbyPage({
   onMapSelectionChanged,
 }) {
   const mapSize = Math.min(viewDimensions.width / 2, viewDimensions.height);
-
+  console.log(viewDimensions);
 
   function LobbyCell({ cellIndex }) {
     const planet = map.planets[cellIndex];
@@ -61,21 +63,34 @@ function LobbyPage({
         [ThemeSize.Medium]: GridMode.Full,
       }}
     >
-      <GridCell fixedWidth width={mapSize}>
-        <div className="u-window-box--small">
-          <Map
+      <GridCell
+        fixedWidth
+        width={mapSize - WIDGET_HEADER_HEIGHT}
+      >
+        <Box themeSize={ThemeSize.Small}>
+          <Widget
             className="u-higher"
-            {...map}
-            cellRenderer={LobbyCell}
-            selection={chosenMapSelection}
-            onSelectionChanged={selection => onMapSelectionChanged({ selection, roomId })}
-          />
-        </div>
+            bodyClassName="u-window-box--none"
+            header="Map"
+          >
+            <Map
+              {...map}
+              cellRenderer={LobbyCell}
+              selection={chosenMapSelection}
+              onSelectionChanged={selection => onMapSelectionChanged({ selection, roomId })}
+            />
+          </Widget>
+        </Box>
       </GridCell>
       <GridCell>
-        <div className="u-window-box--small">
-          <PlanetCard className="u-higher" {...selectedPlanet} />
-        </div>
+        <Box themeSize={ThemeSize.Small}>
+          <Widget
+            header="Planet Details"
+            className="u-higher"
+          >
+            <PlanetCard {...selectedPlanet} />
+          </Widget>
+        </Box>
       </GridCell>
     </Grid>
   );

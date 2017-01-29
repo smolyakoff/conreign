@@ -12,11 +12,13 @@ $icon-margin: 15%;
 
   &__name {
     text-shadow: 1px 1px $color-black;
+    z-index: 1;
+    position: relative;
   }
 
   &__icon {
     position: absolute;
-    z-index: -1;
+    z-index: 0;
     top: $icon-margin;
     left: $icon-margin;
     width: 100% - $icon-margin * 2;

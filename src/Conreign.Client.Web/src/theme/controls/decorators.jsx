@@ -59,6 +59,7 @@ export function withThemeColors(blockClass) {
 }
 
 export const ThemeSize = {
+  Tiny: 'tiny',
   XSmall: 'xsmall',
   Small: 'small',
   Medium: 'medium',

@@ -3,14 +3,10 @@ import block from 'bem-cn';
 
 import {
   H1,
-  Card,
-  CardItem,
-  CardBody,
   Grid,
   Image,
   GridCell,
   PropertyTable,
-  ThemeColor,
   VerticalAlignment,
 } from './../theme';
 
@@ -28,7 +24,7 @@ export default function PlanetCard({
   const color = owner ? owner.color : 'white';
   const ownerValue = (
     <div>
-      <Circle color={color} /> {owner ? owner.nickname : 'Neutral'},
+      <Circle color={color} /> {owner ? owner.nickname : 'Neutral'}
     </div>
   );
   const planetProperties = [
@@ -54,25 +50,22 @@ export default function PlanetCard({
   const css = block('c-planet-details');
 
   return (
-    <Card className={className}>
-      <CardItem themeColor={ThemeColor.Info}>
-        Planet Details
-      </CardItem>
-      <CardBody className={css()}>
-        <Grid gutter verticalAlignment={VerticalAlignment.Center}>
-          <GridCell
-            className={css('icon-container')()}
-            fixedWidth
-          >
-            <Image src={icon.src} alt={icon.name} />
-            <H1>{name}</H1>
-          </GridCell>
-          <GridCell>
-            <PropertyTable properties={planetProperties} />
-          </GridCell>
-        </Grid>
-      </CardBody>
-    </Card>
+    <Grid
+      className={className}
+      gutter
+      verticalAlignment={VerticalAlignment.Center}
+    >
+      <GridCell
+        className={css('icon-container')()}
+        fixedWidth
+      >
+        <Image src={icon.src} alt={icon.name} />
+        <H1>{name}</H1>
+      </GridCell>
+      <GridCell>
+        <PropertyTable properties={planetProperties} />
+      </GridCell>
+    </Grid>
   );
 }
 

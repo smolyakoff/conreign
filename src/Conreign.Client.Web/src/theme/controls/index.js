@@ -8,6 +8,7 @@ export * from './input';
 export * from './text';
 export * from './grid';
 export * from './card';
+export { default as Box, BoxType } from './box';
 export { default as Button } from './button';
 export { default as Spinner } from './spinner';
 export { default as Progress } from './progress';
