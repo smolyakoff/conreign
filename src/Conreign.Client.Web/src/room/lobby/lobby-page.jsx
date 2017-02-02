@@ -29,6 +29,7 @@ function LobbyPage({
   viewDimensions,
   mapSelection,
   currentUser,
+  neutralPlanetsCount,
   onMapSelectionChanged,
 }) {
   const mapSize = Math.min(viewDimensions.width / 2, viewDimensions.height);
@@ -54,6 +55,12 @@ function LobbyPage({
   selectedPlanet = {
     ...selectedPlanet,
     owner: players[selectedPlanet.ownerId],
+  };
+
+  const defaultGameSettings = {
+    mapWidth: map.width,
+    mapHeight: map.height,
+    neutralPlanetsCount,
   };
 
   return (
@@ -90,8 +97,13 @@ function LobbyPage({
           >
             <PlanetCard {...selectedPlanet} />
           </Widget>
-          <Widget header="Game Settings">
-            <GameSettingsForm />
+          <Widget
+            header="Game Settings"
+            className="u-higher"
+          >
+            <GameSettingsForm
+              defaultValues={defaultGameSettings}
+            />
           </Widget>
         </Box>
       </GridCell>
@@ -124,6 +136,7 @@ LobbyPage.propTypes = {
     height: PropTypes.number.isRequired,
     planets: PropTypes.objectOf(PLANET_SHAPE).isRequired,
   }).isRequired,
+  neutralPlanetsCount: PropTypes.number.isRequired,
   mapSelection: MAP_SELECTION_SHAPE,
   onMapSelectionChanged: PropTypes.func,
   players: PropTypes.objectOf(PLAYER_SHAPE).isRequired,
@@ -138,6 +151,7 @@ LobbyPage.defaultProps = {
     end: null,
   },
   onMapSelectionChanged: null,
+  gameSettings: null,
 };
 
 export default connect(

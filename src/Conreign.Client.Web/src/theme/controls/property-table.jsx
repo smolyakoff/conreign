@@ -1,6 +1,8 @@
 import React, { PropTypes } from 'react';
 import block from 'bem-cn';
 
+import { decorate, withThemeSizes } from './decorators';
+
 const table = block('c-property-table');
 
 function Property({ name, value }) {
@@ -48,4 +50,6 @@ PropertyTable.defaultProps = {
   properties: [],
 };
 
-export default PropertyTable;
+export default decorate(
+  withThemeSizes(table(), { propName: 'themeSpacing', valuePrefix: 'spacing-' }),
+)(PropertyTable);

@@ -1,4 +1,3 @@
-// eslint-disable-next-line
 export const Alignment = {
   Top: 'top',
   Bottom: 'bottom',
@@ -7,3 +6,7 @@ export const Alignment = {
   Right: 'right',
 };
 
+export const Orientation = {
+  Vertical: 'vertical',
+  Horizontal: 'horizontal',
+};

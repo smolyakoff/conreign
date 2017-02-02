@@ -61,7 +61,15 @@ a {
 
 // Property Table
 .c-property-table {
+  border-collapse: separate;
   border-spacing: 0;
+
+  @for $i from 1 through length($size-names) {
+    &--spacing-#{nth($size-names, $i)} {
+      border-spacing: 0 nth($sizes, $i);
+    }
+  }
+
   > tbody > tr {
     > td {
       margin: 0;

@@ -1,4 +1,5 @@
 import { keyBy } from 'lodash';
+
 import { AsyncOperationState, createAsyncActionTypes } from './../core';
 
 const GET_ROOM_STATE = 'GET_ROOM_STATE';

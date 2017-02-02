@@ -2,3 +2,30 @@
 @import "~blaze/scss/objects.grid";
 @import "~blaze/scss/objects.grid.responsive";
 @import "~blaze/scss/objects.images";
+
+// Stack Panel
+.o-stack-panel {
+  @for $i from 1 through length($size-names) {
+    &--horizontal.o-stack-panel--spacing-#{nth($size-names, $i)} {
+      .o-stack-panel__item {
+        padding-right: nth($sizes, $i);
+      }
+    }
+    &--vertical.o-stack-panel--spacing-#{nth($size-names, $i)} {
+      .o-stack-panel__item {
+        padding-bottom: nth($sizes, $i);
+      }
+    }
+  }
+  &--horizontal {
+    .o-stack-panel__item:last-child {
+      padding-right: 0;
+    }
+  }
+
+  &--vertical {
+    .o-stack-panel__item:last-child {
+      padding-bottom: 0;
+    }
+  }
+}

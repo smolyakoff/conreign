@@ -113,6 +113,7 @@ GridCell.defaultProps = {
 
 export function Grid({
   gutter,
+  wrap,
   className,
   children,
   verticalAlignment,
@@ -121,6 +122,7 @@ export function Grid({
 }) {
   const modifiers = {
     'no-gutter': !gutter,
+    wrap,
     [verticalAlignment || VerticalAlignment.Top]: isNonEmptyString(verticalAlignment),
     ...responsiveness || {},
   };
@@ -153,6 +155,7 @@ function validateResponsivenessConfiguration(props, propName) {
 
 Grid.propTypes = {
   gutter: PropTypes.bool,
+  wrap: PropTypes.bool,
   className: PropTypes.string,
   children: PropTypes.node,
   verticalAlignment: PropTypes.oneOf(values(VerticalAlignment).concat(null)),
@@ -165,4 +168,5 @@ Grid.defaultProps = {
   verticalAlignment: null,
   responsiveness: {},
   gutter: false,
+  wrap: false,
 };

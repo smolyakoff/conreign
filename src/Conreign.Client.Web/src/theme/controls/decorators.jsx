@@ -1,6 +1,6 @@
 import cx from 'classnames';
 import React, { PropTypes } from 'react';
-import { values, flow, each, isFunction, extend, flatten } from 'lodash';
+import { values, flow, each, isFunction, extend, flatten, defaults, omit } from 'lodash';
 
 import { isNonEmptyString } from './util';
 
@@ -94,30 +94,40 @@ export const withThemeElevation = {
   },
 };
 
-export function withThemeSizes(blockClass = null) {
+export function withThemeSizes(
+  blockClass = null,
+  options,
+) {
+  options = defaults(options, {
+    propName: 'themeSize',
+    valuePrefix: '',
+  });
+  const { propName, valuePrefix } = options;
+
   function formatSizeClass(size) {
     return isNonEmptyString(blockClass)
-      ? `${blockClass}--${size}`
-      : `u-${size}`;
+      ? `${blockClass}--${valuePrefix}${size}`
+      : `u-${valuePrefix}${size}`;
   }
 
-  function mapProps({ className, themeSize, ...others }) {
+  function mapProps({ className, ...others }) {
+    const size = others[propName];
     const css = cx(
       className,
-      isNonEmptyString(themeSize)
-        ? formatSizeClass(themeSize)
+      isNonEmptyString(size)
+        ? formatSizeClass(size)
         : null,
     );
     return {
       className: css,
-      ...others,
+      ...omit(others, propName),
     };
   }
 
   function extendStatics(Control) {
     const propTypes = Control.propTypes || {};
     extend(propTypes, {
-      themeSize: PropTypes.oneOf(values(ThemeSize)),
+      [propName]: PropTypes.oneOf(values(ThemeSize)),
     });
     extend(Control, {
       propTypes,

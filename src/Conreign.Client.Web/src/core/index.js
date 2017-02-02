@@ -7,6 +7,7 @@ import {
 } from './async-dispatcher';
 
 export * from './async-dispatcher';
+export * from './gameplay';
 
 export default function createContainer(imports, config) {
   const { storage, history } = imports;

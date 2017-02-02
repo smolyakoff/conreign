@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { values } from 'lodash';
 
-import { RoomMode } from './gameplay';
+import { RoomMode } from './../core';
 import { getRoomState, selectRoom } from './room';
 import { LobbyPage } from './lobby';
 import { GamePage } from './game';

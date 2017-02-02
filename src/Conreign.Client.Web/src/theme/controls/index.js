@@ -7,6 +7,7 @@ export * from './image';
 export * from './input';
 export * from './text';
 export * from './grid';
+export { default as StackPanel } from './stack-panel';
 export * from './card';
 export { default as Box, BoxType } from './box';
 export { default as Button } from './button';
