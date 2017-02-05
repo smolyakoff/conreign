@@ -8,7 +8,7 @@ import Rx from 'rxjs';
 import './../theme';
 import {
   executeRouteActions,
-  startRouteTransaction,
+  beginRouteTransaction,
   endRouteTransaction,
 } from './../root';
 import { login, AUTH_REDUCER_KEY } from './../auth';
@@ -22,14 +22,14 @@ export default function RouterContainer({ store, history }) {
   function ensureIsAuthenticated() {
     const state = store.getState();
     if (state[AUTH_REDUCER_KEY].user) {
-      return Rx.Observable.empty();
+      return Rx.Observable.of(state[AUTH_REDUCER_KEY].user);
     }
     store.dispatch(executeRouteActions([login()]));
     return Rx.Observable.from(store)
       .first(currentState => isObject(currentState[AUTH_REDUCER_KEY].user));
   }
 
-  function dispatchRouteActions(nextState) {
+  function collectRouteActions(nextState) {
     const storeState = store.getState();
     const components = nextState.routes.map(route => route.component);
     const initializers = components
@@ -37,20 +37,25 @@ export default function RouterContainer({ store, history }) {
       .filter(isFunction);
     const actions = flatMap(initializers, init => init(nextState, storeState))
       .filter(isObject);
-    if (actions.length !== 0) {
-      store.dispatch(executeRouteActions(actions));
+    return actions;
+  }
+
+  function dispatchRouteActions(nextState) {
+    const actions = collectRouteActions(nextState);
+    if (actions.length === 0) {
+      return;
     }
-    return Rx.Observable.empty();
+    store.dispatch(executeRouteActions(actions));
   }
 
   function onRouteChange(prevState, nextState) {
-    dispatchRouteActions(nextState).subscribe();
+    dispatchRouteActions(nextState);
   }
 
   function onRouteEnter(nextState) {
-    store.dispatch(startRouteTransaction());
+    store.dispatch(beginRouteTransaction());
     ensureIsAuthenticated()
-      .mergeMap(() => dispatchRouteActions(nextState))
+      .do(() => dispatchRouteActions(nextState))
       .finally(() => store.dispatch(endRouteTransaction()))
       .subscribe();
   }

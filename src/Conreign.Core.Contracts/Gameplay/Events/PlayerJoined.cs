@@ -5,13 +5,15 @@ using Conreign.Core.Contracts.Gameplay.Data;
 namespace Conreign.Core.Contracts.Gameplay.Events
 {
     [Serializable]
-    public class PlayerJoined : IClientEvent
+    public class PlayerJoined : IClientEvent, IRoomEvent
     {
-        public PlayerJoined(PlayerData player)
+        public PlayerJoined(string roomId, PlayerData player)
         {
+            RoomId = roomId;
             Player = player;
         }
 
         public PlayerData Player { get; }
+        public string RoomId { get; }
     }
 }

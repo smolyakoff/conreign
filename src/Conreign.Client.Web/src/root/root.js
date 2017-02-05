@@ -2,7 +2,7 @@ import { combineReducers } from 'redux';
 import { combineEpics } from 'redux-observable';
 import { snakeCase, get } from 'lodash';
 
-import { AsyncOperationState } from './../core';
+import { AsyncOperationState, isCompletedAsyncAction } from './../core';
 import errors from './../errors';
 import auth from './../auth';
 import home from './../home';
@@ -10,19 +10,24 @@ import room from './../room';
 
 const LISTEN_FOR_SERVER_EVENTS = 'LISTEN_FOR_SERVER_EVENTS';
 const EXECUTE_ROUTE_ACTIONS = 'EXECUTE_ROUTE_ACTIONS';
-const START_ROUTE_TRANSACTION = 'START_ROUTE_TRANSACTION';
+const BEGIN_ROUTE_TRANSACTION = 'BEGIN_ROUTE_TRANSACTION';
 const END_ROUTE_TRANSACTION = 'END_ROUTE_TRANSACTION';
+const COMMIT_ROUTE_TRANSACTION = 'COMMIT_ROUTE_TRANSACTION';
 
 export function listenForServerEvents() {
   return { type: LISTEN_FOR_SERVER_EVENTS };
 }
 
-export function startRouteTransaction() {
-  return { type: START_ROUTE_TRANSACTION };
+export function beginRouteTransaction() {
+  return { type: BEGIN_ROUTE_TRANSACTION };
 }
 
 export function endRouteTransaction() {
   return { type: END_ROUTE_TRANSACTION };
+}
+
+function commitRouteTransaction() {
+  return { type: COMMIT_ROUTE_TRANSACTION };
 }
 
 export function executeRouteActions(actions) {
@@ -47,12 +52,12 @@ export function isRouteLoadingAction(action) {
 
 function operationsReducer(state = INITIAL_OPERATIONS_STATE, action) {
   switch (action.type) {
-    case START_ROUTE_TRANSACTION:
+    case BEGIN_ROUTE_TRANSACTION:
       return {
         ...state,
         routePending: state.routePending + 1,
       };
-    case END_ROUTE_TRANSACTION:
+    case COMMIT_ROUTE_TRANSACTION:
       return {
         ...state,
         routePending: positiveOrZero(state.routePending - 1),
@@ -70,7 +75,6 @@ function operationsReducer(state = INITIAL_OPERATIONS_STATE, action) {
             totalPending: state.totalPending + 1,
           };
         case AsyncOperationState.Completed:
-        case AsyncOperationState.Failed:
           return {
             ...state,
             routePending: isRouteAction
@@ -122,9 +126,22 @@ function createEpic(container) {
       }));
   }
 
+  function endRouteTransactionEpic(action$, store) {
+    return action$
+      .ofType(END_ROUTE_TRANSACTION)
+      .mergeMap(() => action$.filter(isRouteLoadingAction))
+      .filter(isCompletedAsyncAction)
+      .filter(() => {
+        const state = store.getState();
+        return state.operations.routePending === 1;
+      })
+      .mapTo(commitRouteTransaction());
+  }
+
   return combineEpics(
     listenForServerEventsEpic,
     executeRouteActionsEpic,
+    endRouteTransactionEpic,
     errors.createEpic(container),
     auth.createEpic(container),
     home.createEpic(container),

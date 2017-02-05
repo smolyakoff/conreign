@@ -1,27 +1,30 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
+import block from 'bem-cn';
 
-import { H1, P } from './../theme';
+import { H1, P, Box, ThemeSize } from './../theme';
 import { selectErrorPageProps } from './errors';
+import './error-page.scss';
+
+const css = block('c-error-box');
 
 function ErrorPage({ error, statusCode, showStack }) {
   return (
-    <div className="u-absolute-center">
+    <div className={css.mix('u-absolute-center')()}>
       <div className="u-centered">
         <H1 className="u-color-error-dark">Error {statusCode}</H1>
-        <P>{error.message}</P>
+        <P className={css('message')()}>{error.message}</P>
       </div>
       {
         showStack ? (
-          <div className="u-letter-box--medium">
+          <Box themeSize={ThemeSize.Medium}>
             <code
               className="c-code c-code--multiline"
               style={{ fontSize: '0.8em' }}
             >
               {error.stack}
             </code>
-          </div>
-
+          </Box>
         ) : null
       }
     </div>

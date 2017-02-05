@@ -46,8 +46,8 @@ namespace Conreign.Core.Presence
             var isFirstConnection = member.ConnectionIds.Count == 1;
             if (isFirstConnection)
             {
-                var events = WithLeaderCheck(() => Join(userId));
-                await this.NotifyEverybody(events);
+                var events = WithLeaderCheck(() => Join(userId)).Cast<IEvent>().ToArray();
+                await this.NotifyEverybodyExcept(userId, events);
             }
         }
 
@@ -165,11 +165,6 @@ namespace Conreign.Core.Presence
             }
             var leaderChanged = new LeaderChanged {UserId = currentLeader};
             yield return leaderChanged;
-        }
-
-        private bool IsPersitent(IClientEvent @event)
-        {
-            throw new NotImplementedException();
         }
     }
 }

@@ -6,6 +6,7 @@ import 'rxjs/Rx';
 import 'react';
 import 'react-dom';
 import 'redux';
+import 'recompose';
 import 'reselect';
 import 'react-redux';
 import 'redux-observable';

@@ -59,11 +59,6 @@ namespace Conreign.Core.Gameplay
             await WriteStateAsync();
         }
 
-        public Task GenerateMap(Guid userId)
-        {
-            return _lobby.GenerateMap(userId);
-        }
-
         public async Task<IGame> StartGame(Guid userId)
         {
             var game = await _lobby.StartGame(userId);

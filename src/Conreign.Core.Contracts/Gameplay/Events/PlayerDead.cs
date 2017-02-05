@@ -7,13 +7,15 @@ namespace Conreign.Core.Contracts.Gameplay.Events
     [Serializable]
     [Immutable]
     [Persistent]
-    public class PlayerDead : IClientEvent
+    public class PlayerDead : IClientEvent, IRoomEvent
     {
-        public PlayerDead(Guid userId)
+        public PlayerDead(string roomId, Guid userId)
         {
+            RoomId = roomId;
             UserId = userId;
         }
 
         public Guid UserId { get; }
+        public string RoomId { get; }
     }
 }

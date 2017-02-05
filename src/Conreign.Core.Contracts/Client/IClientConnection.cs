@@ -8,7 +8,7 @@ namespace Conreign.Core.Contracts.Client
     {
         Guid Id { get; }
         IObservable<IClientEvent> Events { get; }
-        Task<LoginResult> Login();
+        Task<LoginResult> Login(string accessToken = null);
         Task<LoginResult> Authenticate(string accessToken);
     }
 }

@@ -7,10 +7,11 @@ namespace Conreign.Core.Contracts.Gameplay.Events
 {
     [Serializable]
     [Immutable]
-    public class AttackHappened : IClientEvent
+    public class AttackHappened : IClientEvent, IRoomEvent
     {
-        public AttackHappened(AttackOutcome outcome, string planetName, Guid attackerUserId, Guid? defenderUserId)
+        public AttackHappened(string roomId, AttackOutcome outcome, string planetName, Guid attackerUserId, Guid? defenderUserId)
         {
+            RoomId = roomId;
             Outcome = outcome;
             PlanetName = planetName;
             AttackerUserId = attackerUserId;
@@ -21,5 +22,6 @@ namespace Conreign.Core.Contracts.Gameplay.Events
         public string PlanetName { get; }
         public Guid AttackerUserId { get; }
         public Guid? DefenderUserId { get; }
+        public string RoomId { get; }
     }
 }

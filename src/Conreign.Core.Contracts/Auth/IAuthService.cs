@@ -6,6 +6,6 @@ namespace Conreign.Core.Contracts.Auth
     public interface IAuthService
     {
         Task<ClaimsIdentity> Authenticate(string accessToken);
-        Task<string> Login();
+        Task<string> Login(string accessToken = null);
     }
 }

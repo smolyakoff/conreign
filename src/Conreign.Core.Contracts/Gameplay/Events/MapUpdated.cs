@@ -7,13 +7,15 @@ namespace Conreign.Core.Contracts.Gameplay.Events
 {
     [Serializable]
     [Immutable]
-    public class MapUpdated : IClientEvent
+    public class MapUpdated : IClientEvent, IRoomEvent
     {
-        public MapUpdated(MapData map)
+        public MapUpdated(string roomId, MapData map)
         {
+            RoomId = roomId;
             Map = map;
         }
 
-        public MapData Map { get; set; }
+        public string RoomId { get; }
+        public MapData Map { get; }
     }
 }

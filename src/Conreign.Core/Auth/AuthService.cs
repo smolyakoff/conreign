@@ -33,7 +33,39 @@ namespace Conreign.Core.Auth
             {
                 throw new ArgumentException("Access token cannot be null or empty.", nameof(accessToken));
             }
+            ClaimsIdentity identity;
+            var exception = TryAuthenticate(accessToken, out identity);
+            if (exception != null)
+            {
+                throw exception;
+            }
+            return Task.FromResult(identity);
+        }
+
+        public Task<string> Login(string accessToken = null)
+        {
+            ClaimsIdentity identity;
+            Guid userId;
+            if (string.IsNullOrEmpty(accessToken) || TryAuthenticate(accessToken, out identity) != null)
+            {
+                userId = Guid.NewGuid();
+            }
+            else
+            {
+                var userIdString = identity.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var parsed = Guid.TryParse(userIdString, out userId);
+                userId = parsed ? userId : Guid.NewGuid();
+            }
+            var lifetime = TimeSpan.FromSeconds(_options.TokenLifetimeInSeconds);
+            var payload = JwtTokenPayload.Create(userId.ToString(), lifetime);
+            var token = JsonWebToken.Encode(payload, _options.JwtSecret, JwtHashAlgorithm.HS512);
+            return Task.FromResult(token);
+        }
+
+        private UserException TryAuthenticate(string accessToken, out ClaimsIdentity identity)
+        {
             JwtTokenPayload payload;
+            identity = null;
             try
             {
                 payload = JsonWebToken.DecodeToObject<JwtTokenPayload>(accessToken, _options.JwtSecret, false);
@@ -41,33 +73,24 @@ namespace Conreign.Core.Auth
             catch (Exception ex)
             {
                 _logger.Warning(ex, $"Failed to parse authentication token: {ex.Message}");
-                throw UserException.Create(AuthenticationError.BadToken, "Invalid authentication token.");
+                return UserException.Create(AuthenticationError.BadToken, "Invalid authentication token.");
             }
             if (payload.ExpiresAt < DateTime.UtcNow)
             {
-                throw UserException.Create(AuthenticationError.ExpiredToken, "Authentication token is expired.");
+                return UserException.Create(AuthenticationError.ExpiredToken, "Authentication token is expired.");
             }
             Guid userId;
             var parsed = Guid.TryParse(payload.Subject, out userId);
             if (!parsed)
             {
-                throw UserException.Create(AuthenticationError.BadToken, "Invalid subject.");
+                return UserException.Create(AuthenticationError.BadToken, "Invalid subject.");
             }
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, userId.ToString())
             };
-            var identity = new ClaimsIdentity(claims);
-            return Task.FromResult(identity);
-        }
-
-        public Task<string> Login()
-        {
-            var userId = Guid.NewGuid();
-            var lifetime = TimeSpan.FromSeconds(_options.TokenLifetimeInSeconds);
-            var payload = JwtTokenPayload.Create(userId.ToString(), lifetime);
-            var token = JsonWebToken.Encode(payload, _options.JwtSecret, JwtHashAlgorithm.HS512);
-            return Task.FromResult(token);
+            identity = new ClaimsIdentity(claims);
+            return null;
         }
     }
 }

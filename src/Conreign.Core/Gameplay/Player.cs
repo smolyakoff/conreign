@@ -113,7 +113,7 @@ namespace Conreign.Core.Gameplay
                 throw new ArgumentNullException(nameof(textMessage));
             }
             textMessage.EnsureIsValid<TextMessageData, TextMessageValidator>();
-            var @event = new ChatMessageReceived(_state.UserId, textMessage);
+            var @event = new ChatMessageReceived(_state.RoomId, _state.UserId, textMessage);
             return _state.Room.NotifyEverybody(@event);
         }
 

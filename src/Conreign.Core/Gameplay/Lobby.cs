@@ -82,8 +82,7 @@ namespace Conreign.Core.Gameplay
                     .ToDictionary(x => x.UserId,
                         x => _hub.IsOnline(x.UserId) ? PresenceStatus.Online : PresenceStatus.Offline),
                 Map = _state.MapEditor.Map,
-                LeaderUserId = _hub.LeaderUserId,
-                NeutralPlanetsCount = _state.MapEditor.NeutralPlanetsCount
+                LeaderUserId = _hub.LeaderUserId
             };
             return Task.FromResult<IRoomData>(state);
         }
@@ -93,18 +92,8 @@ namespace Conreign.Core.Gameplay
             EnsureUserIsOnline(userId);
             EnsureGameIsNotStarted();
 
-            var current = new GameOptionsData
-            {
-                MapWidth = _mapEditor.MapWidth,
-                MapHeight = _mapEditor.MapHeigth,
-                NeutralPlanetsCount = _mapEditor.NeutralPlanetsCount
-            };
-            if (current == options)
-            {
-                return;
-            }
             _mapEditor.Generate(options);
-            var mapUpdated = new MapUpdated(_state.MapEditor.Map);
+            var mapUpdated = new MapUpdated(_state.RoomId, _state.MapEditor.Map);
             await _hub.NotifyEverybody(mapUpdated);
         }
 
@@ -122,18 +111,8 @@ namespace Conreign.Core.Gameplay
             {
                 return;
             }
-            var playerUpdated = new PlayerUpdated(_playerListEditor[userId]);
+            var playerUpdated = new PlayerUpdated(_state.RoomId, _playerListEditor[userId]);
             await _hub.NotifyEverybody(playerUpdated);
-        }
-
-        public Task GenerateMap(Guid userId)
-        {
-            EnsureUserIsOnline(userId);
-            EnsureGameIsNotStarted();
-
-            _mapEditor.Generate();
-            var mapUpdated = new MapUpdated(_state.MapEditor.Map);
-            return _hub.NotifyEverybody(mapUpdated);
         }
 
         public async Task<IGame> StartGame(Guid userId)
@@ -154,7 +133,8 @@ namespace Conreign.Core.Gameplay
             if (!_playerListEditor.Contains(userId))
             {
                 var player = _playerListEditor.Add(userId);
-                var playerJoined = new PlayerJoined(player);
+
+                var playerJoined = new PlayerJoined(_state.RoomId, player);
                 if (_playerListEditor.Count == 1)
                 {
                     _mapEditor.Generate();
@@ -170,8 +150,8 @@ namespace Conreign.Core.Gameplay
                     _mapEditor.Generate(options);
                 }
                 _mapEditor.PlacePlanet(userId);
-                var mapUpdated = new MapUpdated(_state.MapEditor.Map);
-                await _hub.NotifyEverybody(playerJoined, mapUpdated);
+                var mapUpdated = new MapUpdated(_state.RoomId, _state.MapEditor.Map);
+                await _hub.NotifyEverybodyExcept(userId, playerJoined, mapUpdated);
             }
         }
 
@@ -203,7 +183,7 @@ namespace Conreign.Core.Gameplay
         {
             if (!_hub.IsOnline(userId))
             {
-                throw new InvalidOperationException($"User {userId} is not a online at {_state.RoomId}.");
+                throw new InvalidOperationException($"User {userId} is not online at {_state.RoomId}.");
             }
         }
 

@@ -7,13 +7,15 @@ namespace Conreign.Core.Contracts.Gameplay.Events
 {
     [Serializable]
     [Immutable]
-    public class PlayerUpdated : IClientEvent
+    public class PlayerUpdated : IClientEvent, IRoomEvent
     {
-        public PlayerUpdated(PlayerData player)
+        public PlayerUpdated(string roomId, PlayerData player)
         {
+            RoomId = roomId;
             Player = player;
         }
 
+        public string RoomId { get; }
         public PlayerData Player { get; }
     }
 }

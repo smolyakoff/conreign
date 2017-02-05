@@ -3,7 +3,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 
-namespace Conreign.Host.Storage
+namespace Conreign.Cluster.Storage
 {
     public class TypeSerializer : SerializerBase<Type>
     {

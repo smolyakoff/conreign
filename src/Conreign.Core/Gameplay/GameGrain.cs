@@ -109,7 +109,7 @@ namespace Conreign.Core.Gameplay
             }
             else
             {
-                await _game.NotifyEverybody(new GameTicked(_tick));
+                await _game.NotifyEverybody(new GameTicked(State.RoomId, _tick));
                 _tick++;
             }
         }

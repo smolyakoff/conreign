@@ -1,7 +1,6 @@
 ﻿using System;
 using Conreign.Core.Gameplay;
 using Conreign.Core.Presence;
-using Conreign.Host.Storage;
 using MongoDB.Bson.Serialization;
 
 namespace Conreign.Cluster.Storage
@@ -22,6 +21,8 @@ namespace Conreign.Cluster.Storage
 
             BsonClassMap.RegisterClassMap<ConnectionState>();
             BsonClassMap.RegisterClassMap<PlayerState>();
+            BsonClassMap.RegisterClassMap<LobbyState>();
+            BsonClassMap.RegisterClassMap<GameState>();
         }
     }
 }

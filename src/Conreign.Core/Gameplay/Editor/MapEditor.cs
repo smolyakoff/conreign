@@ -64,9 +64,18 @@ namespace Conreign.Core.Gameplay.Editor
             {
                 throw new ArgumentNullException(nameof(options));
             }
-            options.EnsureIsValid(new GameOptionsValidator(_state.NeutralPlanetsCount));
-            _state.NeutralPlanetsCount = options.NeutralPlanetsCount;
-            _map.Reset(options.MapWidth, options.MapHeight);
+            options.EnsureIsValid(new GameOptionsValidator(_state.Players.Count));
+            var currentOptions = new GameOptionsData
+            {
+                MapHeight = _state.Map.Height,
+                MapWidth = _state.Map.Width,
+                NeutralPlanetsCount = _state.NeutralPlanetsCount
+            };
+            if (currentOptions != options)
+            {
+                _state.NeutralPlanetsCount = options.NeutralPlanetsCount;
+                _map.Reset(options.MapWidth, options.MapHeight);
+            }
             Generate();
         }
 
@@ -80,6 +89,7 @@ namespace Conreign.Core.Gameplay.Editor
             {
                 throw new InvalidOperationException("No free cells on the map");
             }
+            _state.Players.Add(playerId);
             var freeCoordinate = Sequences
                 .NumbersRangeLong(0, _map.CellsCount)
                 .Where(x => !_map.ContainsPlanet(x))

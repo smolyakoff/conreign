@@ -1,36 +1,45 @@
 import Rx from 'rxjs';
-import { defaults, isObject, get } from 'lodash';
+import { defaults, isObject, get, isString } from 'lodash';
+
+function isNonEmptyString(x) {
+  return isString(x) && x.length > 0;
+}
 
 export const AsyncOperationState = {
   Pending: 'PENDING',
   Completed: 'COMPLETED',
-  Failed: 'FAILED',
 };
+
+function createPendingAsyncActionType(originalType) {
+  return `${originalType}_${AsyncOperationState.Pending}`;
+}
+
+function createCompletedAsyncActionType(originalType) {
+  return `${originalType}_${AsyncOperationState.Completed}`;
+}
 
 export function createPendingAction(action) {
   return Rx.Observable.of({
-    type: `${action.type}_${AsyncOperationState.Pending}`,
+    type: createPendingAsyncActionType(action.type),
     meta: {
       ...action.meta,
       $async: {
         originalType: action.type,
-        states: AsyncOperationState,
         state: AsyncOperationState.Pending,
       },
     },
   });
 }
 
-export function createCompletedAction(result, action) {
+export function createSucceededAction(result, action) {
   return Rx.Observable.of({
     ...result,
-    type: `${action.type}_${AsyncOperationState.Completed}`,
+    type: createCompletedAsyncActionType(action.type),
     meta: {
       ...action.meta,
       ...result.meta,
       $async: {
         causeType: action.type,
-        states: AsyncOperationState,
         state: AsyncOperationState.Completed,
       },
     },
@@ -39,15 +48,14 @@ export function createCompletedAction(result, action) {
 
 export function createFailedAction(err, action) {
   return Rx.Observable.of({
-    type: `${action.type}_${AsyncOperationState.Failed}`,
+    type: createCompletedAsyncActionType(action.type),
     payload: err,
     error: true,
     meta: {
       ...action.meta,
       $async: {
         causeType: action.type,
-        states: AsyncOperationState,
-        state: AsyncOperationState.Failed,
+        state: AsyncOperationState.Completed,
       },
     },
   });
@@ -55,9 +63,8 @@ export function createFailedAction(err, action) {
 
 export function createAsyncActionTypes(originalType) {
   return {
-    [AsyncOperationState.Pending]: `${originalType}_${AsyncOperationState.Pending}`,
-    [AsyncOperationState.Failed]: `${originalType}_${AsyncOperationState.Failed}`,
-    [AsyncOperationState.Completed]: `${originalType}_${AsyncOperationState.Completed}`,
+    [AsyncOperationState.Pending]: createPendingAsyncActionType(originalType),
+    [AsyncOperationState.Completed]: createCompletedAsyncActionType(originalType),
   };
 }
 
@@ -65,17 +72,32 @@ function toObservable(value) {
   return value instanceof Rx.Observable ? value : Rx.Observable.of(value);
 }
 
-export function isAsyncAction(action) {
-  return isObject(get(action, 'meta.$async'));
+export function isAsyncAction(action, originalType = null) {
+  return isObject(get(action, 'meta.$async')) &&
+    (!isNonEmptyString(originalType) ||
+      action.type === createPendingAsyncActionType(originalType) ||
+      action.type === createCompletedAsyncActionType(originalType)
+    );
 }
 
-export function isAsyncFailureAction(action) {
-  return isAsyncAction(action) && action.error;
+export function isCompletedAsyncAction(action, originalType = null) {
+  return isAsyncAction(action) &&
+    action.meta.$async.state === AsyncOperationState.Completed &&
+    (!isNonEmptyString(originalType) ||
+     action.type === createCompletedAsyncActionType(originalType));
+}
+
+export function isFailedAsyncAction(action, originalType = null) {
+  return isCompletedAsyncAction(action, originalType) && action.error;
+}
+
+export function isSucceededAsyncAction(action, originalType = null) {
+  return isCompletedAsyncAction(action, originalType) && !action.error;
 }
 
 export function asyncDispatcher(dispatch, globalOptions = {}) {
   globalOptions = defaults(globalOptions, {
-    createCompletedAction,
+    createSucceededAction,
     createFailedAction,
     createPendingAction,
   });
@@ -86,10 +108,10 @@ export function asyncDispatcher(dispatch, globalOptions = {}) {
       .concat(
         Rx.Observable.from(dispatch(action))
           .concatMap((result) => {
-            const completedAction = options.createCompletedAction(
+            const completedAction = options.createSucceededAction(
               result,
               action,
-              createCompletedAction,
+              createSucceededAction,
             );
             if (!completedAction) {
               return Rx.Observable.empty();

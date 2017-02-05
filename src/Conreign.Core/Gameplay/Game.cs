@@ -133,7 +133,7 @@ namespace Conreign.Core.Gameplay
 
             var state = _state.PlayerStates.GetOrCreateDefault(userId);
             state.TurnStatus = TurnStatus.Ended;
-            return _hub.NotifyEverybody(new TurnEnded(userId));
+            return _hub.NotifyEverybody(new TurnEnded(_state.RoomId, userId));
         }
 
         public Task Notify(ISet<Guid> userIds, params IEvent[] events)
@@ -183,7 +183,7 @@ namespace Conreign.Core.Gameplay
         {
             EnsureGameIsInProgress();
 
-            await NotifyEverybody(new TurnCalculationStarted(_state.Turn));
+            await NotifyEverybody(new TurnCalculationStarted(_state.RoomId, _state.Turn));
             CalculateResources();
             var activePlayers = _state.PlayerStates.Values
                 .Where(x => x.Statistics.DeathTurn == null)
@@ -201,6 +201,7 @@ namespace Conreign.Core.Gameplay
                 .Select(x =>
                 {
                     var turnCalculationEnded = new TurnCalculationEnded(
+                        roomId: _state.RoomId,
                         turn: _state.Turn,
                         map: _state.Map,
                         movingFleets: x.Value.MovingFleets);
@@ -223,7 +224,7 @@ namespace Conreign.Core.Gameplay
                 .Where(x => _state.PlayerStates[x.UserId].Statistics.DeathTurn == null)
                 .Select(x => x.UserId)
                 .Where(PlayerShouldDie)
-                .Select(x => new PlayerDead(x))
+                .Select(x => new PlayerDead(_state.RoomId, x))
                 .ToList();
             foreach (var @event in events)
             {
@@ -289,6 +290,7 @@ namespace Conreign.Core.Gameplay
             {
                 defenderPlanet.Ships += fleet.Ships;
                 var reinforcementsArrived = new ReinforcementsArrived(
+                    _state.RoomId,
                     planetName: attackerPlanet.Name,
                     ownerId: attackerPlanet.OwnerId.Value,
                     ships: fleet.Ships);
@@ -324,6 +326,7 @@ namespace Conreign.Core.Gameplay
             }
             var attackOutcome = battleOutcome.AttackerShips > 0 ? AttackOutcome.Win : AttackOutcome.Defeat;
             var attackEnded = new AttackHappened(
+                roomId: _state.RoomId,
                 attackerUserId: attackerPlanet.OwnerId.Value,
                 defenderUserId: defenderPlanet.OwnerId,
                 planetName: defenderPlanet.Name,

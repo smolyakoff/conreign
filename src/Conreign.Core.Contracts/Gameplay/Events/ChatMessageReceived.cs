@@ -8,15 +8,17 @@ namespace Conreign.Core.Contracts.Gameplay.Events
     [Serializable]
     [Immutable]
     [Persistent]
-    public class ChatMessageReceived : IClientEvent
+    public class ChatMessageReceived : IClientEvent, IRoomEvent
     {
-        public ChatMessageReceived(Guid senderId, TextMessageData message)
+        public ChatMessageReceived(string roomId, Guid senderId, TextMessageData message)
         {
             SenderId = senderId;
             Message = message;
+            RoomId = roomId;
         }
 
         public Guid SenderId { get; }
         public TextMessageData Message { get; }
+        public string RoomId { get; }
     }
 }

@@ -1,10 +1,10 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { findKey, parseInt, isNumber } from 'lodash';
+import { findKey, parseInt, isNumber, values } from 'lodash';
 
 import { Grid, GridCell, ThemeSize, GridMode, Box } from './../../theme';
 import { Map, PlanetCell, MAP_SELECTION_SHAPE } from '../map';
-import { setMapSelection } from './../room';
+import { submitGameSettings, changeGameSettings, GAME_SETTINGS_SHAPE } from './lobby';
 import PlanetCard from './../planet-card';
 import GameSettingsForm from './game-settings-form';
 import Widget from './../widget';
@@ -24,13 +24,16 @@ function adjustMapSelection(map, mapSelection, currentUser) {
 
 function LobbyPage({
   roomId,
+  gameSettings,
   map,
   players,
+  leaderUserId,
   viewDimensions,
   mapSelection,
   currentUser,
-  neutralPlanetsCount,
-  onMapSelectionChanged,
+  onMapSelectionChange,
+  onGameSettingsSubmit,
+  onGameSettingsChange,
 }) {
   const mapSize = Math.min(viewDimensions.width / 2, viewDimensions.height);
 
@@ -57,10 +60,14 @@ function LobbyPage({
     owner: players[selectedPlanet.ownerId],
   };
 
-  const defaultGameSettings = {
+  const isLeader = leaderUserId === currentUser.id;
+
+  gameSettings = gameSettings || {
     mapWidth: map.width,
     mapHeight: map.height,
-    neutralPlanetsCount,
+    neutralPlanetsCount: values(map.planets)
+      .filter(planet => !planet.ownerId)
+      .length,
   };
 
   return (
@@ -84,7 +91,7 @@ function LobbyPage({
               {...map}
               cellRenderer={LobbyCell}
               selection={chosenMapSelection}
-              onSelectionChanged={selection => onMapSelectionChanged({ selection, roomId })}
+              onSelectionChanged={selection => onMapSelectionChange({ selection, roomId })}
             />
           </Widget>
         </Box>
@@ -97,14 +104,20 @@ function LobbyPage({
           >
             <PlanetCard {...selectedPlanet} />
           </Widget>
-          <Widget
-            header="Game Settings"
-            className="u-higher"
-          >
-            <GameSettingsForm
-              defaultValues={defaultGameSettings}
-            />
-          </Widget>
+          {
+            isLeader && (
+              <Widget
+                header="Game Settings"
+                className="u-higher"
+              >
+                <GameSettingsForm
+                  values={gameSettings}
+                  onSubmit={settings => onGameSettingsSubmit({ settings, roomId })}
+                  onChange={settings => onGameSettingsChange({ settings, roomId })}
+                />
+              </Widget>
+            )
+          }
         </Box>
       </GridCell>
     </Grid>
@@ -131,18 +144,21 @@ LobbyPage.propTypes = {
     height: PropTypes.number.isRequired,
   }).isRequired,
   roomId: PropTypes.string.isRequired,
+  gameSettings: GAME_SETTINGS_SHAPE,
   map: PropTypes.shape({
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     planets: PropTypes.objectOf(PLANET_SHAPE).isRequired,
   }).isRequired,
-  neutralPlanetsCount: PropTypes.number.isRequired,
   mapSelection: MAP_SELECTION_SHAPE,
-  onMapSelectionChanged: PropTypes.func,
   players: PropTypes.objectOf(PLAYER_SHAPE).isRequired,
+  leaderUserId: PropTypes.string.isRequired,
   currentUser: PropTypes.shape({
     id: PropTypes.string.isRequired,
   }).isRequired,
+  onMapSelectionChange: PropTypes.func.isRequired,
+  onGameSettingsSubmit: PropTypes.func.isRequired,
+  onGameSettingsChange: PropTypes.func.isRequired,
 };
 
 LobbyPage.defaultProps = {
@@ -150,13 +166,13 @@ LobbyPage.defaultProps = {
     start: null,
     end: null,
   },
-  onMapSelectionChanged: null,
   gameSettings: null,
 };
 
 export default connect(
   null,
   {
-    onMapSelectionChanged: setMapSelection,
+    onGameSettingsSubmit: submitGameSettings,
+    onGameSettingsChange: changeGameSettings,
   },
 )(LobbyPage);

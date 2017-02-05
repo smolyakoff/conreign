@@ -16,9 +16,9 @@ namespace Conreign.Core.Auth
             return _authService.Authenticate(accessToken);
         }
 
-        public Task<string> Login()
+        public Task<string> Login(string accessToken = null)
         {
-            return _authService.Login();
+            return _authService.Login(accessToken);
         }
 
         public override Task OnActivateAsync()

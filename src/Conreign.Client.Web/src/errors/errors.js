@@ -1,7 +1,7 @@
 import serializeError from 'serialize-error';
 import { parseInt } from 'lodash';
 
-import { isAsyncFailureAction } from './../core';
+import { isFailedAsyncAction } from './../core';
 import { isRouteLoadingAction } from './../root';
 
 const INITIAL_STATE = {
@@ -9,7 +9,7 @@ const INITIAL_STATE = {
 };
 
 function isRouteFailureAction(action) {
-  return isAsyncFailureAction(action) && isRouteLoadingAction(action);
+  return isFailedAsyncAction(action) && isRouteLoadingAction(action);
 }
 
 function reducer(state = INITIAL_STATE, action) {

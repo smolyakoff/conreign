@@ -1,6 +1,6 @@
 import decodeJwt from 'jwt-decode';
 
-import { createAsyncActionTypes, AsyncOperationState } from './../core';
+import { createAsyncActionTypes, AsyncOperationState, isSucceededAsyncAction } from './../core';
 
 const LOGIN = 'LOGIN';
 export const {
@@ -15,9 +15,18 @@ function createEpic({ apiDispatcher, userStore }) {
   function loginEpic(action$) {
     return action$
       .ofType(LOGIN)
+      .map((action) => {
+        const user = userStore.get() || {};
+        return {
+          ...action,
+          payload: {
+            accessToken: user.accessToken,
+          },
+        };
+      })
       .mergeMap(apiDispatcher)
       .map((action) => {
-        if (action.type !== LOGIN_COMPLETED) {
+        if (!isSucceededAsyncAction(action, LOGIN)) {
           return action;
         }
         const { payload } = action;

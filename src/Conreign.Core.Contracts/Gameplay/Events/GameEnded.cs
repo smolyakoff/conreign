@@ -8,7 +8,7 @@ namespace Conreign.Core.Contracts.Gameplay.Events
 {
     [Serializable]
     [Immutable]
-    public class GameEnded : IClientEvent, IServerEvent
+    public class GameEnded : IClientEvent, IServerEvent, IRoomEvent
     {
         public GameEnded(string roomId, Dictionary<Guid, GameStatisticsData> statistics)
         {

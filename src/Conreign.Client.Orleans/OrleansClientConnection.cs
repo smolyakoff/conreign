@@ -31,11 +31,11 @@ namespace Conreign.Client.Orleans
 
         public IObservable<IClientEvent> Events => _subject;
 
-        public async Task<LoginResult> Login()
+        public async Task<LoginResult> Login(string accessToken = null)
         {
             EnsureIsNotDisposed();
             var auth = _factory.GetGrain<IAuthGrain>(default(long));
-            var token = await auth.Login();
+            var token = await auth.Login(accessToken);
             return await Authenticate(token);
         }
 
