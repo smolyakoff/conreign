@@ -12,5 +12,6 @@ export * from './card';
 export { default as Box, BoxType } from './box';
 export { default as Button } from './button';
 export { default as Spinner } from './spinner';
+export { default as Alert } from './alert';
 export { default as Progress } from './progress';
 export { default as PropertyTable } from './property-table';

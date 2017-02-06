@@ -4,6 +4,7 @@ import { snakeCase, get } from 'lodash';
 
 import { AsyncOperationState, isCompletedAsyncAction } from './../core';
 import errors from './../errors';
+import notifications from './../notifications';
 import auth from './../auth';
 import home from './../home';
 import room from './../room';
@@ -93,6 +94,7 @@ const reducer = combineReducers({
   operations: operationsReducer,
   [auth.reducer.$key]: auth.reducer,
   [errors.reducer.$key]: errors.reducer,
+  [notifications.reducer.$key]: notifications.reducer,
   [room.reducer.$key]: room.reducer,
 });
 

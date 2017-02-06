@@ -1,19 +1,21 @@
 import serializeError from 'serialize-error';
-import { parseInt } from 'lodash';
+import { parseInt, negate } from 'lodash';
+import { combineEpics } from 'redux-observable';
 
 import { isFailedAsyncAction } from './../core';
 import { isRouteLoadingAction } from './../root';
+import { showNotification } from './../notifications';
 
 const INITIAL_STATE = {
   routingError: null,
 };
 
-function isRouteFailureAction(action) {
+function isFailedRouteAsyncAction(action) {
   return isFailedAsyncAction(action) && isRouteLoadingAction(action);
 }
 
 function reducer(state = INITIAL_STATE, action) {
-  if (isRouteFailureAction(action)) {
+  if (isFailedRouteAsyncAction(action)) {
     return {
       ...state,
       routingError: serializeError(action.payload),
@@ -44,13 +46,28 @@ export function selectErrorPageProps(state, { params }) {
 function createEpic({ history }) {
   function redirectOnRouteErrorEpic(action$) {
     return action$
-      .filter(isRouteFailureAction)
-      .map(a => a.error)
+      .filter(isFailedRouteAsyncAction)
+      .map(action => action.payload)
       .map(mapErrorToStatusCode)
       .do(code => history.push(`${ERROR_PAGE_PREFIX}/${code}`))
       .ignoreElements();
   }
-  return redirectOnRouteErrorEpic;
+
+  function showErrorNotificationEpic(action$) {
+    return action$
+      .filter(action => action.error)
+      .filter(negate(isFailedRouteAsyncAction))
+      .map(action => action.payload)
+      .map(error => showNotification({
+        content: error,
+        rendererName: 'ErrorNotification',
+      }));
+  }
+
+  return combineEpics(
+    redirectOnRouteErrorEpic,
+    showErrorNotificationEpic,
+  );
 }
 
 export default {

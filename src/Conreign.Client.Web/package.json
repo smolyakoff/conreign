@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/smolyakoff/conreign#readme",
   "dependencies": {
+    "animatewithsass": "^3.2.1",
     "babel-polyfill": "^6.20.0",
     "bem-cn": "^2.1.3",
     "blaze": "^3.2.0",
@@ -39,6 +40,7 @@
     "ms-signalr-client": "^2.2.5",
     "normalize.css": "^5.0.0",
     "react": "^15.4.2",
+    "react-addons-css-transition-group": "^15.4.2",
     "react-dom": "^15.4.2",
     "react-measure": "^1.4.5",
     "react-redux": "^5.0.2",

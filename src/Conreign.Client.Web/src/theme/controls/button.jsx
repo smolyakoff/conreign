@@ -17,12 +17,14 @@ function Button({
   fullWidth,
   ghost,
   rounded,
+  close,
   ...others
 }) {
   const modifiers = {
     block: fullWidth,
     ghost,
     rounded,
+    close,
   };
   return (
     <button className={css(modifiers).mix(className)()} {...others}>
@@ -44,6 +46,7 @@ Button.propTypes = {
   fullWidth: PropTypes.bool,
   ghost: PropTypes.bool,
   rounded: PropTypes.bool,
+  close: PropTypes.bool,
 };
 
 Button.defaultProps = {
@@ -52,4 +55,5 @@ Button.defaultProps = {
   fullWidth: false,
   ghost: false,
   rounded: false,
+  close: false,
 };

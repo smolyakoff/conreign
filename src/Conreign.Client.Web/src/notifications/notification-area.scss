@@ -1,0 +1,10 @@
+@import "./../theme/mixins";
+
+.c-notification-area {
+  @include window-box--small();
+  position: fixed;
+  max-width: 50%;
+  z-index: 500;
+  right: 0;
+  bottom: 0;
+}

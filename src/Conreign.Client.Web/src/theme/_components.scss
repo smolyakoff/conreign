@@ -1,3 +1,4 @@
+@import "~blaze/scss/components.headings";
 @import "~blaze/scss/components.typography";
 @import "~blaze/scss/components.links";
 @import "~blaze/scss/components.navs";
@@ -5,6 +6,7 @@
 @import "~blaze/scss/components.inputs";
 @import "~blaze/scss/components.progress";
 @import "~blaze/scss/components.cards";
+@import "~blaze/scss/components.alerts";
 
 body {
   @extend .c-text;

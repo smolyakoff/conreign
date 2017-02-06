@@ -109,3 +109,30 @@ const headings = range(1, 6).map((i) => {
 export const H1 = headings[0];
 export const H2 = headings[1];
 export const H3 = headings[2];
+
+const codeBlock = block('c-code');
+
+function CodeBase({ className, children, multiLine }) {
+  const modifiers = {
+    multiline: multiLine,
+  };
+  return (
+    <code className={codeBlock(modifiers).mix(className)()}>
+      {children}
+    </code>
+  );
+}
+
+CodeBase.propTypes = {
+  className: PropTypes.string,
+  children: PropTypes.node,
+  multiLine: PropTypes.bool,
+};
+
+CodeBase.defaultProps = {
+  className: null,
+  children: null,
+  multiLine: false,
+};
+
+export const Code = decorate(withThemeSizes())(CodeBase);

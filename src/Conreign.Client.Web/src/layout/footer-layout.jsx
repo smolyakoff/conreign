@@ -5,18 +5,19 @@ import { PanelContainer, Panel } from './../theme';
 import PageLoadingIndicator from './page-loading-indicator';
 import Footer from './footer';
 import { selectLayoutProps } from './layout';
-import './root-layout.scss';
+import './footer-layout.scss';
 
-function RootLayout({ children, isPageLoading }) {
+function FooterLayout({ view, children, isPageLoading }) {
   const content = isPageLoading
     ? (
       <div className="u-absolute-center">
         <PageLoadingIndicator />
       </div>
     )
-    : children;
+    : view;
   return (
     <PanelContainer className="u-full-height">
+      {children}
       <Panel className="o-root-view">
         {content}
       </Panel>
@@ -25,13 +26,15 @@ function RootLayout({ children, isPageLoading }) {
   );
 }
 
-RootLayout.propTypes = {
+FooterLayout.propTypes = {
   children: PropTypes.node,
+  view: PropTypes.node,
   isPageLoading: PropTypes.bool,
 };
 
-RootLayout.defaultProps = {
+FooterLayout.defaultProps = {
   children: null,
+  view: null,
   isPageLoading: false,
 };
 
@@ -40,4 +43,4 @@ export default connect(
     ...ownProps,
     ...selectLayoutProps(state),
   }),
-)(RootLayout);
+)(FooterLayout);

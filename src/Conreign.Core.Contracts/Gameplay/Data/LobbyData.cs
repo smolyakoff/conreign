@@ -9,7 +9,6 @@ namespace Conreign.Core.Contracts.Gameplay.Data
     public class LobbyData : IRoomData
     {
         public string RoomId { get; set; }
-        public int NeutralPlanetsCount { get; set; } = Defaults.NeutralPlayersCount;
         public RoomMode Mode => RoomMode.Lobby;
         public List<MessageEnvelope> Events { get; set; } = new List<MessageEnvelope>();
         public List<PlayerData> Players { get; set; } = new List<PlayerData>();

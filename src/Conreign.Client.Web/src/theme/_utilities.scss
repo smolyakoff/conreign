@@ -3,10 +3,12 @@
 @import "~blaze/scss/utilities.sizes";
 @import "~blaze/scss/utilities.elevation";
 
-
-$sides: left right top bottom;
+@import "~animatewithsass/_sliding-entrances/sliding-entrances";
+@import "~animatewithsass/_sliding-exits/sliding-exits";
 
 // Margins and paddings
+$sides: left right top bottom;
+
 @each $side in $sides {
   @for $i from 1 through length($size-names) {
     .u-m#{str-slice($side, 0, 1)}-#{nth($size-names, $i)} {
@@ -27,6 +29,17 @@ $sides: left right top bottom;
   }
 }
 
+// Sizing
 .u-full-height {
   height: 100%;
+}
+
+// Animations
+.u-animation-slide-right {
+  &--enter {
+    @include slideInRight();
+  }
+  &--leave {
+    @include slideOutRight();
+  }
 }

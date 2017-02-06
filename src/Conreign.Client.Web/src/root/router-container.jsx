@@ -12,11 +12,31 @@ import {
   endRouteTransaction,
 } from './../root';
 import { login, AUTH_REDUCER_KEY } from './../auth';
-import { RootLayout, NavigationMenuLayout } from './../layout';
-import { ErrorPage, ERROR_PAGE_PATH } from './../errors';
+import { FooterLayout, NavigationMenuLayout } from './../layout';
+import { ErrorPage, ERROR_PAGE_PATH, ErrorNotification } from './../errors';
 import { HomePage } from './../home';
 import { RoomPage } from './../room';
+import { NotificationArea } from './../notifications';
 
+const NOTIFICATION_RENDERERS = {
+  ErrorNotification,
+};
+
+function AppLayout({ children }) {
+  return (
+    <FooterLayout view={children}>
+      <NotificationArea renderers={NOTIFICATION_RENDERERS} />
+    </FooterLayout>
+  );
+}
+
+AppLayout.propTypes = {
+  children: PropTypes.node,
+};
+
+AppLayout.defaultProps = {
+  children: null,
+};
 
 export default function RouterContainer({ store, history }) {
   function ensureIsAuthenticated() {
@@ -66,7 +86,7 @@ export default function RouterContainer({ store, history }) {
         <Router history={history}>
           <Route
             path="/"
-            component={RootLayout}
+            component={AppLayout}
             onChange={onRouteChange}
             onEnter={onRouteEnter}
           >

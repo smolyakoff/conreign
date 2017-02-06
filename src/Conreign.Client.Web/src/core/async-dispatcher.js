@@ -1,5 +1,6 @@
 import Rx from 'rxjs';
 import { defaults, isObject, get, isString } from 'lodash';
+import serializeError from 'serialize-error';
 
 function isNonEmptyString(x) {
   return isString(x) && x.length > 0;
@@ -49,7 +50,7 @@ export function createSucceededAction(result, action) {
 export function createFailedAction(err, action) {
   return Rx.Observable.of({
     type: createCompletedAsyncActionType(action.type),
-    payload: err,
+    payload: serializeError(err),
     error: true,
     meta: {
       ...action.meta,
@@ -88,11 +89,13 @@ export function isCompletedAsyncAction(action, originalType = null) {
 }
 
 export function isFailedAsyncAction(action, originalType = null) {
-  return isCompletedAsyncAction(action, originalType) && action.error;
+  return action.error &&
+    isCompletedAsyncAction(action, originalType);
 }
 
 export function isSucceededAsyncAction(action, originalType = null) {
-  return isCompletedAsyncAction(action, originalType) && !action.error;
+  return !action.error &&
+    isCompletedAsyncAction(action, originalType);
 }
 
 export function asyncDispatcher(dispatch, globalOptions = {}) {
