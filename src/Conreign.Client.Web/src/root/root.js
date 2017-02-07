@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 import { combineEpics } from 'redux-observable';
 import { snakeCase, get } from 'lodash';
+import serializeError from 'serialize-error';
 
 import { AsyncOperationState, isCompletedAsyncAction } from './../core';
 import errors from './../errors';
@@ -14,6 +15,7 @@ const EXECUTE_ROUTE_ACTIONS = 'EXECUTE_ROUTE_ACTIONS';
 const BEGIN_ROUTE_TRANSACTION = 'BEGIN_ROUTE_TRANSACTION';
 const END_ROUTE_TRANSACTION = 'END_ROUTE_TRANSACTION';
 const COMMIT_ROUTE_TRANSACTION = 'COMMIT_ROUTE_TRANSACTION';
+const REPORT_RENDERING_ERROR = 'REPORT_RENDERING_ERROR';
 
 export function listenForServerEvents() {
   return { type: LISTEN_FOR_SERVER_EVENTS };
@@ -25,6 +27,14 @@ export function beginRouteTransaction() {
 
 export function endRouteTransaction() {
   return { type: END_ROUTE_TRANSACTION };
+}
+
+export function reportRenderingError(error) {
+  return {
+    type: REPORT_RENDERING_ERROR,
+    payload: serializeError(error),
+    error: true,
+  };
 }
 
 function commitRouteTransaction() {

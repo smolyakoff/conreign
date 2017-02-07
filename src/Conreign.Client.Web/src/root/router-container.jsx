@@ -1,6 +1,5 @@
 /* eslint-disable react/forbid-prop-types */
 import React, { PropTypes } from 'react';
-import { Provider } from 'react-redux';
 import { Router, Route, IndexRoute } from 'react-router';
 import { isFunction, flatMap, isObject } from 'lodash';
 import Rx from 'rxjs';
@@ -38,7 +37,7 @@ AppLayout.defaultProps = {
   children: null,
 };
 
-export default function RouterContainer({ store, history }) {
+export default function RouterContainer({ history, store }) {
   function ensureIsAuthenticated() {
     const state = store.getState();
     if (state[AUTH_REDUCER_KEY].user) {
@@ -81,24 +80,22 @@ export default function RouterContainer({ store, history }) {
   }
 
   return (
-    <Provider store={store}>
-      <div className="u-full-height">
-        <Router history={history}>
-          <Route
-            path="/"
-            component={AppLayout}
-            onChange={onRouteChange}
-            onEnter={onRouteEnter}
-          >
-            <Route component={NavigationMenuLayout}>
-              <IndexRoute component={HomePage} />
-              <Route path="/:roomId" component={RoomPage} />
-            </Route>
-            <Route path={ERROR_PAGE_PATH} component={ErrorPage} />
+    <div className="u-full-height">
+      <Router history={history}>
+        <Route
+          path="/"
+          component={AppLayout}
+          onChange={onRouteChange}
+          onEnter={onRouteEnter}
+        >
+          <Route component={NavigationMenuLayout}>
+            <IndexRoute component={HomePage} />
+            <Route path="/:roomId" component={RoomPage} />
           </Route>
-        </Router>
-      </div>
-    </Provider>
+          <Route path={ERROR_PAGE_PATH} component={ErrorPage} />
+        </Route>
+      </Router>
+    </div>
   );
 }
 

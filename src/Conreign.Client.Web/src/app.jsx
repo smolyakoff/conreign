@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import { browserHistory } from 'react-router';
 
 import createContainer from './core';
-import { createStore, RouterContainer, listenForServerEvents } from './root';
+import { createStore, AppContainer, listenForServerEvents } from './root';
 
 if (COMPILATION_MODE === 'debug') {
   window.React = React;
@@ -32,7 +32,7 @@ function run() {
   });
   const store = createStore({ state, container });
   const props = {
-    RootComponent: RouterContainer,
+    RootComponent: AppContainer,
     store,
     history: browserHistory,
   };
@@ -48,7 +48,7 @@ if (TASK === 'run') {
   if (module.hot) {
     // eslint-disable-next-line
     function update() {
-      const UpdatedRoot = require('./root/router-container-hot').default;
+      const UpdatedRoot = require('./root/app-container-hot').default;
       render({
         ...rootProps,
         RootComponent: UpdatedRoot,
@@ -66,7 +66,7 @@ if (TASK === 'run') {
       originalConsoleError(message);
     };
 
-    module.hot.accept('./root/router-container-hot', update);
+    module.hot.accept('./root/app-container-hot', update);
     module.hot.accept('./root/index', update);
   }
 }
