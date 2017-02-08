@@ -1,20 +1,29 @@
 import decodeJwt from 'jwt-decode';
+import { combineEpics } from 'redux-observable';
 
-import { createAsyncActionTypes, AsyncOperationState, isSucceededAsyncAction } from './../core';
+import { createAsyncActionTypes, AsyncOperationState } from './../core';
 
 const LOGIN = 'LOGIN';
 export const {
-  [AsyncOperationState.Completed]: LOGIN_COMPLETED,
+  [AsyncOperationState.Succeeded]: LOGIN_SUCCEEDED,
 } = createAsyncActionTypes(LOGIN);
+const AUTH_REDUCER_KEY = 'auth';
 
-export function login() {
-  return { type: LOGIN };
+export function login(payload = { force: false }) {
+  return {
+    type: LOGIN,
+    payload,
+  };
 }
 
 function createEpic({ apiDispatcher, userStore }) {
-  function loginEpic(action$) {
+  function loginEpic(action$, store) {
     return action$
       .ofType(LOGIN)
+      .filter((action) => {
+        const auth = store.getState()[AUTH_REDUCER_KEY];
+        return action.payload.force || !auth.user;
+      })
       .map((action) => {
         const user = userStore.get() || {};
         return {
@@ -26,7 +35,7 @@ function createEpic({ apiDispatcher, userStore }) {
       })
       .mergeMap(apiDispatcher)
       .map((action) => {
-        if (!isSucceededAsyncAction(action, LOGIN)) {
+        if (action.type !== LOGIN_SUCCEEDED) {
           return action;
         }
         const { payload } = action;
@@ -35,14 +44,21 @@ function createEpic({ apiDispatcher, userStore }) {
           user,
           accessToken: payload.accessToken,
         };
-        userStore.set(userWithToken);
         return {
           ...action,
           payload: userWithToken,
         };
       });
   }
-  return loginEpic;
+
+  function persistUserEpic(action$) {
+    return action$
+      .ofType(LOGIN_SUCCEEDED)
+      .do(action => userStore.set(action.payload))
+      .ignoreElements();
+  }
+
+  return combineEpics(loginEpic, persistUserEpic);
 }
 
 const INITIAL_STATE = {
@@ -52,7 +68,7 @@ const INITIAL_STATE = {
 
 function reducer(state = INITIAL_STATE, action) {
   switch (action.type) {
-    case LOGIN_COMPLETED:
+    case LOGIN_SUCCEEDED:
       return {
         ...state,
         ...action.payload,
@@ -62,7 +78,6 @@ function reducer(state = INITIAL_STATE, action) {
   }
 }
 
-export const AUTH_REDUCER_KEY = 'auth';
 reducer.$key = AUTH_REDUCER_KEY;
 
 export default {

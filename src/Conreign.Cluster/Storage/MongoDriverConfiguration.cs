@@ -1,4 +1,5 @@
 ﻿using System;
+using Conreign.Core.Contracts.Gameplay.Data;
 using Conreign.Core.Gameplay;
 using Conreign.Core.Presence;
 using MongoDB.Bson.Serialization;
@@ -19,6 +20,7 @@ namespace Conreign.Cluster.Storage
             BsonSerializer.RegisterSerializer(typeof(Type), new TypeSerializer());
             BsonSerializer.RegisterSerializer(Type.GetType("System.RuntimeType"), new TypeSerializer());
 
+            BsonClassMap.RegisterClassMap<MapData>();
             BsonClassMap.RegisterClassMap<ConnectionState>();
             BsonClassMap.RegisterClassMap<PlayerState>();
             BsonClassMap.RegisterClassMap<LobbyState>();

@@ -11,7 +11,7 @@ const GET_ROOM_STATE = 'GET_ROOM_STATE';
 const SET_MAP_SELECTION = 'SET_MAP_SELECTION';
 const GET_ROOM_STATE_ACTIONS = createAsyncActionTypes('GET_ROOM_STATE');
 const {
-  [AsyncOperationState.Completed]: GET_ROOM_STATE_COMPLETED,
+  [AsyncOperationState.Succeeded]: GET_ROOM_STATE_COMPLETED,
 } = GET_ROOM_STATE_ACTIONS;
 
 export function getRoomState(payload) {

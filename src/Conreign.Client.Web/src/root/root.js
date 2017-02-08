@@ -1,9 +1,10 @@
 import { combineReducers } from 'redux';
 import { combineEpics } from 'redux-observable';
-import { snakeCase, get } from 'lodash';
+import { snakeCase, get, isArray } from 'lodash';
 import serializeError from 'serialize-error';
+import Rx from 'rxjs';
 
-import { AsyncOperationState, isCompletedAsyncAction } from './../core';
+import { AsyncOperationState } from './../core';
 import errors from './../errors';
 import notifications from './../notifications';
 import auth from './../auth';
@@ -14,18 +15,20 @@ const LISTEN_FOR_SERVER_EVENTS = 'LISTEN_FOR_SERVER_EVENTS';
 const EXECUTE_ROUTE_ACTIONS = 'EXECUTE_ROUTE_ACTIONS';
 const BEGIN_ROUTE_TRANSACTION = 'BEGIN_ROUTE_TRANSACTION';
 const END_ROUTE_TRANSACTION = 'END_ROUTE_TRANSACTION';
-const COMMIT_ROUTE_TRANSACTION = 'COMMIT_ROUTE_TRANSACTION';
 const REPORT_RENDERING_ERROR = 'REPORT_RENDERING_ERROR';
 
 export function listenForServerEvents() {
   return { type: LISTEN_FOR_SERVER_EVENTS };
 }
 
-export function beginRouteTransaction() {
-  return { type: BEGIN_ROUTE_TRANSACTION };
+export function beginRouteTransaction(payload) {
+  return {
+    type: BEGIN_ROUTE_TRANSACTION,
+    payload,
+  };
 }
 
-export function endRouteTransaction() {
+function endRouteTransaction() {
   return { type: END_ROUTE_TRANSACTION };
 }
 
@@ -35,10 +38,6 @@ export function reportRenderingError(error) {
     payload: serializeError(error),
     error: true,
   };
-}
-
-function commitRouteTransaction() {
-  return { type: COMMIT_ROUTE_TRANSACTION };
 }
 
 export function executeRouteActions(actions) {
@@ -68,7 +67,7 @@ function operationsReducer(state = INITIAL_OPERATIONS_STATE, action) {
         ...state,
         routePending: state.routePending + 1,
       };
-    case COMMIT_ROUTE_TRANSACTION:
+    case END_ROUTE_TRANSACTION:
       return {
         ...state,
         routePending: positiveOrZero(state.routePending - 1),
@@ -85,7 +84,8 @@ function operationsReducer(state = INITIAL_OPERATIONS_STATE, action) {
               : state.routePending,
             totalPending: state.totalPending + 1,
           };
-        case AsyncOperationState.Completed:
+        case AsyncOperationState.Failed:
+        case AsyncOperationState.Succeeded:
           return {
             ...state,
             routePending: isRouteAction
@@ -125,35 +125,52 @@ function createEpic(container) {
       }));
   }
 
-  function executeRouteActionsEpic(action$) {
-    return action$
-      .ofType(EXECUTE_ROUTE_ACTIONS)
-      .flatMap(({ payload }) => payload)
-      .map(action => ({
-        ...action,
-        meta: {
-          ...action.meta,
-          $route: true,
-        },
-      }));
+  function mapToRouteAction(action) {
+    return {
+      ...action,
+      meta: {
+        ...action.meta,
+        $route: true,
+      },
+    };
   }
 
-  function endRouteTransactionEpic(action$, store) {
-    return action$
-      .ofType(END_ROUTE_TRANSACTION)
-      .mergeMap(() => action$.filter(isRouteLoadingAction))
-      .filter(isCompletedAsyncAction)
-      .filter(() => {
-        const state = store.getState();
-        return state.operations.routePending === 1;
-      })
-      .mapTo(commitRouteTransaction());
+  function isRouteTransactionInProgress(store) {
+    const state = store.getState();
+    return state.operations.routePending > 1;
   }
+
+  function routeTransactionEpic(action$, store) {
+    return action$
+      .ofType(BEGIN_ROUTE_TRANSACTION)
+      .mergeMap((action) => {
+        const actions = action.payload;
+        return Rx.Observable.from(actions)
+          .concatMap((actionOrActions) => {
+            const stageActions = isArray(actionOrActions)
+              ? actionOrActions
+              : [actionOrActions];
+            if (stageActions.length === 0) {
+              return Rx.Observable.empty();
+            }
+            return Rx.Observable.from(stageActions)
+              .map(mapToRouteAction)
+              .concat(
+                action$
+                  .startWith(null)
+                  .takeWhile(() => isRouteTransactionInProgress(store))
+                  .ignoreElements(),
+              );
+          })
+          .catch(e => Rx.Observable.of(endRouteTransaction()).throw(e))
+          .concat([endRouteTransaction()]);
+      });
+  }
+
 
   return combineEpics(
     listenForServerEventsEpic,
-    executeRouteActionsEpic,
-    endRouteTransactionEpic,
+    routeTransactionEpic,
     errors.createEpic(container),
     auth.createEpic(container),
     home.createEpic(container),

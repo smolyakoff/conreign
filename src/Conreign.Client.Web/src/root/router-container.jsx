@@ -2,15 +2,12 @@
 import React, { PropTypes } from 'react';
 import { Router, Route, IndexRoute } from 'react-router';
 import { isFunction, flatMap, isObject } from 'lodash';
-import Rx from 'rxjs';
 
 import './../theme';
 import {
-  executeRouteActions,
   beginRouteTransaction,
-  endRouteTransaction,
 } from './../root';
-import { login, AUTH_REDUCER_KEY } from './../auth';
+import { login } from './../auth';
 import { FooterLayout, NavigationMenuLayout } from './../layout';
 import { ErrorPage, ERROR_PAGE_PATH, ErrorNotification } from './../errors';
 import { HomePage } from './../home';
@@ -37,17 +34,7 @@ AppLayout.defaultProps = {
   children: null,
 };
 
-export default function RouterContainer({ history, store }) {
-  function ensureIsAuthenticated() {
-    const state = store.getState();
-    if (state[AUTH_REDUCER_KEY].user) {
-      return Rx.Observable.of(state[AUTH_REDUCER_KEY].user);
-    }
-    store.dispatch(executeRouteActions([login()]));
-    return Rx.Observable.from(store)
-      .first(currentState => isObject(currentState[AUTH_REDUCER_KEY].user));
-  }
-
+export default function RouterContainer({ history }, { store }) {
   function collectRouteActions(nextState) {
     const storeState = store.getState();
     const components = nextState.routes.map(route => route.component);
@@ -59,24 +46,22 @@ export default function RouterContainer({ history, store }) {
     return actions;
   }
 
-  function dispatchRouteActions(nextState) {
+  function dispatchRouteTransaction(nextState, authRequired) {
     const actions = collectRouteActions(nextState);
-    if (actions.length === 0) {
-      return;
+    const stages = [];
+    if (authRequired) {
+      stages.push(login());
     }
-    store.dispatch(executeRouteActions(actions));
+    stages.push(actions);
+    store.dispatch(beginRouteTransaction(stages));
   }
 
   function onRouteChange(prevState, nextState) {
-    dispatchRouteActions(nextState);
+    dispatchRouteTransaction(nextState, false);
   }
 
   function onRouteEnter(nextState) {
-    store.dispatch(beginRouteTransaction());
-    ensureIsAuthenticated()
-      .do(() => dispatchRouteActions(nextState))
-      .finally(() => store.dispatch(endRouteTransaction()))
-      .subscribe();
+    dispatchRouteTransaction(nextState, true);
   }
 
   return (
@@ -85,10 +70,12 @@ export default function RouterContainer({ history, store }) {
         <Route
           path="/"
           component={AppLayout}
-          onChange={onRouteChange}
-          onEnter={onRouteEnter}
         >
-          <Route component={NavigationMenuLayout}>
+          <Route
+            component={NavigationMenuLayout}
+            onChange={onRouteChange}
+            onEnter={onRouteEnter}
+          >
             <IndexRoute component={HomePage} />
             <Route path="/:roomId" component={RoomPage} />
           </Route>
@@ -101,5 +88,9 @@ export default function RouterContainer({ history, store }) {
 
 RouterContainer.propTypes = {
   history: PropTypes.object.isRequired,
+
+};
+
+RouterContainer.contextTypes = {
   store: PropTypes.object.isRequired,
 };

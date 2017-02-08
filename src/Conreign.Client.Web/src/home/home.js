@@ -1,3 +1,5 @@
+import { isSucceededAsyncAction } from './../core';
+
 const JOIN_ROOM = 'JOIN_ROOM';
 
 export function joinRoom(payload) {
@@ -7,15 +9,16 @@ export function joinRoom(payload) {
   };
 }
 
-function createEpic({ apiClient, history }) {
+function createEpic({ apiDispatcher, history }) {
   function joinRoomEpic(action$) {
     return action$.ofType(JOIN_ROOM)
-      .mergeMap(action =>
-        apiClient
-          .send(action)
-          .do(() => history.push(`/${action.payload.roomId}`))
-          .ignoreElements(),
-      );
+      .mergeMap(action => apiDispatcher(action)
+        .do((result) => {
+          if (!isSucceededAsyncAction(result, JOIN_ROOM)) {
+            return;
+          }
+          history.push(`/${action.payload.roomId}`);
+        }));
   }
   return joinRoomEpic;
 }

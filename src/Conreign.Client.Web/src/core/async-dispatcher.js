@@ -1,5 +1,5 @@
 import Rx from 'rxjs';
-import { defaults, isObject, get, isString } from 'lodash';
+import { defaults, isObject, get, isString, uniqueId, invert } from 'lodash';
 import serializeError from 'serialize-error';
 
 function isNonEmptyString(x) {
@@ -8,23 +8,33 @@ function isNonEmptyString(x) {
 
 export const AsyncOperationState = {
   Pending: 'PENDING',
-  Completed: 'COMPLETED',
+  Succeeded: 'SUCCEEDED',
+  Failed: 'FAILED',
 };
+
+function generateCorrelationId() {
+  return uniqueId('async-op-');
+}
 
 function createPendingAsyncActionType(originalType) {
   return `${originalType}_${AsyncOperationState.Pending}`;
 }
 
-function createCompletedAsyncActionType(originalType) {
-  return `${originalType}_${AsyncOperationState.Completed}`;
+function createSucceededAsyncActionType(originalType) {
+  return `${originalType}_${AsyncOperationState.Succeeded}`;
 }
 
-export function createPendingAction(action) {
+function createFailedAsyncActionType(originalType) {
+  return `${originalType}_${AsyncOperationState.Failed}`;
+}
+
+export function createPendingAction(action, correlationId) {
   return Rx.Observable.of({
     type: createPendingAsyncActionType(action.type),
     meta: {
       ...action.meta,
       $async: {
+        correlationId,
         originalType: action.type,
         state: AsyncOperationState.Pending,
       },
@@ -32,31 +42,33 @@ export function createPendingAction(action) {
   });
 }
 
-export function createSucceededAction(result, action) {
+export function createSucceededAction(result, originalAction, correlationId) {
   return Rx.Observable.of({
     ...result,
-    type: createCompletedAsyncActionType(action.type),
+    type: createSucceededAsyncActionType(originalAction.type),
     meta: {
-      ...action.meta,
+      ...originalAction.meta,
       ...result.meta,
       $async: {
-        causeType: action.type,
-        state: AsyncOperationState.Completed,
+        correlationId,
+        causeType: originalAction.type,
+        state: AsyncOperationState.Succeeded,
       },
     },
   });
 }
 
-export function createFailedAction(err, action) {
+export function createFailedAction(error, originalAction, correlationId) {
   return Rx.Observable.of({
-    type: createCompletedAsyncActionType(action.type),
-    payload: serializeError(err),
+    type: createFailedAsyncActionType(originalAction.type),
+    payload: serializeError(error),
     error: true,
     meta: {
-      ...action.meta,
+      ...originalAction.meta,
       $async: {
-        causeType: action.type,
-        state: AsyncOperationState.Completed,
+        correlationId,
+        causeType: originalAction.type,
+        state: AsyncOperationState.Succeeded,
       },
     },
   });
@@ -65,7 +77,8 @@ export function createFailedAction(err, action) {
 export function createAsyncActionTypes(originalType) {
   return {
     [AsyncOperationState.Pending]: createPendingAsyncActionType(originalType),
-    [AsyncOperationState.Completed]: createCompletedAsyncActionType(originalType),
+    [AsyncOperationState.Succeeded]: createSucceededAsyncActionType(originalType),
+    [AsyncOperationState.Failed]: createFailedAsyncActionType(originalType),
   };
 }
 
@@ -74,18 +87,22 @@ function toObservable(value) {
 }
 
 export function isAsyncAction(action, originalType = null) {
-  return isObject(get(action, 'meta.$async')) &&
-    (!isNonEmptyString(originalType) ||
-      action.type === createPendingAsyncActionType(originalType) ||
-      action.type === createCompletedAsyncActionType(originalType)
-    );
+  if (!isObject(get(action, 'meta.$async'))) {
+    return false;
+  }
+  if (isNonEmptyString(originalType)) {
+    const derivedTypes = invert(createAsyncActionTypes(originalType));
+    return isNonEmptyString(derivedTypes[action.type]);
+  }
+  return true;
 }
 
 export function isCompletedAsyncAction(action, originalType = null) {
-  return isAsyncAction(action) &&
-    action.meta.$async.state === AsyncOperationState.Completed &&
-    (!isNonEmptyString(originalType) ||
-     action.type === createCompletedAsyncActionType(originalType));
+  if (!isAsyncAction(action, originalType)) {
+    return false;
+  }
+  const state = action.meta.$async.state;
+  return state !== AsyncOperationState.Pending;
 }
 
 export function isFailedAsyncAction(action, originalType = null) {
@@ -106,7 +123,8 @@ export function asyncDispatcher(dispatch, globalOptions = {}) {
   });
   function dispatchWithStates(action, options = {}) {
     options = defaults(options, globalOptions);
-    const pendingAction = toObservable(options.createPendingAction(action));
+    const correlationId = generateCorrelationId();
+    const pendingAction = toObservable(options.createPendingAction(action, correlationId));
     return pendingAction
       .concat(
         Rx.Observable.from(dispatch(action))
@@ -114,6 +132,7 @@ export function asyncDispatcher(dispatch, globalOptions = {}) {
             const completedAction = options.createSucceededAction(
               result,
               action,
+              correlationId,
               createSucceededAction,
             );
             if (!completedAction) {
@@ -125,6 +144,7 @@ export function asyncDispatcher(dispatch, globalOptions = {}) {
             const failedAction = options.createFailedAction(
               err,
               action,
+              correlationId,
               createFailedAction,
             );
             if (!failedAction) {
