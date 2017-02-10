@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net;
-using System.Security.Policy;
 using Conreign.Api;
 using Conreign.Api.Configuration;
 using Conreign.Cluster;
@@ -13,8 +12,8 @@ namespace Conreign.Host.Development
 {
     internal class Program
     {
-        private static SiloHost _silo;
         private const string SiloAppDomainName = "OrleansSilo";
+        private static SiloHost _silo;
 
         public static void Main(string[] args)
         {
@@ -24,7 +23,6 @@ namespace Conreign.Host.Development
                 Console.WriteLine("Press any key to exit...");
                 Console.ReadLine();
             }
-
         }
 
         private static IDisposable RunApi()
@@ -43,8 +41,8 @@ namespace Conreign.Host.Development
         private static IDisposable RunSilo()
         {
             var domain = AppDomain.CreateDomain(SiloAppDomainName,
-    null,
-    new AppDomainSetup { AppDomainInitializer = InitializeSilo });
+                null,
+                new AppDomainSetup {AppDomainInitializer = InitializeSilo});
             Console.WriteLine("Orleans silo is running.");
             return new Disposable(() => domain.DoCallBack(ShutdownSilo));
         }
@@ -74,7 +72,5 @@ namespace Conreign.Host.Development
             GC.SuppressFinalize(_silo);
             _silo = null;
         }
-
-
     }
 }

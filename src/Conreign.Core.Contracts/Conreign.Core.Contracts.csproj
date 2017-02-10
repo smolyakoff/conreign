@@ -68,6 +68,7 @@
     <Compile Include="Communication\EventExtensions.cs" />
     <Compile Include="Communication\PersistentAttribute.cs" />
     <Compile Include="Gameplay\Events\IRoomEvent.cs" />
+    <Compile Include="Presence\Events\IPresenceEvent.cs" />
     <Compile Include="Validation\ValidationErrorDetails.cs" />
     <Compile Include="Validation\ValidationFailure.cs" />
     <Compile Include="Communication\Events\Connected.cs" />

@@ -164,7 +164,7 @@ namespace Conreign.Core.Gameplay
         {
             _state.IsGameStarted = false;
             _state.MapEditor = new MapEditorState();
-            _state.Hub = new HubState();
+            _state.Hub = new HubState { Id = _state.RoomId };
             _state.Players = new List<PlayerData>();
             Initialize();
         }

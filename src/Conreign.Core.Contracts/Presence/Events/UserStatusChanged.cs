@@ -1,12 +1,22 @@
 ﻿using System;
 using Conreign.Core.Contracts.Communication;
+using Orleans.Concurrency;
 
 namespace Conreign.Core.Contracts.Presence.Events
 {
     [Serializable]
-    public class UserStatusChanged : IClientEvent
+    [Immutable]
+    public class UserStatusChanged : IClientEvent, IPresenceEvent
     {
-        public PresenceStatus Status { get; set; }
-        public Guid UserId { get; set; }
+        public UserStatusChanged(string hubId, Guid userId, PresenceStatus status)
+        {
+            HubId = hubId;
+            UserId = userId;
+            Status = status;
+        }
+
+        public PresenceStatus Status { get;  }
+        public Guid UserId { get;  }
+        public string HubId { get; }
     }
 }

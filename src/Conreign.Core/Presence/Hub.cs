@@ -35,20 +35,21 @@ namespace Conreign.Core.Presence
                 return _state.Members
                     .Select(x => x.Key)
                     .OrderBy(x => _state.JoinOrder.IndexOf(x))
+                    .Where(IsOnline)
                     .FirstOrDefault();
             }
         }
 
         public async Task Connect(Guid userId, Guid connectionId)
         {
-            var member = _state.Members.GetOrCreateDefault(userId);
-            member.ConnectionIds.Add(connectionId);
-            var isFirstConnection = member.ConnectionIds.Count == 1;
-            if (isFirstConnection)
+            var events = WithLeaderCheck(() =>
             {
-                var events = WithLeaderCheck(() => Join(userId)).Cast<IEvent>().ToArray();
-                await this.NotifyEverybodyExcept(userId, events);
-            }
+                var member = _state.Members.GetOrCreateDefault(userId);
+                member.ConnectionIds.Add(connectionId);
+                var isFirstConnection = member.ConnectionIds.Count == 1;
+                return isFirstConnection ? Join(userId) : Enumerable.Empty<IClientEvent>();
+            });
+            await this.NotifyEverybodyExcept(userId, events.Cast<IEvent>().ToArray());
         }
 
         public async Task Disconnect(Guid userId, Guid connectionId)
@@ -57,13 +58,14 @@ namespace Conreign.Core.Presence
             {
                 return;
             }
-            var member = _state.Members.GetOrCreateDefault(userId);
-            member.ConnectionIds.Remove(connectionId);
-            if (member.ConnectionIds.Count == 0)
+            var events = WithLeaderCheck(() =>
             {
-                var events = WithLeaderCheck(() => Leave(userId));
-                await this.NotifyEverybody(events);
-            }
+                var member = _state.Members.GetOrCreateDefault(userId);
+                member.ConnectionIds.Remove(connectionId);
+                var noConnections = member.ConnectionIds.Count == 0;
+                return noConnections ? Leave(userId) : Enumerable.Empty<IClientEvent>();
+            });
+            await this.NotifyEverybody(events);
         }
 
         public async Task Notify(ISet<Guid> userIds, params IEvent[] events)
@@ -75,6 +77,10 @@ namespace Conreign.Core.Presence
             if (events == null)
             {
                 throw new ArgumentNullException(nameof(events));
+            }
+            if (events.Length == 0)
+            {
+                return;
             }
             var targetUserIds = _state.Members
                 .Select(x => x.Key)
@@ -98,6 +104,10 @@ namespace Conreign.Core.Presence
 
         public async Task NotifyEverybody(params IEvent[] events)
         {
+            if (events.Length == 0)
+            {
+                return;
+            }
             var ids = _state.Members.Select(x => x.Key).ToHashSet();
             var serverEvents = events.OfType<IServerEvent>().ToArray();
             if (serverEvents.Length > 0)
@@ -109,6 +119,10 @@ namespace Conreign.Core.Presence
 
         public Task NotifyEverybodyExcept(ISet<Guid> userIds, params IEvent[] events)
         {
+            if (events.Length == 0)
+            {
+                return TaskCompleted.Completed;
+            }
             var ids = _state.Members.Select(x => x.Key).ToHashSet();
             ids.ExceptWith(userIds);
             return Notify(ids, events);
@@ -133,22 +147,22 @@ namespace Conreign.Core.Presence
             {
                 _state.JoinOrder.Add(userId);
             }
-            var statusChanged = new UserStatusChanged
-            {
-                Status = PresenceStatus.Online,
-                UserId = userId
-            };
+            var statusChanged = new UserStatusChanged(
+                hubId: _state.Id,
+                userId: userId,
+                status: PresenceStatus.Online
+            );
             yield return statusChanged;
         }
 
-        private static IEnumerable<IClientEvent> Leave(Guid userId)
+        private IEnumerable<IClientEvent> Leave(Guid userId)
         {
-            var @event = new UserStatusChanged
-            {
-                Status = PresenceStatus.Offline,
-                UserId = userId
-            };
-            yield return @event;
+            var statusChanged = new UserStatusChanged(
+                hubId: _state.Id,
+                userId: userId,
+                status: PresenceStatus.Offline
+            );
+            yield return statusChanged;
         }
 
         private IEnumerable<IClientEvent> WithLeaderCheck(Func<IEnumerable<IClientEvent>> func)
@@ -163,7 +177,7 @@ namespace Conreign.Core.Presence
             {
                 yield break;
             }
-            var leaderChanged = new LeaderChanged {UserId = currentLeader};
+            var leaderChanged = new LeaderChanged(_state.Id, currentLeader);
             yield return leaderChanged;
         }
     }

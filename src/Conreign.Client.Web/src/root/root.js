@@ -145,6 +145,9 @@ function createEpic(container) {
       .ofType(BEGIN_ROUTE_TRANSACTION)
       .mergeMap((action) => {
         const actions = action.payload;
+        if (actions.length === 0) {
+          return Rx.Observable.of(endRouteTransaction());
+        }
         return Rx.Observable.from(actions)
           .concatMap((actionOrActions) => {
             const stageActions = isArray(actionOrActions)

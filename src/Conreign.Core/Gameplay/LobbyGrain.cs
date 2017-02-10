@@ -104,6 +104,7 @@ namespace Conreign.Core.Gameplay
         private void InitializeState()
         {
             State.RoomId = this.GetPrimaryKeyString();
+            State.Hub.Id = State.RoomId;
         }
     }
 }

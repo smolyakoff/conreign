@@ -166,6 +166,7 @@ namespace Conreign.Core.Gameplay
             _state.Map = data.Map;
             _state.Hub = new HubState
             {
+                Id = _state.RoomId,
                 Members = data.HubMembers
                     .ToDictionary(x => x.Key, x => new HubMemberState {ConnectionIds = x.Value}),
                 JoinOrder = data.HubJoinOrder

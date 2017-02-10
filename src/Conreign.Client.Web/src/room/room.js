@@ -1,12 +1,15 @@
-import { keyBy, findKey, isNumber } from 'lodash';
+import { omit, findKey, isNumber } from 'lodash';
+import fp from 'lodash/fp';
 import { combineEpics } from 'redux-observable';
 
-import { AsyncOperationState, createAsyncActionTypes } from './../core';
+import { AsyncOperationState, createAsyncActionTypes, PresenceStatus } from './../core';
 import { composeReducers } from './../util';
 import lobby from './lobby';
 
 const HANDLE_MAP_UPDATED = 'HANDLE_MAP_UPDATED';
 const HANDLE_PLAYER_JOINED = 'HANDLE_PLAYER_JOINED';
+const HANDLE_USER_STATUS_CHANGED = 'HANDLE_USER_STATUS_CHANGED';
+const HANDLE_LEADER_CHANGED = 'HANDLE_LEADER_CHANGED';
 const GET_ROOM_STATE = 'GET_ROOM_STATE';
 const SET_MAP_SELECTION = 'SET_MAP_SELECTION';
 const GET_ROOM_STATE_ACTIONS = createAsyncActionTypes('GET_ROOM_STATE');
@@ -43,9 +46,15 @@ function createEpic(container) {
 }
 
 function mapRoomDtoToRoomState(room) {
-  const players = keyBy(room.players, p => p.userId);
+  const players = fp.flow(
+      fp.keyBy(p => p.userId),
+      fp.mapValues(p => ({
+        ...p,
+        status: room.playerStatuses[p.userId],
+      })),
+    )(room.players);
   return {
-    ...room,
+    ...omit(room, 'playerStatuses'),
     players,
   };
 }
@@ -122,14 +131,47 @@ function roomReducer(state = {}, action) {
     }
     case HANDLE_PLAYER_JOINED: {
       const room = state[action.payload.roomId];
+      const player = action.payload.player;
       return {
         ...state,
         [action.payload.roomId]: {
           ...room,
           players: {
             ...room.players,
-            [action.payload.player.userId]: action.payload.player,
+            [player.userId]: {
+              ...player,
+              status: PresenceStatus.Online,
+            },
           },
+        },
+      };
+    }
+    case HANDLE_USER_STATUS_CHANGED: {
+      const event = action.payload;
+      const room = state[event.hubId];
+      const player = room.players[event.userId];
+      return {
+        ...state,
+        [event.hubId]: {
+          ...room,
+          players: {
+            ...room.players,
+            [player.userId]: {
+              ...player,
+              status: event.status,
+            },
+          },
+        },
+      };
+    }
+    case HANDLE_LEADER_CHANGED: {
+      const event = action.payload;
+      const room = state[event.hubId];
+      return {
+        ...state,
+        [event.hubId]: {
+          ...room,
+          leaderUserId: event.userId,
         },
       };
     }

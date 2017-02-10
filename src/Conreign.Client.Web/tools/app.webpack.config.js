@@ -52,8 +52,8 @@ function createConfiguration(options) {
         {
           test: /\.scss$/,
           loader: ExtractTextPlugin.extract({
-            fallbackLoader: 'style-loader',
-            loader: [
+            fallback: 'style-loader',
+            use: [
               'css-loader?importLoaders=1',
               'postcss-loader',
               'sass-loader',

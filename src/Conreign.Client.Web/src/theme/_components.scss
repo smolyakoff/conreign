@@ -6,6 +6,7 @@
 @import "~blaze/scss/components.inputs";
 @import "~blaze/scss/components.progress";
 @import "~blaze/scss/components.cards";
+@import "~blaze/scss/components.tables";
 @import "~blaze/scss/components.alerts";
 
 body {
@@ -21,6 +22,29 @@ a {
 .c-field {
   color: $field-color;
   box-sizing: border-box;
+}
+
+// Tables
+.c-table {
+  &__row {
+    &--v-align-top {
+      align-items: flex-start;
+    }
+    &--v-align-center {
+      align-items: center;
+    }
+    &--v-align-baseline {
+      align-items: baseline;
+    }
+    &--v-align-bottom {
+      align-items: flex-end;
+    }
+  }
+  &__cell {
+    &--width-fixed {
+      flex: initial;
+    }
+  }
 }
 
 // Spinner (from SpinKit)

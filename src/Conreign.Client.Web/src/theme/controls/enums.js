@@ -6,6 +6,13 @@ export const Alignment = {
   Right: 'right',
 };
 
+export const VerticalAlignment = {
+  Top: Alignment.Top,
+  Bottom: Alignment.Bottom,
+  Center: Alignment.Center,
+  Baseline: 'baseline',
+};
+
 export const Orientation = {
   Vertical: 'vertical',
   Horizontal: 'horizontal',

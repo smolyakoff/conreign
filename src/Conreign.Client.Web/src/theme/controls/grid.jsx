@@ -12,17 +12,11 @@ import {
   each,
 } from 'lodash';
 
-import { Alignment } from './enums';
+import { VerticalAlignment } from './enums';
 import { ThemeSize } from './decorators';
 import { isNonEmptyString } from './util';
 
 const css = block('o-grid');
-
-export const VerticalAlignment = {
-  Top: Alignment.Top,
-  Center: Alignment.Center,
-  Bottom: Alignment.Bottom,
-};
 
 export const GridMode = {
   Fit: 'fit',

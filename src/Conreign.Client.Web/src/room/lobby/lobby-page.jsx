@@ -2,14 +2,31 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { findKey, parseInt, isNumber, values } from 'lodash';
 
-import { Grid, GridCell, ThemeSize, GridMode, Box } from './../../theme';
+import { PLAYER_SHAPE, PLANET_SHAPE } from './../schemas';
+import { Grid, GridCell, ThemeSize, GridMode, Box, Widget } from './../../theme';
 import { Map, PlanetCell, MAP_SELECTION_SHAPE } from '../map';
 import { submitGameSettings, changeGameSettings, GAME_SETTINGS_SHAPE } from './lobby';
 import PlanetCard from './../planet-card';
+import PlayerList from './../player-list';
 import GameSettingsForm from './game-settings-form';
-import Widget from './../widget';
 
 const WIDGET_HEADER_HEIGHT = 40;
+
+function calculateMapSize(viewDimensions, mapDimensions) {
+  const {
+    width: fullVw,
+    height: fullVh,
+  } = viewDimensions;
+  const vw = (fullVw / 2) - WIDGET_HEADER_HEIGHT;
+  const vh = fullVh - WIDGET_HEADER_HEIGHT;
+  const {
+    width: mw,
+    height: mh,
+  } = mapDimensions;
+  const k = mh > mw ? mw / mh : 1;
+  const dim = mh >= mw && vw < vh ? vw : vh;
+  return dim * k;
+}
 
 function adjustMapSelection(map, mapSelection, currentUser) {
   if (isNumber(mapSelection.start)) {
@@ -35,7 +52,7 @@ function LobbyPage({
   onGameSettingsSubmit,
   onGameSettingsChange,
 }) {
-  const mapSize = Math.min(viewDimensions.width / 2, viewDimensions.height);
+  const mapSize = calculateMapSize(viewDimensions, map);
 
   function LobbyCell({ cellIndex }) {
     const planet = map.planets[cellIndex];
@@ -79,7 +96,7 @@ function LobbyPage({
     >
       <GridCell
         fixedWidth
-        width={mapSize - WIDGET_HEADER_HEIGHT}
+        width={mapSize}
       >
         <Box themeSize={ThemeSize.Small}>
           <Widget
@@ -118,25 +135,17 @@ function LobbyPage({
               </Widget>
             )
           }
+          <Widget
+            header="Players"
+            className="u-higher"
+          >
+            <PlayerList players={values(players)} />
+          </Widget>
         </Box>
       </GridCell>
     </Grid>
   );
 }
-
-const PLANET_SHAPE = PropTypes.shape({
-  name: PropTypes.string.isRequired,
-  productionRate: PropTypes.number.isRequired,
-  power: PropTypes.number.isRequired,
-  ships: PropTypes.number.isRequired,
-  ownerId: PropTypes.string,
-});
-
-const PLAYER_SHAPE = PropTypes.shape({
-  userId: PropTypes.string.isRequired,
-  color: PropTypes.string.isRequired,
-  nickname: PropTypes.string,
-});
 
 LobbyPage.propTypes = {
   viewDimensions: PropTypes.shape({
