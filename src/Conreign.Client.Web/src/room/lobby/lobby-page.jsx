@@ -17,15 +17,16 @@ function calculateMapSize(viewDimensions, mapDimensions) {
     width: fullVw,
     height: fullVh,
   } = viewDimensions;
-  const vw = (fullVw / 2) - WIDGET_HEADER_HEIGHT;
+  const vw = fullVw / 2;
   const vh = fullVh - WIDGET_HEADER_HEIGHT;
   const {
     width: mw,
     height: mh,
   } = mapDimensions;
-  const k = mh > mw ? mw / mh : 1;
-  const dim = mh >= mw && vw < vh ? vw : vh;
-  return dim * k;
+  const wCellSize = vw / mw;
+  const hCellSize = vh / mh;
+  const size = Math.min(wCellSize, hCellSize) * mw;
+  return size;
 }
 
 function adjustMapSelection(map, mapSelection, currentUser) {

@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react';
 
-import { PresenceStatus } from './../core';
 import { PLAYER_SHAPE, PLAYER } from './schemas';
 import {
   Table,
@@ -8,43 +7,32 @@ import {
   TableRow,
   TableCell,
 } from './../theme';
-import { Circle } from './icons';
+import PlayerIcon from './player-icon';
 
-const StatusColor = {
-  [PresenceStatus.Online]: '#4CAF50',
-  [PresenceStatus.Offline]: '#F44336',
-};
-
-function Player({
+function PlayerRow({
   nickname,
   status,
   color,
 }) {
   return (
     <TableRow>
+      <TableCell fixedWidth>
+        <PlayerIcon color={color} status={status} />
+      </TableCell>
       <TableCell>
-        <span style={{ color }}>{nickname}</span>
-      </TableCell>
-      <TableCell fixedWidth>
-        {status === PresenceStatus.Online ? 'Online' : 'Offline'}
-      </TableCell>
-      <TableCell fixedWidth>
-        <Circle
-          className="u-xsmall"
-          color={StatusColor[status]}
-        />
+        {nickname}
       </TableCell>
     </TableRow>
   );
 }
 
-Player.propTypes = PLAYER;
+PlayerRow.propTypes = PLAYER;
 
 export default function PlayerList({
   players,
 }) {
   const rows = players.map(
-    (p, i) => <Player key={p.userId} index={i} {...p} />,
+    (p, i) => <PlayerRow key={p.userId} index={i} {...p} />,
   );
   return (
     <Table>

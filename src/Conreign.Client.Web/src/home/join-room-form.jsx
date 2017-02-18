@@ -43,7 +43,7 @@ export default class JoinRoomForm extends Component {
             >
               <Icon tagName="span">#</Icon>
               <Input
-                placeholder="your-galaxy-hastag"
+                placeholder="your-galaxy-hashtag"
                 onChange={e => this.onRoomIdChange(e.target.value)}
                 value={roomId}
               />

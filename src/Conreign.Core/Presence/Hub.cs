@@ -147,12 +147,15 @@ namespace Conreign.Core.Presence
             {
                 _state.JoinOrder.Add(userId);
             }
-            var statusChanged = new UserStatusChanged(
-                hubId: _state.Id,
-                userId: userId,
-                status: PresenceStatus.Online
-            );
-            yield return statusChanged;
+            else
+            {
+                var statusChanged = new UserStatusChanged(
+                    hubId: _state.Id,
+                    userId: userId,
+                    status: PresenceStatus.Online
+                    );
+                yield return statusChanged;
+            }
         }
 
         private IEnumerable<IClientEvent> Leave(Guid userId)

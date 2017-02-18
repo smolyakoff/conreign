@@ -129,11 +129,9 @@ namespace Conreign.Core.Gameplay
         {
             EnsureGameIsNotStarted();
 
-            await _hub.Connect(userId, connectionId);
             if (!_playerListEditor.Contains(userId))
             {
                 var player = _playerListEditor.Add(userId);
-
                 var playerJoined = new PlayerJoined(_state.RoomId, player);
                 if (_playerListEditor.Count == 1)
                 {
@@ -153,6 +151,7 @@ namespace Conreign.Core.Gameplay
                 var mapUpdated = new MapUpdated(_state.RoomId, _state.MapEditor.Map);
                 await _hub.NotifyEverybodyExcept(userId, playerJoined, mapUpdated);
             }
+            await _hub.Connect(userId, connectionId);
         }
 
         public Task Disconnect(Guid userId, Guid connectionId)

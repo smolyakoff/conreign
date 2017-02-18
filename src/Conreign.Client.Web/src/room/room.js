@@ -156,7 +156,7 @@ function roomReducer(state = {}, action) {
           ...room,
           players: {
             ...room.players,
-            [player.userId]: {
+            [event.userId]: {
               ...player,
               status: event.status,
             },
