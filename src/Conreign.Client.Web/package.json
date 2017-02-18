@@ -34,6 +34,7 @@
     "blaze": "^3.2.0",
     "classnames": "^2.2.5",
     "color": "^1.0.3",
+    "evil-icons": "^1.9.0",
     "jquery": "^3.1.1",
     "jwt-decode": "^2.1.0",
     "lodash": "^4.17.4",

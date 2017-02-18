@@ -7,7 +7,7 @@ import { Grid, GridCell, ThemeSize, GridMode, Box, Widget } from './../../theme'
 import { Map, PlanetCell, MAP_SELECTION_SHAPE } from '../map';
 import { submitGameSettings, changeGameSettings, GAME_SETTINGS_SHAPE } from './lobby';
 import PlanetCard from './../planet-card';
-import PlayerList from './../player-list';
+import Chat from './../chat';
 import GameSettingsForm from './game-settings-form';
 
 const WIDGET_HEADER_HEIGHT = 40;
@@ -137,10 +137,10 @@ function LobbyPage({
             )
           }
           <Widget
-            header="Players"
+            header="Chat"
             className="u-higher"
           >
-            <PlayerList players={values(players)} />
+            <Chat />
           </Widget>
         </Box>
       </GridCell>
