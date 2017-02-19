@@ -3,7 +3,8 @@ export * from './decorators';
 
 export * from './panel';
 export * from './nav';
-export * from './image';
+export { default as Image } from './image';
+export { default as Icon } from './icon';
 export * from './input';
 export * from './text';
 export * from './grid';

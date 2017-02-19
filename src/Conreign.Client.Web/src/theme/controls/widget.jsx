@@ -1,12 +1,14 @@
 import React, { PropTypes } from 'react';
+import cn from 'classnames';
 
 import { Card, CardItem, CardBody } from './card';
 import { ThemeColor } from './decorators';
 
 export default function Widget({
+  className,
+  children,
   header,
   bodyClassName,
-  children,
   ...otherProps
 }) {
   const headerUi = header
@@ -17,7 +19,7 @@ export default function Widget({
     )
     : null;
   return (
-    <Card {...otherProps}>
+    <Card className={cn(className, 'u-full-height')} {...otherProps}>
       {headerUi}
       <CardBody className={bodyClassName}>
         {children}
@@ -27,13 +29,15 @@ export default function Widget({
 }
 
 Widget.propTypes = {
-  header: PropTypes.node,
+  className: PropTypes.string,
   children: PropTypes.node,
+  header: PropTypes.node,
   bodyClassName: PropTypes.string,
 };
 
 Widget.defaultProps = {
-  header: null,
+  className: null,
   children: null,
+  header: null,
   bodyClassName: null,
 };

@@ -48,6 +48,9 @@ function createConfiguration(options) {
           test: /\.jsx?$/,
           loader: 'babel-loader',
           include: PATHS.SRC,
+          options: {
+            cacheDirectory: true,
+          },
         },
         {
           test: /\.scss$/,
@@ -62,7 +65,7 @@ function createConfiguration(options) {
         },
         {
           test: /\.svg$/,
-          loader: 'file-loader',
+          loader: 'svg-sprite-loader',
         },
       ],
     },

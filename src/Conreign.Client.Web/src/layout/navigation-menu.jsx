@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router';
 
 import logo from './logo.svg';
-import { Nav, NavItem, NavContent, Image } from './../theme';
+import { Nav, NavItem, NavContent, Icon } from './../theme';
 
 export default function NavigationMenu(props) {
   return (
@@ -11,7 +11,7 @@ export default function NavigationMenu(props) {
         <Link to="/">Home</Link>
       </NavItem>
       <NavContent className="u-window-box--small">
-        <Image src={logo} />
+        <Icon name={logo} />
       </NavContent>
       <NavItem>
         <Link to="/rules">Rules</Link>

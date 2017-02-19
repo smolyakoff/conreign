@@ -6,7 +6,6 @@ import {
   Button,
   InputContainer,
   Input,
-  Icon,
 } from './../theme';
 import { sanitizeRoomId } from './join-room-form-util';
 
@@ -41,7 +40,7 @@ export default class JoinRoomForm extends Component {
               themeSize="large"
               className="u-mb-medium"
             >
-              <Icon tagName="span">#</Icon>
+              <span className="c-icon">#</span>
               <Input
                 placeholder="your-galaxy-hashtag"
                 onChange={e => this.onRoomIdChange(e.target.value)}

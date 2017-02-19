@@ -25,6 +25,7 @@ function createConfiguration({ compilationMode }) {
       filename: 'conreign-[name].[chunkhash].js',
       library: LIB_VARIABLE_NAME,
     },
+    devtool: 'source-map',
     plugins: [
       new DllPlugin({
         path: path.join(PATHS.BUILD, 'conreign-[name].manifest.json'),

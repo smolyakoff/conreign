@@ -1,6 +1,6 @@
 import cx from 'classnames';
 import React, { PropTypes } from 'react';
-import { values, flow, each, isFunction, extend, flatten, defaults, omit } from 'lodash';
+import { values, flow, each, isFunction, extend, flatten, defaults, omit, isUndefined } from 'lodash';
 
 import { isNonEmptyString } from './util';
 
@@ -125,13 +125,16 @@ export function withThemeSizes(
   }
 
   function extendStatics(Control) {
-    const propTypes = Control.propTypes || {};
-    extend(propTypes, {
+    Control.propTypes = {
+      ...Control.propTypes,
       [propName]: PropTypes.oneOf(values(ThemeSize)),
-    });
-    extend(Control, {
-      propTypes,
-    });
+    };
+    if (!isUndefined(options.defaultValue)) {
+      Control.defaultProps = {
+        ...Control.defaultProps,
+        [propName]: options.defaultValue,
+      };
+    }
   }
 
   return {

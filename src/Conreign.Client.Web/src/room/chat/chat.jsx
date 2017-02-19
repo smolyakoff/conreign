@@ -1,14 +1,14 @@
 import React from 'react';
-import settingsIconSrc from 'evil-icons/assets/icons/ei-gear.svg';
+import gear from 'evil-icons/assets/icons/ei-gear.svg';
 
-import { PanelContainer, Panel, Grid, GridCell, Button } from './../../theme';
+import { PanelContainer, Panel, Grid, GridCell, Button, Icon, ThemeSize } from './../../theme';
 
 function ChatControlPanel() {
   return (
     <Grid>
       <GridCell fixedWidth>
         <Button>
-          <img src={settingsIconSrc} alt="" />
+          <Icon name={gear} themeSize={ThemeSize.Medium} />
         </Button>
       </GridCell>
       <GridCell>

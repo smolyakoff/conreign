@@ -31,6 +31,7 @@ $sides: left right top bottom;
 
 // Sizing
 .u-full-height {
+  box-sizing: border-box;
   height: 100%;
 }
 

@@ -3,6 +3,20 @@
 @import "~blaze/scss/objects.grid.responsive";
 @import "~blaze/scss/objects.images";
 
+// Icon
+.o-svg-icon {
+  display: block;
+  width: auto;
+  height: 100%;
+
+  @for $i from 1 through length($size-names) {
+    &--#{nth($size-names, $i)} {
+      width: #{nth($icon-sizes, $i)}px;
+      height: #{nth($icon-sizes, $i)}px;
+    }
+  }
+}
+
 // Stack Panel
 .o-stack-panel {
   @for $i from 1 through length($size-names) {

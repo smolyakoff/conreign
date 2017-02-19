@@ -4,7 +4,7 @@ import block from 'bem-cn';
 import {
   H1,
   Grid,
-  Image,
+  Icon,
   GridCell,
   PropertyTable,
   VerticalAlignment,
@@ -59,7 +59,7 @@ export default function PlanetCard({
         className={css('icon-container')()}
         fixedWidth
       >
-        <Image src={icon.src} alt={icon.name} />
+        <Icon name={icon.id} />
         <H1>{name}</H1>
       </GridCell>
       <GridCell>

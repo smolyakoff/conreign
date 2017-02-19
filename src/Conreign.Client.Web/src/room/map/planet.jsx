@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import block from 'bem-cn';
 import Color from 'color';
-import { Progress, PropertyTable, ThemeSize, ThemeColor } from './../../theme';
+import { Progress, PropertyTable, ThemeSize, ThemeColor, Icon } from './../../theme';
 import './planet.scss';
 import { choosePlanetIcon } from './../icons';
 
@@ -35,11 +35,9 @@ export default function Planet({
   return (
     <div className={planet()} style={style}>
       <span className={planet('name')()}>{name}</span>
-      <img
-        src={icon.src}
-        className={planet('icon')()}
-        alt={icon.name}
-      />
+      <div className={planet('icon')()}>
+        <Icon name={icon.id} />
+      </div>
       <div className={planet('planet-properties')()}>
         <PropertyTable
           properties={planetProperties}
