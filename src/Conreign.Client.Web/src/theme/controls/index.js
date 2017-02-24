@@ -9,7 +9,7 @@ export * from './input';
 export * from './text';
 export * from './grid';
 export * from './table';
-export { default as StackPanel } from './stack-panel';
+export * from './deck';
 export * from './card';
 export { default as Widget } from './widget';
 export { default as Box, BoxType } from './box';

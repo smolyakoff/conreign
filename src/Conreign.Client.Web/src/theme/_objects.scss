@@ -3,6 +3,18 @@
 @import "~blaze/scss/objects.grid.responsive";
 @import "~blaze/scss/objects.images";
 
+// Grid
+.o-grid {
+  @for $i from 1 through length($size-names) {
+    &--gutter-#{nth($size-names, $i)}{
+      > .o-grid__cell {
+        padding-left: nth($sizes, $i);
+        padding-right: nth($sizes, $i);
+      }
+    }
+  }
+}
+
 // Icon
 .o-svg-icon {
   display: block;
@@ -17,28 +29,42 @@
   }
 }
 
-// Stack Panel
-.o-stack-panel {
+// Deck
+.o-deck {
+  display: flex;
+  height: 100%;
+
+  &--orientation-vertical {
+    flex-direction: column;
+  }
+
+  &__item {
+    &--stretch {
+      flex: 1;
+    }
+  }
+
   @for $i from 1 through length($size-names) {
-    &--horizontal.o-stack-panel--spacing-#{nth($size-names, $i)} {
-      .o-stack-panel__item {
+    &--spacing-#{nth($size-names, $i)}.o-deck--orientation-horizontal {
+      > .o-deck__item {
         padding-right: nth($sizes, $i);
       }
     }
-    &--vertical.o-stack-panel--spacing-#{nth($size-names, $i)} {
-      .o-stack-panel__item {
+    &--spacing-#{nth($size-names, $i)}.o-deck--orientation-vertical {
+      > .o-deck__item {
         padding-bottom: nth($sizes, $i);
       }
     }
   }
-  &--horizontal {
-    .o-stack-panel__item:last-child {
+
+  &--orientation-horizontal {
+    > .o-deck__item:last-child {
       padding-right: 0;
     }
   }
 
-  &--vertical {
-    .o-stack-panel__item:last-child {
+  &--orientation-vertical {
+    > .o-deck__item:last-child {
       padding-bottom: 0;
     }
   }

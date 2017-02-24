@@ -1,7 +1,18 @@
 import React from 'react';
 import gear from 'evil-icons/assets/icons/ei-gear.svg';
 
-import { PanelContainer, Panel, Grid, GridCell, Button, Icon, ThemeSize } from './../../theme';
+import {
+  PanelContainer,
+  Panel,
+  Grid,
+  GridCell,
+  Button,
+  Icon,
+  ThemeSize,
+  Deck,
+  DeckItem,
+  Orientation,
+} from './../../theme';
 
 function ChatControlPanel() {
   return (
@@ -23,13 +34,17 @@ function ChatControlPanel() {
 
 export default function Chat() {
   return (
-    <div>
-      <PanelContainer>
-        <Panel>
-          Text
-        </Panel>
-      </PanelContainer>
-      <ChatControlPanel />
-    </div>
+    <Deck orientation={Orientation.Vertical}>
+      <DeckItem stretch>
+        <PanelContainer className="u-full-height">
+          <Panel>
+            Text
+          </Panel>
+        </PanelContainer>
+      </DeckItem>
+      <DeckItem>
+        <ChatControlPanel />
+      </DeckItem>
+    </Deck>
   );
 }

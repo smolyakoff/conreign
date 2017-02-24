@@ -1,8 +1,41 @@
 import React, { PropTypes } from 'react';
-import cn from 'classnames';
+import block from 'bem-cn';
 
-import { Card, CardItem, CardBody } from './card';
-import { ThemeColor } from './decorators';
+const widget = block('c-widget');
+
+function WidgetHeader({ children }) {
+  return (
+    <div className={widget('header')()}>
+      {children}
+    </div>
+  );
+}
+
+WidgetHeader.propTypes = {
+  children: PropTypes.node,
+};
+
+WidgetHeader.defaultProps = {
+  children: null,
+};
+
+function WidgetBody({ className, children }) {
+  return (
+    <div className={widget('body').mix(className)()}>
+      {children}
+    </div>
+  );
+}
+
+WidgetBody.propTypes = {
+  className: PropTypes.string,
+  children: PropTypes.node,
+};
+
+WidgetBody.defaultProps = {
+  className: null,
+  children: null,
+};
 
 export default function Widget({
   className,
@@ -13,18 +46,21 @@ export default function Widget({
 }) {
   const headerUi = header
     ? (
-      <CardItem themeColor={ThemeColor.Info}>
+      <WidgetHeader>
         {header}
-      </CardItem>
+      </WidgetHeader>
     )
     : null;
   return (
-    <Card className={cn(className, 'u-full-height')} {...otherProps}>
+    <div
+      className={widget.mix(className)()}
+      {...otherProps}
+    >
       {headerUi}
-      <CardBody className={bodyClassName}>
+      <WidgetBody className={bodyClassName}>
         {children}
-      </CardBody>
-    </Card>
+      </WidgetBody>
+    </div>
   );
 }
 

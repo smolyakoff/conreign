@@ -8,6 +8,7 @@ import {
   GridCell,
   PropertyTable,
   VerticalAlignment,
+  ThemeSize,
 } from './../theme';
 
 import { choosePlanetIcon, Circle } from './icons';
@@ -52,7 +53,7 @@ export default function PlanetCard({
   return (
     <Grid
       className={className}
-      gutter
+      gutter={ThemeSize.Medium}
       verticalAlignment={VerticalAlignment.Center}
     >
       <GridCell

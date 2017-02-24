@@ -7,8 +7,8 @@ import {
   Input,
   ThemeSize,
   Button,
-  Box,
-  BoxType,
+  Deck,
+  DeckItem,
 } from './../../theme';
 import { GAME_SETTINGS_SHAPE } from './lobby';
 
@@ -55,17 +55,19 @@ function GameSettingsForm({ onFieldChange, onSubmit, values }) {
   const properties = objectValues(FIELDS)
     .map(field => createFormProperty(field, values, onFieldChange));
   return (
-    <div>
-      <PropertyTable
-        properties={properties}
-        themeSpacing={ThemeSize.Small}
-      />
-      <Box type={BoxType.Letter} themeSize={ThemeSize.XSmall}>
+    <Deck themeSpacing={ThemeSize.Small}>
+      <DeckItem>
+        <PropertyTable
+          properties={properties}
+          themeSpacing={ThemeSize.Small}
+        />
+      </DeckItem>
+      <DeckItem>
         <Button onClick={onSubmit}>
           Generate Map
         </Button>
-      </Box>
-    </div>
+      </DeckItem>
+    </Deck>
   );
 }
 

@@ -1,9 +1,20 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { findKey, parseInt, isNumber, values } from 'lodash';
+import Measure from 'react-measure';
 
 import { PLAYER_SHAPE, PLANET_SHAPE } from './../schemas';
-import { Grid, GridCell, ThemeSize, GridMode, Box, Widget } from './../../theme';
+import {
+  Grid,
+  GridCell,
+  ThemeSize,
+  GridMode,
+  Widget,
+  Deck,
+  DeckItem,
+  Box,
+  BoxType,
+} from './../../theme';
 import { Map, PlanetCell, MAP_SELECTION_SHAPE } from '../map';
 import { submitGameSettings, changeGameSettings, GAME_SETTINGS_SHAPE } from './lobby';
 import PlanetCard from './../planet-card';
@@ -46,15 +57,12 @@ function LobbyPage({
   map,
   players,
   leaderUserId,
-  viewDimensions,
   mapSelection,
   currentUser,
   onMapSelectionChange,
   onGameSettingsSubmit,
   onGameSettingsChange,
 }) {
-  const mapSize = calculateMapSize(viewDimensions, map);
-
   function LobbyCell({ cellIndex }) {
     const planet = map.planets[cellIndex];
     if (!planet) {
@@ -89,70 +97,84 @@ function LobbyPage({
   };
 
   return (
-    <Grid
-      responsiveness={{
-        [ThemeSize.Small]: GridMode.Full,
-        [ThemeSize.Medium]: GridMode.Full,
-      }}
+    <Box
+      className="u-full-height"
+      type={BoxType.Letter}
+      themeSize={ThemeSize.Small}
     >
-      <GridCell
-        fixedWidth
-        width={mapSize}
-      >
-        <Box themeSize={ThemeSize.Small}>
-          <Widget
-            className="u-higher"
-            bodyClassName="u-window-box--none"
-            header="Map"
-          >
-            <Map
-              {...map}
-              cellRenderer={LobbyCell}
-              selection={chosenMapSelection}
-              onSelectionChanged={selection => onMapSelectionChange({ selection, roomId })}
-            />
-          </Widget>
-        </Box>
-      </GridCell>
-      <GridCell>
-        <Box themeSize={ThemeSize.Small}>
-          <Widget
-            header="Planet Details"
-            className="u-higher"
-          >
-            <PlanetCard {...selectedPlanet} />
-          </Widget>
-          {
-            isLeader && (
-              <Widget
-                header="Game Settings"
-                className="u-higher"
+      <Measure whitelist={['width', 'height']}>
+        {
+          dimensions => (
+            <Grid
+              className="u-full-height"
+              gutter={ThemeSize.Small}
+              responsiveness={{
+                [ThemeSize.Small]: GridMode.Full,
+                [ThemeSize.Medium]: GridMode.Full,
+              }}
+            >
+              <GridCell
+                fixedWidth
+                width={calculateMapSize(dimensions, map)}
               >
-                <GameSettingsForm
-                  values={gameSettings}
-                  onSubmit={settings => onGameSettingsSubmit({ settings, roomId })}
-                  onChange={settings => onGameSettingsChange({ settings, roomId })}
-                />
-              </Widget>
-            )
-          }
-          <Widget
-            header="Chat"
-            className="u-higher"
-          >
-            <Chat />
-          </Widget>
-        </Box>
-      </GridCell>
-    </Grid>
+                <Widget
+                  className="u-higher"
+                  bodyClassName="u-window-box--none"
+                  header="Map"
+                >
+                  <Map
+                    {...map}
+                    cellRenderer={LobbyCell}
+                    selection={chosenMapSelection}
+                    onSelectionChanged={selection => onMapSelectionChange({ selection, roomId })}
+                  />
+                </Widget>
+              </GridCell>
+              <GridCell>
+                <Deck>
+                  <DeckItem>
+                    <Widget
+                      header="Planet Details"
+                      className="u-higher"
+                    >
+                      <PlanetCard {...selectedPlanet} />
+                    </Widget>
+                  </DeckItem>
+                  {
+                    isLeader && (
+                      <DeckItem>
+                        <Widget
+                          header="Game Settings"
+                          className="u-higher"
+                        >
+                          <GameSettingsForm
+                            values={gameSettings}
+                            onSubmit={settings => onGameSettingsSubmit({ settings, roomId })}
+                            onChange={settings => onGameSettingsChange({ settings, roomId })}
+                          />
+                        </Widget>
+                      </DeckItem>
+                    )
+                  }
+                  <DeckItem stretch>
+                    <Widget
+                      header="Chat"
+                      className="u-higher u-full-height"
+                    >
+                      <Chat />
+                    </Widget>
+                  </DeckItem>
+                </Deck>
+              </GridCell>
+            </Grid>
+          )
+        }
+      </Measure>
+    </Box>
   );
 }
 
 LobbyPage.propTypes = {
-  viewDimensions: PropTypes.shape({
-    width: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired,
-  }).isRequired,
   roomId: PropTypes.string.isRequired,
   gameSettings: GAME_SETTINGS_SHAPE,
   map: PropTypes.shape({

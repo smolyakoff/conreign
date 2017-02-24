@@ -47,6 +47,20 @@ a {
   }
 }
 
+// Widgets
+.c-widget {
+  display: flex;
+  flex-direction: column;
+  &__header {
+    @include window-box--small();
+    background-color: $color-info;
+  }
+  &__body {
+    @include window-box--small();
+    flex: 1;
+  }
+}
+
 // Spinner (from SpinKit)
 .c-spinner-chasing-dots {
   @keyframes sk-rotate {

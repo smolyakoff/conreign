@@ -116,6 +116,7 @@ export function Grid({
 }) {
   const modifiers = {
     'no-gutter': !gutter,
+    gutter,
     wrap,
     [verticalAlignment || VerticalAlignment.Top]: isNonEmptyString(verticalAlignment),
     ...responsiveness || {},
@@ -148,11 +149,11 @@ function validateResponsivenessConfiguration(props, propName) {
 }
 
 Grid.propTypes = {
-  gutter: PropTypes.bool,
+  gutter: PropTypes.oneOf(values(ThemeSize).concat([null])),
   wrap: PropTypes.bool,
   className: PropTypes.string,
   children: PropTypes.node,
-  verticalAlignment: PropTypes.oneOf(values(VerticalAlignment).concat(null)),
+  verticalAlignment: PropTypes.oneOf(values(VerticalAlignment).concat([null])),
   responsiveness: validateResponsivenessConfiguration,
 };
 
@@ -161,6 +162,6 @@ Grid.defaultProps = {
   children: null,
   verticalAlignment: null,
   responsiveness: {},
-  gutter: false,
+  gutter: null,
   wrap: false,
 };
