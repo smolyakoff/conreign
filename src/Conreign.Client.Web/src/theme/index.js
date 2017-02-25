@@ -1,7 +1,7 @@
-import block from 'bem-cn';
+import bem from 'bem-cn';
 import './theme.scss';
 
-block.setup({
+bem.setup({
   mod: '--',
   modValue: '-',
 });

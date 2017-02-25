@@ -1,9 +1,9 @@
 import React, { PropTypes } from 'react';
-import block from 'bem-cn';
+import bem from 'bem-cn';
 
 import { decorate, withThemeSizes, withThemeColors } from './decorators';
 
-const progress = block('c-progress');
+const progress = bem('c-progress');
 const bar = progress('bar');
 
 function ProgressBar({ value, className, children }) {

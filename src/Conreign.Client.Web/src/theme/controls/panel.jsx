@@ -1,8 +1,8 @@
-import block from 'bem-cn';
+import bem from 'bem-cn';
 import React, { PropTypes } from 'react';
 
 export function PanelContainer({ className, children, ...others }) {
-  const css = block('o-panel-container');
+  const css = bem('o-panel-container');
   return (
     <div className={css.mix(className)()} {...others}>
       {children}
@@ -27,7 +27,7 @@ export function Panel({
   className,
   ...others
 }) {
-  const css = block('o-panel');
+  const css = bem('o-panel');
   const modifiers = {
     'nav-top': hasTopNav,
     'nav-bottom': hasBottomNav,

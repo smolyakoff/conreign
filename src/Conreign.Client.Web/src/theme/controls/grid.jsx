@@ -1,4 +1,4 @@
-import block from 'bem-cn';
+import bem from 'bem-cn';
 import React, { PropTypes } from 'react';
 import {
   isNumber,
@@ -16,7 +16,7 @@ import { VerticalAlignment } from './enums';
 import { ThemeSize } from './decorators';
 import { isNonEmptyString } from './util';
 
-const css = block('o-grid');
+const css = bem('o-grid');
 
 export const GridMode = {
   Fit: 'fit',

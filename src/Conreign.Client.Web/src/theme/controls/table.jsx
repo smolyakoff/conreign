@@ -1,10 +1,10 @@
 import React, { PropTypes } from 'react';
-import block from 'bem-cn';
+import bem from 'bem-cn';
 import { values } from 'lodash';
 
 import { VerticalAlignment } from './enums';
 
-const tableBlock = block('c-table');
+const tableBlock = bem('c-table');
 
 export function Table({
   className,

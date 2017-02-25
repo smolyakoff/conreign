@@ -1,11 +1,11 @@
 import React, { PropTypes } from 'react';
-import block from 'bem-cn';
+import bem from 'bem-cn';
 import { noop } from 'lodash';
 
 import Button from './button';
 import { decorate, withThemeColors } from './decorators';
 
-const css = block('c-alert');
+const css = bem('c-alert');
 
 function Alert({
   className,

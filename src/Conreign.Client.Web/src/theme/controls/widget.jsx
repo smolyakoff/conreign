@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
-import block from 'bem-cn';
+import bem from 'bem-cn';
 
-const widget = block('c-widget');
+const widget = bem('c-widget');
 
 function WidgetHeader({ children }) {
   return (

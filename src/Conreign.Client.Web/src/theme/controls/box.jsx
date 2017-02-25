@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import { values } from 'lodash';
-import block from 'bem-cn';
+import bem from 'bem-cn';
 
 import { ThemeSize } from './decorators';
 
@@ -11,7 +11,7 @@ export const BoxType = {
 };
 
 export default function Box({ className, type, themeSize, children }) {
-  const css = block(`u-${type}-box`)({
+  const css = bem(`u-${type}-box`)({
     [themeSize || 'none']: true,
   });
   return (

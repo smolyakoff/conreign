@@ -128,3 +128,71 @@ a {
     text-align: right;
   }
 }
+
+// Icon Button
+.c-icon-button {
+  display: inline;
+  max-width: 100%;
+  margin: $button-margin;
+  padding: 0;
+  outline: 0;
+  font-family: $button-font-family;
+  font-size: $button-font-size;
+  line-height: $button-line-height;
+  text-align: $button-text-align;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: $button-white-space;
+  cursor: pointer;
+  overflow: hidden;
+  vertical-align: middle;
+  appearance: none;
+  user-select: none;
+  border: none;
+  background: none;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: $button-disabled-opacity;
+  }
+
+  &__content {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  @each $size in $size-names {
+    &--#{$size} {
+      .c-icon-button__icon {
+        width: 2em;
+        height: 2em;
+      }
+    }
+  }
+
+  @each $color in $color-names {
+    $current-color: map_get($colors, $color);
+
+    &--#{$color} {
+      color: $current-color;
+      .c-icon-button__icon {
+        fill: $current-color;
+      }
+
+      &:not(:disabled) {
+        &:hover {
+          color: lighten($current-color, $color-tint);
+          .c-icon-button__icon {
+            fill: lighten($current-color, $color-tint);
+          }
+        }
+        &:focus {
+          color: $border-color-focus;
+          .c-icon-button__icon {
+            fill: $border-color-focus;
+          }
+        }
+      }
+    }
+  }
+}

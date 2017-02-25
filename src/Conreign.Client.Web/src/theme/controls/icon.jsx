@@ -1,9 +1,9 @@
 import React, { PropTypes } from 'react';
-import block from 'bem-cn';
+import bem from 'bem-cn';
 
-import { decorate, withThemeSizes } from './decorators';
+import { decorate, withThemeSizes, withThemeColors } from './decorators';
 
-const css = block('o-svg-icon');
+const css = bem('o-svg-icon');
 
 function Icon({ className, name, ...others }) {
   return (
@@ -24,4 +24,5 @@ Icon.defaultProps = {
 
 export default decorate(
   withThemeSizes(css()),
+  withThemeColors(css()),
 )(Icon);

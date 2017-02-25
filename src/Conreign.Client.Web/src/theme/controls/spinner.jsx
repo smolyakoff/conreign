@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
-import block from 'bem-cn';
+import bem from 'bem-cn';
 
-const spinner = block('c-spinner-chasing-dots');
+const spinner = bem('c-spinner-chasing-dots');
 
 function Spinner({ className, size }) {
   const styles = {

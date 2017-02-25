@@ -1,6 +1,6 @@
-import cx from 'classnames';
+import cn from 'classnames';
 import React, { PropTypes } from 'react';
-import { values, flow, each, isFunction, extend, flatten, defaults, omit, isUndefined } from 'lodash';
+import { values, flow, each, isFunction, flatten, defaults, omit, isUndefined } from 'lodash';
 
 import { isNonEmptyString } from './util';
 
@@ -31,11 +31,18 @@ export function decorate(...decorators) {
   };
 }
 
-export function withThemeColors(blockClass) {
-  function mapProps({ className, themeColor, ...others }) {
-    const css = cx(
+export function withThemeColors(blockClass, options = {}) {
+  options = defaults(options, {
+    defaultValue: null,
+    getClassName: props => `${blockClass}--${props.themeColor}`,
+  });
+  function mapProps(props) {
+    const { className, themeColor, ...others } = props;
+    const css = cn(
       className,
-      isNonEmptyString(themeColor) ? `${blockClass}--${themeColor}` : null,
+      isNonEmptyString(themeColor)
+        ? options.getClassName(props)
+        : null,
     );
     return {
       className: css,
@@ -43,13 +50,14 @@ export function withThemeColors(blockClass) {
     };
   }
   function extendStatics(Control) {
-    const propTypes = Control.propTypes || {};
-    extend(propTypes, {
+    Control.propTypes = {
+      ...Control.propTypes,
       themeColor: PropTypes.oneOf(values(ThemeColor)),
-    });
-    extend(Control, {
-      propTypes,
-    });
+    };
+    Control.defaultProps = {
+      ...Control.defaultProps,
+      themeColor: options.defaultValue,
+    };
   }
 
   return {
@@ -77,7 +85,7 @@ export const ThemeElevation = {
 
 export const withThemeElevation = {
   mapProps: ({ className, themeElevation, ...otherProps }) => ({
-    className: cx(
+    className: cn(
       className,
       isNonEmptyString(themeElevation) ? `u-${themeElevation}` : null,
     ),
@@ -112,7 +120,7 @@ export function withThemeSizes(
 
   function mapProps({ className, ...others }) {
     const size = others[propName];
-    const css = cx(
+    const css = cn(
       className,
       isNonEmptyString(size)
         ? formatSizeClass(size)
@@ -145,7 +153,7 @@ export function withThemeSizes(
 
 export function withActiveState(blockClass) {
   function mapProps({ className, active, ...others }) {
-    const css = cx(
+    const css = cn(
       className,
       isNonEmptyString(active) ? `${blockClass}--active` : null,
     );
@@ -155,18 +163,14 @@ export function withActiveState(blockClass) {
     };
   }
   function extendStatics(Control) {
-    const propTypes = Control.propTypes || {};
-    const defaultProps = Control.defaultProps || {};
-    extend(propTypes, {
+    Control.propTypes = {
+      ...Control.propTypes,
       active: PropTypes.bool,
-    });
-    extend(defaultProps, {
+    };
+    Control.defaultProps = {
+      ...Control.defaultProps,
       active: false,
-    });
-    extend(Control, {
-      propTypes,
-      defaultProps,
-    });
+    };
   }
 
   return {

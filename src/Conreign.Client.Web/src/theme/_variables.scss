@@ -10,13 +10,21 @@ $durationDefault: 0.5s;
 // Sizes
 $size-names: tiny xsmall small medium large xlarge super;
 $sizes: $spacing-tiny $spacing-xsmall $spacing-small $spacing-medium $spacing-large $spacing-xlarge $spacing-super;
-$icon-sizes: 4 8 16 32 48 64 128;
+$icon-sizes: (
+  tiny: 4px,
+  xsmall: 8px,
+  small: 16px,
+  medium: 32px,
+  large: 64px,
+  xlarge: 128px,
+  super: 256px,
+);
 
 // Colors
 $text-color: $color-white;
 $color-brand: material-color('deep-orange', '800');
 $color-bg-brand: material-color('blue-grey', '900');
-$color-names: brand info warning success error;
+$color-names: default brand info warning success error;
 
 // Typography
 $text-font-family: 'Orbitron', $text-font-family;
@@ -30,6 +38,7 @@ $field-background-color: transparent;
 
 // Buttons
 $button-brand-background-color: $color-brand;
+$button-ghost-brand-color: $color-brand;
 
 // Cards
 $card-background-color: transparentize($color-bg-brand, 0.8);

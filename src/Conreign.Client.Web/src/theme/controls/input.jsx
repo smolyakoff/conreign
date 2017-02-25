@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import block from 'bem-cn';
+import bem from 'bem-cn';
 
 import {
   withThemeColors,
@@ -15,7 +15,7 @@ function InputBase({
   ...others
 }) {
   const Tag = tagName;
-  const css = block(INPUT_CLASS);
+  const css = bem(INPUT_CLASS);
   return (
     <Tag className={css.mix(className)} {...others} />
   );
@@ -45,7 +45,7 @@ function InputContainerBase({
   iconLeft,
   iconRight,
 }) {
-  const css = block(INPUT_FIELD_CLASS);
+  const css = bem(INPUT_FIELD_CLASS);
   const modifiers = {
     'icon-left': iconLeft,
     'icon-right': iconRight,

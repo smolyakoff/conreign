@@ -1,11 +1,11 @@
 import React, { PropTypes } from 'react';
 import { values } from 'lodash';
-import block from 'bem-cn';
+import bem from 'bem-cn';
 
 import { Orientation } from './enums';
 import { decorate, withThemeSizes, ThemeSize } from './decorators';
 
-const deck = block('o-deck');
+const deck = bem('o-deck');
 
 export function DeckItem({ children, stretch }) {
   const item = deck('item');

@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import block from 'bem-cn';
+import bem from 'bem-cn';
 
 import {
   decorate,
@@ -7,7 +7,7 @@ import {
   withThemeColors,
 } from './decorators';
 
-const css = block('c-card');
+const css = bem('c-card');
 
 function CardBase({ className, tagName, children, grouped }) {
   const Tag = tagName;

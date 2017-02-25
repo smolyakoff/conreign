@@ -1,4 +1,4 @@
-import block from 'bem-cn';
+import bem from 'bem-cn';
 import React, { PropTypes } from 'react';
 
 import { Alignment } from './enums';
@@ -9,7 +9,7 @@ import {
 } from './decorators';
 import { isNonEmptyString } from './util';
 
-const css = block('c-nav');
+const css = bem('c-nav');
 
 export function Nav({
   tagName,

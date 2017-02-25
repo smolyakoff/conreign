@@ -1,14 +1,11 @@
 import React from 'react';
 import gear from 'evil-icons/assets/icons/ei-gear.svg';
+import comment from 'evil-icons/assets/icons/ei-comment.svg';
 
 import {
   PanelContainer,
   Panel,
-  Grid,
-  GridCell,
-  Button,
-  Icon,
-  ThemeSize,
+  IconButton,
   Deck,
   DeckItem,
   Orientation,
@@ -16,25 +13,23 @@ import {
 
 function ChatControlPanel() {
   return (
-    <Grid>
-      <GridCell fixedWidth>
-        <Button>
-          <Icon name={gear} themeSize={ThemeSize.Medium} />
-        </Button>
-      </GridCell>
-      <GridCell>
+    <Deck orientation={Orientation.Horizontal}>
+      <DeckItem>
+        <IconButton iconName={gear} />
+      </DeckItem>
+      <DeckItem stretch>
         <input type="text" />
-      </GridCell>
-      <GridCell fixedWidth>
-        <Button>Send</Button>
-      </GridCell>
-    </Grid>
+      </DeckItem>
+      <DeckItem>
+        <IconButton iconName={comment}>Send</IconButton>
+      </DeckItem>
+    </Deck>
   );
 }
 
 export default function Chat() {
   return (
-    <Deck orientation={Orientation.Vertical}>
+    <Deck>
       <DeckItem stretch>
         <PanelContainer className="u-full-height">
           <Panel>

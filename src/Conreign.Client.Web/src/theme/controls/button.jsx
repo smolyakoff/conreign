@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import block from 'bem-cn';
+import bem from 'bem-cn';
 
 import {
   withThemeColors,
@@ -9,7 +9,7 @@ import {
 } from './decorators';
 
 const CSS_CLASS = 'c-button';
-const css = block(CSS_CLASS);
+const css = bem(CSS_CLASS);
 
 function Button({
   className,
@@ -35,7 +35,14 @@ function Button({
 
 export default decorate([
   withActiveState(CSS_CLASS),
-  withThemeColors(CSS_CLASS),
+  withThemeColors(
+    CSS_CLASS,
+    {
+      getClassName: props => props.ghost
+        ? `${CSS_CLASS}--ghost-${props.themeColor}`
+        : `${CSS_CLASS}--${props.themeColor}`,
+    },
+  ),
   withThemeSizes(),
 ])(Button);
 

@@ -5,6 +5,7 @@ export * from './panel';
 export * from './nav';
 export { default as Image } from './image';
 export { default as Icon } from './icon';
+export { default as IconButton } from './icon-button';
 export * from './input';
 export * from './text';
 export * from './grid';

@@ -1,9 +1,9 @@
 import React, { PropTypes } from 'react';
-import block from 'bem-cn';
+import bem from 'bem-cn';
 
 import { decorate, withThemeSizes } from './decorators';
 
-const table = block('c-property-table');
+const table = bem('c-property-table');
 
 function Property({ name, value }) {
   return (

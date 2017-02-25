@@ -17,14 +17,19 @@
 
 // Icon
 .o-svg-icon {
-  display: block;
-  width: auto;
+  display: inline;
   height: 100%;
 
-  @for $i from 1 through length($size-names) {
-    &--#{nth($size-names, $i)} {
-      width: #{nth($icon-sizes, $i)}px;
-      height: #{nth($icon-sizes, $i)}px;
+  @each $size in $size-names {
+    &--#{$size} {
+      width: #{map_get($icon-sizes, $size)};
+      height: #{map_get($icon-sizes, $size)};
+    }
+  }
+
+  @each $color-name in $color-names {
+    &--#{$color-name} {
+      fill: map-get($colors , $color-name);
     }
   }
 }

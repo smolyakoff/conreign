@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import block from 'bem-cn';
+import bem from 'bem-cn';
 import { values, range } from 'lodash';
 
 import { withThemeSizes, decorate } from './decorators';
@@ -24,7 +24,7 @@ function TextBase({
   ...others
 }) {
   const Tag = kbd ? 'kbd' : tagName;
-  const css = block('c-text');
+  const css = bem('c-text');
   const modifiers = {
     highlight,
     [emphasize]: isNonEmptyString(emphasize),
@@ -65,7 +65,7 @@ export const Text = decorate(withThemeSizes())(TextBase);
 
 function Paragraph({ className, children, ...others }) {
   return (
-    <p className={block('c-paragraph').mix(className)()} {...others}>
+    <p className={bem('c-paragraph').mix(className)()} {...others}>
       {children}
     </p>
   );
@@ -83,7 +83,7 @@ Paragraph.defaultProps = {
 
 export const P = decorate(withThemeSizes())(Paragraph);
 
-const heading = block('c-heading');
+const heading = bem('c-heading');
 
 const headings = range(1, 6).map((i) => {
   const Tag = `h${i}`;
@@ -110,7 +110,7 @@ export const H1 = headings[0];
 export const H2 = headings[1];
 export const H3 = headings[2];
 
-const codeBlock = block('c-code');
+const codeBlock = bem('c-code');
 
 function CodeBase({ className, children, multiLine }) {
   const modifiers = {
