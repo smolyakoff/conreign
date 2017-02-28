@@ -1,10 +1,15 @@
 @import "~blaze/scss/objects.panels";
+@import "~blaze/scss/objects.drawers";
 @import "~blaze/scss/objects.grid";
 @import "~blaze/scss/objects.grid.responsive";
 @import "~blaze/scss/objects.images";
 
 // Grid
 .o-grid {
+  > .o-grid__cell {
+    box-sizing: border-box;
+  }
+
   @for $i from 1 through length($size-names) {
     &--gutter-#{nth($size-names, $i)}{
       > .o-grid__cell {
@@ -13,6 +18,12 @@
       }
     }
   }
+}
+
+// Drawer
+.o-drawer-container {
+  position: relative;
+  overflow: hidden;
 }
 
 // Icon

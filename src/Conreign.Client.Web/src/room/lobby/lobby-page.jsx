@@ -3,7 +3,10 @@ import { connect } from 'react-redux';
 import { findKey, parseInt, isNumber, values } from 'lodash';
 import Measure from 'react-measure';
 
-import { PLAYER_SHAPE, PLANET_SHAPE } from './../schemas';
+import {
+  PLAYER_SHAPE,
+  PLANET_SHAPE,
+} from './../schemas';
 import {
   Grid,
   GridCell,
@@ -15,13 +18,21 @@ import {
   Box,
   BoxType,
 } from './../../theme';
-import { Map, PlanetCell, MAP_SELECTION_SHAPE } from '../map';
-import { submitGameSettings, changeGameSettings, GAME_SETTINGS_SHAPE } from './lobby';
+import { Map, PlanetCell, MAP_SELECTION_SHAPE } from './../map';
+import {
+  submitGameSettings,
+  changeGameSettings,
+  submitPlayerSettings,
+  changePlayerSettings,
+  setPlayerSettingsVisibility,
+} from './lobby';
+import { GAME_SETTINGS_SHAPE, PLAYER_SETTINGS_SHAPE } from './schemas';
 import PlanetCard from './../planet-card';
 import Chat from './../chat';
 import GameSettingsForm from './game-settings-form';
+import PlayerSettingsForm from './player-settings-form';
 
-const WIDGET_HEADER_HEIGHT = 40;
+const WIDGET_HEADER_HEIGHT = 21;
 
 function calculateMapSize(viewDimensions, mapDimensions) {
   const {
@@ -53,15 +64,20 @@ function adjustMapSelection(map, mapSelection, currentUser) {
 
 function LobbyPage({
   roomId,
+  playerSettings,
   gameSettings,
   map,
   players,
   leaderUserId,
   mapSelection,
   currentUser,
+  playerSettingsOpen,
+  onPlayerSettingsSetVisibility,
   onMapSelectionChange,
   onGameSettingsSubmit,
   onGameSettingsChange,
+  onPlayerSettingsChange,
+  onPlayerSettingsSubmit,
 }) {
   function LobbyCell({ cellIndex }) {
     const planet = map.planets[cellIndex];
@@ -74,7 +90,6 @@ function LobbyPage({
   LobbyCell.propTypes = {
     cellIndex: PropTypes.number.isRequired,
   };
-
   const chosenMapSelection = adjustMapSelection(
     map,
     mapSelection,
@@ -85,9 +100,7 @@ function LobbyPage({
     ...selectedPlanet,
     owner: players[selectedPlanet.ownerId],
   };
-
   const isLeader = leaderUserId === currentUser.id;
-
   gameSettings = gameSettings || {
     mapWidth: map.width,
     mapHeight: map.height,
@@ -95,6 +108,11 @@ function LobbyPage({
       .filter(planet => !planet.ownerId)
       .length,
   };
+  playerSettings = playerSettings || players[currentUser.id];
+
+  const usedNicknames = values(players)
+    .filter(p => p.userId !== currentUser.id)
+    .map(u => u.nickname);
 
   return (
     <Box
@@ -160,8 +178,24 @@ function LobbyPage({
                     <Widget
                       header="Chat"
                       className="u-higher u-full-height"
+                      bodyClassName="u-window-box--none"
                     >
-                      <Chat />
+                      <Chat
+                        players={values(players)}
+                        settingsOpen={playerSettingsOpen}
+                        settingsChildren={
+                          <PlayerSettingsForm
+                            values={playerSettings}
+                            previousValues={players[currentUser.id]}
+                            usedNicknames={usedNicknames}
+                            onSubmit={settings => onPlayerSettingsSubmit({ settings, roomId })}
+                            onChange={settings => onPlayerSettingsChange({ settings, roomId })}
+                          />
+                        }
+                        onSettingsToggle={
+                          visible => onPlayerSettingsSetVisibility({ roomId, visible })
+                        }
+                      />
                     </Widget>
                   </DeckItem>
                 </Deck>
@@ -177,6 +211,7 @@ function LobbyPage({
 LobbyPage.propTypes = {
   roomId: PropTypes.string.isRequired,
   gameSettings: GAME_SETTINGS_SHAPE,
+  playerSettings: PLAYER_SETTINGS_SHAPE,
   map: PropTypes.shape({
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
@@ -188,9 +223,13 @@ LobbyPage.propTypes = {
   currentUser: PropTypes.shape({
     id: PropTypes.string.isRequired,
   }).isRequired,
+  playerSettingsOpen: PropTypes.bool,
+  onPlayerSettingsSetVisibility: PropTypes.func.isRequired,
   onMapSelectionChange: PropTypes.func.isRequired,
   onGameSettingsSubmit: PropTypes.func.isRequired,
   onGameSettingsChange: PropTypes.func.isRequired,
+  onPlayerSettingsChange: PropTypes.func.isRequired,
+  onPlayerSettingsSubmit: PropTypes.func.isRequired,
 };
 
 LobbyPage.defaultProps = {
@@ -199,6 +238,8 @@ LobbyPage.defaultProps = {
     end: null,
   },
   gameSettings: null,
+  playerSettings: null,
+  playerSettingsOpen: false,
 };
 
 export default connect(
@@ -206,5 +247,8 @@ export default connect(
   {
     onGameSettingsSubmit: submitGameSettings,
     onGameSettingsChange: changeGameSettings,
+    onPlayerSettingsSubmit: submitPlayerSettings,
+    onPlayerSettingsChange: changePlayerSettings,
+    onPlayerSettingsSetVisibility: setPlayerSettingsVisibility,
   },
 )(LobbyPage);

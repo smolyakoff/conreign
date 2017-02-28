@@ -1,12 +1,12 @@
 import React, { PropTypes } from 'react';
 
-import { PLAYER_SHAPE, PLAYER } from './schemas';
+import { PLAYER_SHAPE, PLAYER } from '../schemas';
 import {
   Table,
   TableBody,
   TableRow,
   TableCell,
-} from './../theme';
+} from './../../theme';
 import PlayerIcon from './player-icon';
 
 function PlayerRow({

@@ -13,6 +13,13 @@ export const VerticalAlignment = {
   Baseline: 'baseline',
 };
 
+export const Position = {
+  Top: Alignment.Top,
+  Bottom: Alignment.Bottom,
+  Left: Alignment.Left,
+  Right: Alignment.Right,
+};
+
 export const Orientation = {
   Vertical: 'vertical',
   Horizontal: 'horizontal',

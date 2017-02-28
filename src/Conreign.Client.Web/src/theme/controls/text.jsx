@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import bem from 'bem-cn';
 import { values, range } from 'lodash';
 
-import { withThemeSizes, decorate } from './decorators';
+import { withThemeSizes, withThemeColors, decorate } from './decorators';
 import { isNonEmptyString } from './util';
 
 export const TextEmphasize = {
@@ -61,7 +61,10 @@ TextBase.defaultProps = {
   kbd: false,
 };
 
-export const Text = decorate(withThemeSizes())(TextBase);
+export const Text = decorate(
+  withThemeSizes(),
+  withThemeColors(),
+)(TextBase);
 
 function Paragraph({ className, children, ...others }) {
   return (

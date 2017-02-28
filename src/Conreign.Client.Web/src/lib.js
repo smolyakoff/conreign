@@ -8,6 +8,7 @@ import 'react-addons-css-transition-group';
 import 'react-dom';
 import 'redux';
 import 'recompose';
+import 'revalidate';
 import 'reselect';
 import 'react-redux';
 import 'redux-observable';

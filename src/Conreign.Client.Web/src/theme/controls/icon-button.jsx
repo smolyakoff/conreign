@@ -16,9 +16,10 @@ function IconButton({
   className,
   iconName,
   children,
+  ...others
 }) {
   return (
-    <button className={button.mix(className)()}>
+    <button className={button.mix(className)()} {...others}>
       <div className={button('content')}>
         <Icon className={button('icon')()} name={iconName} />
         {children}

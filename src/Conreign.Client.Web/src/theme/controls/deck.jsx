@@ -7,22 +7,24 @@ import { decorate, withThemeSizes, ThemeSize } from './decorators';
 
 const deck = bem('o-deck');
 
-export function DeckItem({ children, stretch }) {
+export function DeckItem({ className, children, stretch }) {
   const item = deck('item');
   const modifiers = { stretch };
   return (
-    <div className={item(modifiers)()}>
+    <div className={item(modifiers).mix(className)()}>
       {children}
     </div>
   );
 }
 
 DeckItem.propTypes = {
+  className: PropTypes.string,
   children: PropTypes.node,
   stretch: PropTypes.bool,
 };
 
 DeckItem.defaultProps = {
+  className: null,
   children: null,
   stretch: false,
 };

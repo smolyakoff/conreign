@@ -4,7 +4,7 @@
   @include window-box--small();
   position: fixed;
   max-width: 50%;
-  z-index: 500;
+  z-index: $z-over-everything + 100;
   right: 0;
   bottom: 0;
 }

@@ -72,3 +72,36 @@ InputContainerBase.defaultProps = {
 };
 
 export const InputContainer = decorate(withThemeSizes())(InputContainerBase);
+
+const hint = bem('c-hint');
+
+function HintBase({
+  className,
+  children,
+  isStatic,
+}) {
+  const modifiers = {
+    static: isStatic,
+  };
+  return (
+    <div className={hint(modifiers).mix(className)()}>
+      {children}
+    </div>
+  );
+}
+
+HintBase.propTypes = {
+  className: PropTypes.string,
+  children: PropTypes.node,
+  isStatic: PropTypes.bool,
+};
+
+HintBase.defaultProps = {
+  className: null,
+  children: null,
+  isStatic: false,
+};
+
+export const Hint = decorate(
+  withThemeColors(hint()),
+)(HintBase);

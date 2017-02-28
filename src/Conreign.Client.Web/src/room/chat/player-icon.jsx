@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import block from 'bem-cn';
 import { values } from 'lodash';
 
-import { PresenceStatus } from './../core';
+import { PresenceStatus } from './../../core';
 import './player-icon.scss';
 
 const css = block('c-player-icon');

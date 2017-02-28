@@ -1,0 +1,6 @@
+@import "./../../theme/variables";
+
+.chat-sidebar {
+  width: 200px;
+  background-color: lighten($color-bg-brand, 0.1);
+}

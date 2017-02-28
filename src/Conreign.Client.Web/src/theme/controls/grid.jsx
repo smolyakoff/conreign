@@ -149,7 +149,7 @@ function validateResponsivenessConfiguration(props, propName) {
 }
 
 Grid.propTypes = {
-  gutter: PropTypes.oneOf(values(ThemeSize).concat([null])),
+  gutter: PropTypes.oneOf(values(ThemeSize).concat([null, true])),
   wrap: PropTypes.bool,
   className: PropTypes.string,
   children: PropTypes.node,

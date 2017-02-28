@@ -9,7 +9,6 @@ namespace Conreign.Core.Gameplay.Editor
 {
     public class PlayerListEditor
     {
-        private readonly PlayerOptionsValidator _optionsValidator;
         private readonly List<PlayerData> _state;
 
         public PlayerListEditor(List<PlayerData> state)
@@ -19,7 +18,6 @@ namespace Conreign.Core.Gameplay.Editor
                 throw new ArgumentNullException(nameof(state));
             }
             _state = state;
-            _optionsValidator = new PlayerOptionsValidator();
         }
 
         public int Count => _state.Count;
@@ -66,7 +64,12 @@ namespace Conreign.Core.Gameplay.Editor
                 throw new ArgumentNullException(nameof(options));
             }
             EnsurePlayerExists(userId);
-            options.EnsureIsValid(_optionsValidator);
+            var usedNicknames = _state
+                .Where(x => x.UserId != userId)
+                .Select(x => x.Nickname)
+                .ToHashSet();
+            var validator = new PlayerOptionsValidator(usedNicknames);
+            options.EnsureIsValid(validator);
             var player = this[userId];
             var current = new PlayerOptionsData
             {

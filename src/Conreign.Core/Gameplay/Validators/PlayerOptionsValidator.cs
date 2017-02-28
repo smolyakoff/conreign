@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Conreign.Core.Contracts.Gameplay.Data;
 using FluentValidation;
 
@@ -6,10 +8,18 @@ namespace Conreign.Core.Gameplay.Validators
 {
     public class PlayerOptionsValidator : AbstractValidator<PlayerOptionsData>
     {
-        public PlayerOptionsValidator()
+        private readonly HashSet<string> _usedNicknames;
+
+        public PlayerOptionsValidator(HashSet<string> usedNicknames)
         {
-            RuleFor(x => x.Nickname).NotEmpty();
+            _usedNicknames = usedNicknames ?? throw new ArgumentNullException(nameof(usedNicknames));
+            RuleFor(x => x.Nickname).Must(BeUnique).NotEmpty();
             RuleFor(x => x.Color).NotEmpty().Matches(new Regex("^#[0-9a-f]{6}$"));
+        }
+
+        private bool BeUnique(string nickname)
+        {
+            return !_usedNicknames.Contains(nickname);
         }
     }
 }

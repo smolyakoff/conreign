@@ -34,7 +34,9 @@ export function decorate(...decorators) {
 export function withThemeColors(blockClass, options = {}) {
   options = defaults(options, {
     defaultValue: null,
-    getClassName: props => `${blockClass}--${props.themeColor}`,
+    getClassName: props => blockClass
+      ? `${blockClass}--${props.themeColor}`
+      : `u-color-${props.themeColor}`,
   });
   function mapProps(props) {
     const { className, themeColor, ...others } = props;

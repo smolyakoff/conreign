@@ -11,6 +11,7 @@ export * from './text';
 export * from './grid';
 export * from './table';
 export * from './deck';
+export { default as DrawerContainer } from './drawer';
 export * from './card';
 export { default as Widget } from './widget';
 export { default as Box, BoxType } from './box';

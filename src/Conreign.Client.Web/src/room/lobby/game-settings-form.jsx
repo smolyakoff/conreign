@@ -10,7 +10,7 @@ import {
   Deck,
   DeckItem,
 } from './../../theme';
-import { GAME_SETTINGS_SHAPE } from './lobby';
+import { GAME_SETTINGS_SHAPE } from './schemas';
 
 function NumericInput(props) {
   return (
@@ -51,9 +51,9 @@ function createFormProperty(field, values, onChange) {
   };
 }
 
-function GameSettingsForm({ onFieldChange, onSubmit, values }) {
+function GameSettingsForm({ onChange, onSubmit, values }) {
   const properties = objectValues(FIELDS)
-    .map(field => createFormProperty(field, values, onFieldChange));
+    .map(field => createFormProperty(field, values, onChange));
   return (
     <Deck themeSpacing={ThemeSize.Small}>
       <DeckItem>
@@ -73,7 +73,7 @@ function GameSettingsForm({ onFieldChange, onSubmit, values }) {
 
 GameSettingsForm.propTypes = {
   values: GAME_SETTINGS_SHAPE.isRequired,
-  onFieldChange: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
 };
 
@@ -101,6 +101,6 @@ function submit(event, props) {
 }
 
 export default withHandlers({
-  onFieldChange: props => event => setField(event, props),
+  onChange: props => event => setField(event, props),
   onSubmit: props => event => submit(event, props),
 })(GameSettingsForm);

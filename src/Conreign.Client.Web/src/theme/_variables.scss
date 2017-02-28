@@ -41,6 +41,9 @@ $button-brand-background-color: $color-brand;
 $button-ghost-brand-color: $color-brand;
 
 // Cards
-$card-background-color: transparentize($color-bg-brand, 0.8);
+$card-background-color: transparentize($color-bg-brand, 0.7);
 $card-border-radius: 0;
 $card-item-border-bottom: 0;
+
+$drawer-background-color: $card-background-color;
+$drawer-color: $color-white;

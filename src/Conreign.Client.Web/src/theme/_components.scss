@@ -4,10 +4,12 @@
 @import "~blaze/scss/components.navs";
 @import "~blaze/scss/components.buttons";
 @import "~blaze/scss/components.inputs";
+@import "~blaze/scss/components.hints";
 @import "~blaze/scss/components.progress";
 @import "~blaze/scss/components.cards";
 @import "~blaze/scss/components.tables";
 @import "~blaze/scss/components.alerts";
+@import "~blaze/scss/components.overlays";
 
 body {
   @extend .c-text;
@@ -51,6 +53,7 @@ a {
 .c-widget {
   display: flex;
   flex-direction: column;
+  background-color: $card-background-color;
   &__header {
     @include window-box--small();
     background-color: $color-info;

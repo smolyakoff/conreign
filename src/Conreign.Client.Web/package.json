@@ -51,6 +51,7 @@
     "redux-devtools-extension": "^1.0.0",
     "redux-observable": "^0.12.2",
     "reselect": "^2.5.4",
+    "revalidate": "^1.1.0",
     "rxjs": "^5.0.3",
     "sass-material-colors": "0.0.5",
     "serialize-error": "^2.1.0",
