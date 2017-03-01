@@ -45,7 +45,7 @@ function createEpic(container) {
   );
 }
 
-function mapRoomDtoToRoomState(room) {
+function normalizeRoomState(room) {
   const players = fp.flow(
       fp.keyBy(p => p.userId),
       fp.mapValues(p => ({
@@ -91,88 +91,62 @@ function roomReducer(state = {}, action) {
   }
   switch (action.type) {
     case GET_ROOM_STATE_COMPLETED:
-      return {
-        ...state,
-        [action.payload.roomId]: mapRoomDtoToRoomState(action.payload),
-      };
+      return normalizeRoomState(action.payload);
     case SET_MAP_SELECTION:
       return {
         ...state,
-        [action.payload.roomId]: {
-          ...state[action.payload.roomId],
-          mapSelection: action.payload.selection,
-        },
+        mapSelection: action.payload.selection,
       };
     case HANDLE_MAP_UPDATED: {
-      const roomId = action.payload.roomId;
-      if (!state[roomId]) {
-        return state;
-      }
       const {
         map: previousMap,
         mapSelection: previousSelection,
-      } = state[roomId];
+      } = state;
       const currentMap = action.payload.map;
       const currentSelection = moveSelection({
         previousSelection,
         previousMap,
         currentMap,
       });
-      const { map } = action.payload;
       return {
         ...state,
-        [action.payload.roomId]: {
-          ...state[action.payload.roomId],
-          map,
-          mapSelection: currentSelection,
-          gameSettings: null,
-        },
+        map: currentMap,
+        mapSelection: currentSelection,
+        gameSettings: null,
       };
     }
     case HANDLE_PLAYER_JOINED: {
-      const room = state[action.payload.roomId];
-      const player = action.payload.player;
+      const { player } = action.payload;
       return {
         ...state,
-        [action.payload.roomId]: {
-          ...room,
-          players: {
-            ...room.players,
-            [player.userId]: {
-              ...player,
-              status: PresenceStatus.Online,
-            },
+        players: {
+          ...state.players,
+          [player.userId]: {
+            ...player,
+            status: PresenceStatus.Online,
           },
         },
       };
     }
     case HANDLE_USER_STATUS_CHANGED: {
       const event = action.payload;
-      const room = state[event.hubId];
-      const player = room.players[event.userId];
+      const player = state.players[event.userId];
       return {
         ...state,
-        [event.hubId]: {
-          ...room,
-          players: {
-            ...room.players,
-            [event.userId]: {
-              ...player,
-              status: event.status,
-            },
+        players: {
+          ...state.players,
+          [event.userId]: {
+            ...player,
+            status: event.status,
           },
         },
       };
     }
     case HANDLE_LEADER_CHANGED: {
       const event = action.payload;
-      const room = state[event.hubId];
       return {
         ...state,
-        [event.hubId]: {
-          ...room,
-          leaderUserId: event.userId,
-        },
+        leaderUserId: event.userId,
       };
     }
     default:
@@ -181,12 +155,12 @@ function roomReducer(state = {}, action) {
 }
 
 const reducer = composeReducers(roomReducer, lobby.reducer);
-reducer.$key = 'rooms';
+reducer.$key = 'room';
 
 
-export function selectRoom(state, roomId) {
+export function selectRoomPage(state, roomId) {
   return {
-    ...state[reducer.$key][roomId],
+    ...state.room,
     roomId,
     currentUser: {
       id: state.auth.user.sub,

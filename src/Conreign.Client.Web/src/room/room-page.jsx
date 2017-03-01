@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { values } from 'lodash';
 
 import { RoomMode } from './../core';
-import { getRoomState, selectRoom, setMapSelection } from './room';
+import { getRoomState, selectRoomPage, setMapSelection } from './room';
 import { LobbyPage } from './lobby';
 import { GamePage } from './game';
 
@@ -25,7 +25,7 @@ RoomPage.propTypes = {
 RoomPage.init = ({ params }) => getRoomState(params);
 
 export default connect(
-  (state, { params }) => selectRoom(state, params.roomId),
+  (state, { params }) => selectRoomPage(state, params.roomId),
   {
     onMapSelectionChange: setMapSelection,
   },

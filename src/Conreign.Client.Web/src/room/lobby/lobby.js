@@ -1,5 +1,5 @@
 import { combineEpics } from 'redux-observable';
-import { createAsyncActionTypes, AsyncOperationState, isSucceededAsyncAction } from './../../core';
+import { createAsyncActionTypes, AsyncOperationState } from './../../core';
 
 const SUBMIT_GAME_SETTINGS = 'UPDATE_GAME_OPTIONS';
 const CHANGE_GAME_SETTINGS = 'CHANGE_GAME_SETTINGS';
@@ -64,24 +64,14 @@ function createEpic({ apiDispatcher }) {
   function submitPlayerSettingsEpic(action$) {
     return action$
       .ofType(SUBMIT_PLAYER_SETTINGS)
-      .mergeMap(action =>
-        apiDispatcher({
-          ...action,
-          payload: {
-            roomId: action.payload.roomId,
-            options: action.payload.settings,
-          },
-        })
-        .map((resultAction) => {
-          if (isSucceededAsyncAction(resultAction)) {
-            return {
-              ...resultAction,
-              payload: action.payload,
-            };
-          }
-          return resultAction;
-        }),
-      );
+      .map(action => ({
+        ...action,
+        payload: {
+          roomId: action.payload.roomId,
+          options: action.payload.settings,
+        },
+      }))
+      .mergeMap(apiDispatcher);
   }
   return combineEpics(
     submitGameSettingsEpic,
@@ -91,66 +81,40 @@ function createEpic({ apiDispatcher }) {
 
 function reducer(state, action) {
   switch (action.type) {
-    case CHANGE_GAME_SETTINGS: {
-      const { roomId, settings } = action.payload;
-      const room = state[roomId];
+    case CHANGE_GAME_SETTINGS:
       return {
         ...state,
-        [action.payload.roomId]: {
-          ...room,
-          gameSettings: settings,
-        },
+        gameSettings: action.payload.settings,
       };
-    }
-    case CHANGE_PLAYER_SETTINGS: {
-      const { roomId, settings } = action.payload;
-      const room = state[roomId];
+    case CHANGE_PLAYER_SETTINGS:
       return {
         ...state,
-        [roomId]: {
-          ...room,
-          playerSettings: settings,
-        },
+        playerSettings: action.payload.settings,
       };
-    }
     case HANDLE_PLAYER_UPDATED: {
-      const { roomId, player } = action.payload;
-      const room = state[roomId];
-      const currentPlayer = room.players[player.userId];
+      const { player } = action.payload;
+      const currentPlayer = state.players[player.userId];
       return {
         ...state,
-        [roomId]: {
-          ...room,
-          players: {
-            ...room.players,
-            [player.userId]: {
-              ...currentPlayer,
-              ...player,
-            },
+        players: {
+          ...state.players,
+          [player.userId]: {
+            ...currentPlayer,
+            ...player,
           },
         },
       };
     }
-    case SUBMIT_PLAYER_SETTINGS_SUCCEEDED: {
-      const { roomId } = action.payload;
-      const room = state[roomId];
+    case SUBMIT_PLAYER_SETTINGS_SUCCEEDED:
       return {
         ...state,
-        [roomId]: {
-          ...room,
-          playerSettingsOpen: false,
-        },
+        playerSettingsOpen: false,
       };
-    }
     case SET_PLAYER_SETTINGS_VISIBILITY: {
-      const { roomId, visible } = action.payload;
-      const room = state[roomId];
+      const { visible } = action.payload;
       return {
         ...state,
-        [roomId]: {
-          ...room,
-          playerSettingsOpen: visible,
-        },
+        playerSettingsOpen: visible,
       };
     }
     default:
