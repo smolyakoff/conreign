@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import { noop } from 'lodash';
+import { withState, withHandlers, compose } from 'recompose';
 
 import gear from 'evil-icons/assets/icons/ei-gear.svg';
 import comment from 'evil-icons/assets/icons/ei-comment.svg';
@@ -10,12 +11,17 @@ import {
   GridCell,
   VerticalAlignment,
 } from './../../theme';
+import ChatMessageInput from './chat-message-input';
 
 
-export default function ChatControlPanel({
+function ChatControlPanel({
   className,
+  message,
   showSettings,
   onSettingsClick,
+  onSendClick,
+  onMessageSend,
+  onMessageEdit,
 }) {
   return (
     <Grid
@@ -31,10 +37,18 @@ export default function ChatControlPanel({
         )
       }
       <GridCell gutter={false}>
-        <textarea />
+        <ChatMessageInput
+          value={message}
+          onSend={onMessageSend}
+          onChange={e => onMessageEdit(e.target.value)}
+          onEdit={onMessageEdit}
+        />
       </GridCell>
       <GridCell fixedWidth>
-        <IconButton iconName={comment}>
+        <IconButton
+          iconName={comment}
+          onClick={onSendClick}
+        >
           Send
         </IconButton>
       </GridCell>
@@ -44,12 +58,32 @@ export default function ChatControlPanel({
 
 ChatControlPanel.propTypes = {
   className: PropTypes.string,
+  message: PropTypes.string.isRequired,
   showSettings: PropTypes.bool,
   onSettingsClick: PropTypes.func,
+  onSendClick: PropTypes.func.isRequired,
+  onMessageSend: PropTypes.func,
+  onMessageEdit: PropTypes.func.isRequired,
 };
 
 ChatControlPanel.defaultProps = {
   className: null,
   showSettings: false,
   onSettingsClick: noop,
+  onMessageSend: noop,
 };
+
+function send(props, event) {
+  if (!props.message) {
+    return;
+  }
+  (props.onMessageSend || noop)(props.message, event);
+  props.onMessageEdit('');
+}
+
+export default compose(
+  withState('message', 'onMessageEdit', ''),
+  withHandlers({
+    onSendClick: props => event => send(props, event),
+  }),
+)(ChatControlPanel);

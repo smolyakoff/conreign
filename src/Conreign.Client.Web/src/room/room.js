@@ -2,12 +2,11 @@ import { omit, findKey, isNumber } from 'lodash';
 import fp from 'lodash/fp';
 import { combineEpics } from 'redux-observable';
 
-import { AsyncOperationState, createAsyncActionTypes, PresenceStatus } from './../core';
+import { AsyncOperationState, createAsyncActionTypes } from './../core';
 import { composeReducers } from './../util';
 import lobby from './lobby';
 
 const HANDLE_MAP_UPDATED = 'HANDLE_MAP_UPDATED';
-const HANDLE_PLAYER_JOINED = 'HANDLE_PLAYER_JOINED';
 const HANDLE_USER_STATUS_CHANGED = 'HANDLE_USER_STATUS_CHANGED';
 const HANDLE_LEADER_CHANGED = 'HANDLE_LEADER_CHANGED';
 const GET_ROOM_STATE = 'GET_ROOM_STATE';
@@ -113,19 +112,6 @@ function roomReducer(state = {}, action) {
         map: currentMap,
         mapSelection: currentSelection,
         gameSettings: null,
-      };
-    }
-    case HANDLE_PLAYER_JOINED: {
-      const { player } = action.payload;
-      return {
-        ...state,
-        players: {
-          ...state.players,
-          [player.userId]: {
-            ...player,
-            status: PresenceStatus.Online,
-          },
-        },
       };
     }
     case HANDLE_USER_STATUS_CHANGED: {
