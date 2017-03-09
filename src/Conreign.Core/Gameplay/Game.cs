@@ -73,7 +73,7 @@ namespace Conreign.Core.Gameplay
             {
                 RoomId = _state.RoomId,
                 Players = _state.Players,
-                Events = _hub.GetEvents(userId).Select(x => new MessageEnvelope {Payload = x}).ToList(),
+                Events = _hub.GetEvents(userId).Select(x => new EventEnvelope(x)).ToList(),
                 LeaderUserId = _hub.LeaderUserId,
                 Map = _state.Map,
                 MovingFleets = playerState.MovingFleets,

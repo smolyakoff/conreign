@@ -14,11 +14,13 @@ namespace Conreign.Core.Contracts.Gameplay.Events
             PlanetName = planetName;
             OwnerId = ownerId;
             Ships = ships;
+            Timestamp = DateTime.UtcNow;
         }
 
         public string RoomId { get; }
         public string PlanetName { get; }
         public Guid OwnerId { get; }
         public int Ships { get; }
+        public DateTime Timestamp { get; }
     }
 }

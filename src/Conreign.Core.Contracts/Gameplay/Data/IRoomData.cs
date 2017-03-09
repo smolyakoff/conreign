@@ -9,7 +9,7 @@ namespace Conreign.Core.Contracts.Gameplay.Data
     {
         string RoomId { get; }
         RoomMode Mode { get; }
-        List<MessageEnvelope> Events { get; }
+        List<EventEnvelope> Events { get; }
         List<PlayerData> Players { get; }
         Dictionary<Guid, PresenceStatus> PlayerStatuses { get; }
         MapData Map { get; }

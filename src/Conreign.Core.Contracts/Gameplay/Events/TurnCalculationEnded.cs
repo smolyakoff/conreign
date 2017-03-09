@@ -16,11 +16,13 @@ namespace Conreign.Core.Contracts.Gameplay.Events
             Turn = turn;
             Map = map;
             MovingFleets = movingFleets;
+            Timestamp = DateTime.UtcNow;
         }
 
         public string RoomId { get; }
         public int Turn { get; }
         public MapData Map { get; }
         public List<MovingFleetData> MovingFleets { get; }
+        public DateTime Timestamp { get; }
     }
 }

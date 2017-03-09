@@ -48,10 +48,10 @@
 // Deck
 .o-deck {
   display: flex;
-  height: 100%;
 
   &--orientation-vertical {
     flex-direction: column;
+    height: 100%;
   }
 
   &__item {

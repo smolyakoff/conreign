@@ -36,6 +36,7 @@
     <Compile Include="Auth\Errors\AuthenticationError.cs" />
     <Compile Include="Auth\IAuthGrain.cs" />
     <Compile Include="Auth\IAuthService.cs" />
+    <Compile Include="Client\EventEnvelope.cs" />
     <Compile Include="Client\Exceptions\ClientException.cs" />
     <Compile Include="Client\Exceptions\ConnectionException.cs" />
     <Compile Include="Client\Exceptions\ServerErrorException.cs" />
@@ -61,7 +62,7 @@
     <Compile Include="Client\Messages\UserError.cs" />
     <Compile Include="Client\Messages\UserErrorExtensions.cs" />
     <Compile Include="Client\Exceptions\UserExceptionExtensions.cs" />
-    <Compile Include="Client\Messages\WriteCommand.cs" />
+    <Compile Include="Client\Messages\SendMessageCommand.cs" />
     <Compile Include="Client\Metadata.cs" />
     <Compile Include="Client\Serialization\MessageEnvelopeJsonConverter.cs" />
     <Compile Include="Client\Serialization\MessageTypeSerializer.cs" />

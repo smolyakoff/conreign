@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using AutoMapper;
 using Conreign.Client.Handler.Handlers;
 using Conreign.Client.Handler.Handlers.Behaviours;
-using Conreign.Client.Handler.Handlers.Common;
-using Conreign.Core.Contracts.Client.Messages;
 using MediatR;
 using SimpleInjector;
 
@@ -37,7 +34,7 @@ namespace Conreign.Client.Handler
             });
             container.Register(() =>
             {
-                var configuration = new MapperConfiguration(cfg => cfg.AddProfiles(assemblies));
+                var configuration = new MapperConfiguration(cfg => cfg.AddProfile<HandlersMappingProfile>());
                 return configuration.CreateMapper();
             }, Lifestyle.Singleton);
             container.Register<SingleInstanceFactory>(() => container.GetInstance, Lifestyle.Singleton);

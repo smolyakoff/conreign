@@ -15,10 +15,12 @@ namespace Conreign.Core.Contracts.Gameplay.Events
             SenderId = senderId;
             Message = message;
             RoomId = roomId;
+            Timestamp = DateTime.UtcNow;
         }
 
         public Guid SenderId { get; }
         public TextMessageData Message { get; }
         public string RoomId { get; }
+        public DateTime Timestamp { get; }
     }
 }

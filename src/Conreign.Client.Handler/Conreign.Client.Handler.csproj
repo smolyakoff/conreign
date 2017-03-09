@@ -61,7 +61,7 @@
     <Compile Include="Handlers\StartGameHandler.cs" />
     <Compile Include="Handlers\UpdateGameOptionsHandler.cs" />
     <Compile Include="Handlers\UpdatePlayerOptionsHandler.cs" />
-    <Compile Include="Handlers\WriteHandler.cs" />
+    <Compile Include="Handlers\SendMessageHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

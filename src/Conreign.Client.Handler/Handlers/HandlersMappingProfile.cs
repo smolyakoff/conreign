@@ -9,7 +9,7 @@ namespace Conreign.Client.Handler.Handlers
         public HandlersMappingProfile()
         {
             CreateMap<CancelFleetCommand, FleetCancelationData>();
-            CreateMap<WriteCommand, TextMessageData>();
+            CreateMap<SendMessageCommand, TextMessageData>();
         }
     }
 }

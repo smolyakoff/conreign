@@ -15,5 +15,6 @@ namespace Conreign.Client.SignalR
         }
 
         public Exception Exception { get; }
+        public DateTime Timestamp { get; }
     }
 }

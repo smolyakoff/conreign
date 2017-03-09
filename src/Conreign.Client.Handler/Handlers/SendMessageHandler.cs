@@ -8,11 +8,11 @@ using MediatR;
 
 namespace Conreign.Client.Handler.Handlers
 {
-    internal class WriteHandler : ICommandHandler<WriteCommand, Unit>
+    internal class SendMessageHandler : ICommandHandler<SendMessageCommand, Unit>
     {
         private readonly IMapper _mapper;
 
-        public WriteHandler(IMapper mapper)
+        public SendMessageHandler(IMapper mapper)
         {
             if (mapper == null)
             {
@@ -21,13 +21,13 @@ namespace Conreign.Client.Handler.Handlers
             _mapper = mapper;
         }
 
-        public async Task<Unit> Handle(CommandEnvelope<WriteCommand, Unit> message)
+        public async Task<Unit> Handle(CommandEnvelope<SendMessageCommand, Unit> message)
         {
             var context = message.Context;
             var command = message.Command;
             var player = await context.User.JoinRoom(command.RoomId, context.Connection.Id);
-            var textMessage = _mapper.Map<WriteCommand, TextMessageData>(command);
-            await player.Write(textMessage);
+            var textMessage = _mapper.Map<SendMessageCommand, TextMessageData>(command);
+            await player.SendMessage(textMessage);
             return Unit.Value;
         }
     }

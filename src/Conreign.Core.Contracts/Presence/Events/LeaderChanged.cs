@@ -14,5 +14,6 @@ namespace Conreign.Core.Contracts.Presence.Events
 
         public string HubId { get; set; }
         public Guid? UserId { get; set; }
+        public DateTime Timestamp { get; }
     }
 }

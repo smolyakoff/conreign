@@ -1,10 +1,11 @@
 import React, { PropTypes } from 'react';
+import { keyBy } from 'lodash';
 
 import './chat.scss';
 import ChatControlPanel from './chat-control-panel';
 import ChatMessageArea from './chat-message-area';
 import PlayerList from './player-list';
-import { PLAYER_SHAPE } from './../schemas';
+import { PLAYER_SHAPE, GAME_EVENT_SHAPE } from './../schemas';
 
 import {
   Deck,
@@ -18,11 +19,15 @@ import {
   GridCell,
 } from './../../theme';
 
+
 export default function Chat({
   players,
+  events,
+  renderers,
   settingsChildren,
   settingsOpen,
   onSettingsToggle,
+  onMessageSend,
 }) {
   const showSettings = !!settingsChildren;
 
@@ -40,9 +45,13 @@ export default function Chat({
           }
           onOverlayClick={e => onSettingsToggle(false, e)}
         >
-          <Grid className="u-full-height">
+          <Grid className="u-full-height u-small">
             <GridCell>
-              <ChatMessageArea />
+              <ChatMessageArea
+                events={events}
+                players={keyBy(players, x => x.userId)}
+                renderers={renderers}
+              />
             </GridCell>
             <GridCell className="chat-sidebar" fixedWidth>
               <PlayerList players={players} />
@@ -55,6 +64,7 @@ export default function Chat({
           <ChatControlPanel
             showSettings={showSettings}
             onSettingsClick={e => onSettingsToggle(!settingsOpen, e)}
+            onMessageSend={onMessageSend}
           />
         </Box>
       </DeckItem>
@@ -63,13 +73,19 @@ export default function Chat({
 }
 
 Chat.propTypes = {
-  players: PropTypes.arrayOf(PLAYER_SHAPE).isRequired,
+  players: PropTypes.arrayOf(PLAYER_SHAPE),
+  events: PropTypes.arrayOf(GAME_EVENT_SHAPE),
+  renderers: PropTypes.objectOf(PropTypes.func),
   settingsChildren: PropTypes.node,
   settingsOpen: PropTypes.bool,
   onSettingsToggle: PropTypes.func.isRequired,
+  onMessageSend: PropTypes.func.isRequired,
 };
 
 Chat.defaultProps = {
+  events: [],
+  players: [],
   settingsChildren: null,
   settingsOpen: false,
+  renderers: {},
 };

@@ -88,7 +88,7 @@ namespace Conreign.Experiments
                     }
                 };
                 await handler.Handle(updatePlayer, meta);
-                var write = new WriteCommand
+                var write = new SendMessageCommand
                 {
                     RoomId = "conreign",
                     Text = "Hello!"

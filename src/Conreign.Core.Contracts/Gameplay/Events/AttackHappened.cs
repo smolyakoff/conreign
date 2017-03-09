@@ -16,6 +16,7 @@ namespace Conreign.Core.Contracts.Gameplay.Events
             PlanetName = planetName;
             AttackerUserId = attackerUserId;
             DefenderUserId = defenderUserId;
+            Timestamp = DateTime.UtcNow;
         }
 
         public AttackOutcome Outcome { get; }
@@ -23,5 +24,6 @@ namespace Conreign.Core.Contracts.Gameplay.Events
         public Guid AttackerUserId { get; }
         public Guid? DefenderUserId { get; }
         public string RoomId { get; }
+        public DateTime Timestamp { get; }
     }
 }

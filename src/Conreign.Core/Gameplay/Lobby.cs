@@ -76,7 +76,7 @@ namespace Conreign.Core.Gameplay
             var state = new LobbyData
             {
                 RoomId = _state.RoomId,
-                Events = _hub.GetEvents(userId).Select(x => new MessageEnvelope {Payload = x}).ToList(),
+                Events = _hub.GetEvents(userId).Select(x => new EventEnvelope(x)).ToList(),
                 Players = _state.Players,
                 PlayerStatuses = _state.Players
                     .ToDictionary(x => x.UserId,

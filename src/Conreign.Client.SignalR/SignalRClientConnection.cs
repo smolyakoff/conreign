@@ -71,10 +71,10 @@ namespace Conreign.Client.SignalR
             return Task.FromResult(result);
         }
 
-        public async Task<LoginResult> Login()
+        public async Task<LoginResult> Login(string accessToken = null)
         {
             EnsureIsNotDisposed();
-            var login = new LoginCommand();
+            var login = new LoginCommand { AccessToken =  accessToken };
             var response = await _sender.Send(login);
             return await Authenticate(response.AccessToken);
         }

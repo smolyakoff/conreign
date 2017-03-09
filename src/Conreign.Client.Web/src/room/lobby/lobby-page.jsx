@@ -6,6 +6,7 @@ import Measure from 'react-measure';
 import {
   PLAYER_SHAPE,
   PLANET_SHAPE,
+  GAME_EVENT_SHAPE,
 } from './../schemas';
 import {
   Grid,
@@ -68,10 +69,13 @@ function LobbyPage({
   gameSettings,
   map,
   players,
+  events,
+  eventRenderers,
   leaderUserId,
   mapSelection,
   currentUser,
   playerSettingsOpen,
+  onMessageSend,
   onPlayerSettingsSetVisibility,
   onMapSelectionChange,
   onGameSettingsSubmit,
@@ -182,6 +186,10 @@ function LobbyPage({
                     >
                       <Chat
                         players={values(players)}
+                        events={events}
+                        renderers={{
+                          ...eventRenderers,
+                        }}
                         settingsOpen={playerSettingsOpen}
                         settingsChildren={
                           <PlayerSettingsForm
@@ -195,6 +203,7 @@ function LobbyPage({
                         onSettingsToggle={
                           visible => onPlayerSettingsSetVisibility({ roomId, visible })
                         }
+                        onMessageSend={text => onMessageSend({ roomId, text })}
                       />
                     </Widget>
                   </DeckItem>
@@ -219,11 +228,14 @@ LobbyPage.propTypes = {
   }).isRequired,
   mapSelection: MAP_SELECTION_SHAPE,
   players: PropTypes.objectOf(PLAYER_SHAPE).isRequired,
+  events: PropTypes.arrayOf(GAME_EVENT_SHAPE).isRequired,
+  eventRenderers: PropTypes.objectOf(PropTypes.func).isRequired,
   leaderUserId: PropTypes.string.isRequired,
   currentUser: PropTypes.shape({
     id: PropTypes.string.isRequired,
   }).isRequired,
   playerSettingsOpen: PropTypes.bool,
+  onMessageSend: PropTypes.func.isRequired,
   onPlayerSettingsSetVisibility: PropTypes.func.isRequired,
   onMapSelectionChange: PropTypes.func.isRequired,
   onGameSettingsSubmit: PropTypes.func.isRequired,

@@ -13,10 +13,12 @@ namespace Conreign.Core.Contracts.Presence.Events
             HubId = hubId;
             UserId = userId;
             Status = status;
+            Timestamp = DateTime.UtcNow;
         }
 
         public PresenceStatus Status { get;  }
         public Guid UserId { get;  }
         public string HubId { get; }
+        public DateTime Timestamp { get; }
     }
 }

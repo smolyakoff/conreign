@@ -96,13 +96,13 @@ namespace Conreign.Client.SignalR.Proxies
             return _context.Send(command);
         }
 
-        public Task Write(TextMessageData textMessage)
+        public Task SendMessage(TextMessageData textMessage)
         {
             if (textMessage == null)
             {
                 throw new ArgumentNullException(nameof(textMessage));
             }
-            var command = new WriteCommand
+            var command = new SendMessageCommand
             {
                 RoomId = _roomId,
                 Text = textMessage.Text

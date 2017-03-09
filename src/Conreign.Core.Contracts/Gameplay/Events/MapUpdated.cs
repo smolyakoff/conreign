@@ -13,9 +13,11 @@ namespace Conreign.Core.Contracts.Gameplay.Events
         {
             RoomId = roomId;
             Map = map;
+            Timestamp = DateTime.UtcNow;
         }
 
         public string RoomId { get; }
         public MapData Map { get; }
+        public DateTime Timestamp { get; }
     }
 }

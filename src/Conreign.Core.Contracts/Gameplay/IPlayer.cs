@@ -11,7 +11,7 @@ namespace Conreign.Core.Contracts.Gameplay
         Task LaunchFleet(FleetData fleet);
         Task CancelFleet(FleetCancelationData fleetCancelation);
         Task EndTurn();
-        Task Write(TextMessageData textMessage);
+        Task SendMessage(TextMessageData textMessage);
         Task<IRoomData> GetState();
     }
 }

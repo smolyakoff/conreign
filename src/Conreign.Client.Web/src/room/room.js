@@ -2,15 +2,18 @@ import { omit, findKey, isNumber } from 'lodash';
 import fp from 'lodash/fp';
 import { combineEpics } from 'redux-observable';
 
-import { AsyncOperationState, createAsyncActionTypes } from './../core';
+import { AsyncOperationState, createAsyncActionTypes, GameEventType } from './../core';
 import { composeReducers } from './../util';
 import lobby from './lobby';
 
 const HANDLE_MAP_UPDATED = 'HANDLE_MAP_UPDATED';
 const HANDLE_USER_STATUS_CHANGED = 'HANDLE_USER_STATUS_CHANGED';
 const HANDLE_LEADER_CHANGED = 'HANDLE_LEADER_CHANGED';
+const HANDLE_CHAT_MESSAGE_RECEIVED = 'HANDLE_CHAT_MESSAGE_RECEIVED';
 const GET_ROOM_STATE = 'GET_ROOM_STATE';
 const SET_MAP_SELECTION = 'SET_MAP_SELECTION';
+const SEND_MESSAGE = 'SEND_MESSAGE';
+
 const GET_ROOM_STATE_ACTIONS = createAsyncActionTypes('GET_ROOM_STATE');
 const {
   [AsyncOperationState.Succeeded]: GET_ROOM_STATE_COMPLETED,
@@ -30,6 +33,13 @@ export function setMapSelection(payload) {
   };
 }
 
+export function sendMessage(payload) {
+  return {
+    type: SEND_MESSAGE,
+    payload,
+  };
+}
+
 function createEpic(container) {
   const { apiDispatcher } = container;
 
@@ -38,8 +48,16 @@ function createEpic(container) {
       .ofType(GET_ROOM_STATE)
       .mergeMap(apiDispatcher);
   }
+
+  function sendMessageEpic(action$) {
+    return action$
+      .ofType(SEND_MESSAGE)
+      .mergeMap(apiDispatcher);
+  }
+
   return combineEpics(
     getRoomStateEpic,
+    sendMessageEpic,
     lobby.createEpic(container),
   );
 }
@@ -135,6 +153,14 @@ function roomReducer(state = {}, action) {
         leaderUserId: event.userId,
       };
     }
+    case HANDLE_CHAT_MESSAGE_RECEIVED:
+      return {
+        ...state,
+        events: [...state.events, {
+          type: GameEventType.ChatMessageReceived,
+          payload: action.payload,
+        }],
+      };
     default:
       return state;
   }
@@ -143,10 +169,22 @@ function roomReducer(state = {}, action) {
 const reducer = composeReducers(roomReducer, lobby.reducer);
 reducer.$key = 'room';
 
+function dehydrateEvent(event) {
+  const payload = event.payload;
+  return {
+    ...event,
+    payload: {
+      ...payload,
+      timestamp: new Date(payload.timestamp),
+    },
+  };
+}
 
 export function selectRoomPage(state, roomId) {
+  const room = state[reducer.$key];
   return {
-    ...state.room,
+    ...room,
+    events: room.events.map(dehydrateEvent),
     roomId,
     currentUser: {
       id: state.auth.user.sub,

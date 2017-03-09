@@ -6,6 +6,11 @@ namespace Conreign.Core.Contracts.Gameplay.Events
     [Serializable]
     public class GameStarted : IClientEvent
     {
+        public GameStarted()
+        {
+            Timestamp = DateTime.UtcNow;
+        }
+
         [Serializable]
         public class Server : IServerEvent
         {
@@ -16,5 +21,7 @@ namespace Conreign.Core.Contracts.Gameplay.Events
 
             public IGame Game { get; }
         }
+
+        public DateTime Timestamp { get; }
     }
 }

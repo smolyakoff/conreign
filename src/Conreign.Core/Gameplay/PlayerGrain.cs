@@ -48,9 +48,9 @@ namespace Conreign.Core.Gameplay
             return _player.EndTurn();
         }
 
-        public Task Write(TextMessageData textMessage)
+        public Task SendMessage(TextMessageData textMessage)
         {
-            return _player.Write(textMessage);
+            return _player.SendMessage(textMessage);
         }
 
         public async Task<IRoomData> GetState()

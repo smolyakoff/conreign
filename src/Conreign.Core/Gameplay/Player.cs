@@ -106,7 +106,7 @@ namespace Conreign.Core.Gameplay
             return game.EndTurn(_state.UserId);
         }
 
-        public Task Write(TextMessageData textMessage)
+        public Task SendMessage(TextMessageData textMessage)
         {
             if (textMessage == null)
             {
