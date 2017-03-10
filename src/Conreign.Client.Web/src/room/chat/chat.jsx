@@ -5,7 +5,7 @@ import './chat.scss';
 import ChatControlPanel from './chat-control-panel';
 import ChatMessageArea from './chat-message-area';
 import PlayerList from './player-list';
-import { PLAYER_SHAPE, GAME_EVENT_SHAPE } from './../schemas';
+import { PLAYER_SHAPE, GAME_EVENT_SHAPE } from '../room-schemas';
 
 import {
   Deck,

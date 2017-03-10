@@ -17,7 +17,7 @@ import {
   ThemeColor,
   Orientation,
  } from './../../theme';
-import { PLAYER_SETTINGS_SHAPE } from './schemas';
+import { PLAYER_SETTINGS_SHAPE } from './lobby-schemas';
 
 const FIELD = {
   name: 'nickname',

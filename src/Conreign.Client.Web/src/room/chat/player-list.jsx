@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 
-import { PLAYER_SHAPE, PLAYER } from '../schemas';
+import { PLAYER_SHAPE, PLAYER } from '../room-schemas';
 import {
   Table,
   TableBody,

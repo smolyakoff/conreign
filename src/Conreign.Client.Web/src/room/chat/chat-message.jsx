@@ -13,9 +13,10 @@ import {
   ThemeColor,
   TextEmphasize,
 } from './../../theme';
-import { PLAYER_SHAPE } from './../schemas';
+import { PLAYER_SHAPE } from '../room-schemas';
 import PlayerIcon from './player-icon';
 import vader from './vader.svg';
+import './vader-icon.scss';
 
 const TIME_FORMAT = 'HH:MM';
 
@@ -37,7 +38,10 @@ export default function ChatMessage({
               />
             )
             : (
-              <Icon name={vader} />
+              <Icon
+                className="c-vader-icon"
+                name={vader}
+              />
             )
         }
       </GridCell>
@@ -47,8 +51,11 @@ export default function ChatMessage({
           orientation={Orientation.Horizontal}
         >
           <DeckItem>
-            <Text emphasize={TextEmphasize.Loud}>
-              {sender ? sender.nickname : 'DARK FORCE'}
+            <Text
+              emphasize={TextEmphasize.Loud}
+              themeColor={sender ? ThemeColor.Info : ThemeColor.Warning}
+            >
+              {sender ? sender.nickname : 'VADER'}
             </Text>
           </DeckItem>
           <DeckItem stretch>

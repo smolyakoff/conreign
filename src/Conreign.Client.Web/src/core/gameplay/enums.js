@@ -10,4 +10,6 @@ export const PresenceStatus = {
 
 export const GameEventType = {
   ChatMessageReceived: 'ChatMessageReceived',
+  PlayerJoined: 'PlayerJoined',
+  PlayerUpdated: 'PlayerUpdated',
 };

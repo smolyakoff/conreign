@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 
 import { PanelContainer, Panel } from './../../theme';
-import { GAME_EVENT_SHAPE, PLAYER_SHAPE } from './../schemas';
+import { GAME_EVENT_SHAPE, PLAYER_SHAPE } from '../room-schemas';
 import ChatMessage from './chat-message';
 
 export default function ChatMessageArea({

@@ -10,7 +10,7 @@ import {
   Deck,
   DeckItem,
 } from './../../theme';
-import { GAME_SETTINGS_SHAPE } from './schemas';
+import { GAME_SETTINGS_SHAPE } from './lobby-schemas';
 
 function NumericInput(props) {
   return (

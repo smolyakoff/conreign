@@ -1,5 +1,10 @@
 import { combineEpics } from 'redux-observable';
-import { createAsyncActionTypes, AsyncOperationState, PresenceStatus } from './../../core';
+import {
+  createAsyncActionTypes,
+  AsyncOperationState,
+  PresenceStatus,
+  GameEventType,
+} from './../../core';
 
 const SUBMIT_GAME_SETTINGS = 'UPDATE_GAME_OPTIONS';
 const CHANGE_GAME_SETTINGS = 'CHANGE_GAME_SETTINGS';
@@ -103,20 +108,38 @@ function reducer(state, action) {
             status: PresenceStatus.Online,
           },
         },
+        events: [
+          ...state.events,
+          {
+            type: GameEventType.PlayerJoined,
+            payload: action.payload,
+          },
+        ],
       };
     }
     case HANDLE_PLAYER_UPDATED: {
-      const { player } = action.payload;
-      const currentPlayer = state.players[player.userId];
+      const { player: currentPlayer, timestamp } = action.payload;
+      const previousPlayer = state.players[currentPlayer.userId];
       return {
         ...state,
         players: {
           ...state.players,
-          [player.userId]: {
+          [currentPlayer.userId]: {
+            ...previousPlayer,
             ...currentPlayer,
-            ...player,
           },
         },
+        events: [
+          ...state.events,
+          {
+            type: GameEventType.PlayerUpdated,
+            payload: {
+              timestamp,
+              previousPlayer,
+              currentPlayer,
+            },
+          },
+        ],
       };
     }
     case SUBMIT_PLAYER_SETTINGS_SUCCEEDED:

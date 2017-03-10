@@ -7,7 +7,7 @@ import {
   PLAYER_SHAPE,
   PLANET_SHAPE,
   GAME_EVENT_SHAPE,
-} from './../schemas';
+} from '../room-schemas';
 import {
   Grid,
   GridCell,
@@ -27,9 +27,10 @@ import {
   changePlayerSettings,
   setPlayerSettingsVisibility,
 } from './lobby';
-import { GAME_SETTINGS_SHAPE, PLAYER_SETTINGS_SHAPE } from './schemas';
+import { GAME_SETTINGS_SHAPE, PLAYER_SETTINGS_SHAPE } from './lobby-schemas';
 import PlanetCard from './../planet-card';
 import Chat from './../chat';
+import lobbyEventRenderers from './lobby-event-renderers';
 import GameSettingsForm from './game-settings-form';
 import PlayerSettingsForm from './player-settings-form';
 
@@ -189,6 +190,7 @@ function LobbyPage({
                         events={events}
                         renderers={{
                           ...eventRenderers,
+                          ...lobbyEventRenderers,
                         }}
                         settingsOpen={playerSettingsOpen}
                         settingsChildren={
