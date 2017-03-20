@@ -22,6 +22,7 @@ import {
 
 export default function Chat({
   players,
+  currentUserId,
   events,
   renderers,
   settingsChildren,
@@ -50,6 +51,7 @@ export default function Chat({
               <ChatMessageArea
                 events={events}
                 players={keyBy(players, x => x.userId)}
+                currentUserId={currentUserId}
                 renderers={renderers}
               />
             </GridCell>
@@ -74,6 +76,7 @@ export default function Chat({
 
 Chat.propTypes = {
   players: PropTypes.arrayOf(PLAYER_SHAPE),
+  currentUserId: PropTypes.string.isRequired,
   events: PropTypes.arrayOf(GAME_EVENT_SHAPE),
   renderers: PropTypes.objectOf(PropTypes.func),
   settingsChildren: PropTypes.node,

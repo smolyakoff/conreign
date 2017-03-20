@@ -186,6 +186,7 @@ function LobbyPage({
                       bodyClassName="u-window-box--none"
                     >
                       <Chat
+                        currentUserId={currentUser.id}
                         players={values(players)}
                         events={events}
                         renderers={{

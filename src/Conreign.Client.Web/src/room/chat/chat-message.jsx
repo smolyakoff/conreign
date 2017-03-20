@@ -64,7 +64,9 @@ export default function ChatMessage({
             </Text>
           </DeckItem>
         </Deck>
-        {children}
+        <div>
+          {children}
+        </div>
       </GridCell>
     </Grid>
   );

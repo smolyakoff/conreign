@@ -15,6 +15,7 @@ import 'redux-observable';
 import 'react-router';
 import 'redux-devtools-extension/developmentOnly';
 import 'react-measure';
+import 'react-virtualized';
 import 'classnames';
 import 'color';
 import 'bem-cn';
