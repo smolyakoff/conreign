@@ -1,6 +1,7 @@
 source https://nuget.org/api/v2
 redirects: on
 
+nuget System.ValueTuple
 nuget Humanizer
 nuget Microsoft.Extensions.Configuration
 nuget Microsoft.Extensions.Configuration.Binder

@@ -1,5 +1,6 @@
 ﻿using System;
 using Conreign.Core.Contracts.Gameplay.Data;
+using Conreign.Core.Contracts.Gameplay.Events;
 using Conreign.Core.Gameplay;
 using Conreign.Core.Presence;
 using MongoDB.Bson.Serialization;

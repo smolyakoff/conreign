@@ -137,7 +137,7 @@ namespace Conreign.Core.Presence
         public IEnumerable<IClientEvent> GetEvents(Guid userId)
         {
             return _state.Events
-                .Where(x => x.Recipients.Contains(userId))
+                .Where(x => x.Event.IsPublic() || x.Recipients.Contains(userId))
                 .Select(x => x.Event);
         }
 

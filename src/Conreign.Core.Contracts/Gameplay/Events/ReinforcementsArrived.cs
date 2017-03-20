@@ -6,6 +6,7 @@ namespace Conreign.Core.Contracts.Gameplay.Events
 {
     [Serializable]
     [Immutable]
+    [Private]
     public class ReinforcementsArrived : IClientEvent, IRoomEvent
     {
         public ReinforcementsArrived(string roomId, string planetName, Guid ownerId, int ships)
