@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { AutoSizer, CellMeasurer, List, CellMeasurerCache } from 'react-virtualized';
 import { drop, some } from 'lodash';
 
+import './chat-message-area.scss';
 import { GAME_EVENT_SHAPE, PLAYER_SHAPE } from '../room-schemas';
 import ChatMessage from './chat-message';
 
@@ -68,20 +69,22 @@ export default class ChatMessageArea extends Component {
   render() {
     const { events } = this.props;
     return (
-      <AutoSizer onResize={this._resize}>
-        {({ height, width }) => (
-          <List
-            ref={(list) => { this._list = list; }}
-            deferredMeasurementCache={this._cache}
-            height={height}
-            width={width}
-            rowCount={events.length}
-            rowHeight={this._cache.rowHeight}
-            rowRenderer={this._renderRow}
-            scrollToIndex={this.state.scrollIndex}
-          />
-        )}
-      </AutoSizer>
+      <div className="c-chat-message-area">
+        <AutoSizer onResize={this._resize}>
+          {({ height, width }) => (
+            <List
+              ref={(list) => { this._list = list; }}
+              deferredMeasurementCache={this._cache}
+              height={height}
+              width={width}
+              rowCount={events.length}
+              rowHeight={this._cache.rowHeight}
+              rowRenderer={this._renderRow}
+              scrollToIndex={this.state.scrollIndex}
+            />
+          )}
+        </AutoSizer>
+      </div>
     );
   }
 }

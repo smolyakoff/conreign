@@ -112,7 +112,7 @@ function roomReducer(state = {}, action) {
     case SET_MAP_SELECTION:
       return {
         ...state,
-        mapSelection: action.payload.selection,
+        mapSelection: action.payload,
       };
     case HANDLE_MAP_UPDATED: {
       const {
@@ -129,7 +129,6 @@ function roomReducer(state = {}, action) {
         ...state,
         map: currentMap,
         mapSelection: currentSelection,
-        gameSettings: null,
       };
     }
     case HANDLE_USER_STATUS_CHANGED: {

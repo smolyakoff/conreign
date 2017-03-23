@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { findKey, parseInt, isNumber, values } from 'lodash';
 import Measure from 'react-measure';
+import { compose, withHandlers, withPropsOnChange } from 'recompose';
 
 import {
   PLAYER_SHAPE,
@@ -16,8 +17,6 @@ import {
   Widget,
   Deck,
   DeckItem,
-  Box,
-  BoxType,
 } from './../../theme';
 import { Map, PlanetCell, MAP_SELECTION_SHAPE } from './../map';
 import {
@@ -26,6 +25,7 @@ import {
   submitPlayerSettings,
   changePlayerSettings,
   setPlayerSettingsVisibility,
+  startGame,
 } from './lobby';
 import { GAME_SETTINGS_SHAPE, PLAYER_SETTINGS_SHAPE } from './lobby-schemas';
 import PlanetCard from './../planet-card';
@@ -65,7 +65,6 @@ function adjustMapSelection(map, mapSelection, currentUser) {
 }
 
 function LobbyPage({
-  roomId,
   playerSettings,
   gameSettings,
   map,
@@ -83,6 +82,7 @@ function LobbyPage({
   onGameSettingsChange,
   onPlayerSettingsChange,
   onPlayerSettingsSubmit,
+  onGameStart,
 }) {
   function LobbyCell({ cellIndex }) {
     const planet = map.planets[cellIndex];
@@ -100,19 +100,8 @@ function LobbyPage({
     mapSelection,
     currentUser,
   );
-  let selectedPlanet = map.planets[chosenMapSelection.start];
-  selectedPlanet = {
-    ...selectedPlanet,
-    owner: players[selectedPlanet.ownerId],
-  };
+  const selectedPlanet = map.planets[chosenMapSelection.start];
   const isLeader = leaderUserId === currentUser.id;
-  gameSettings = gameSettings || {
-    mapWidth: map.width,
-    mapHeight: map.height,
-    neutralPlanetsCount: values(map.planets)
-      .filter(planet => !planet.ownerId)
-      .length,
-  };
   playerSettings = playerSettings || players[currentUser.id];
 
   const usedNicknames = values(players)
@@ -120,108 +109,100 @@ function LobbyPage({
     .map(u => u.nickname);
 
   return (
-    <Box
-      className="u-full-height"
-      type={BoxType.Letter}
-      themeSize={ThemeSize.Small}
-    >
-      <Measure whitelist={['width', 'height']}>
-        {
-          dimensions => (
-            <Grid
-              className="u-full-height"
-              gutter={ThemeSize.Small}
-              responsiveness={{
-                [ThemeSize.Small]: GridMode.Full,
-                [ThemeSize.Medium]: GridMode.Full,
-              }}
+    <Measure whitelist={['width', 'height']}>
+      {
+        dimensions => (
+          <Grid
+            className="u-full-height"
+            gutter={ThemeSize.Small}
+            responsiveness={{
+              [ThemeSize.Small]: GridMode.Full,
+              [ThemeSize.Medium]: GridMode.Full,
+            }}
+          >
+            <GridCell
+              fixedWidth
+              width={calculateMapSize(dimensions, map)}
             >
-              <GridCell
-                fixedWidth
-                width={calculateMapSize(dimensions, map)}
+              <Widget
+                className="u-higher"
+                bodyClassName="u-window-box--none"
+                header="Map"
               >
-                <Widget
-                  className="u-higher"
-                  bodyClassName="u-window-box--none"
-                  header="Map"
-                >
-                  <Map
-                    {...map}
-                    cellRenderer={LobbyCell}
-                    selection={chosenMapSelection}
-                    onSelectionChanged={selection => onMapSelectionChange({ selection, roomId })}
-                  />
-                </Widget>
-              </GridCell>
-              <GridCell>
-                <Deck>
-                  <DeckItem>
-                    <Widget
-                      header="Planet Details"
-                      className="u-higher"
-                    >
-                      <PlanetCard {...selectedPlanet} />
-                    </Widget>
-                  </DeckItem>
-                  {
-                    isLeader && (
-                      <DeckItem>
-                        <Widget
-                          header="Game Settings"
-                          className="u-higher"
-                        >
-                          <GameSettingsForm
-                            values={gameSettings}
-                            onSubmit={settings => onGameSettingsSubmit({ settings, roomId })}
-                            onChange={settings => onGameSettingsChange({ settings, roomId })}
-                          />
-                        </Widget>
-                      </DeckItem>
-                    )
-                  }
-                  <DeckItem stretch>
-                    <Widget
-                      header="Chat"
-                      className="u-higher u-full-height"
-                      bodyClassName="u-window-box--none"
-                    >
-                      <Chat
-                        currentUserId={currentUser.id}
-                        players={values(players)}
-                        events={events}
-                        renderers={{
-                          ...eventRenderers,
-                          ...lobbyEventRenderers,
-                        }}
-                        settingsOpen={playerSettingsOpen}
-                        settingsChildren={
-                          <PlayerSettingsForm
-                            values={playerSettings}
-                            previousValues={players[currentUser.id]}
-                            usedNicknames={usedNicknames}
-                            onSubmit={settings => onPlayerSettingsSubmit({ settings, roomId })}
-                            onChange={settings => onPlayerSettingsChange({ settings, roomId })}
-                          />
-                        }
-                        onSettingsToggle={
-                          visible => onPlayerSettingsSetVisibility({ roomId, visible })
-                        }
-                        onMessageSend={text => onMessageSend({ roomId, text })}
-                      />
-                    </Widget>
-                  </DeckItem>
-                </Deck>
-              </GridCell>
-            </Grid>
-          )
-        }
-      </Measure>
-    </Box>
+                <Map
+                  {...map}
+                  cellRenderer={LobbyCell}
+                  selection={chosenMapSelection}
+                  onSelectionChanged={onMapSelectionChange}
+                />
+              </Widget>
+            </GridCell>
+            <GridCell>
+              <Deck>
+                <DeckItem>
+                  <Widget
+                    header="Planet Details"
+                    className="u-higher"
+                  >
+                    <PlanetCard
+                      {...selectedPlanet}
+                      owner={players[selectedPlanet.ownerId]}
+                    />
+                  </Widget>
+                </DeckItem>
+                <DeckItem stretch>
+                  <Widget
+                    header="Chat"
+                    className="u-higher u-full-height"
+                    bodyClassName="u-window-box--none"
+                  >
+                    <Chat
+                      currentUserId={currentUser.id}
+                      players={values(players)}
+                      events={events}
+                      renderers={eventRenderers}
+                      settingsOpen={playerSettingsOpen}
+                      settingsChildren={
+                        <PlayerSettingsForm
+                          values={playerSettings}
+                          previousValues={players[currentUser.id]}
+                          usedNicknames={usedNicknames}
+                          onSubmit={onPlayerSettingsSubmit}
+                          onChange={onPlayerSettingsChange}
+                        />
+                      }
+                      onSettingsToggle={onPlayerSettingsSetVisibility}
+                      onMessageSend={onMessageSend}
+                    />
+                  </Widget>
+                </DeckItem>
+                {
+                  isLeader && (
+                    <DeckItem>
+                      <Widget
+                        header="Game Settings"
+                        className="u-higher"
+                      >
+                        <GameSettingsForm
+                          values={gameSettings}
+                          onSubmit={onGameSettingsSubmit}
+                          onChange={onGameSettingsChange}
+                          onStart={onGameStart}
+                        />
+                      </Widget>
+                    </DeckItem>
+                  )
+                }
+              </Deck>
+            </GridCell>
+          </Grid>
+        )
+    }
+    </Measure>
   );
 }
 
 LobbyPage.propTypes = {
-  roomId: PropTypes.string.isRequired,
   gameSettings: GAME_SETTINGS_SHAPE,
   playerSettings: PLAYER_SETTINGS_SHAPE,
   map: PropTypes.shape({
@@ -243,6 +224,7 @@ LobbyPage.propTypes = {
   onMapSelectionChange: PropTypes.func.isRequired,
   onGameSettingsSubmit: PropTypes.func.isRequired,
   onGameSettingsChange: PropTypes.func.isRequired,
+  onGameStart: PropTypes.func.isRequired,
   onPlayerSettingsChange: PropTypes.func.isRequired,
   onPlayerSettingsSubmit: PropTypes.func.isRequired,
 };
@@ -257,13 +239,34 @@ LobbyPage.defaultProps = {
   playerSettingsOpen: false,
 };
 
-export default connect(
-  null,
-  {
-    onGameSettingsSubmit: submitGameSettings,
-    onGameSettingsChange: changeGameSettings,
-    onPlayerSettingsSubmit: submitPlayerSettings,
-    onPlayerSettingsChange: changePlayerSettings,
-    onPlayerSettingsSetVisibility: setPlayerSettingsVisibility,
-  },
+export default compose(
+  connect(
+    null,
+    {
+      onGameSettingsSubmit: submitGameSettings,
+      onGameSettingsChange: changeGameSettings,
+      onGameStart: startGame,
+      onPlayerSettingsSubmit: submitPlayerSettings,
+      onPlayerSettingsChange: changePlayerSettings,
+      onPlayerSettingsSetVisibility: setPlayerSettingsVisibility,
+    },
+  ),
+  withPropsOnChange(['eventRenderers'], ({ eventRenderers }) => ({
+    eventRenderers: {
+      ...eventRenderers,
+      ...lobbyEventRenderers,
+    },
+  })),
+  withHandlers({
+    onGameSettingsSubmit: ({ onGameSettingsSubmit, roomId }) =>
+      settings => onGameSettingsSubmit({ roomId, settings }),
+    onGameSettingsChange: ({ onGameSettingsChange, roomId }) =>
+      settings => onGameSettingsChange({ roomId, settings }),
+    onPlayerSettingsChange: ({ onPlayerSettingsChange, roomId }) =>
+      settings => onPlayerSettingsChange({ roomId, settings }),
+    onPlayerSettingsSubmit: ({ onPlayerSettingsSubmit, roomId }) =>
+      settings => onPlayerSettingsSubmit({ roomId, settings }),
+    onGameStart: ({ onGameStart, roomId }) => () => onGameStart({ roomId }),
+    onMessageSend: ({ onMessageSend, roomId }) => text => onMessageSend({ roomId, text }),
+  }),
 )(LobbyPage);

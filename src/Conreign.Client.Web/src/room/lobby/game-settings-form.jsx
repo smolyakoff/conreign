@@ -1,14 +1,16 @@
 import React, { PropTypes } from 'react';
 import { keyBy, values as objectValues, isFinite } from 'lodash';
-import { withHandlers } from 'recompose';
+import { withHandlers, compose, pure } from 'recompose';
 
 import {
   PropertyTable,
   Input,
   ThemeSize,
+  ThemeColor,
   Button,
   Deck,
   DeckItem,
+  Orientation,
 } from './../../theme';
 import { GAME_SETTINGS_SHAPE } from './lobby-schemas';
 
@@ -51,7 +53,7 @@ function createFormProperty(field, values, onChange) {
   };
 }
 
-function GameSettingsForm({ onChange, onSubmit, values }) {
+function GameSettingsForm({ onChange, onSubmit, onStart, values }) {
   const properties = objectValues(FIELDS)
     .map(field => createFormProperty(field, values, onChange));
   return (
@@ -63,9 +65,18 @@ function GameSettingsForm({ onChange, onSubmit, values }) {
         />
       </DeckItem>
       <DeckItem>
-        <Button onClick={onSubmit}>
-          Generate Map
-        </Button>
+        <Deck orientation={Orientation.Horizontal}>
+          <DeckItem>
+            <Button onClick={onSubmit}>
+              Generate Map
+            </Button>
+          </DeckItem>
+          <DeckItem>
+            <Button themeColor={ThemeColor.Brand} onClick={onStart}>
+              Start Game
+            </Button>
+          </DeckItem>
+        </Deck>
       </DeckItem>
     </Deck>
   );
@@ -75,6 +86,7 @@ GameSettingsForm.propTypes = {
   values: GAME_SETTINGS_SHAPE.isRequired,
   onChange: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  onStart: PropTypes.func.isRequired,
 };
 
 
@@ -100,7 +112,10 @@ function submit(event, props) {
   props.onSubmit(props.values, event);
 }
 
-export default withHandlers({
-  onChange: props => event => setField(event, props),
-  onSubmit: props => event => submit(event, props),
-})(GameSettingsForm);
+export default compose(
+  withHandlers({
+    onChange: props => event => setField(event, props),
+    onSubmit: props => event => submit(event, props),
+  }),
+  pure,
+)(GameSettingsForm);

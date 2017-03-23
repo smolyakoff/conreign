@@ -1,11 +1,14 @@
 import { combineEpics } from 'redux-observable';
+import { values } from 'lodash';
 import {
   createAsyncActionTypes,
   AsyncOperationState,
   PresenceStatus,
   GameEventType,
+  RoomMode,
 } from './../../core';
 
+const START_GAME = 'START_GAME';
 const SUBMIT_GAME_SETTINGS = 'UPDATE_GAME_OPTIONS';
 const CHANGE_GAME_SETTINGS = 'CHANGE_GAME_SETTINGS';
 const CHANGE_PLAYER_SETTINGS = 'CHANGE_PLAYER_SETTINGS';
@@ -16,6 +19,9 @@ const SET_PLAYER_SETTINGS_VISIBILITY = 'SET_PLAYER_SETTINGS_VISIBILITY';
 const {
   [AsyncOperationState.Succeeded]: SUBMIT_PLAYER_SETTINGS_SUCCEEDED,
 } = createAsyncActionTypes(SUBMIT_PLAYER_SETTINGS);
+const {
+  [AsyncOperationState.Succeeded]: START_GAME_SUCCEEDED,
+} = createAsyncActionTypes(START_GAME);
 
 
 export function setPlayerSettingsVisibility(payload) {
@@ -53,6 +59,13 @@ export function submitPlayerSettings(payload) {
   };
 }
 
+export function startGame(payload) {
+  return {
+    type: START_GAME,
+    payload,
+  };
+}
+
 function createEpic({ apiDispatcher }) {
   function submitGameSettingsEpic(action$) {
     return action$
@@ -79,13 +92,33 @@ function createEpic({ apiDispatcher }) {
       }))
       .mergeMap(apiDispatcher);
   }
+
+  function startGameEpic(action$) {
+    return action$
+      .ofType(START_GAME)
+      .mergeMap(apiDispatcher);
+  }
+
   return combineEpics(
     submitGameSettingsEpic,
     submitPlayerSettingsEpic,
+    startGameEpic,
   );
 }
 
 function reducer(state, action) {
+  if (!state.gameSettings && state.map) {
+    state = {
+      ...state,
+      gameSettings: {
+        mapWidth: state.map.width,
+        mapHeight: state.map.height,
+        neutralPlanetsCount: values(state.map.planets)
+          .filter(planet => !planet.ownerId)
+          .length,
+      },
+    };
+  }
   switch (action.type) {
     case CHANGE_GAME_SETTINGS:
       return {
@@ -147,13 +180,16 @@ function reducer(state, action) {
         ...state,
         playerSettingsOpen: false,
       };
-    case SET_PLAYER_SETTINGS_VISIBILITY: {
-      const { visible } = action.payload;
+    case SET_PLAYER_SETTINGS_VISIBILITY:
       return {
         ...state,
-        playerSettingsOpen: visible,
+        playerSettingsOpen: action.payload,
       };
-    }
+    case START_GAME_SUCCEEDED:
+      return {
+        ...state,
+        mode: RoomMode.Game,
+      };
     default:
       return state;
   }
