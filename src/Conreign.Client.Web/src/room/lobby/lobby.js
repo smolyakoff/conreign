@@ -5,7 +5,6 @@ import {
   AsyncOperationState,
   PresenceStatus,
   GameEventType,
-  RoomMode,
 } from './../../core';
 
 const START_GAME = 'START_GAME';
@@ -19,9 +18,6 @@ const SET_PLAYER_SETTINGS_VISIBILITY = 'SET_PLAYER_SETTINGS_VISIBILITY';
 const {
   [AsyncOperationState.Succeeded]: SUBMIT_PLAYER_SETTINGS_SUCCEEDED,
 } = createAsyncActionTypes(SUBMIT_PLAYER_SETTINGS);
-const {
-  [AsyncOperationState.Succeeded]: START_GAME_SUCCEEDED,
-} = createAsyncActionTypes(START_GAME);
 
 
 export function setPlayerSettingsVisibility(payload) {
@@ -184,11 +180,6 @@ function reducer(state, action) {
       return {
         ...state,
         playerSettingsOpen: action.payload,
-      };
-    case START_GAME_SUCCEEDED:
-      return {
-        ...state,
-        mode: RoomMode.Game,
       };
     default:
       return state;

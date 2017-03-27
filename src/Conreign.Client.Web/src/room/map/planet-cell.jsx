@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import { pure } from 'recompose';
 
 import Planet from './planet';
 
@@ -13,7 +14,7 @@ const OWNER_SHAPE = PropTypes.shape({
   color: PropTypes.string.isRequired,
 });
 
-export default function PlanetCell({ planet, owner }) {
+function PlanetCell({ planet, owner }) {
   const color = owner ? owner.color : null;
   return <Planet {...planet} color={color} />;
 }
@@ -24,3 +25,5 @@ PlanetCell.propTypes = {
 PlanetCell.defaultProps = {
   owner: null,
 };
+
+export default pure(PlanetCell);

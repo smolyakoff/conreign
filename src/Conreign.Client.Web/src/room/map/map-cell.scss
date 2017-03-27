@@ -1,0 +1,36 @@
+@import "./../../theme/variables";
+
+$map-border-color: material-color('grey', '900');
+$map-border: solid 1px $map-border-color;
+
+.c-map-cell {
+  padding: 0;
+  display: block;
+  background: none;
+  color: inherit;
+  text-align: inherit;
+  position: relative;
+  outline: none;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: $map-border;
+  &:after {
+    content: '';
+    display: block;
+    padding-bottom: 100%;
+  }
+  &::-moz-focus-inner {
+    border: 0;
+  }
+  &--selection-start {
+    border: solid 2px $color-success;
+  }
+
+  &__content {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+}

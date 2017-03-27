@@ -13,3 +13,8 @@ export const GameEventType = {
   PlayerJoined: 'PlayerJoined',
   PlayerUpdated: 'PlayerUpdated',
 };
+
+export const TurnStatus = {
+  Thinking: 0,
+  Ended: 1,
+};

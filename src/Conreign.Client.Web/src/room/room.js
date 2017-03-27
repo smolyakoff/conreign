@@ -1,10 +1,11 @@
-import { omit, findKey, isNumber } from 'lodash';
+import { omit, findKey, isNumber, parseInt } from 'lodash';
 import fp from 'lodash/fp';
 import { combineEpics } from 'redux-observable';
 
 import { AsyncOperationState, createAsyncActionTypes, GameEventType } from './../core';
 import { composeReducers } from './../util';
 import lobby from './lobby';
+import game from './game';
 
 const HANDLE_MAP_UPDATED = 'HANDLE_MAP_UPDATED';
 const HANDLE_USER_STATUS_CHANGED = 'HANDLE_USER_STATUS_CHANGED';
@@ -59,6 +60,7 @@ function createEpic(container) {
     getRoomStateEpic,
     sendMessageEpic,
     lobby.createEpic(container),
+    game.createEpic(container),
   );
 }
 
@@ -165,7 +167,11 @@ function roomReducer(state = {}, action) {
   }
 }
 
-const reducer = composeReducers(roomReducer, lobby.reducer);
+const reducer = composeReducers(
+  roomReducer,
+  lobby.reducer,
+  game.reducer,
+);
 reducer.$key = 'room';
 
 function dehydrateEvent(event) {
@@ -179,15 +185,32 @@ function dehydrateEvent(event) {
   };
 }
 
+function ensureMapSelection(map, mapSelection, currentUser) {
+  if (isNumber(mapSelection.start)) {
+    return mapSelection;
+  }
+  const currentUserPlanetPosition = findKey(
+    map.planets,
+    p => p.ownerId === currentUser.id,
+  );
+  return { start: parseInt(currentUserPlanetPosition) };
+}
+
 export function selectRoomPage(state, roomId) {
   const room = state[reducer.$key];
+  const currentUser = {
+    id: state.auth.user.sub,
+  };
   return {
     ...room,
+    mapSelection: ensureMapSelection(
+      room.map,
+      room.mapSelection || {},
+      currentUser,
+    ),
     events: room.events.map(dehydrateEvent),
     roomId,
-    currentUser: {
-      id: state.auth.user.sub,
-    },
+    currentUser,
   };
 }
 

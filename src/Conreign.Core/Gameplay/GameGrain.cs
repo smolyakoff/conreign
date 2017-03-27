@@ -124,7 +124,7 @@ namespace Conreign.Core.Gameplay
 
         private void ScheduleTimer()
         {
-            _timer = RegisterTimer(Tick, null, TimeSpan.Zero, TickInterval);
+            _timer = RegisterTimer(Tick, null, TickInterval, TickInterval);
         }
 
         private void StopTimer()

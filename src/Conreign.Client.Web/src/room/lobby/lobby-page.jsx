@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { findKey, parseInt, isNumber, values } from 'lodash';
+import { values } from 'lodash';
 import Measure from 'react-measure';
 import { compose, withHandlers, withPropsOnChange } from 'recompose';
 
@@ -34,35 +34,35 @@ import lobbyEventRenderers from './lobby-event-renderers';
 import GameSettingsForm from './game-settings-form';
 import PlayerSettingsForm from './player-settings-form';
 
-const WIDGET_HEADER_HEIGHT = 21;
+const WIDGET_HEADER_HEIGHT = 35;
 
-function calculateMapSize(viewDimensions, mapDimensions) {
+function calculateMapViewDimensions(viewDimensions) {
   const {
     width: fullVw,
     height: fullVh,
   } = viewDimensions;
   const vw = fullVw / 2;
   const vh = fullVh - WIDGET_HEADER_HEIGHT;
-  const {
-    width: mw,
-    height: mh,
-  } = mapDimensions;
-  const wCellSize = vw / mw;
-  const hCellSize = vh / mh;
-  const size = Math.min(wCellSize, hCellSize) * mw;
-  return size;
+  return { width: vw, height: vh };
 }
 
-function adjustMapSelection(map, mapSelection, currentUser) {
-  if (isNumber(mapSelection.start)) {
-    return mapSelection;
+function LobbyCell({
+  cellIndex,
+  planets,
+  players,
+}) {
+  const planet = planets[cellIndex];
+  if (!planet) {
+    return null;
   }
-  const currentUserPlanetPosition = findKey(
-    map.planets,
-    p => p.ownerId === currentUser.id,
-  );
-  return { start: parseInt(currentUserPlanetPosition) };
+  const owner = players[planet.ownerId];
+  return <PlanetCell planet={planet} owner={owner} />;
 }
+LobbyCell.propTypes = {
+  cellIndex: PropTypes.number.isRequired,
+  planets: PropTypes.objectOf(PLANET_SHAPE).isRequired,
+  players: PropTypes.objectOf(PLAYER_SHAPE).isRequired,
+};
 
 function LobbyPage({
   playerSettings,
@@ -70,6 +70,7 @@ function LobbyPage({
   map,
   players,
   events,
+  cellRenderer,
   eventRenderers,
   leaderUserId,
   mapSelection,
@@ -84,23 +85,7 @@ function LobbyPage({
   onPlayerSettingsSubmit,
   onGameStart,
 }) {
-  function LobbyCell({ cellIndex }) {
-    const planet = map.planets[cellIndex];
-    if (!planet) {
-      return null;
-    }
-    const owner = players[planet.ownerId];
-    return <PlanetCell planet={planet} owner={owner} />;
-  }
-  LobbyCell.propTypes = {
-    cellIndex: PropTypes.number.isRequired,
-  };
-  const chosenMapSelection = adjustMapSelection(
-    map,
-    mapSelection,
-    currentUser,
-  );
-  const selectedPlanet = map.planets[chosenMapSelection.start];
+  const selectedPlanet = map.planets[mapSelection.start];
   const isLeader = leaderUserId === currentUser.id;
   playerSettings = playerSettings || players[currentUser.id];
 
@@ -111,92 +96,97 @@ function LobbyPage({
   return (
     <Measure whitelist={['width', 'height']}>
       {
-        dimensions => (
-          <Grid
-            className="u-full-height"
-            gutter={ThemeSize.Small}
-            responsiveness={{
-              [ThemeSize.Small]: GridMode.Full,
-              [ThemeSize.Medium]: GridMode.Full,
-            }}
-          >
-            <GridCell
-              fixedWidth
-              width={calculateMapSize(dimensions, map)}
+        (dimensions) => {
+          const {
+            width: mapViewWidth,
+            height: mapViewHeight,
+          } = calculateMapViewDimensions(dimensions);
+          return (
+            <Grid
+              className="u-full-height"
+              gutter={ThemeSize.Small}
+              responsiveness={{
+                [ThemeSize.Small]: GridMode.Full,
+                [ThemeSize.Medium]: GridMode.Full,
+              }}
             >
-              <Widget
-                className="u-higher"
-                bodyClassName="u-window-box--none"
-                header="Map"
-              >
-                <Map
-                  {...map}
-                  cellRenderer={LobbyCell}
-                  selection={chosenMapSelection}
-                  onSelectionChanged={onMapSelectionChange}
-                />
-              </Widget>
-            </GridCell>
-            <GridCell>
-              <Deck>
-                <DeckItem>
-                  <Widget
-                    header="Planet Details"
-                    className="u-higher"
-                  >
-                    <PlanetCard
-                      {...selectedPlanet}
-                      owner={players[selectedPlanet.ownerId]}
-                    />
-                  </Widget>
-                </DeckItem>
-                <DeckItem stretch>
-                  <Widget
-                    header="Chat"
-                    className="u-higher u-full-height"
-                    bodyClassName="u-window-box--none"
-                  >
-                    <Chat
-                      currentUserId={currentUser.id}
-                      players={values(players)}
-                      events={events}
-                      renderers={eventRenderers}
-                      settingsOpen={playerSettingsOpen}
-                      settingsChildren={
-                        <PlayerSettingsForm
-                          values={playerSettings}
-                          previousValues={players[currentUser.id]}
-                          usedNicknames={usedNicknames}
-                          onSubmit={onPlayerSettingsSubmit}
-                          onChange={onPlayerSettingsChange}
-                        />
-                      }
-                      onSettingsToggle={onPlayerSettingsSetVisibility}
-                      onMessageSend={onMessageSend}
-                    />
-                  </Widget>
-                </DeckItem>
-                {
-                  isLeader && (
-                    <DeckItem>
-                      <Widget
-                        header="Game Settings"
-                        className="u-higher"
-                      >
-                        <GameSettingsForm
-                          values={gameSettings}
-                          onSubmit={onGameSettingsSubmit}
-                          onChange={onGameSettingsChange}
-                          onStart={onGameStart}
-                        />
-                      </Widget>
-                    </DeckItem>
-                  )
-                }
-              </Deck>
-            </GridCell>
-          </Grid>
-        )
+              <GridCell fixedWidth>
+                <Widget
+                  className="u-higher"
+                  bodyClassName="u-window-box--none"
+                  header="Map"
+                >
+                  <Map
+                    {...map}
+                    viewWidth={mapViewWidth}
+                    viewHeight={mapViewHeight}
+                    cellRenderer={cellRenderer}
+                    selection={mapSelection}
+                    onSelectionChanged={onMapSelectionChange}
+                  />
+                </Widget>
+              </GridCell>
+              <GridCell>
+                <Deck>
+                  <DeckItem>
+                    <Widget
+                      header="Planet Details"
+                      className="u-higher"
+                    >
+                      <PlanetCard
+                        {...selectedPlanet}
+                        owner={players[selectedPlanet.ownerId]}
+                      />
+                    </Widget>
+                  </DeckItem>
+                  <DeckItem stretch>
+                    <Widget
+                      header="Chat"
+                      className="u-higher u-full-height"
+                      bodyClassName="u-window-box--none"
+                    >
+                      <Chat
+                        currentUserId={currentUser.id}
+                        players={values(players)}
+                        events={events}
+                        renderers={eventRenderers}
+                        settingsOpen={playerSettingsOpen}
+                        settingsChildren={
+                          <PlayerSettingsForm
+                            values={playerSettings}
+                            previousValues={players[currentUser.id]}
+                            usedNicknames={usedNicknames}
+                            onSubmit={onPlayerSettingsSubmit}
+                            onChange={onPlayerSettingsChange}
+                          />
+                        }
+                        onSettingsToggle={onPlayerSettingsSetVisibility}
+                        onMessageSend={onMessageSend}
+                      />
+                    </Widget>
+                  </DeckItem>
+                  {
+                    isLeader && (
+                      <DeckItem>
+                        <Widget
+                          header="Game Settings"
+                          className="u-higher"
+                        >
+                          <GameSettingsForm
+                            values={gameSettings}
+                            onSubmit={onGameSettingsSubmit}
+                            onChange={onGameSettingsChange}
+                            onStart={onGameStart}
+                          />
+                        </Widget>
+                      </DeckItem>
+                    )
+                  }
+                </Deck>
+              </GridCell>
+            </Grid>
+          );
+        }
     }
     </Measure>
   );
@@ -211,6 +201,7 @@ LobbyPage.propTypes = {
     planets: PropTypes.objectOf(PLANET_SHAPE).isRequired,
   }).isRequired,
   mapSelection: MAP_SELECTION_SHAPE,
+  cellRenderer: PropTypes.func.isRequired,
   players: PropTypes.objectOf(PLAYER_SHAPE).isRequired,
   events: PropTypes.arrayOf(GAME_EVENT_SHAPE).isRequired,
   eventRenderers: PropTypes.objectOf(PropTypes.func).isRequired,
@@ -251,6 +242,15 @@ export default compose(
       onPlayerSettingsSetVisibility: setPlayerSettingsVisibility,
     },
   ),
+  withPropsOnChange(['map', 'players'], ({ map, players }) => ({
+    // eslint-disable-next-line react/prop-types
+    cellRenderer: ({ cellIndex }) =>
+      <LobbyCell
+        cellIndex={cellIndex}
+        planets={map.planets}
+        players={players}
+      />,
+  })),
   withPropsOnChange(['eventRenderers'], ({ eventRenderers }) => ({
     eventRenderers: {
       ...eventRenderers,
