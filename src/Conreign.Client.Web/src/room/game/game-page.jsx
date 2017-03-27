@@ -5,17 +5,17 @@ import {
   Grid,
   GridCell,
   GridMode,
-  Deck,
-  DeckItem,
+  Box,
   Widget,
   ThemeSize,
 } from './../../theme';
 
 import { Map } from './../map';
-import { PLANET_SHAPE } from './../room-schemas';
+import { PLANET_SHAPE, PLAYER_SHAPE } from './../room-schemas';
 import GameStatusBoard from './game-status-board';
 
 const WIDGET_HEADER_HEIGHT = 35;
+const CONTROLS_HEIGHT = 78;
 
 function calculateMapViewDimensions(viewDimensions) {
   const {
@@ -23,14 +23,17 @@ function calculateMapViewDimensions(viewDimensions) {
     height: fullVh,
   } = viewDimensions;
   const vw = fullVw / 2;
-  const vh = fullVh - WIDGET_HEADER_HEIGHT;
+  const vh = fullVh - WIDGET_HEADER_HEIGHT - CONTROLS_HEIGHT;
   return { width: vw, height: vh };
 }
 
 function GamePage({
   map,
   turn,
+  players,
+  currentUser,
 }) {
+  const currentPlayer = players[currentUser.id];
   return (
     <Measure>
       {(dimensions) => {
@@ -49,28 +52,22 @@ function GamePage({
           >
             <GridCell fixedWidth>
               <Widget
-                header="Control Panel"
-                className="u-full-height u-higher"
+                header="Map"
+                className="u-higher"
                 bodyClassName="u-window-box--none"
               >
-                <Deck>
-                  <DeckItem>
-                    <GameStatusBoard
-                      turn={turn}
-                      turnSeconds={turn}
-                    />
-                  </DeckItem>
-                  <DeckItem stretch>
-                    <Map
-                      {...map}
-                      viewWidth={mapViewWidth}
-                      viewHeight={mapViewHeight}
-                    />
-                  </DeckItem>
-                  <DeckItem>
-                    Hello
-                  </DeckItem>
-                </Deck>
+                <Box themeSize={ThemeSize.Medium}>
+                  <GameStatusBoard
+                    turn={turn}
+                    turnSeconds={turn}
+                    player={currentPlayer}
+                  />
+                </Box>
+                <Map
+                  {...map}
+                  viewWidth={mapViewWidth}
+                  viewHeight={mapViewHeight}
+                />
               </Widget>
             </GridCell>
             <GridCell />
@@ -86,6 +83,10 @@ GamePage.propTypes = {
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
     planets: PropTypes.objectOf(PLANET_SHAPE).isRequired,
+  }).isRequired,
+  players: PropTypes.objectOf(PLAYER_SHAPE).isRequired,
+  currentUser: PropTypes.shape({
+    id: PropTypes.string.isRequired,
   }).isRequired,
   turn: PropTypes.number.isRequired,
 };

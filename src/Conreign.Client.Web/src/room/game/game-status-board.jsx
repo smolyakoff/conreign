@@ -1,6 +1,13 @@
 import React, { PropTypes } from 'react';
 
-import { Grid, GridCell } from './../../theme';
+import {
+  Grid,
+  GridCell,
+  Text,
+  VerticalAlignment,
+  TextEmphasize,
+} from './../../theme';
+import { PLAYER_SHAPE } from './../room-schemas';
 
 function formatTurnTime(seconds) {
   return `00:${seconds}`;
@@ -9,11 +16,24 @@ function formatTurnTime(seconds) {
 function GameStatusBoard({
   turn,
   turnSeconds,
+  player,
 }) {
   return (
-    <Grid>
+    <Grid
+      className="u-centered u-large"
+      verticalAlignment={VerticalAlignment.Center}
+    >
       <GridCell>
-        Turn {turn + 1}
+        <div>Turn</div>
+        <div>{turn}</div>
+      </GridCell>
+      <GridCell>
+        <Text
+          emphasize={TextEmphasize.Loud}
+          style={{ color: player.color }}
+        >
+          {player.nickname}
+        </Text>
       </GridCell>
       <GridCell>
         {formatTurnTime(turnSeconds)}
@@ -25,6 +45,7 @@ function GameStatusBoard({
 GameStatusBoard.propTypes = {
   turn: PropTypes.number.isRequired,
   turnSeconds: PropTypes.number.isRequired,
+  player: PLAYER_SHAPE.isRequired,
 };
 
 export default GameStatusBoard;
