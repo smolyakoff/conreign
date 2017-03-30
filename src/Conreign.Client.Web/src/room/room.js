@@ -17,7 +17,7 @@ const SEND_MESSAGE = 'SEND_MESSAGE';
 
 const GET_ROOM_STATE_ACTIONS = createAsyncActionTypes('GET_ROOM_STATE');
 const {
-  [AsyncOperationState.Succeeded]: GET_ROOM_STATE_COMPLETED,
+  [AsyncOperationState.Succeeded]: GET_ROOM_STATE_SUCCEEDED,
 } = GET_ROOM_STATE_ACTIONS;
 
 export function getRoomState(payload) {
@@ -109,7 +109,7 @@ function roomReducer(state = {}, action) {
     return state;
   }
   switch (action.type) {
-    case GET_ROOM_STATE_COMPLETED:
+    case GET_ROOM_STATE_SUCCEEDED:
       return normalizeRoomState(action.payload);
     case SET_MAP_SELECTION:
       return {

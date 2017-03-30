@@ -1,6 +1,7 @@
 import { createStore, applyMiddleware } from 'redux';
 import { createEpicMiddleware } from 'redux-observable';
 import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly';
+import { get } from 'lodash';
 
 import main from './root';
 
@@ -9,7 +10,10 @@ const { createEpic, reducer } = main;
 function createEnhancer(container) {
   const epic = createEpic(container);
   const epicMiddleware = createEpicMiddleware(epic);
-  return composeWithDevTools(applyMiddleware(epicMiddleware));
+  const devToolsOptions = {
+    predicate: (state, action) => !get(action, 'meta.$hideFromDevTools'),
+  };
+  return composeWithDevTools(devToolsOptions)(applyMiddleware(epicMiddleware));
 }
 
 function createDebugStore({ state = {}, container }) {

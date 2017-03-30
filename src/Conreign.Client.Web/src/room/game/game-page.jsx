@@ -30,6 +30,7 @@ function calculateMapViewDimensions(viewDimensions) {
 function GamePage({
   map,
   turn,
+  turnSeconds,
   players,
   currentUser,
 }) {
@@ -59,7 +60,7 @@ function GamePage({
                 <Box themeSize={ThemeSize.Medium}>
                   <GameStatusBoard
                     turn={turn}
-                    turnSeconds={turn}
+                    turnSeconds={turnSeconds}
                     player={currentPlayer}
                   />
                 </Box>
@@ -89,6 +90,11 @@ GamePage.propTypes = {
     id: PropTypes.string.isRequired,
   }).isRequired,
   turn: PropTypes.number.isRequired,
+  turnSeconds: PropTypes.number,
+};
+
+GamePage.defaultProps = {
+  turnSeconds: null,
 };
 
 export default GamePage;

@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import { padStart, isNumber } from 'lodash';
 
 import {
   Grid,
@@ -10,7 +11,10 @@ import {
 import { PLAYER_SHAPE } from './../room-schemas';
 
 function formatTurnTime(seconds) {
-  return `00:${seconds}`;
+  if (!isNumber(seconds)) {
+    return 'Loading...';
+  }
+  return `00:${padStart(seconds.toString(), 2, '0')}`;
 }
 
 function GameStatusBoard({
@@ -25,7 +29,7 @@ function GameStatusBoard({
     >
       <GridCell>
         <div>Turn</div>
-        <div>{turn}</div>
+        <div>{turn + 1}</div>
       </GridCell>
       <GridCell>
         <Text
@@ -44,8 +48,12 @@ function GameStatusBoard({
 
 GameStatusBoard.propTypes = {
   turn: PropTypes.number.isRequired,
-  turnSeconds: PropTypes.number.isRequired,
+  turnSeconds: PropTypes.number,
   player: PLAYER_SHAPE.isRequired,
+};
+
+GameStatusBoard.defaultProps = {
+  turnSeconds: null,
 };
 
 export default GameStatusBoard;
