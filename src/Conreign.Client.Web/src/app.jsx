@@ -1,4 +1,5 @@
 /* eslint-disable global-require, no-console */
+import 'babel-polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { browserHistory } from 'react-router';

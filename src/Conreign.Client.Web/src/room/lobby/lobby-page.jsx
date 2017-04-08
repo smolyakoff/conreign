@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { values } from 'lodash';
+import { values, mapValues } from 'lodash';
 import Measure from 'react-measure';
 import { compose, withHandlers, withPropsOnChange } from 'recompose';
 
@@ -18,7 +18,7 @@ import {
   Deck,
   DeckItem,
 } from './../../theme';
-import { Map, PlanetCell, MAP_SELECTION_SHAPE } from './../map';
+import { Map, Planet, MAP_SELECTION_SHAPE } from './../map';
 import {
   submitGameSettings,
   changeGameSettings,
@@ -46,19 +46,17 @@ function calculateMapViewDimensions(viewDimensions) {
   return { width: vw, height: vh };
 }
 
-function LobbyCell({
+function LobbyMapPlanetCell({
   cellIndex,
   planets,
   players,
 }) {
   const planet = planets[cellIndex];
-  if (!planet) {
-    return null;
-  }
   const owner = players[planet.ownerId];
-  return <PlanetCell planet={planet} owner={owner} />;
+  const color = owner ? owner.color : null;
+  return <Planet {...planet} color={color} />;
 }
-LobbyCell.propTypes = {
+LobbyMapPlanetCell.propTypes = {
   cellIndex: PropTypes.number.isRequired,
   planets: PropTypes.objectOf(PLANET_SHAPE).isRequired,
   players: PropTypes.objectOf(PLAYER_SHAPE).isRequired,
@@ -68,17 +66,17 @@ function LobbyPage({
   playerSettings,
   gameSettings,
   map,
+  mapSelection,
+  mapCells,
   players,
   events,
-  cellRenderer,
   eventRenderers,
   leaderUserId,
-  mapSelection,
   currentUser,
   playerSettingsOpen,
   onMessageSend,
   onPlayerSettingsSetVisibility,
-  onMapSelectionChange,
+  onMapCellFocus,
   onGameSettingsSubmit,
   onGameSettingsChange,
   onPlayerSettingsChange,
@@ -120,9 +118,9 @@ function LobbyPage({
                     {...map}
                     viewWidth={mapViewWidth}
                     viewHeight={mapViewHeight}
-                    cellRenderer={cellRenderer}
+                    cells={mapCells}
                     selection={mapSelection}
-                    onSelectionChanged={onMapSelectionChange}
+                    onCellFocus={onMapCellFocus}
                   />
                 </Widget>
               </GridCell>
@@ -201,7 +199,7 @@ LobbyPage.propTypes = {
     planets: PropTypes.objectOf(PLANET_SHAPE).isRequired,
   }).isRequired,
   mapSelection: MAP_SELECTION_SHAPE,
-  cellRenderer: PropTypes.func.isRequired,
+  mapCells: PropTypes.objectOf(PropTypes.node).isRequired,
   players: PropTypes.objectOf(PLAYER_SHAPE).isRequired,
   events: PropTypes.arrayOf(GAME_EVENT_SHAPE).isRequired,
   eventRenderers: PropTypes.objectOf(PropTypes.func).isRequired,
@@ -212,7 +210,7 @@ LobbyPage.propTypes = {
   playerSettingsOpen: PropTypes.bool,
   onMessageSend: PropTypes.func.isRequired,
   onPlayerSettingsSetVisibility: PropTypes.func.isRequired,
-  onMapSelectionChange: PropTypes.func.isRequired,
+  onMapCellFocus: PropTypes.func.isRequired,
   onGameSettingsSubmit: PropTypes.func.isRequired,
   onGameSettingsChange: PropTypes.func.isRequired,
   onGameStart: PropTypes.func.isRequired,
@@ -230,7 +228,19 @@ LobbyPage.defaultProps = {
   playerSettingsOpen: false,
 };
 
-export default compose(
+function generateMapCells({ planets, players }) {
+  return mapValues(planets, (planet) => {
+    const owner = planet.ownerId ? players[planet.ownerId] : null;
+    const color = owner ? owner.color : null;
+    return <Planet {...planet} color={color} />;
+  });
+}
+
+const onMapCellFocus =
+  ({ onMapSelectionChange, mapSelection }) =>
+  ({ cellIndex }) => onMapSelectionChange({ ...mapSelection, start: cellIndex });
+
+const enhance = compose(
   connect(
     null,
     {
@@ -243,13 +253,10 @@ export default compose(
     },
   ),
   withPropsOnChange(['map', 'players'], ({ map, players }) => ({
-    // eslint-disable-next-line react/prop-types
-    cellRenderer: ({ cellIndex }) =>
-      <LobbyCell
-        cellIndex={cellIndex}
-        planets={map.planets}
-        players={players}
-      />,
+    mapCells: generateMapCells({
+      players,
+      planets: map.planets,
+    }),
   })),
   withPropsOnChange(['eventRenderers'], ({ eventRenderers }) => ({
     eventRenderers: {
@@ -268,5 +275,8 @@ export default compose(
       settings => onPlayerSettingsSubmit({ roomId, settings }),
     onGameStart: ({ onGameStart, roomId }) => () => onGameStart({ roomId }),
     onMessageSend: ({ onMessageSend, roomId }) => text => onMessageSend({ roomId, text }),
+    onMapCellFocus,
   }),
-)(LobbyPage);
+);
+
+export default enhance(LobbyPage);

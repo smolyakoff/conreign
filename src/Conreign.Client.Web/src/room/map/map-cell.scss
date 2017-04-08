@@ -25,6 +25,12 @@ $map-border: solid 1px $map-border-color;
   &--selection-start {
     border: solid 2px $color-success;
   }
+  &--selection-end {
+    border: solid 2px $color-warning;
+  }
+  &--selection-intermediate {
+    background-color: transparentize($color-info, 0.9);
+  }
 
   &__content {
     width: 100%;

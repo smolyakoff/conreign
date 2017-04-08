@@ -1,4 +1,4 @@
-import { pick, includes, mean } from 'lodash';
+import { pick, includes, mean, isNumber } from 'lodash';
 import Rx from 'rxjs';
 import { combineEpics } from 'redux-observable';
 
@@ -15,6 +15,57 @@ const HANDLE_GAME_TICKED = 'HANDLE_GAME_TICKED';
 const HANDLE_TURN_CALCULATION_STARTED = 'HANDLE_TURN_CALCULATION_STARTED';
 const HANDLE_TURN_CALCULATION_ENDED = 'HANDLE_TURN_CALCULATION_ENDED';
 const LAUNCH_FLEET = 'LAUNCH_FLEET';
+
+export function changeMapSelection({
+  cellIndex,
+  mapSelection,
+  planets,
+  currentUser,
+}) {
+  const planet = planets[cellIndex];
+  if (!planet) {
+    return mapSelection;
+  }
+  const { start, end } = mapSelection;
+  const endPlanet = isNumber(end) ? planets[end] : null;
+
+  // No destination planet selected
+  if (endPlanet === null) {
+    if (cellIndex === start) {
+      return mapSelection;
+    }
+    return {
+      ...mapSelection,
+      end: cellIndex,
+    };
+  // Destination planet is mine
+  } else if (endPlanet.ownerId === currentUser.id) {
+    if (planet.ownerId === currentUser.id) {
+      return {
+        start: cellIndex,
+        end: null,
+      };
+    }
+    return {
+      ...mapSelection,
+      end: cellIndex,
+    };
+  }
+  // Destination planet is foreign
+  if (planet.ownerId === currentUser.id) {
+    return {
+      start: cellIndex,
+      end: null,
+    };
+  }
+  if (end === cellIndex) {
+    return mapSelection;
+  }
+  return {
+    ...mapSelection,
+    end: cellIndex,
+  };
+}
 
 function reducer(state, action) {
   switch (action.type) {

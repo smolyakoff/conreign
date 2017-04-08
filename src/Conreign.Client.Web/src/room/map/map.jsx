@@ -1,19 +1,33 @@
 import React, { PropTypes } from 'react';
-import { compose, pure, withHandlers } from 'recompose';
-import { range, isNumber } from 'lodash';
+import { pure } from 'recompose';
+import { range, isNumber, noop, memoize, includes } from 'lodash';
 import bem from 'bem-cn';
 
 import './map.scss';
 import MapCell, { CellSelection } from './map-cell';
+import { generatePath } from './../../core';
 
 const block = bem('c-map');
 
-function chooseCellSelection(cellIndex, selection) {
-  if (selection.start === cellIndex) {
+const isInPath = memoize((position, start, end, width) => {
+  if (position === start || position === end) {
+    return false;
+  }
+  const path = generatePath({ start, end, width });
+  return includes(path, position);
+}, (...args) => args.join('-'));
+
+function chooseCellSelection(cellIndex, { start, end }, width) {
+  if (start === cellIndex) {
     return CellSelection.Start;
   }
-  if (selection.end === cellIndex) {
+  if (end === cellIndex) {
     return CellSelection.End;
+  }
+  if (isNumber(start) && isNumber(end)) {
+    return isInPath(cellIndex, start, end, width)
+      ? CellSelection.Intermediate
+      : CellSelection.None;
   }
   return CellSelection.None;
 }
@@ -41,7 +55,7 @@ function Map({
   height,
   viewWidth,
   viewHeight,
-  cellRenderer,
+  cells,
   selection,
   onCellFocus,
 }) {
@@ -54,17 +68,18 @@ function Map({
     <div className={block.mix(className)} style={style}>
       {
         range(0, height * width).map((cellIndex) => {
-          const cellSelection = chooseCellSelection(cellIndex, selection);
+          const content = cells[cellIndex];
+          const cellSelection = chooseCellSelection(cellIndex, selection, width);
           return (
             <MapCell
               key={cellIndex}
               cellIndex={cellIndex}
-              cellRenderer={cellRenderer}
               selection={cellSelection}
               mapWidth={width}
-              mapHeight={height}
-              onFocus={onCellFocus}
-            />
+              onFocus={content ? onCellFocus : noop}
+            >
+              {content}
+            </MapCell>
           );
         })
       }
@@ -79,13 +94,13 @@ export const MAP_SELECTION_SHAPE = PropTypes.shape({
 
 Map.propTypes = {
   selection: MAP_SELECTION_SHAPE,
-  onCellFocus: PropTypes.func.isRequired,
+  onCellFocus: PropTypes.func,
   className: PropTypes.string,
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
   viewWidth: PropTypes.number,
   viewHeight: PropTypes.number,
-  cellRenderer: PropTypes.func,
+  cells: PropTypes.objectOf(PropTypes.node),
 };
 
 Map.defaultProps = {
@@ -96,20 +111,8 @@ Map.defaultProps = {
   viewWidth: null,
   viewHeight: null,
   className: null,
-  cellRenderer: () => null,
+  cells: {},
+  onCellFocus: noop,
 };
 
-function focus({ onSelectionChanged, selection }, { cellIndex }) {
-  const currentSelection = {
-    ...selection,
-    start: cellIndex,
-  };
-  onSelectionChanged(currentSelection);
-}
-
-export default compose(
-  pure,
-  withHandlers({
-    onCellFocus: props => event => focus(props, event),
-  }),
-)(Map);
+export default pure(Map);

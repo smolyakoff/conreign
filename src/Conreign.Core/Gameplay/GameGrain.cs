@@ -103,6 +103,7 @@ namespace Conreign.Core.Gameplay
                 StopTimer();
                 return;
             }
+            _tick++;
             if (_tick == TurnLengthInTicks)
             {
                 await CalculateTurnInternal();
@@ -110,7 +111,6 @@ namespace Conreign.Core.Gameplay
             else
             {
                 await _game.NotifyEverybody(new GameTicked(State.RoomId, _tick));
-                _tick++;
             }
         }
 

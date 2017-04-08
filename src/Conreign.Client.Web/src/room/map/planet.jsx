@@ -1,16 +1,25 @@
 import React, { PropTypes } from 'react';
+import { pure } from 'recompose';
 import block from 'bem-cn';
 import Color from 'color';
+import { values, kebabCase } from 'lodash';
 import { Progress, PropertyTable, ThemeSize, ThemeColor, Icon } from './../../theme';
 import './planet.scss';
 import { choosePlanetIcon } from './../icons';
 
-export default function Planet({
+export const PlanetDisplayMode = {
+  Lobby: 'Lobby',
+  Game: 'Game',
+};
+
+function Planet({
   name,
   power,
   productionRate,
   icons,
   color,
+  ships,
+  displayMode,
 }) {
   const planet = block('c-planet');
   const style = {};
@@ -32,16 +41,25 @@ export default function Planet({
       />
     ),
   }];
+  const properties = displayMode === PlanetDisplayMode.Lobby
+    ? (
+      <PropertyTable
+        themeSpacing={ThemeSize.XSmall}
+        properties={planetProperties}
+      />
+    )
+    : ships;
+  const propModifiers = {
+    mode: kebabCase(displayMode),
+  };
   return (
     <div className={planet()} style={style}>
       <span className={planet('name')()}>{name}</span>
       <div className={planet('icon')()}>
         <Icon name={icon.id} />
       </div>
-      <div className={planet('planet-properties')()}>
-        <PropertyTable
-          properties={planetProperties}
-        />
+      <div className={planet('planet-properties')(propModifiers)()}>
+        {properties}
       </div>
     </div>
   );
@@ -51,8 +69,10 @@ Planet.propTypes = {
   name: PropTypes.string.isRequired,
   power: PropTypes.number.isRequired,
   productionRate: PropTypes.number.isRequired,
+  ships: PropTypes.number.isRequired,
   icons: PropTypes.objectOf(PropTypes.string),
   color: PropTypes.string,
+  displayMode: PropTypes.oneOf(values(PlanetDisplayMode)),
 };
 
 Planet.defaultProps = {
@@ -62,4 +82,7 @@ Planet.defaultProps = {
     50: 'mars',
     80: 'earth',
   },
+  displayMode: PlanetDisplayMode.Lobby,
 };
+
+export default pure(Planet);

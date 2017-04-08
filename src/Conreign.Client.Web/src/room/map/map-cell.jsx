@@ -15,23 +15,17 @@ export const CellSelection = {
 };
 
 function MapCell({
+  children,
   cellIndex,
-  cellRenderer,
   selection,
   mapWidth,
-  mapHeight,
   onFocus,
 }) {
-  const content = cellRenderer({
-    width: mapWidth,
-    height: mapHeight,
-    cellIndex,
-  });
   const widthPercentage = `${100 / mapWidth}%`;
   const modifiers = {
     [`selection-${selection}`]: isString(selection),
   };
-  const Tag = content ? 'button' : 'div';
+  const Tag = children ? 'button' : 'div';
   return (
     <Tag
       key={cellIndex}
@@ -40,23 +34,22 @@ function MapCell({
       onFocus={onFocus}
     >
       <div className={block('content')()}>
-        {content}
+        {children}
       </div>
     </Tag>
   );
 }
 
 MapCell.propTypes = {
+  children: PropTypes.node,
   cellIndex: PropTypes.number.isRequired,
   mapWidth: PropTypes.number.isRequired,
-  mapHeight: PropTypes.number.isRequired,
-  cellRenderer: PropTypes.func,
   selection: PropTypes.oneOf(values(CellSelection)),
   onFocus: PropTypes.func,
 };
 
 MapCell.defaultProps = {
-  cellRenderer: () => null,
+  children: null,
   selection: CellSelection.None,
   onFocus: noop,
 };

@@ -1,5 +1,7 @@
 import React, { PropTypes } from 'react';
 import Measure from 'react-measure';
+import { compose, withPropsOnChange, withHandlers } from 'recompose';
+import { mapValues } from 'lodash';
 
 import {
   Grid,
@@ -10,8 +12,9 @@ import {
   ThemeSize,
 } from './../../theme';
 
-import { Map } from './../map';
+import { Map, Planet, PlanetDisplayMode, MAP_SELECTION_SHAPE } from './../map';
 import { PLANET_SHAPE, PLAYER_SHAPE } from './../room-schemas';
+import { changeMapSelection } from './game';
 import GameStatusBoard from './game-status-board';
 
 const WIDGET_HEADER_HEIGHT = 35;
@@ -29,10 +32,13 @@ function calculateMapViewDimensions(viewDimensions) {
 
 function GamePage({
   map,
+  mapSelection,
+  mapCells,
   turn,
   turnSeconds,
   players,
   currentUser,
+  onMapCellFocus,
 }) {
   const currentPlayer = players[currentUser.id];
   return (
@@ -66,8 +72,11 @@ function GamePage({
                 </Box>
                 <Map
                   {...map}
+                  selection={mapSelection}
+                  cells={mapCells}
                   viewWidth={mapViewWidth}
                   viewHeight={mapViewHeight}
+                  onCellFocus={onMapCellFocus}
                 />
               </Widget>
             </GridCell>
@@ -85,16 +94,61 @@ GamePage.propTypes = {
     height: PropTypes.number.isRequired,
     planets: PropTypes.objectOf(PLANET_SHAPE).isRequired,
   }).isRequired,
+  mapSelection: MAP_SELECTION_SHAPE.isRequired,
+  mapCells: PropTypes.objectOf(PropTypes.node).isRequired,
   players: PropTypes.objectOf(PLAYER_SHAPE).isRequired,
   currentUser: PropTypes.shape({
     id: PropTypes.string.isRequired,
   }).isRequired,
   turn: PropTypes.number.isRequired,
   turnSeconds: PropTypes.number,
+  onMapCellFocus: PropTypes.func.isRequired,
 };
 
 GamePage.defaultProps = {
   turnSeconds: null,
 };
 
-export default GamePage;
+function generateMapCells({ planets, players }) {
+  const planetCells = mapValues(planets, (planet) => {
+    const owner = planet.ownerId ? players[planet.ownerId] : null;
+    const color = owner ? owner.color : null;
+    return (
+      <Planet
+        {...planet}
+        color={color}
+        displayMode={PlanetDisplayMode.Game}
+      />
+    );
+  });
+  return planetCells;
+}
+
+const onMapCellFocus =
+  ({ onMapSelectionChange, map, mapSelection, players, currentUser }) =>
+  ({ cellIndex }) => {
+    const updatedSelection = changeMapSelection({
+      cellIndex,
+      mapSelection,
+      planets: map.planets,
+      players,
+      currentUser,
+    });
+    if (updatedSelection !== mapSelection) {
+      onMapSelectionChange(updatedSelection);
+    }
+  };
+
+const enhance = compose(
+  withPropsOnChange(['map', 'players'], ({ map, players }) => ({
+    mapCells: generateMapCells({
+      players,
+      planets: map.planets,
+    }),
+  })),
+  withHandlers({
+    onMapCellFocus,
+  }),
+);
+
+export default enhance(GamePage);
