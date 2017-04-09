@@ -1,3 +1,4 @@
+System.ValueTuple
 System.Reactive.Core
 System.Reactive.Linq
 Microsoft.Tpl.Dataflow

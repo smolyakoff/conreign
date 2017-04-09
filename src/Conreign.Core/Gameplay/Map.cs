@@ -137,26 +137,9 @@ namespace Conreign.Core.Gameplay
             }
             var source = GetPlanetCoordinateByName(from);
             var destination = GetPlanetCoordinateByName(to);
-            var current = source;
-            var path = new List<long> {current.Position};
-            while (current != destination)
-            {
-                var distanceX = Math.Abs(destination.X - current.X);
-                var distanceY = Math.Abs(destination.Y - current.Y);
-                var x = 0;
-                var y = 0;
-                if (distanceX >= distanceY)
-                {
-                    x = destination.X - current.X > 0 ? 1 : -1;
-                }
-                else
-                {
-                    y = destination.Y - current.Y > 0 ? 1 : -1;
-                }
-                current = current.Move(x, y);
-                path.Add(current.Position);
-            }
-            return path.LongCount();
+            var distanceX = Math.Abs(destination.X - source.X);
+            var distanceY = Math.Abs(destination.Y - source.Y);
+            return distanceX + distanceY + 1;
         }
 
         public List<long> GenerateRoute(string from, string to)
@@ -171,37 +154,24 @@ namespace Conreign.Core.Gameplay
             }
             var source = GetPlanetCoordinateByName(from);
             var destination = GetPlanetCoordinateByName(to);
-            var current = source;
-            var path = new List<long> {current.Position};
-            while (current != destination)
+            var distanceX = Math.Abs(destination.X - source.X);
+            var distanceY = Math.Abs(destination.Y - source.Y);
+            var currentPosition = source.Position;
+            var destinationPosition = destination.Position;
+            var path = new List<long>(distanceX + distanceY + 1) {currentPosition};
+            var dx = destination.X >= source.X ? 1 : -1;
+            var dy = destination.Y >= source.Y ? Width : -Width;
+            (var delta, var nextDelta) = distanceX > distanceY ? (dx, dy) : (dy, dx);
+            for (var i = 0; i < Math.Abs(distanceX - distanceY); i++)
             {
-                var distanceX = Math.Abs(destination.X - current.X);
-                var distanceY = Math.Abs(destination.Y - current.Y);
-                var x = 0;
-                var y = 0;
-                if (distanceX == distanceY)
-                {
-                    // Randomly choose horizontal or vertical move
-                    var r = _random.Next(0, 2);
-                    if (r == 0)
-                    {
-                        distanceX += 1;
-                    }
-                    else
-                    {
-                        distanceY += 1;
-                    }
-                }
-                if (distanceX > distanceY)
-                {
-                    x = destination.X - current.X > 0 ? 1 : -1;
-                }
-                else
-                {
-                    y = destination.Y - current.Y > 0 ? 1 : -1;
-                }
-                current = current.Move(x, y);
-                path.Add(current.Position);
+                currentPosition += delta;
+                path.Add(currentPosition);
+            }
+            while (currentPosition != destinationPosition)
+            {
+                currentPosition += delta;
+                path.Add(currentPosition);
+                (delta, nextDelta) = (nextDelta, delta);
             }
             return path;
         }

@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import { pure } from 'recompose';
-import { range, isNumber, noop, memoize, includes } from 'lodash';
+import { range, isNumber, noop } from 'lodash';
 import bem from 'bem-cn';
 
 import './map.scss';
@@ -9,27 +9,23 @@ import { generatePath } from './../../core';
 
 const block = bem('c-map');
 
-const isInPath = memoize((position, start, end, width) => {
-  if (position === start || position === end) {
-    return false;
-  }
-  const path = generatePath({ start, end, width });
-  return includes(path, position);
-}, (...args) => args.join('-'));
-
-function chooseCellSelection(cellIndex, { start, end }, width) {
+function chooseCellSelection(cellIndex, { start, end }, pathSet) {
   if (start === cellIndex) {
     return CellSelection.Start;
   }
   if (end === cellIndex) {
     return CellSelection.End;
   }
-  if (isNumber(start) && isNumber(end)) {
-    return isInPath(cellIndex, start, end, width)
-      ? CellSelection.Intermediate
-      : CellSelection.None;
+  if (pathSet === null) {
+    return CellSelection.None;
   }
-  return CellSelection.None;
+  return pathSet.has(cellIndex)
+    ? CellSelection.Intermediate
+    : CellSelection.None;
+}
+
+function isDoubleSelection({ start, end }) {
+  return isNumber(start) && isNumber(end);
 }
 
 function fitWidthToView(mapWidth, mapHeight, viewWidth = null, viewHeight = null) {
@@ -64,12 +60,16 @@ function Map({
   if (isNumber(pxWidth)) {
     style.width = pxWidth;
   }
+  const path = isDoubleSelection(selection)
+    ? generatePath(selection.start, selection.end, width)
+    : null;
+  const pathSet = path === null ? null : new Set(path);
   return (
     <div className={block.mix(className)} style={style}>
       {
         range(0, height * width).map((cellIndex) => {
           const content = cells[cellIndex];
-          const cellSelection = chooseCellSelection(cellIndex, selection, width);
+          const cellSelection = chooseCellSelection(cellIndex, selection, pathSet);
           return (
             <MapCell
               key={cellIndex}

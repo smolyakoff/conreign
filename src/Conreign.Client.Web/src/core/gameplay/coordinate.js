@@ -1,49 +1,47 @@
 import { memoize } from 'lodash';
 
-export function getRowIndex({ position, width }) {
+export function getRowIndex(position, width) {
   return position % width;
 }
 
-export function getColumnIndex({ position, width }) {
+export function getColumnIndex(position, width) {
   return Math.floor(position / width);
 }
 
-export function getPosition({ x, y, width }) {
+export function getPosition(x, y, width) {
   return x + (y * width);
 }
 
-function generatePathImpl({ start, end, width }) {
+function generatePathImpl(start, end, width) {
+  const srcX = getRowIndex(start, width);
+  const srcY = getColumnIndex(start, width);
+  const destX = getRowIndex(end, width);
+  const destY = getColumnIndex(end, width);
+  const distanceX = Math.abs(destX - srcX);
+  const distanceY = Math.abs(destY - srcY);
   let current = start;
-  const path = [];
+  const path = new Array(distanceX + distanceY + 1);
+  let i = 0;
+  path[i] = current;
+  i += 1;
+  const dx = destX >= srcX ? 1 : -1;
+  const dy = destY >= srcY ? width : -width;
+  let [delta, nextDelta] = distanceX > distanceY ? [dx, dy] : [dy, dx];
+  for (let k = 0; k < Math.abs(distanceX - distanceY); k += 1) {
+    current += delta;
+    path[i] = current;
+    i += 1;
+  }
   while (current !== end) {
-    let dx = 0;
-    let dy = 0;
-    const src = { position: current, width };
-    const srcX = getRowIndex(src);
-    const srcY = getColumnIndex(src);
-    const dest = { position: end, width };
-    const destX = getRowIndex(dest);
-    const destY = getColumnIndex(dest);
-    const distanceX = Math.abs(destX - srcX);
-    const distanceY = Math.abs(destY - srcY);
-    if (distanceX === distanceY) {
-      dx += 1;
-    } else if (distanceX > distanceY) {
-      dx = destX - srcX > 0 ? 1 : -1;
-    } else {
-      dy = destY - srcY > 0 ? 1 : -1;
-    }
-    current = getPosition({
-      x: srcX + dx,
-      y: srcY + dy,
-      width,
-    });
-    path.push(current);
+    current += delta;
+    path[i] = current;
+    i += 1;
+    [delta, nextDelta] = [nextDelta, delta];
   }
   return path;
 }
 
 export const generatePath = memoize(
   generatePathImpl,
-  ({ start, end, width }) => [start, end, width].join('-'),
+  (...args) => args.join('-'),
 );
