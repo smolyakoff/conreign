@@ -21,9 +21,8 @@ function generatePathImpl(start, end, width) {
   const distanceY = Math.abs(destY - srcY);
   let current = start;
   const path = new Array(distanceX + distanceY + 1);
-  let i = 0;
-  path[i] = current;
-  i += 1;
+  path[0] = current;
+  let i = 1;
   const dx = destX >= srcX ? 1 : -1;
   const dy = destY >= srcY ? width : -width;
   let [delta, nextDelta] = distanceX > distanceY ? [dx, dy] : [dy, dx];

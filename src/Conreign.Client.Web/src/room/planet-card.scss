@@ -1,7 +1,8 @@
 .c-planet-details {
   &__icon-container {
-    width: 100px;
     position: relative;
+    flex-grow: 1;
+    max-width: 120px;
     .c-heading {
       display: block;
       margin: 0;
@@ -12,8 +13,6 @@
       transform: translate(-50%,-50%);
     }
     img {
-      min-width: 120px;
-      max-height: 120px;
       opacity: 0.5;
     }
   }

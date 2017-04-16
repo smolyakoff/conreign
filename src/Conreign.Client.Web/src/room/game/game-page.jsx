@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import Measure from 'react-measure';
 import { compose, withPropsOnChange, withHandlers } from 'recompose';
-import { mapValues } from 'lodash';
+import { mapValues, isNumber } from 'lodash';
 
 import {
   Grid,
@@ -16,9 +16,10 @@ import { Map, Planet, PlanetDisplayMode, MAP_SELECTION_SHAPE } from './../map';
 import { PLANET_SHAPE, PLAYER_SHAPE } from './../room-schemas';
 import { changeMapSelection } from './game';
 import GameStatusBoard from './game-status-board';
+import CommandCenter from './command-center';
 
 const WIDGET_HEADER_HEIGHT = 35;
-const CONTROLS_HEIGHT = 78;
+const STATUS_BOARD_HEIGHT = 78;
 
 function calculateMapViewDimensions(viewDimensions) {
   const {
@@ -26,7 +27,7 @@ function calculateMapViewDimensions(viewDimensions) {
     height: fullVh,
   } = viewDimensions;
   const vw = fullVw / 2;
-  const vh = fullVh - WIDGET_HEADER_HEIGHT - CONTROLS_HEIGHT;
+  const vh = fullVh - WIDGET_HEADER_HEIGHT - STATUS_BOARD_HEIGHT;
   return { width: vw, height: vh };
 }
 
@@ -41,6 +42,13 @@ function GamePage({
   onMapCellFocus,
 }) {
   const currentPlayer = players[currentUser.id];
+  const sourcePlanet = map.planets[mapSelection.start];
+  const destinationPlanet = isNumber(mapSelection.end)
+    ? map.planets[mapSelection.end]
+    : null;
+  const destinationPlanetOwner = destinationPlanet && destinationPlanet.ownerId
+    ? players[destinationPlanet.ownerId]
+    : null;
   return (
     <Measure>
       {(dimensions) => {
@@ -80,7 +88,19 @@ function GamePage({
                 />
               </Widget>
             </GridCell>
-            <GridCell />
+            <GridCell>
+              <Widget
+                header="Command Center"
+                className="u-higher"
+              >
+                <CommandCenter
+                  currentPlayer={currentPlayer}
+                  sourcePlanet={sourcePlanet}
+                  destinationPlanet={destinationPlanet}
+                  destinationPlanetOwner={destinationPlanetOwner}
+                />
+              </Widget>
+            </GridCell>
           </Grid>
         );
       }}

@@ -1,0 +1,14 @@
+@import "./../../theme/variables";
+
+.c-fleet-route-label {
+  font-weight: bold;
+  &--owner-you {
+    color: $color-success;
+  }
+  &--owner-neutral {
+    color: $color-grey;
+  }
+  &--owner-enemy {
+    color: $color-error;
+  }
+}

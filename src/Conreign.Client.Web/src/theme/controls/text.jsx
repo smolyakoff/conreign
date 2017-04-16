@@ -84,7 +84,10 @@ Paragraph.defaultProps = {
   children: null,
 };
 
-export const P = decorate(withThemeSizes())(Paragraph);
+export const P = decorate(
+  withThemeSizes(),
+  withThemeColors(),
+)(Paragraph);
 
 const heading = bem('c-heading');
 
