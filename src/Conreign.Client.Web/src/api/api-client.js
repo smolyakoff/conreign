@@ -1,8 +1,9 @@
 // eslint-disable-next-line
 import $ from 'expose-loader?jQuery!expose-loader?$!jquery';
 import 'ms-signalr-client';
-import Rx from 'rxjs/Rx';
 import { once, fromPairs, map, startCase } from 'lodash';
+
+import Rx from './../rx';
 
 const signalRConnectionState = $.signalR.connectionState;
 

@@ -2,7 +2,7 @@ import serializeError from 'serialize-error';
 import { parseInt, negate } from 'lodash';
 import { combineEpics } from 'redux-observable';
 
-import { isFailedAsyncAction } from './../core';
+import { isFailedAsyncAction } from '../framework';
 import { isRouteLoadingAction } from './../root';
 import { showNotification } from './../notifications';
 

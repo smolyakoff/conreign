@@ -1,7 +1,7 @@
 import { PropTypes } from 'react';
 import { values } from 'lodash';
 
-import { PresenceStatus, GameEventType } from './../core';
+import { PresenceStatus, events } from './../api';
 
 export const PLAYER = {
   userId: PropTypes.string.isRequired,
@@ -21,6 +21,6 @@ export const PLANET_SHAPE = PropTypes.shape({
 });
 
 export const GAME_EVENT_SHAPE = PropTypes.shape({
-  type: PropTypes.oneOf(values(GameEventType)).isRequired,
+  type: PropTypes.oneOf(values(events)).isRequired,
   payload: PropTypes.any.isRequired,
 });

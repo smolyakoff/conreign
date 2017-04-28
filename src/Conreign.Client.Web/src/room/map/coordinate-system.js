@@ -12,6 +12,16 @@ export function getPosition(x, y, width) {
   return x + (y * width);
 }
 
+export function getDistance(start, end, width) {
+  const srcX = getRowIndex(start, width);
+  const srcY = getColumnIndex(start, width);
+  const destX = getRowIndex(end, width);
+  const destY = getColumnIndex(end, width);
+  const distanceX = Math.abs(destX - srcX);
+  const distanceY = Math.abs(destY - srcY);
+  return distanceX + distanceY;
+}
+
 function generatePathImpl(start, end, width) {
   const srcX = getRowIndex(start, width);
   const srcY = getColumnIndex(start, width);

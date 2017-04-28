@@ -1,6 +1,5 @@
 import { defaults, isString, isUndefined } from 'lodash';
 
-
 export default class ValueStore {
   constructor(storage, options) {
     this._storage = storage;

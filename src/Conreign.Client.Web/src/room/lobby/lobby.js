@@ -1,89 +1,76 @@
 import { combineEpics } from 'redux-observable';
-import { values } from 'lodash';
+import { values, pick } from 'lodash';
 import {
-  createAsyncActionTypes,
-  AsyncOperationState,
+  createSucceededAsyncActionType,
+  mapEventNameToActionType,
+} from '../../framework';
+import {
+  PLAYER_JOINED,
+  PLAYER_UPDATED,
+  UPDATE_GAME_OPTIONS,
+  UPDATE_PLAYER_OPTIONS,
+  START_GAME,
+  GET_ROOM_STATE,
+  GAME_STARTED,
   PresenceStatus,
-  GameEventType,
-} from './../../core';
+  RoomMode,
+  TurnStatus,
+} from '../../api';
 
-const START_GAME = 'START_GAME';
-const SUBMIT_GAME_SETTINGS = 'UPDATE_GAME_OPTIONS';
-const CHANGE_GAME_SETTINGS = 'CHANGE_GAME_SETTINGS';
-const CHANGE_PLAYER_SETTINGS = 'CHANGE_PLAYER_SETTINGS';
-const SUBMIT_PLAYER_SETTINGS = 'UPDATE_PLAYER_OPTIONS';
-const HANDLE_PLAYER_UPDATED = 'HANDLE_PLAYER_UPDATED';
-const HANDLE_PLAYER_JOINED = 'HANDLE_PLAYER_JOINED';
-const SET_PLAYER_SETTINGS_VISIBILITY = 'SET_PLAYER_SETTINGS_VISIBILITY';
-const {
-  [AsyncOperationState.Succeeded]: SUBMIT_PLAYER_SETTINGS_SUCCEEDED,
-} = createAsyncActionTypes(SUBMIT_PLAYER_SETTINGS);
+const CHANGE_GAME_OPTIONS = 'CHANGE_GAME_OPTIONS';
+const CHANGE_PLAYER_OPTIONS = 'CHANGE_PLAYER_OPTIONS';
+const SET_PLAYER_OPTIONS_VISIBILITY = 'SET_PLAYER_OPTIONS_VISIBILITY';
+const HANDLE_PLAYER_UPDATED = mapEventNameToActionType(PLAYER_UPDATED);
+const HANDLE_PLAYER_JOINED = mapEventNameToActionType(PLAYER_JOINED);
+const HANDLE_GAME_STARTED = mapEventNameToActionType(GAME_STARTED);
+const UPDATE_PLAYER_OPTIONS_SUCCEEDED = createSucceededAsyncActionType(UPDATE_PLAYER_OPTIONS);
+const GET_ROOM_STATE_SUCCEEDED = createSucceededAsyncActionType(GET_ROOM_STATE);
 
 
-export function setPlayerSettingsVisibility(payload) {
+export function setPlayerOptionsVisibility(payload) {
   return {
-    type: SET_PLAYER_SETTINGS_VISIBILITY,
+    type: SET_PLAYER_OPTIONS_VISIBILITY,
     payload,
   };
 }
 
-export function submitGameSettings(payload) {
+
+export function changeGameOptions(payload) {
   return {
-    type: SUBMIT_GAME_SETTINGS,
+    type: CHANGE_GAME_OPTIONS,
     payload,
   };
 }
 
-export function changeGameSettings(payload) {
+export function changePlayerOptions(payload) {
   return {
-    type: CHANGE_GAME_SETTINGS,
-    payload,
-  };
-}
-
-export function changePlayerSettings(payload) {
-  return {
-    type: CHANGE_PLAYER_SETTINGS,
-    payload,
-  };
-}
-
-export function submitPlayerSettings(payload) {
-  return {
-    type: SUBMIT_PLAYER_SETTINGS,
-    payload,
-  };
-}
-
-export function startGame(payload) {
-  return {
-    type: START_GAME,
+    type: CHANGE_PLAYER_OPTIONS,
     payload,
   };
 }
 
 function createEpic({ apiDispatcher }) {
-  function submitGameSettingsEpic(action$) {
+  function updateGameOptionsEpic(action$) {
     return action$
-      .ofType(SUBMIT_GAME_SETTINGS)
+      .ofType(UPDATE_GAME_OPTIONS)
       .map(action => ({
         ...action,
         payload: {
           roomId: action.payload.roomId,
-          options: action.payload.settings,
+          options: action.payload.options,
         },
       }))
       .mergeMap(apiDispatcher);
   }
 
-  function submitPlayerSettingsEpic(action$) {
+  function updatePlayerOptionsEpic(action$) {
     return action$
-      .ofType(SUBMIT_PLAYER_SETTINGS)
+      .ofType(UPDATE_PLAYER_OPTIONS)
       .map(action => ({
         ...action,
         payload: {
           roomId: action.payload.roomId,
-          options: action.payload.settings,
+          options: action.payload.options,
         },
       }))
       .mergeMap(apiDispatcher);
@@ -96,35 +83,39 @@ function createEpic({ apiDispatcher }) {
   }
 
   return combineEpics(
-    submitGameSettingsEpic,
-    submitPlayerSettingsEpic,
+    updateGameOptionsEpic,
+    updatePlayerOptionsEpic,
     startGameEpic,
   );
 }
 
 function reducer(state, action) {
-  if (!state.gameSettings && state.map) {
-    state = {
-      ...state,
-      gameSettings: {
-        mapWidth: state.map.width,
-        mapHeight: state.map.height,
-        neutralPlanetsCount: values(state.map.planets)
-          .filter(planet => !planet.ownerId)
-          .length,
-      },
-    };
+  if (state.mode !== RoomMode.Lobby) {
+    return state;
   }
   switch (action.type) {
-    case CHANGE_GAME_SETTINGS:
+    case GET_ROOM_STATE_SUCCEEDED: {
+      const map = action.payload.map;
       return {
         ...state,
-        gameSettings: action.payload.settings,
+        gameOptions: {
+          mapWidth: map.width,
+          mapHeight: map.height,
+          neutralPlanetsCount: values(map.planets)
+            .filter(planet => !planet.ownerId)
+            .length,
+        },
       };
-    case CHANGE_PLAYER_SETTINGS:
+    }
+    case CHANGE_GAME_OPTIONS:
       return {
         ...state,
-        playerSettings: action.payload.settings,
+        gameOptions: action.payload.options,
+      };
+    case CHANGE_PLAYER_OPTIONS:
+      return {
+        ...state,
+        playerOptions: action.payload.options,
       };
     case HANDLE_PLAYER_JOINED: {
       const { player } = action.payload;
@@ -140,7 +131,7 @@ function reducer(state, action) {
         events: [
           ...state.events,
           {
-            type: GameEventType.PlayerJoined,
+            type: action.meta.$event,
             payload: action.payload,
           },
         ],
@@ -161,7 +152,7 @@ function reducer(state, action) {
         events: [
           ...state.events,
           {
-            type: GameEventType.PlayerUpdated,
+            type: action.meta.$event,
             payload: {
               timestamp,
               previousPlayer,
@@ -171,20 +162,44 @@ function reducer(state, action) {
         ],
       };
     }
-    case SUBMIT_PLAYER_SETTINGS_SUCCEEDED:
+    case UPDATE_PLAYER_OPTIONS_SUCCEEDED:
       return {
         ...state,
-        playerSettingsOpen: false,
+        playerOptionsOpen: false,
       };
-    case SET_PLAYER_SETTINGS_VISIBILITY:
+    case SET_PLAYER_OPTIONS_VISIBILITY:
       return {
         ...state,
-        playerSettingsOpen: action.payload,
+        playerOptionsOpen: action.payload,
+      };
+    case HANDLE_GAME_STARTED:
+      return {
+        ...pick(state, [
+          'roomId',
+          'players',
+          'map',
+          'leaderUserId',
+          'playerStatuses',
+        ]),
+        events: [],
+        mode: RoomMode.Game,
+        deadPlayers: [],
+        turn: 0,
+        turnSeconds: null,
+        waitingFleets: [],
+        movingFleets: [],
+        turnStatus: TurnStatus.Thinking,
       };
     default:
       return state;
   }
 }
+
+export {
+  updateGameOptions,
+  updatePlayerOptions,
+  startGame,
+} from './../../api';
 
 export default {
   reducer,

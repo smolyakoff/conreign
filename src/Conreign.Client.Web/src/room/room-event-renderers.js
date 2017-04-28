@@ -1,5 +1,5 @@
-import { GameEventType } from './../core';
+import { CHAT_MESSAGE_RECEIVED } from './../api';
 
 export default {
-  [GameEventType.ChatMessageReceived]: ({ message }) => message.text,
+  [CHAT_MESSAGE_RECEIVED]: ({ message }) => message.text,
 };

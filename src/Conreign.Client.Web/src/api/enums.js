@@ -8,12 +8,6 @@ export const PresenceStatus = {
   Offline: 1,
 };
 
-export const GameEventType = {
-  ChatMessageReceived: 'ChatMessageReceived',
-  PlayerJoined: 'PlayerJoined',
-  PlayerUpdated: 'PlayerUpdated',
-};
-
 export const TurnStatus = {
   Thinking: 0,
   Ended: 1,

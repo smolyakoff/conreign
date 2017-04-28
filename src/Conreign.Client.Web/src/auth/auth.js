@@ -1,9 +1,9 @@
 import decodeJwt from 'jwt-decode';
 import { combineEpics } from 'redux-observable';
 
-import { createAsyncActionTypes, AsyncOperationState } from './../core';
+import { createAsyncActionTypes, AsyncOperationState } from './../framework';
+import { LOGIN } from './../api';
 
-const LOGIN = 'LOGIN';
 export const {
   [AsyncOperationState.Succeeded]: LOGIN_SUCCEEDED,
 } = createAsyncActionTypes(LOGIN);
@@ -79,6 +79,13 @@ function reducer(state = INITIAL_STATE, action) {
 }
 
 reducer.$key = AUTH_REDUCER_KEY;
+
+export function selectUser(state) {
+  const tokenPayload = state[reducer.$key].user;
+  return {
+    id: tokenPayload.sub,
+  };
+}
 
 export default {
   createEpic,

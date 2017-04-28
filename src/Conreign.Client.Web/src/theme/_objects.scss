@@ -6,10 +6,6 @@
 
 // Grid
 .o-grid {
-  > .o-grid__cell {
-    box-sizing: border-box;
-  }
-
   @for $i from 1 through length($size-names) {
     &--gutter-#{nth($size-names, $i)}{
       > .o-grid__cell {
@@ -17,6 +13,10 @@
         padding-right: nth($sizes, $i);
       }
     }
+  }
+
+  &__cell {
+    box-sizing: border-box;
   }
 }
 

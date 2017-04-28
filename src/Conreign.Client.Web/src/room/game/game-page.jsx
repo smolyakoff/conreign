@@ -12,9 +12,15 @@ import {
   ThemeSize,
 } from './../../theme';
 
-import { Map, Planet, PlanetDisplayMode, MAP_SELECTION_SHAPE } from './../map';
+import {
+  Map,
+  Planet,
+  PlanetDisplayMode,
+  updateMapSelection,
+  getDistance,
+  MAP_SELECTION_SHAPE,
+} from './../map';
 import { PLANET_SHAPE, PLAYER_SHAPE } from './../room-schemas';
-import { changeMapSelection } from './game';
 import GameStatusBoard from './game-status-board';
 import CommandCenter from './command-center';
 
@@ -48,6 +54,9 @@ function GamePage({
     : null;
   const destinationPlanetOwner = destinationPlanet && destinationPlanet.ownerId
     ? players[destinationPlanet.ownerId]
+    : null;
+  const routeDistance = destinationPlanet
+    ? getDistance(mapSelection.start, mapSelection.end, map.width)
     : null;
   return (
     <Measure>
@@ -98,6 +107,7 @@ function GamePage({
                   sourcePlanet={sourcePlanet}
                   destinationPlanet={destinationPlanet}
                   destinationPlanetOwner={destinationPlanetOwner}
+                  routeDistance={routeDistance}
                 />
               </Widget>
             </GridCell>
@@ -145,14 +155,13 @@ function generateMapCells({ planets, players }) {
 }
 
 const onMapCellFocus =
-  ({ onMapSelectionChange, map, mapSelection, players, currentUser }) =>
+  ({ onMapSelectionChange, map, mapSelection, currentUser }) =>
   ({ cellIndex }) => {
-    const updatedSelection = changeMapSelection({
+    const updatedSelection = updateMapSelection({
       cellIndex,
       mapSelection,
       planets: map.planets,
-      players,
-      currentUser,
+      currentUserId: currentUser.id,
     });
     if (updatedSelection !== mapSelection) {
       onMapSelectionChange(updatedSelection);

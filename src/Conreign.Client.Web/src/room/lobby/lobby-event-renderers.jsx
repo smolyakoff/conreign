@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import { omit } from 'lodash';
 
-import { GameEventType } from './../../core';
+import { PLAYER_JOINED, PLAYER_UPDATED } from './../../api';
 import { Text, P } from './../../theme';
 import { PLAYER_SHAPE, PLAYER } from './../room-schemas';
 
@@ -40,6 +40,6 @@ PlayerUpdated.propTypes = {
 };
 
 export default {
-  [GameEventType.PlayerJoined]: PlayerJoined,
-  [GameEventType.PlayerUpdated]: PlayerUpdated,
+  [PLAYER_JOINED]: PlayerJoined,
+  [PLAYER_UPDATED]: PlayerUpdated,
 };

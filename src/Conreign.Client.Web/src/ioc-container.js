@@ -1,13 +1,7 @@
 import { get } from 'lodash';
 
-import createApiClient from './api-client';
-import ValueStore from './value-store';
-import {
-  asyncDispatcher as createAsyncDispatcher,
-} from './async-dispatcher';
-
-export * from './async-dispatcher';
-export * from './gameplay';
+import { createApiClient } from './api';
+import { ValueStore, createAsyncOperationDispatcher } from './framework';
 
 export default function createContainer(imports, config) {
   const { storage, history } = imports;
@@ -20,7 +14,7 @@ export default function createContainer(imports, config) {
   const apiClient = createApiClient(accessTokenProvider, {
     baseUrl: apiServerUrl,
   });
-  const apiDispatcher = createAsyncDispatcher(apiClient.send);
+  const apiDispatcher = createAsyncOperationDispatcher(apiClient.send);
   return {
     history,
     apiClient,

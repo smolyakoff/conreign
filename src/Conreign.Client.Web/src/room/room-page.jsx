@@ -2,12 +2,12 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { values } from 'lodash';
 
-import { RoomMode } from './../core';
 import { Box, BoxType, ThemeSize } from './../theme';
 import {
-  getRoomState,
+  RoomMode,
   selectRoomPage,
   setMapSelection,
+  getRoomState,
   sendMessage,
 } from './room';
 import { LobbyPage } from './lobby';

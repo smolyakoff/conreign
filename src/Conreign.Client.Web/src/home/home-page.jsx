@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 
 import './home-page.scss';
-import { joinRoom } from './home';
+import { joinRoom } from './../api';
 import JoinRoomForm from './join-room-form';
 
 function HomePage({ onJoin }) {

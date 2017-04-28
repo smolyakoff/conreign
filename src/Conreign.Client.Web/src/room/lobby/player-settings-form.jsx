@@ -17,7 +17,7 @@ import {
   ThemeColor,
   Orientation,
  } from './../../theme';
-import { PLAYER_SETTINGS_SHAPE } from './lobby-schemas';
+import { PLAYER_OPTIONS_SHAPE } from './lobby-schemas';
 
 const FIELD = {
   name: 'nickname',
@@ -115,8 +115,8 @@ function PlayerSettingsForm({
 }
 
 PlayerSettingsForm.propTypes = {
-  previousValues: PLAYER_SETTINGS_SHAPE.isRequired,
-  values: PLAYER_SETTINGS_SHAPE.isRequired,
+  previousValues: PLAYER_OPTIONS_SHAPE.isRequired,
+  values: PLAYER_OPTIONS_SHAPE.isRequired,
   errors: PropTypes.objectOf(PropTypes.object).isRequired,
   onChange: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,

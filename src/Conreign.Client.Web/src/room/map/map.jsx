@@ -5,7 +5,7 @@ import bem from 'bem-cn';
 
 import './map.scss';
 import MapCell, { CellSelection } from './map-cell';
-import { generatePath } from './../../core';
+import { generatePath } from './coordinate-system';
 
 const block = bem('c-map');
 

@@ -1,45 +1,36 @@
-import { omit, findKey, isNumber, parseInt } from 'lodash';
+import { omit } from 'lodash';
 import fp from 'lodash/fp';
 import { combineEpics } from 'redux-observable';
 
-import { AsyncOperationState, createAsyncActionTypes, GameEventType } from './../core';
-import { composeReducers } from './../util';
+import {
+  createSucceededAsyncActionType,
+  mapEventNameToActionType,
+} from './../framework';
+
+import {
+  MAP_UPDATED,
+  USER_STATUS_CHANGED,
+  LEADER_CHANGED,
+  CHAT_MESSAGE_RECEIVED,
+  GET_ROOM_STATE,
+  SEND_MESSAGE,
+} from './../api';
+import { selectUser } from './../auth';
+import {
+  resetMapSelection,
+  ensureMapSelection,
+  SET_MAP_SELECTION,
+} from './map';
 import lobby from './lobby';
 import game from './game';
+import { composeReducers } from './../util';
 
-const HANDLE_MAP_UPDATED = 'HANDLE_MAP_UPDATED';
-const HANDLE_USER_STATUS_CHANGED = 'HANDLE_USER_STATUS_CHANGED';
-const HANDLE_LEADER_CHANGED = 'HANDLE_LEADER_CHANGED';
-const HANDLE_CHAT_MESSAGE_RECEIVED = 'HANDLE_CHAT_MESSAGE_RECEIVED';
-const GET_ROOM_STATE = 'GET_ROOM_STATE';
-const SET_MAP_SELECTION = 'SET_MAP_SELECTION';
-const SEND_MESSAGE = 'SEND_MESSAGE';
+const HANDLE_MAP_UPDATED = mapEventNameToActionType(MAP_UPDATED);
+const HANDLE_USER_STATUS_CHANGED = mapEventNameToActionType(USER_STATUS_CHANGED);
+const HANDLE_LEADER_CHANGED = mapEventNameToActionType(LEADER_CHANGED);
+const HANDLE_CHAT_MESSAGE_RECEIVED = mapEventNameToActionType(CHAT_MESSAGE_RECEIVED);
+const GET_ROOM_STATE_SUCCEEDED = createSucceededAsyncActionType(GET_ROOM_STATE);
 
-const GET_ROOM_STATE_ACTIONS = createAsyncActionTypes('GET_ROOM_STATE');
-const {
-  [AsyncOperationState.Succeeded]: GET_ROOM_STATE_SUCCEEDED,
-} = GET_ROOM_STATE_ACTIONS;
-
-export function getRoomState(payload) {
-  return {
-    type: GET_ROOM_STATE,
-    payload,
-  };
-}
-
-export function setMapSelection(payload) {
-  return {
-    type: SET_MAP_SELECTION,
-    payload,
-  };
-}
-
-export function sendMessage(payload) {
-  return {
-    type: SEND_MESSAGE,
-    payload,
-  };
-}
 
 function createEpic(container) {
   const { apiDispatcher } = container;
@@ -78,32 +69,6 @@ function normalizeRoomState(room) {
   };
 }
 
-function moveCoordinate({ previousCoordinate, previousMap, currentMap }) {
-  if (!isNumber(previousCoordinate)) {
-    return null;
-  }
-  const planet = previousMap[previousCoordinate];
-  return planet ? findKey(currentMap, v => v.name === planet.name) : null;
-}
-
-function moveSelection({ previousSelection, previousMap, currentMap }) {
-  if (!previousSelection) {
-    return { start: null, end: null };
-  }
-  return {
-    start: moveCoordinate({
-      previousCoordinate: previousSelection.start,
-      previousMap,
-      currentMap,
-    }),
-    end: moveCoordinate({
-      previousCoordinate: previousSelection.end,
-      previousMap,
-      currentMap,
-    }),
-  };
-}
-
 function roomReducer(state = {}, action) {
   if (action.error) {
     return state;
@@ -122,11 +87,11 @@ function roomReducer(state = {}, action) {
         mapSelection: previousSelection,
       } = state;
       const currentMap = action.payload.map;
-      const currentSelection = moveSelection({
+      const currentSelection = resetMapSelection(
         previousSelection,
         previousMap,
         currentMap,
-      });
+      );
       return {
         ...state,
         map: currentMap,
@@ -158,7 +123,7 @@ function roomReducer(state = {}, action) {
       return {
         ...state,
         events: [...state.events, {
-          type: GameEventType.ChatMessageReceived,
+          type: CHAT_MESSAGE_RECEIVED,
           payload: action.payload,
         }],
       };
@@ -174,45 +139,22 @@ const reducer = composeReducers(
 );
 reducer.$key = 'room';
 
-function dehydrateEvent(event) {
-  const payload = event.payload;
-  return {
-    ...event,
-    payload: {
-      ...payload,
-      timestamp: new Date(payload.timestamp),
-    },
-  };
-}
-
-function ensureMapSelection(map, mapSelection, currentUser) {
-  if (isNumber(mapSelection.start)) {
-    return mapSelection;
-  }
-  const currentUserPlanetPosition = findKey(
-    map.planets,
-    p => p.ownerId === currentUser.id,
-  );
-  return { start: parseInt(currentUserPlanetPosition) };
-}
-
-export function selectRoomPage(state, roomId) {
+export function selectRoomPage(state) {
   const room = state[reducer.$key];
-  const currentUser = {
-    id: state.auth.user.sub,
-  };
+  const currentUser = selectUser(state);
   return {
     ...room,
     mapSelection: ensureMapSelection(
-      room.map,
       room.mapSelection || {},
+      room.map.planets,
       currentUser,
     ),
-    events: room.events.map(dehydrateEvent),
-    roomId,
     currentUser,
   };
 }
+
+export { RoomMode, sendMessage, getRoomState } from './../api';
+export { setMapSelection } from './map';
 
 export default {
   createEpic,

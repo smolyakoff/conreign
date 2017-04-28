@@ -1,10 +1,13 @@
 import { combineReducers } from 'redux';
 import { combineEpics } from 'redux-observable';
-import { snakeCase, get, isArray } from 'lodash';
+import { get, isArray } from 'lodash';
 import serializeError from 'serialize-error';
-import Rx from 'rxjs';
 
-import { AsyncOperationState } from './../core';
+import Rx from './../rx';
+import {
+  AsyncOperationState,
+  mapEventNameToActionType,
+} from '../framework';
 import errors from './../errors';
 import notifications from './../notifications';
 import auth from './../auth';
@@ -117,10 +120,10 @@ function createEpic(container) {
       .mergeMap(() => apiClient.events)
       .map(event => ({
         ...event,
-        type: `HANDLE_${snakeCase(event.type).toUpperCase()}`,
+        type: mapEventNameToActionType(event.type),
         meta: {
           ...event.meta,
-          $event: true,
+          $event: event.type,
         },
       }));
   }

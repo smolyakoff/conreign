@@ -20,14 +20,14 @@ import {
 } from './../../theme';
 import { Map, Planet, MAP_SELECTION_SHAPE } from './../map';
 import {
-  submitGameSettings,
-  changeGameSettings,
-  submitPlayerSettings,
-  changePlayerSettings,
-  setPlayerSettingsVisibility,
+  updateGameOptions,
+  changeGameOptions,
+  updatePlayerOptions,
+  changePlayerOptions,
+  setPlayerOptionsVisibility,
   startGame,
 } from './lobby';
-import { GAME_SETTINGS_SHAPE, PLAYER_SETTINGS_SHAPE } from './lobby-schemas';
+import { GAME_OPTIONS_SHAPE, PLAYER_OPTIONS_SHAPE } from './lobby-schemas';
 import PlanetCard from './../planet-card';
 import Chat from './../chat';
 import lobbyEventRenderers from './lobby-event-renderers';
@@ -63,8 +63,9 @@ LobbyMapPlanetCell.propTypes = {
 };
 
 function LobbyPage({
-  playerSettings,
-  gameSettings,
+  playerOptions,
+  playerOptionsOpen,
+  gameOptions,
   map,
   mapSelection,
   mapCells,
@@ -73,19 +74,18 @@ function LobbyPage({
   eventRenderers,
   leaderUserId,
   currentUser,
-  playerSettingsOpen,
   onMessageSend,
-  onPlayerSettingsSetVisibility,
+  onSetPlayerOptionsVisibility,
   onMapCellFocus,
-  onGameSettingsSubmit,
-  onGameSettingsChange,
-  onPlayerSettingsChange,
-  onPlayerSettingsSubmit,
+  onGameOptionsUpdate,
+  onGameOptionsChange,
+  onPlayerOptionsChange,
+  onPlayerOptionsUpdate,
   onGameStart,
 }) {
   const selectedPlanet = map.planets[mapSelection.start];
   const isLeader = leaderUserId === currentUser.id;
-  playerSettings = playerSettings || players[currentUser.id];
+  playerOptions = playerOptions || players[currentUser.id];
 
   const usedNicknames = values(players)
     .filter(p => p.userId !== currentUser.id)
@@ -148,17 +148,17 @@ function LobbyPage({
                         players={values(players)}
                         events={events}
                         renderers={eventRenderers}
-                        settingsOpen={playerSettingsOpen}
+                        settingsOpen={playerOptionsOpen}
                         settingsChildren={
                           <PlayerSettingsForm
-                            values={playerSettings}
+                            values={playerOptions}
                             previousValues={players[currentUser.id]}
                             usedNicknames={usedNicknames}
-                            onSubmit={onPlayerSettingsSubmit}
-                            onChange={onPlayerSettingsChange}
+                            onSubmit={onPlayerOptionsUpdate}
+                            onChange={onPlayerOptionsChange}
                           />
                         }
-                        onSettingsToggle={onPlayerSettingsSetVisibility}
+                        onSettingsToggle={onSetPlayerOptionsVisibility}
                         onMessageSend={onMessageSend}
                       />
                     </Widget>
@@ -171,9 +171,9 @@ function LobbyPage({
                           className="u-higher"
                         >
                           <GameSettingsForm
-                            values={gameSettings}
-                            onSubmit={onGameSettingsSubmit}
-                            onChange={onGameSettingsChange}
+                            values={gameOptions}
+                            onSubmit={onGameOptionsUpdate}
+                            onChange={onGameOptionsChange}
                             onStart={onGameStart}
                           />
                         </Widget>
@@ -191,8 +191,8 @@ function LobbyPage({
 }
 
 LobbyPage.propTypes = {
-  gameSettings: GAME_SETTINGS_SHAPE,
-  playerSettings: PLAYER_SETTINGS_SHAPE,
+  gameOptions: GAME_OPTIONS_SHAPE.isRequired,
+  playerOptions: PLAYER_OPTIONS_SHAPE,
   map: PropTypes.shape({
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
@@ -207,15 +207,15 @@ LobbyPage.propTypes = {
   currentUser: PropTypes.shape({
     id: PropTypes.string.isRequired,
   }).isRequired,
-  playerSettingsOpen: PropTypes.bool,
+  playerOptionsOpen: PropTypes.bool,
   onMessageSend: PropTypes.func.isRequired,
-  onPlayerSettingsSetVisibility: PropTypes.func.isRequired,
+  onSetPlayerOptionsVisibility: PropTypes.func.isRequired,
   onMapCellFocus: PropTypes.func.isRequired,
-  onGameSettingsSubmit: PropTypes.func.isRequired,
-  onGameSettingsChange: PropTypes.func.isRequired,
+  onGameOptionsUpdate: PropTypes.func.isRequired,
+  onGameOptionsChange: PropTypes.func.isRequired,
   onGameStart: PropTypes.func.isRequired,
-  onPlayerSettingsChange: PropTypes.func.isRequired,
-  onPlayerSettingsSubmit: PropTypes.func.isRequired,
+  onPlayerOptionsChange: PropTypes.func.isRequired,
+  onPlayerOptionsUpdate: PropTypes.func.isRequired,
 };
 
 LobbyPage.defaultProps = {
@@ -223,9 +223,8 @@ LobbyPage.defaultProps = {
     start: null,
     end: null,
   },
-  gameSettings: null,
-  playerSettings: null,
-  playerSettingsOpen: false,
+  playerOptions: null,
+  playerOptionsOpen: false,
 };
 
 function generateMapCells({ planets, players }) {
@@ -244,12 +243,12 @@ const enhance = compose(
   connect(
     null,
     {
-      onGameSettingsSubmit: submitGameSettings,
-      onGameSettingsChange: changeGameSettings,
+      onGameOptionsUpdate: updateGameOptions,
+      onGameOptionsChange: changeGameOptions,
+      onPlayerOptionsUpdate: updatePlayerOptions,
+      onPlayerOptionsChange: changePlayerOptions,
+      onSetPlayerOptionsVisibility: setPlayerOptionsVisibility,
       onGameStart: startGame,
-      onPlayerSettingsSubmit: submitPlayerSettings,
-      onPlayerSettingsChange: changePlayerSettings,
-      onPlayerSettingsSetVisibility: setPlayerSettingsVisibility,
     },
   ),
   withPropsOnChange(['map', 'players'], ({ map, players }) => ({
@@ -265,14 +264,14 @@ const enhance = compose(
     },
   })),
   withHandlers({
-    onGameSettingsSubmit: ({ onGameSettingsSubmit, roomId }) =>
-      settings => onGameSettingsSubmit({ roomId, settings }),
-    onGameSettingsChange: ({ onGameSettingsChange, roomId }) =>
-      settings => onGameSettingsChange({ roomId, settings }),
-    onPlayerSettingsChange: ({ onPlayerSettingsChange, roomId }) =>
-      settings => onPlayerSettingsChange({ roomId, settings }),
-    onPlayerSettingsSubmit: ({ onPlayerSettingsSubmit, roomId }) =>
-      settings => onPlayerSettingsSubmit({ roomId, settings }),
+    onGameOptionsUpdate: ({ onGameOptionsUpdate, roomId }) =>
+      options => onGameOptionsUpdate({ roomId, options }),
+    onGameOptionsChange: ({ onGameOptionsChange, roomId }) =>
+      options => onGameOptionsChange({ roomId, options }),
+    onPlayerOptionsChange: ({ onPlayerOptionsChange, roomId }) =>
+      options => onPlayerOptionsChange({ roomId, options }),
+    onPlayerOptionsUpdate: ({ onPlayerOptionsUpdate, roomId }) =>
+      options => onPlayerOptionsUpdate({ roomId, options }),
     onGameStart: ({ onGameStart, roomId }) => () => onGameStart({ roomId }),
     onMessageSend: ({ onMessageSend, roomId }) => text => onMessageSend({ roomId, text }),
     onMapCellFocus,

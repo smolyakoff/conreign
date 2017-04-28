@@ -74,7 +74,7 @@ export default function ChatMessage({
 
 ChatMessage.propTypes = {
   sender: PLAYER_SHAPE,
-  timestamp: PropTypes.instanceOf(Date).isRequired,
+  timestamp: PropTypes.string.isRequired,
   children: PropTypes.node,
 };
 

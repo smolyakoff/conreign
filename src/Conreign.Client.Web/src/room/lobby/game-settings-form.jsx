@@ -12,7 +12,7 @@ import {
   DeckItem,
   Orientation,
 } from './../../theme';
-import { GAME_SETTINGS_SHAPE } from './lobby-schemas';
+import { GAME_OPTIONS_SHAPE } from './lobby-schemas';
 
 function NumericInput(props) {
   return (
@@ -83,7 +83,7 @@ function GameSettingsForm({ onChange, onSubmit, onStart, values }) {
 }
 
 GameSettingsForm.propTypes = {
-  values: GAME_SETTINGS_SHAPE.isRequired,
+  values: GAME_OPTIONS_SHAPE.isRequired,
   onChange: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   onStart: PropTypes.func.isRequired,
