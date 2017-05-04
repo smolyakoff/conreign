@@ -53,6 +53,7 @@ function FleetRouteCard({
         </Box>
         <PlanetCard
           {...sourcePlanet}
+          ships={sourcePlanet.ships}
           owner={sourcePlanetOwner}
         />
       </GridCell>

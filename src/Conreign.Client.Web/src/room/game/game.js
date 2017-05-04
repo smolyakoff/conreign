@@ -1,4 +1,4 @@
-import { includes, mean } from 'lodash';
+import { includes, mean, findKey } from 'lodash';
 import { combineEpics } from 'redux-observable';
 
 import Rx from './../../rx';
@@ -8,9 +8,14 @@ import {
   GAME_TICKED,
   TURN_CALCULATION_STARTED,
   TURN_CALCULATION_ENDED,
+  LAUNCH_FLEET,
 } from './../../api';
 import {
   mapEventNameToActionType,
+  createAsyncActionTypes,
+  getOriginalPayload,
+  getAsyncOperationCorrelationId,
+  AsyncOperationState,
 } from './../../framework';
 
 const AVERAGE_SERVER_TICK_INTERVAL = 5000;
@@ -23,12 +28,72 @@ const HANDLE_GAME_TICKED = mapEventNameToActionType(GAME_TICKED);
 const HANDLE_TURN_CALCULATION_STARTED = mapEventNameToActionType(TURN_CALCULATION_STARTED);
 const HANDLE_TURN_CALCULATION_ENDED = mapEventNameToActionType(TURN_CALCULATION_ENDED);
 const SET_TURN_TIMER_SECONDS = 'SET_TURN_TIMER_SECONDS';
+const {
+  [AsyncOperationState.Pending]: LAUNCH_FLEET_PENDING,
+  [AsyncOperationState.Failed]: LAUNCH_FLEET_FAILED,
+} = createAsyncActionTypes(LAUNCH_FLEET);
+
+function selectPlanetPositionByName(state, name) {
+  const planets = state.map.planets;
+  return findKey(
+    planets,
+    planet => planet.name === name,
+  );
+}
 
 function reducer(state, action) {
   if (state.mode !== RoomMode.Game) {
     return state;
   }
-  switch (action.type) {
+  const { payload, type } = action;
+  switch (type) {
+    case LAUNCH_FLEET_PENDING: {
+      const fleet = payload.fleet;
+      const planets = state.map.planets;
+      const sourcePlanetPosition = selectPlanetPositionByName(state, fleet.from);
+      const sourcePlanet = planets[sourcePlanetPosition];
+      return {
+        ...state,
+        map: {
+          ...state.map,
+          planets: {
+            ...planets,
+            [sourcePlanetPosition]: {
+              ...sourcePlanet,
+              ships: sourcePlanet.ships - fleet.ships,
+            },
+          },
+        },
+        waitingFleets: [
+          ...state.waitingFleets,
+          {
+            id: getAsyncOperationCorrelationId(action),
+            ...payload.fleet,
+          },
+        ],
+      };
+    }
+    case LAUNCH_FLEET_FAILED: {
+      const id = getAsyncOperationCorrelationId(action);
+      const { fleet } = getOriginalPayload(action);
+      const planets = state.map.planets;
+      const sourcePlanetPosition = selectPlanetPositionByName(state, fleet.from);
+      const sourcePlanet = planets[sourcePlanetPosition];
+      return {
+        ...state,
+        waitingFleets: state.waitingFleets.filter(x => x.id !== id),
+        map: {
+          ...state.map,
+          planets: {
+            ...planets,
+            [sourcePlanetPosition]: {
+              ...sourcePlanet,
+              ships: sourcePlanet.ships + fleet.ships,
+            },
+          },
+        },
+      };
+    }
     case HANDLE_TURN_CALCULATION_STARTED:
       return {
         ...state,
@@ -86,7 +151,13 @@ function mapTickActionToEvent(action) {
   }
 }
 
-function createEpic() {
+function createEpic({ apiDispatcher }) {
+  function launchFleetEpic(action$) {
+    return action$
+      .ofType(LAUNCH_FLEET)
+      .mergeMap(apiDispatcher);
+  }
+
   function turnTimerEpic(action$) {
     const serverTickEvents$ = action$
       .filter(isTickAction)
@@ -138,8 +209,11 @@ function createEpic() {
 
   return combineEpics(
     turnTimerEpic,
+    launchFleetEpic,
   );
 }
+
+export { launchFleet } from './../../api';
 
 export default {
   reducer,

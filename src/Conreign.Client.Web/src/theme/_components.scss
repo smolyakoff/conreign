@@ -167,8 +167,8 @@ a {
   @each $size in $size-names {
     &--#{$size} {
       .c-icon-button__icon {
-        width: 2em;
-        height: 2em;
+        width: map_get($icon-sizes, $size);
+        height: map_get($icon-sizes, $size);
       }
     }
   }

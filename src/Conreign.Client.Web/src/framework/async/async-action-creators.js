@@ -9,12 +9,14 @@ import {
   createFailedAsyncActionType,
 } from './async-action-type-conventions';
 
-export function createPendingAction(originalAction) {
+export function createPendingAction(originalAction, correlationId) {
   return {
     type: createPendingAsyncActionType(originalAction.type),
+    payload: originalAction.payload,
     meta: {
       ...originalAction.meta,
       $async: {
+        correlationId,
         originalType: originalAction.type,
         state: AsyncOperationState.Pending,
       },
@@ -25,14 +27,17 @@ export function createPendingAction(originalAction) {
 export function createSucceededAction(
   { payload, meta },
   originalAction,
+  correlationId,
 ) {
   return {
     payload,
+    originalPayload: originalAction.payload,
     type: createSucceededAsyncActionType(originalAction.type),
     meta: {
       ...originalAction.meta,
       ...meta,
       $async: {
+        correlationId,
         originalType: originalAction.type,
         state: AsyncOperationState.Succeeded,
       },
@@ -40,14 +45,16 @@ export function createSucceededAction(
   };
 }
 
-export function createFailedAction(error, originalAction) {
+export function createFailedAction(error, originalAction, correlationId) {
   return {
     type: createFailedAsyncActionType(originalAction.type),
     payload: serializeError(error),
+    originalPayload: originalAction.payload,
     error: true,
     meta: {
       ...originalAction.meta,
       $async: {
+        correlationId,
         originalType: originalAction.type,
         state: AsyncOperationState.Succeeded,
       },
@@ -82,4 +89,12 @@ export function isFailedAsyncAction(action, originalType = null) {
 export function isSucceededAsyncAction(action, originalType = null) {
   return !action.error &&
     isCompletedAsyncAction(action, originalType);
+}
+
+export function getAsyncOperationCorrelationId(action) {
+  return action.meta.$async.correlationId;
+}
+
+export function getOriginalPayload(action) {
+  return action.originalPayload;
 }

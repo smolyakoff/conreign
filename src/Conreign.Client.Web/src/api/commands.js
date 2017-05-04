@@ -5,6 +5,7 @@ export const UPDATE_GAME_OPTIONS = 'UPDATE_GAME_OPTIONS';
 export const UPDATE_PLAYER_OPTIONS = 'UPDATE_PLAYER_OPTIONS';
 export const GET_ROOM_STATE = 'GET_ROOM_STATE';
 export const SEND_MESSAGE = 'SEND_MESSAGE';
+export const LAUNCH_FLEET = 'LAUNCH_FLEET';
 
 export function login(payload) {
   return {
@@ -51,6 +52,13 @@ export function startGame(payload) {
 export function sendMessage(payload) {
   return {
     type: SEND_MESSAGE,
+    payload,
+  };
+}
+
+export function launchFleet(payload) {
+  return {
+    type: LAUNCH_FLEET,
     payload,
   };
 }

@@ -2,12 +2,16 @@ import React, { PropTypes } from 'react';
 import { parseInt, isFinite } from 'lodash';
 import { compose, withState, withHandlers } from 'recompose';
 
+import arrows from './../icons/arrows.svg';
+
 import {
   Grid,
   GridCell,
   Input,
+  IconButton,
   Button,
   Text,
+  P,
   ThemeColor,
   ThemeSize,
   VerticalAlignment,
@@ -15,20 +19,31 @@ import {
 
 function FleetForm({
   ships,
+  maxShips,
   distance,
+  onRaiseButtonClick,
   onShipsInputChange,
   onFormSubmit,
 }) {
+  const canSubmit = ships > 0 && ships <= maxShips;
+  const canRaise = ships < maxShips;
+  const errorMessage = ships > maxShips
+    ? `Only ${maxShips} ships are ready to be dispatched from the source planet.`
+    : null;
   return (
     <form onSubmit={onFormSubmit}>
       <Grid
         gutter={ThemeSize.Small}
         verticalAlignment={VerticalAlignment.Center}
       >
-        <GridCell fixedWidth gutter={false}>
-          <Button ghost>
-            ▲
-          </Button>
+        <GridCell fixedWidth>
+          <IconButton
+            disabled={!canRaise}
+            iconName={arrows}
+            themeSize={ThemeSize.Small}
+            themeColor={ThemeColor.Info}
+            onClick={onRaiseButtonClick}
+          />
         </GridCell>
         <GridCell>
           <Input
@@ -46,22 +61,34 @@ function FleetForm({
         </GridCell>
         <GridCell fixedWidth>
           <Button
-            themeColor={ThemeColor.Brand}
-            ghost
+            type="submit"
+            disabled={!canSubmit}
+            themeColor={ThemeColor.Info}
           >
             Dispatch
           </Button>
         </GridCell>
       </Grid>
+      {
+        errorMessage &&
+          <P
+            themeColor={ThemeColor.Error}
+            themeSize={ThemeSize.Small}
+          >
+            {errorMessage}
+          </P>
+      }
     </form>
   );
 }
 
 FleetForm.propTypes = {
-  ships: PropTypes.number.isRequired,
+  ships: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  maxShips: PropTypes.number.isRequired,
   distance: PropTypes.number.isRequired,
   onShipsInputChange: PropTypes.func.isRequired,
   onFormSubmit: PropTypes.func.isRequired,
+  onRaiseButtonClick: PropTypes.func.isRequired,
 };
 
 const onShipsInputChange = props => (event) => {
@@ -79,11 +106,17 @@ const onFormSubmit = ({ ships, onSubmit }) => (event) => {
   onSubmit({ ships });
 };
 
+const onRaiseButtonClick = ({ setShips, maxShips }) => (event) => {
+  event.preventDefault();
+  setShips(maxShips);
+};
+
 const enhance = compose(
   withState('ships', 'setShips', ({ maxShips }) => maxShips),
   withHandlers({
     onShipsInputChange,
     onFormSubmit,
+    onRaiseButtonClick,
   }),
 );
 

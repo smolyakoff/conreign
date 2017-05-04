@@ -1,4 +1,5 @@
 import Rx from 'rxjs';
+import { uniqueId } from 'lodash';
 
 import {
   createPendingAction,
@@ -6,9 +7,14 @@ import {
   createFailedAction,
 } from './async-action-creators';
 
+function generateCorrelationId() {
+  return uniqueId('async-operation-');
+}
+
 export default function createAsyncOperationObservable(action, dispatch) {
+  const id = generateCorrelationId();
   return Rx.Observable.from(dispatch(action))
-    .map(result => createSucceededAction(result, action))
-    .catch(error => Rx.Observable.of(createFailedAction(error, action)))
-    .startWith(createPendingAction(action));
+    .map(result => createSucceededAction(result, action, id))
+    .catch(error => Rx.Observable.of(createFailedAction(error, action, id)))
+    .startWith(createPendingAction(action, id));
 }
