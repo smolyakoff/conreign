@@ -19,7 +19,7 @@ function MapCell({
   cellIndex,
   selection,
   mapWidth,
-  onFocus,
+  onClick,
 }) {
   const widthPercentage = `${100 / mapWidth}%`;
   const modifiers = {
@@ -31,7 +31,7 @@ function MapCell({
       key={cellIndex}
       className={block(modifiers)()}
       style={{ flexBasis: widthPercentage }}
-      onFocus={onFocus}
+      onClick={onClick}
     >
       <div className={block('content')()}>
         {children}
@@ -45,22 +45,22 @@ MapCell.propTypes = {
   cellIndex: PropTypes.number.isRequired,
   mapWidth: PropTypes.number.isRequired,
   selection: PropTypes.oneOf(values(CellSelection)),
-  onFocus: PropTypes.func,
+  onClick: PropTypes.func,
 };
 
 MapCell.defaultProps = {
   children: null,
   selection: CellSelection.None,
-  onFocus: noop,
+  onClick: noop,
 };
 
 function focus(props, event) {
-  props.onFocus({ event, cellIndex: props.cellIndex });
+  props.onClick({ event, cellIndex: props.cellIndex });
 }
 
 export default compose(
   pure,
   withHandlers({
-    onFocus: props => event => focus(props, event),
+    onClick: props => event => focus(props, event),
   }),
 )(MapCell);

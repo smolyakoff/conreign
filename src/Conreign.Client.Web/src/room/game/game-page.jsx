@@ -47,7 +47,7 @@ function GamePage({
   turnSeconds,
   players,
   currentUser,
-  onMapCellFocus,
+  onMapCellClick,
   onFleetFormSubmit,
 }) {
   const currentPlayer = players[currentUser.id];
@@ -96,7 +96,7 @@ function GamePage({
                   cells={mapCells}
                   viewWidth={mapViewWidth}
                   viewHeight={mapViewHeight}
-                  onCellFocus={onMapCellFocus}
+                  onCellClick={onMapCellClick}
                 />
               </Widget>
             </GridCell>
@@ -136,7 +136,7 @@ GamePage.propTypes = {
   }).isRequired,
   turn: PropTypes.number.isRequired,
   turnSeconds: PropTypes.number,
-  onMapCellFocus: PropTypes.func.isRequired,
+  onMapCellClick: PropTypes.func.isRequired,
   onFleetFormSubmit: PropTypes.func.isRequired,
 };
 
@@ -159,7 +159,7 @@ function generateMapCells(planets, players) {
   return planetCells;
 }
 
-const onMapCellFocus =
+const onMapCellClick =
   ({ onMapSelectionChange, map, mapSelection, currentUser }) =>
   ({ cellIndex }) => {
     const updatedSelection = updateMapSelection({
@@ -193,7 +193,7 @@ const enhance = compose(
     mapCells: generateMapCells(map.planets, players),
   })),
   withHandlers({
-    onMapCellFocus,
+    onMapCellClick,
     onFleetFormSubmit,
   }),
 );

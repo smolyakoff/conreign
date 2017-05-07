@@ -22,27 +22,18 @@ export function updateMapSelection({
       ...mapSelection,
       end: cellIndex,
     };
-    // Destination planet is mine
-  } else if (endPlanet.ownerId === currentUserId) {
-    if (planet.ownerId === currentUserId) {
-      return {
-        start: cellIndex,
-        end: null,
-      };
-    }
-    return {
-      ...mapSelection,
-      end: cellIndex,
-    };
   }
-  // Destination planet is foreign
-  if (planet.ownerId === currentUserId) {
+  // Destination planet selected
+  const startSelected = start === cellIndex;
+  const endSelected = end === cellIndex;
+  const mineEndSelected = endSelected && planet.ownerId === currentUserId;
+  if (startSelected || mineEndSelected) {
     return {
       start: cellIndex,
       end: null,
     };
   }
-  if (end === cellIndex) {
+  if (endSelected) {
     return mapSelection;
   }
   return {

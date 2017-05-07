@@ -76,7 +76,7 @@ function LobbyPage({
   currentUser,
   onMessageSend,
   onSetPlayerOptionsVisibility,
-  onMapCellFocus,
+  onMapCellClick,
   onGameOptionsUpdate,
   onGameOptionsChange,
   onPlayerOptionsChange,
@@ -120,7 +120,7 @@ function LobbyPage({
                     viewHeight={mapViewHeight}
                     cells={mapCells}
                     selection={mapSelection}
-                    onCellFocus={onMapCellFocus}
+                    onCellClick={onMapCellClick}
                   />
                 </Widget>
               </GridCell>
@@ -210,7 +210,7 @@ LobbyPage.propTypes = {
   playerOptionsOpen: PropTypes.bool,
   onMessageSend: PropTypes.func.isRequired,
   onSetPlayerOptionsVisibility: PropTypes.func.isRequired,
-  onMapCellFocus: PropTypes.func.isRequired,
+  onMapCellClick: PropTypes.func.isRequired,
   onGameOptionsUpdate: PropTypes.func.isRequired,
   onGameOptionsChange: PropTypes.func.isRequired,
   onGameStart: PropTypes.func.isRequired,
@@ -235,7 +235,7 @@ function generateMapCells({ planets, players }) {
   });
 }
 
-const onMapCellFocus =
+const onMapCellClick =
   ({ onMapSelectionChange, mapSelection }) =>
   ({ cellIndex }) => onMapSelectionChange({ ...mapSelection, start: cellIndex });
 
@@ -274,7 +274,7 @@ const enhance = compose(
       options => onPlayerOptionsUpdate({ roomId, options }),
     onGameStart: ({ onGameStart, roomId }) => () => onGameStart({ roomId }),
     onMessageSend: ({ onMessageSend, roomId }) => text => onMessageSend({ roomId, text }),
-    onMapCellFocus,
+    onMapCellClick,
   }),
 );
 

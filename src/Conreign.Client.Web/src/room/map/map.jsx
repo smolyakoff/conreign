@@ -53,7 +53,7 @@ function Map({
   viewHeight,
   cells,
   selection,
-  onCellFocus,
+  onCellClick,
 }) {
   const pxWidth = fitWidthToView(width, height, viewWidth, viewHeight);
   const style = {};
@@ -76,7 +76,7 @@ function Map({
               cellIndex={cellIndex}
               selection={cellSelection}
               mapWidth={width}
-              onFocus={content ? onCellFocus : noop}
+              onClick={content ? onCellClick : noop}
             >
               {content}
             </MapCell>
@@ -94,7 +94,7 @@ export const MAP_SELECTION_SHAPE = PropTypes.shape({
 
 Map.propTypes = {
   selection: MAP_SELECTION_SHAPE,
-  onCellFocus: PropTypes.func,
+  onCellClick: PropTypes.func,
   className: PropTypes.string,
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
@@ -112,7 +112,7 @@ Map.defaultProps = {
   viewHeight: null,
   className: null,
   cells: {},
-  onCellFocus: noop,
+  onCellClick: noop,
 };
 
 export default pure(Map);
