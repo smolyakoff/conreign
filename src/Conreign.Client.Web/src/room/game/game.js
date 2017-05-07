@@ -28,10 +28,18 @@ const HANDLE_GAME_TICKED = mapEventNameToActionType(GAME_TICKED);
 const HANDLE_TURN_CALCULATION_STARTED = mapEventNameToActionType(TURN_CALCULATION_STARTED);
 const HANDLE_TURN_CALCULATION_ENDED = mapEventNameToActionType(TURN_CALCULATION_ENDED);
 const SET_TURN_TIMER_SECONDS = 'SET_TURN_TIMER_SECONDS';
+const CHANGE_FLEET = 'CHANGE_FLEET';
 const {
   [AsyncOperationState.Pending]: LAUNCH_FLEET_PENDING,
   [AsyncOperationState.Failed]: LAUNCH_FLEET_FAILED,
 } = createAsyncActionTypes(LAUNCH_FLEET);
+
+export function changeFleet(payload) {
+  return {
+    type: CHANGE_FLEET,
+    payload,
+  };
+}
 
 function selectPlanetPositionByName(state, name) {
   const planets = state.map.planets;
@@ -47,11 +55,18 @@ function reducer(state, action) {
   }
   const { payload, type } = action;
   switch (type) {
+    case CHANGE_FLEET: {
+      return {
+        ...state,
+        fleetShips: payload.ships,
+      };
+    }
     case LAUNCH_FLEET_PENDING: {
       const fleet = payload.fleet;
       const planets = state.map.planets;
       const sourcePlanetPosition = selectPlanetPositionByName(state, fleet.from);
       const sourcePlanet = planets[sourcePlanetPosition];
+      const shipsLeft = sourcePlanet.ships - fleet.ships;
       return {
         ...state,
         map: {
@@ -60,7 +75,7 @@ function reducer(state, action) {
             ...planets,
             [sourcePlanetPosition]: {
               ...sourcePlanet,
-              ships: sourcePlanet.ships - fleet.ships,
+              ships: shipsLeft,
             },
           },
         },
@@ -71,6 +86,7 @@ function reducer(state, action) {
             ...payload.fleet,
           },
         ],
+        fleetShips: fleet.ships > shipsLeft ? shipsLeft : fleet.ships,
       };
     }
     case LAUNCH_FLEET_FAILED: {

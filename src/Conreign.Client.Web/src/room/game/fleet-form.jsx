@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import { parseInt, isFinite } from 'lodash';
-import { compose, withState, withHandlers } from 'recompose';
+import { compose, withHandlers } from 'recompose';
 
 import arrows from './../icons/arrows.svg';
 
@@ -94,11 +94,11 @@ FleetForm.propTypes = {
 const onShipsInputChange = props => (event) => {
   const value = parseInt(event.target.value);
   if (!isFinite(value)) {
-    props.setShips('');
+    props.onChange({ ships: '' });
     return;
   }
   const ships = Math.abs(Math.floor(value));
-  props.setShips(ships);
+  props.onChange({ ships });
 };
 
 const onFormSubmit = ({ ships, onSubmit }) => (event) => {
@@ -106,13 +106,12 @@ const onFormSubmit = ({ ships, onSubmit }) => (event) => {
   onSubmit({ ships });
 };
 
-const onRaiseButtonClick = ({ setShips, maxShips }) => (event) => {
+const onRaiseButtonClick = ({ onChange, maxShips }) => (event) => {
   event.preventDefault();
-  setShips(maxShips);
+  onChange({ ships: maxShips });
 };
 
 const enhance = compose(
-  withState('ships', 'setShips', ({ maxShips }) => maxShips),
   withHandlers({
     onShipsInputChange,
     onFormSubmit,

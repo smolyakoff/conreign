@@ -11,7 +11,9 @@ function CommandCenter({
   destinationPlanet,
   destinationPlanetOwner,
   routeDistance,
+  fleetShips,
   onFleetFormSubmit,
+  onFleetFormChange,
 }) {
   return (
     <Deck>
@@ -28,9 +30,11 @@ function CommandCenter({
         destinationPlanet && (
           <DeckItem>
             <FleetForm
+              ships={fleetShips}
               maxShips={sourcePlanet.ships}
               distance={routeDistance}
               onSubmit={onFleetFormSubmit}
+              onChange={onFleetFormChange}
             />
           </DeckItem>
         )
@@ -45,7 +49,9 @@ CommandCenter.propTypes = {
   destinationPlanet: PLANET_SHAPE,
   destinationPlanetOwner: PLAYER_SHAPE,
   routeDistance: PropTypes.number,
+  fleetShips: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   onFleetFormSubmit: PropTypes.func.isRequired,
+  onFleetFormChange: PropTypes.func.isRequired,
 };
 
 CommandCenter.defaultProps = {

@@ -22,7 +22,7 @@ import {
   MAP_SELECTION_SHAPE,
 } from './../map';
 import { PLANET_SHAPE, PLAYER_SHAPE } from './../room-schemas';
-import { launchFleet } from './game';
+import { launchFleet, changeFleet } from './game';
 import GameStatusBoard from './game-status-board';
 import CommandCenter from './command-center';
 
@@ -45,10 +45,12 @@ function GamePage({
   mapCells,
   turn,
   turnSeconds,
+  fleetShips,
   players,
   currentUser,
   onMapCellClick,
   onFleetFormSubmit,
+  onFleetFormChange,
 }) {
   const currentPlayer = players[currentUser.id];
   const sourcePlanet = map.planets[mapSelection.start];
@@ -61,6 +63,7 @@ function GamePage({
   const routeDistance = destinationPlanet
     ? getDistance(mapSelection.start, mapSelection.end, map.width)
     : null;
+  const finalFleetShips = isNumber(fleetShips) ? fleetShips : sourcePlanet.ships;
   return (
     <Measure>
       {(dimensions) => {
@@ -111,7 +114,9 @@ function GamePage({
                   destinationPlanet={destinationPlanet}
                   destinationPlanetOwner={destinationPlanetOwner}
                   routeDistance={routeDistance}
+                  fleetShips={finalFleetShips}
                   onFleetFormSubmit={onFleetFormSubmit}
+                  onFleetFormChange={onFleetFormChange}
                 />
               </Widget>
             </GridCell>
@@ -136,12 +141,18 @@ GamePage.propTypes = {
   }).isRequired,
   turn: PropTypes.number.isRequired,
   turnSeconds: PropTypes.number,
+  fleetShips: PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.string,
+  ]),
   onMapCellClick: PropTypes.func.isRequired,
   onFleetFormSubmit: PropTypes.func.isRequired,
+  onFleetFormChange: PropTypes.func.isRequired,
 };
 
 GamePage.defaultProps = {
   turnSeconds: null,
+  fleetShips: null,
 };
 
 function generateMapCells(planets, players) {
@@ -188,6 +199,7 @@ const onFleetFormSubmit = ({ onFleetLaunch, mapSelection, roomId, map }) => ({ s
 const enhance = compose(
   connect(null, {
     onFleetLaunch: launchFleet,
+    onFleetFormChange: changeFleet,
   }),
   withPropsOnChange(['map', 'players'], ({ map, players }) => ({
     mapCells: generateMapCells(map.planets, players),
