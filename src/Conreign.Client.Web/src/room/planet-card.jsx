@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import { pure } from 'recompose';
 import block from 'bem-cn';
 
 import {
@@ -14,7 +15,7 @@ import {
 import { choosePlanetIcon, Circle } from './icons';
 import './planet-card.scss';
 
-export default function PlanetCard({
+function PlanetCard({
   className,
   name,
   productionRate,
@@ -86,3 +87,5 @@ PlanetCard.defaultProps = {
   className: null,
   owner: null,
 };
+
+export default pure(PlanetCard);

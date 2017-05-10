@@ -13,6 +13,12 @@ export const VerticalAlignment = {
   Baseline: 'baseline',
 };
 
+export const HorizontalAlignment = {
+  Left: Alignment.Left,
+  Center: Alignment.Center,
+  Right: Alignment.Right,
+};
+
 export const Position = {
   Top: Alignment.Top,
   Bottom: Alignment.Bottom,

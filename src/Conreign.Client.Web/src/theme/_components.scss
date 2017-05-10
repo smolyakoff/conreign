@@ -41,10 +41,22 @@ a {
     &--v-align-bottom {
       align-items: flex-end;
     }
+    &--active {
+      background-color: $color-bg-brand;
+    }
   }
   &__cell {
     &--width-fixed {
       flex: initial;
+    }
+    &--h-align-left {
+      justify-content: flex-start;
+    }
+    &--h-align-right {
+      justify-content: flex-end;
+    }
+    &--h-align-center {
+      justify-content: center;
     }
   }
 }

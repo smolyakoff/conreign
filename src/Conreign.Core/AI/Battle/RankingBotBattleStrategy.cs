@@ -12,11 +12,7 @@ namespace Conreign.Core.AI.Battle
 
         public RankingBotBattleStrategy(RankingBotBattleStrategyOptions options)
         {
-            if (options == null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-            _options = options;
+            _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
         public List<FleetData> ChooseFleetsToLaunch(Guid userId, ReadOnlyMap map)
@@ -62,8 +58,8 @@ namespace Conreign.Core.AI.Battle
                 }
                 fleets.Add(new FleetData
                 {
-                    From = candidate.Source.Name,
-                    To = candidate.Destination.Name,
+                    From = candidate.Source.Position,
+                    To = candidate.Destination.Position,
                     Ships = candidate.Ships
                 });
                 sentShips[candidate.Source.Name] += candidate.Ships;
@@ -103,7 +99,7 @@ namespace Conreign.Core.AI.Battle
 
         private int ShouldLaunchAttackShips(ReadOnlyMap map, ReadOnlyPlanetData source, ReadOnlyPlanetData destination)
         {
-            var distance = map.CalculateDistance(source.Name, destination.Name);
+            var distance = map.CalculateDistance(source.Position, destination.Position);
             var enemyExpectedPower = (destination.Ships + destination.ProductionRate*distance)*destination.Power;
             var requiredShips = (int) Math.Ceiling((enemyExpectedPower/source.Power)*_options.ClevernessFactor);
             var enoughShips = source.Ships >= requiredShips;
@@ -136,7 +132,7 @@ namespace Conreign.Core.AI.Battle
 
         private bool IsVisible(ReadOnlyMap map, ReadOnlyPlanetData source, ReadOnlyPlanetData destination)
         {
-            var distance = map.CalculateDistance(source.Name, destination.Name);
+            var distance = map.CalculateDistance(source.Position, destination.Position);
             return distance < map.MaxDistance*_options.VisionFactor;
         }
 

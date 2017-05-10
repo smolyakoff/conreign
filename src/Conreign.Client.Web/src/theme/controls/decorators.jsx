@@ -157,7 +157,7 @@ export function withActiveState(blockClass) {
   function mapProps({ className, active, ...others }) {
     const css = cn(
       className,
-      isNonEmptyString(active) ? `${blockClass}--active` : null,
+      active ? `${blockClass}--active` : null,
     );
     return {
       className: css,

@@ -12,18 +12,14 @@ namespace Conreign.Core.AI.Battle
 
         public ReadOnlyMap(Map map)
         {
-            if (map == null)
-            {
-                throw new ArgumentNullException(nameof(map));
-            }
-            _map = map;
+            _map = map ?? throw new ArgumentNullException(nameof(map));
         }
 
-        public ReadOnlyPlanetData this[string name] => new ReadOnlyPlanetData(_map[name]);
+        public ReadOnlyPlanetData this[long position] => 
+            new ReadOnlyPlanetData(_map[position], position);
 
-        public ReadOnlyPlanetData this[long coordinate] => new ReadOnlyPlanetData(_map[coordinate]);
-
-        public ReadOnlyPlanetData this[int x, int y] => new ReadOnlyPlanetData(_map[x, y]);
+        public ReadOnlyPlanetData this[int x, int y] => 
+            new ReadOnlyPlanetData(_map[x, y], new Coordinate(x, y, Width, Height).Position);
 
         public int Height => _map.Height;
         public long MaxDistance => _map.MaxDistance;
@@ -31,27 +27,17 @@ namespace Conreign.Core.AI.Battle
 
         public IEnumerator<ReadOnlyPlanetData> GetEnumerator()
         {
-            return _map.Select(x => new ReadOnlyPlanetData(x)).GetEnumerator();
+            return _map.Select(x => new ReadOnlyPlanetData(x.Value, x.Key)).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return _map.Select(x => new ReadOnlyPlanetData(x)).GetEnumerator();
+            return _map.Select(x => new ReadOnlyPlanetData(x.Value, x.Key)).GetEnumerator();
         }
 
-        public long CalculateDistance(string from, string to)
+        public long CalculateDistance(long from, long to)
         {
             return _map.CalculateDistance(from, to);
-        }
-
-        public Coordinate GetPlanetCoordinateByName(string name)
-        {
-            return _map.GetPlanetCoordinateByName(name);
-        }
-
-        public long GetPlanetPositionByName(string name)
-        {
-            return _map.GetPlanetPositionByName(name);
         }
     }
 }

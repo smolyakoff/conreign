@@ -7,15 +7,13 @@ namespace Conreign.Core.AI.Battle
     {
         private readonly PlanetData _planet;
 
-        public ReadOnlyPlanetData(PlanetData planet)
+        public ReadOnlyPlanetData(PlanetData planet, long position)
         {
-            if (planet == null)
-            {
-                throw new ArgumentNullException(nameof(planet));
-            }
-            _planet = planet;
+            Position = position;
+            _planet = planet ?? throw new ArgumentNullException(nameof(planet));
         }
 
+        public long Position { get; }
         public string Name => _planet.Name;
         public int ProductionRate => _planet.ProductionRate;
         public double Power => _planet.Power;

@@ -1,8 +1,8 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Measure from 'react-measure';
-import { compose, withPropsOnChange, withHandlers } from 'recompose';
-import { mapValues, isNumber } from 'lodash';
+import { compose, withPropsOnChange, withHandlers, withProps } from 'recompose';
+import { mapValues, isNumber, isNil } from 'lodash';
 
 import {
   Grid,
@@ -22,7 +22,15 @@ import {
   MAP_SELECTION_SHAPE,
 } from './../map';
 import { PLANET_SHAPE, PLAYER_SHAPE } from './../room-schemas';
-import { launchFleet, changeFleet } from './game';
+import { FLEET_SHAPE } from './game-schemas';
+import {
+  launchFleet,
+  changeFleet,
+  selectFleet,
+  cancelFleet,
+  endTurn,
+  selectWaitingFleetsWithDetails,
+} from './game';
 import GameStatusBoard from './game-status-board';
 import CommandCenter from './command-center';
 
@@ -46,11 +54,16 @@ function GamePage({
   turn,
   turnSeconds,
   fleetShips,
+  waitingFleets,
+  selectedFleetIndex,
   players,
   currentUser,
   onMapCellClick,
+  onFleetSelect,
   onFleetFormSubmit,
   onFleetFormChange,
+  onCancelFleetClick,
+  onEndTurnClick,
 }) {
   const currentPlayer = players[currentUser.id];
   const sourcePlanet = map.planets[mapSelection.start];
@@ -63,7 +76,7 @@ function GamePage({
   const routeDistance = destinationPlanet
     ? getDistance(mapSelection.start, mapSelection.end, map.width)
     : null;
-  const finalFleetShips = isNumber(fleetShips) ? fleetShips : sourcePlanet.ships;
+  const finalFleetShips = isNil(fleetShips) ? sourcePlanet.ships : fleetShips;
   return (
     <Measure>
       {(dimensions) => {
@@ -115,8 +128,13 @@ function GamePage({
                   destinationPlanetOwner={destinationPlanetOwner}
                   routeDistance={routeDistance}
                   fleetShips={finalFleetShips}
+                  waitingFleets={waitingFleets}
+                  selectedFleetIndex={selectedFleetIndex}
+                  onFleetClick={onFleetSelect}
                   onFleetFormSubmit={onFleetFormSubmit}
                   onFleetFormChange={onFleetFormChange}
+                  onCancelFleetClick={onCancelFleetClick}
+                  onEndTurnClick={onEndTurnClick}
                 />
               </Widget>
             </GridCell>
@@ -145,14 +163,20 @@ GamePage.propTypes = {
     PropTypes.number,
     PropTypes.string,
   ]),
+  selectedFleetIndex: PropTypes.number,
+  waitingFleets: PropTypes.arrayOf(FLEET_SHAPE).isRequired,
   onMapCellClick: PropTypes.func.isRequired,
+  onFleetSelect: PropTypes.func.isRequired,
   onFleetFormSubmit: PropTypes.func.isRequired,
   onFleetFormChange: PropTypes.func.isRequired,
+  onCancelFleetClick: PropTypes.func.isRequired,
+  onEndTurnClick: PropTypes.func.isRequired,
 };
 
 GamePage.defaultProps = {
   turnSeconds: null,
   fleetShips: null,
+  selectedFleetIndex: null,
 };
 
 function generateMapCells(planets, players) {
@@ -184,28 +208,46 @@ const onMapCellClick =
     }
   };
 
-const onFleetFormSubmit = ({ onFleetLaunch, mapSelection, roomId, map }) => ({ ships }) => {
-  const planets = map.planets;
+const onFleetFormSubmit = ({ onFleetLaunch, mapSelection, roomId }) => ({ ships }) => {
   onFleetLaunch({
     roomId,
     fleet: {
-      from: planets[mapSelection.start].name,
-      to: planets[mapSelection.end].name,
+      from: mapSelection.start,
+      to: mapSelection.end,
       ships,
     },
   });
 };
 
+const onCancelFleetClick = ({ selectedFleetIndex, onFleetCancel, roomId }) => () => {
+  onFleetCancel({
+    index: selectedFleetIndex,
+    roomId,
+  });
+};
+
+const onEndTurnClick = ({ onEndTurnClick: emit, roomId }) => () => {
+  emit({ roomId });
+};
+
 const enhance = compose(
   connect(null, {
+    onFleetSelect: selectFleet,
     onFleetLaunch: launchFleet,
+    onFleetCancel: cancelFleet,
     onFleetFormChange: changeFleet,
+    onEndTurnClick: endTurn,
   }),
+  withProps(props => ({
+    waitingFleets: selectWaitingFleetsWithDetails(props),
+  })),
   withPropsOnChange(['map', 'players'], ({ map, players }) => ({
     mapCells: generateMapCells(map.planets, players),
   })),
   withHandlers({
     onMapCellClick,
+    onEndTurnClick,
+    onCancelFleetClick,
     onFleetFormSubmit,
   }),
 );

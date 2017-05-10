@@ -20,16 +20,12 @@ namespace Conreign.Core.Tests.Gameplay
                 Width = width,
                 Height = height
             };
-            var map = new Map(state)
-            {
-                [fromX, fromY] = new PlanetData {Name = "A"},
-                [toX, toY] = new PlanetData {Name = "B"}
-            };
-            var route = map.GenerateRoute("A", "B");
-
-            // Assert start and end points
+            var map = new Map(state);
             var source = new Coordinate(fromX, fromY, width, height);
             var destination = new Coordinate(toX, toY, width, height);
+            var route = map.GenerateRoute(source.Position, destination.Position);
+
+            // Assert start and end points
             Assert.Equal(source.Position, route[0]);
             Assert.Equal(destination.Position, route[route.Count - 1]);
 

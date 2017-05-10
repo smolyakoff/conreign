@@ -11,12 +11,8 @@ namespace Conreign.Core.Gameplay.Validators
 
         public LaunchFleetValidator(Guid senderId, Map map)
         {
-            if (map == null)
-            {
-                throw new ArgumentNullException(nameof(map));
-            }
             _senderId = senderId;
-            _map = map;
+            _map = map ?? throw new ArgumentNullException(nameof(map));
 
             RuleFor(x => x.From)
                 .NotEmpty()
@@ -31,25 +27,25 @@ namespace Conreign.Core.Gameplay.Validators
                 .Must(BeEnoughShips);
         }
 
-        private static bool NotBeTheSameAsFrom(FleetData fleet, string to)
+        private static bool NotBeTheSameAsFrom(FleetData fleet, long to)
         {
             return to != fleet.From;
         }
 
         private bool BeEnoughShips(FleetData fleet, int ships)
         {
-            var availableShips = _map.GetPlanetByNameOrNull(fleet.From).Ships;
+            var availableShips = _map[fleet.From].Ships;
             return availableShips >= ships;
         }
 
-        private bool Exist(string planet)
+        private bool Exist(long coordinate)
         {
-            return _map.GetPlanetByNameOrNull(planet) != null;
+            return _map.ContainsPlanet(coordinate);
         }
 
-        private bool BelongToSender(string planet)
+        private bool BelongToSender(long coordinate)
         {
-            return _map.GetPlanetByNameOrNull(planet).OwnerId == _senderId;
+            return _map[coordinate].OwnerId == _senderId;
         }
     }
 }

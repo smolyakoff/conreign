@@ -2,7 +2,8 @@ import React, { PropTypes } from 'react';
 import bem from 'bem-cn';
 import { values } from 'lodash';
 
-import { VerticalAlignment } from './enums';
+import { VerticalAlignment, HorizontalAlignment } from './enums';
+import { decorate, withActiveState } from './decorators';
 
 const tableBlock = bem('c-table');
 
@@ -120,7 +121,9 @@ TableBody.defaultProps = {
   children: null,
 };
 
-export function TableRow({
+const rowBlock = tableBlock('row');
+
+function TableRowBase({
   className,
   children,
   heading,
@@ -137,7 +140,7 @@ export function TableRow({
   };
   return (
     <tr
-      className={tableBlock('row')(modifiers).mix(className)()}
+      className={rowBlock(modifiers).mix(className)()}
       {...others}
     >
       {children}
@@ -145,7 +148,7 @@ export function TableRow({
   );
 }
 
-TableRow.propTypes = {
+TableRowBase.propTypes = {
   className: PropTypes.string,
   children: PropTypes.node,
   heading: PropTypes.bool,
@@ -154,7 +157,7 @@ TableRow.propTypes = {
   verticalAlignment: PropTypes.oneOf(values(VerticalAlignment)),
 };
 
-TableRow.defaultProps = {
+TableRowBase.defaultProps = {
   className: null,
   children: null,
   heading: false,
@@ -163,14 +166,20 @@ TableRow.defaultProps = {
   verticalAlignment: VerticalAlignment.Center,
 };
 
+export const TableRow = decorate(
+  withActiveState(rowBlock()),
+)(TableRowBase);
+
 export function TableCell({
   className,
   children,
   fixedWidth,
+  horizontalAlignment,
   ...others
 }) {
   const modifiers = {
     'width-fixed': fixedWidth,
+    'h-align': horizontalAlignment,
   };
   return (
     <td
@@ -186,10 +195,12 @@ TableCell.propTypes = {
   className: PropTypes.string,
   children: PropTypes.node,
   fixedWidth: PropTypes.bool,
+  horizontalAlignment: PropTypes.oneOf(values(HorizontalAlignment)),
 };
 
 TableCell.defaultProps = {
   className: null,
   children: null,
   fixedWidth: false,
+  horizontalAlignment: HorizontalAlignment.Left,
 };

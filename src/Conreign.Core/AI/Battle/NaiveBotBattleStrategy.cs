@@ -28,8 +28,8 @@ namespace Conreign.Core.AI.Battle
             var fleets = myPlanets
                 .Select(source => new FleetData
                 {
-                    From = source.Name,
-                    To = otherPlanets[_random.Next(0, otherPlanets.Count)].Name,
+                    From = source.Position,
+                    To = otherPlanets[_random.Next(0, otherPlanets.Count)].Position,
                     Ships = source.Ships
                 })
                 .ToList();

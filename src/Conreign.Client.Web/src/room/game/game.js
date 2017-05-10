@@ -1,4 +1,5 @@
-import { includes, mean, findKey } from 'lodash';
+import { includes, mean } from 'lodash';
+import { createSelector } from 'reselect';
 import { combineEpics } from 'redux-observable';
 
 import Rx from './../../rx';
@@ -9,14 +10,18 @@ import {
   TURN_CALCULATION_STARTED,
   TURN_CALCULATION_ENDED,
   LAUNCH_FLEET,
+  CANCEL_FLEET,
+  END_TURN,
 } from './../../api';
 import {
   mapEventNameToActionType,
   createAsyncActionTypes,
   getOriginalPayload,
   getAsyncOperationCorrelationId,
+  createSucceededAsyncActionType,
   AsyncOperationState,
 } from './../../framework';
+import { getDistance } from './../map';
 
 const AVERAGE_SERVER_TICK_INTERVAL = 5000;
 const SERVER_TICK_RESOLUTION = 5;
@@ -29,10 +34,12 @@ const HANDLE_TURN_CALCULATION_STARTED = mapEventNameToActionType(TURN_CALCULATIO
 const HANDLE_TURN_CALCULATION_ENDED = mapEventNameToActionType(TURN_CALCULATION_ENDED);
 const SET_TURN_TIMER_SECONDS = 'SET_TURN_TIMER_SECONDS';
 const CHANGE_FLEET = 'CHANGE_FLEET';
+const SELECT_FLEET = 'SELECT_FLEET';
 const {
   [AsyncOperationState.Pending]: LAUNCH_FLEET_PENDING,
   [AsyncOperationState.Failed]: LAUNCH_FLEET_FAILED,
 } = createAsyncActionTypes(LAUNCH_FLEET);
+const CANCEL_FLEET_SUCCEEDED = createSucceededAsyncActionType(CANCEL_FLEET);
 
 export function changeFleet(payload) {
   return {
@@ -41,12 +48,11 @@ export function changeFleet(payload) {
   };
 }
 
-function selectPlanetPositionByName(state, name) {
-  const planets = state.map.planets;
-  return findKey(
-    planets,
-    planet => planet.name === name,
-  );
+export function selectFleet(payload) {
+  return {
+    type: SELECT_FLEET,
+    payload,
+  };
 }
 
 function reducer(state, action) {
@@ -61,11 +67,16 @@ function reducer(state, action) {
         fleetShips: payload.ships,
       };
     }
+    case SELECT_FLEET: {
+      return {
+        ...state,
+        selectedFleetIndex: payload.index,
+      };
+    }
     case LAUNCH_FLEET_PENDING: {
       const fleet = payload.fleet;
       const planets = state.map.planets;
-      const sourcePlanetPosition = selectPlanetPositionByName(state, fleet.from);
-      const sourcePlanet = planets[sourcePlanetPosition];
+      const sourcePlanet = planets[fleet.from];
       const shipsLeft = sourcePlanet.ships - fleet.ships;
       return {
         ...state,
@@ -73,7 +84,7 @@ function reducer(state, action) {
           ...state.map,
           planets: {
             ...planets,
-            [sourcePlanetPosition]: {
+            [fleet.from]: {
               ...sourcePlanet,
               ships: shipsLeft,
             },
@@ -93,8 +104,7 @@ function reducer(state, action) {
       const id = getAsyncOperationCorrelationId(action);
       const { fleet } = getOriginalPayload(action);
       const planets = state.map.planets;
-      const sourcePlanetPosition = selectPlanetPositionByName(state, fleet.from);
-      const sourcePlanet = planets[sourcePlanetPosition];
+      const sourcePlanet = planets[fleet.from];
       return {
         ...state,
         waitingFleets: state.waitingFleets.filter(x => x.id !== id),
@@ -102,12 +112,24 @@ function reducer(state, action) {
           ...state.map,
           planets: {
             ...planets,
-            [sourcePlanetPosition]: {
+            [fleet.from]: {
               ...sourcePlanet,
               ships: sourcePlanet.ships + fleet.ships,
             },
           },
         },
+      };
+    }
+    case CANCEL_FLEET_SUCCEEDED: {
+      const { index } = getOriginalPayload(action);
+      const { waitingFleets } = state;
+      return {
+        ...state,
+        waitingFleets: [
+          ...waitingFleets.slice(0, index),
+          ...waitingFleets.slice(index + 1),
+        ],
+        selectedFleetIndex: null,
       };
     }
     case HANDLE_TURN_CALCULATION_STARTED:
@@ -122,6 +144,8 @@ function reducer(state, action) {
         map,
         turn: turn + 1,
         movingFleets,
+        waitingFleets: [],
+        selectedFleetIndex: null,
         isCalculating: false,
       };
     }
@@ -171,6 +195,18 @@ function createEpic({ apiDispatcher }) {
   function launchFleetEpic(action$) {
     return action$
       .ofType(LAUNCH_FLEET)
+      .mergeMap(apiDispatcher);
+  }
+
+  function cancelFleetEpic(action$) {
+    return action$
+      .ofType(CANCEL_FLEET)
+      .mergeMap(apiDispatcher);
+  }
+
+  function endTurnEpic(action$) {
+    return action$
+      .ofType(END_TURN)
       .mergeMap(apiDispatcher);
   }
 
@@ -226,10 +262,27 @@ function createEpic({ apiDispatcher }) {
   return combineEpics(
     turnTimerEpic,
     launchFleetEpic,
+    cancelFleetEpic,
+    endTurnEpic,
   );
 }
 
-export { launchFleet } from './../../api';
+const selectWaitingFleets = state => state.waitingFleets;
+const selectMap = state => state.map;
+
+export const selectWaitingFleetsWithDetails = createSelector(
+  selectWaitingFleets,
+  selectMap,
+  (waitingFleets, map) => waitingFleets.map(fleet => ({
+    id: fleet.id,
+    from: map.planets[fleet.from],
+    to: map.planets[fleet.to],
+    ships: fleet.ships,
+    distance: getDistance(fleet.from, fleet.to, map.width),
+  })),
+);
+
+export { launchFleet, cancelFleet, endTurn } from './../../api';
 
 export default {
   reducer,

@@ -2,8 +2,8 @@
 {
     public class FleetData
     {
-        public string From { get; set; }
-        public string To { get; set; }
+        public long From { get; set; }
+        public long To { get; set; }
         public int Ships { get; set; }
     }
 }

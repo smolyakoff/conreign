@@ -6,6 +6,8 @@ export const UPDATE_PLAYER_OPTIONS = 'UPDATE_PLAYER_OPTIONS';
 export const GET_ROOM_STATE = 'GET_ROOM_STATE';
 export const SEND_MESSAGE = 'SEND_MESSAGE';
 export const LAUNCH_FLEET = 'LAUNCH_FLEET';
+export const CANCEL_FLEET = 'CANCEL_FLEET';
+export const END_TURN = 'END_TURN';
 
 export function login(payload) {
   return {
@@ -59,6 +61,20 @@ export function sendMessage(payload) {
 export function launchFleet(payload) {
   return {
     type: LAUNCH_FLEET,
+    payload,
+  };
+}
+
+export function cancelFleet(payload) {
+  return {
+    type: CANCEL_FLEET,
+    payload,
+  };
+}
+
+export function endTurn(payload) {
+  return {
+    type: END_TURN,
     payload,
   };
 }

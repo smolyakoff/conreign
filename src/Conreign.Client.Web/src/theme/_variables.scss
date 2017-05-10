@@ -40,10 +40,16 @@ $field-background-color: transparent;
 $button-brand-background-color: $color-brand;
 $button-ghost-brand-color: $color-brand;
 
+// Tables
+$table-heading-background-color: transparent;
+$table-heading-color: $color-info;
+$table-row-clickable-color: $color-default;
+
 // Cards
 $card-background-color: transparentize($color-bg-brand, 0.7);
 $card-border-radius: 0;
 $card-item-border-bottom: 0;
 
+// Drawers
 $drawer-background-color: $card-background-color;
 $drawer-color: $color-white;

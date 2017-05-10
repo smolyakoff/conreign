@@ -1,23 +1,17 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Conreign.Core.Contracts.Gameplay.Data;
 
 namespace Conreign.Core.Gameplay
 {
-    public class Map : IEnumerable<PlanetData>
+    public class Map : IEnumerable<KeyValuePair<long, PlanetData>>
     {
-        private readonly Random _random = new Random();
         private readonly MapData _state;
 
         public Map(MapData state)
         {
-            if (state == null)
-            {
-                throw new ArgumentNullException(nameof(state));
-            }
-            _state = state;
+            _state = state ?? throw new ArgumentNullException(nameof(state));
         }
 
         public int Width => _state.Width;
@@ -34,25 +28,27 @@ namespace Conreign.Core.Gameplay
             }
         }
 
-        public PlanetData this[long coordinate]
+        public IEnumerable<PlanetData> Planets => _state.Planets.Values;
+
+        public PlanetData this[long position]
         {
             get
             {
-                EnsureCoordinateIsValid(coordinate);
-                if (!ContainsPlanet(coordinate))
+                EnsurePositionIsValid(position);
+                if (!ContainsPlanet(position))
                 {
-                    throw new ArgumentException($"There is no planet at {coordinate}", nameof(coordinate));
+                    throw new ArgumentException($"There is no planet at {position}", nameof(position));
                 }
-                return _state.Planets[coordinate];
+                return _state.Planets[position];
             }
             set
             {
                 if (value == null)
                 {
-                    _state.Planets.Remove(coordinate);
+                    _state.Planets.Remove(position);
                     return;
                 }
-                _state.Planets[coordinate] = value;
+                _state.Planets[position] = value;
             }
         }
 
@@ -72,88 +68,30 @@ namespace Conreign.Core.Gameplay
             }
         }
 
-        public PlanetData this[string name] => GetPlanetByName(name);
-
-        public IEnumerator<PlanetData> GetEnumerator()
+        public bool ContainsPlanet(long position)
         {
-            return _state.Planets.Values.GetEnumerator();
+            return _state.Planets.ContainsKey(position);
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        public long CalculateDistance(long from, long to)
         {
-            return _state.Planets.Values.GetEnumerator();
-        }
+            EnsurePositionIsValid(from);
+            EnsurePositionIsValid(to);
 
-        public bool ContainsPlanet(long coordinate)
-        {
-            return _state.Planets.ContainsKey(coordinate);
-        }
-
-        public Coordinate GetPlanetCoordinateByName(string name)
-        {
-            var position = GetPlanetPositionByName(name);
-            return new Coordinate(position, Width, Height);
-        }
-
-        public long GetPlanetPositionByName(string name)
-        {
-            var positions = _state.Planets
-                .Where(pair => pair.Value.Name == name)
-                .Select(x => x.Key)
-                .ToList();
-            if (positions.Count == 0)
-            {
-                throw new InvalidOperationException($"Planet {name} was not found.");
-            }
-            var position = positions[0];
-            return position;
-        }
-
-        public PlanetData GetPlanetByNameOrNull(string name)
-        {
-            return _state.Planets.Values.FirstOrDefault(x => x.Name == name);
-        }
-
-        public PlanetData GetPlanetByName(string name)
-        {
-            var planet = GetPlanetByNameOrNull(name);
-            if (planet == null)
-            {
-                throw new InvalidOperationException($"Planet {name} was not found");
-            }
-            return planet;
-            ;
-        }
-
-        public long CalculateDistance(string from, string to)
-        {
-            if (string.IsNullOrEmpty(from))
-            {
-                throw new ArgumentException("From cannot be null or empty.", nameof(from));
-            }
-            if (string.IsNullOrEmpty(to))
-            {
-                throw new ArgumentException("To cannot be null or empty.", nameof(to));
-            }
-            var source = GetPlanetCoordinateByName(from);
-            var destination = GetPlanetCoordinateByName(to);
+            var source = new Coordinate(from, Width, Height);
+            var destination = new Coordinate(to, Width, Height);
             var distanceX = Math.Abs(destination.X - source.X);
             var distanceY = Math.Abs(destination.Y - source.Y);
             return distanceX + distanceY + 1;
         }
 
-        public List<long> GenerateRoute(string from, string to)
+        public List<long> GenerateRoute(long from, long to)
         {
-            if (string.IsNullOrEmpty(from))
-            {
-                throw new ArgumentException("From cannot be null or empty.", nameof(from));
-            }
-            if (string.IsNullOrEmpty(to))
-            {
-                throw new ArgumentException("To cannot be null or empty.", nameof(to));
-            }
-            var source = GetPlanetCoordinateByName(from);
-            var destination = GetPlanetCoordinateByName(to);
+            EnsurePositionIsValid(from);
+            EnsurePositionIsValid(to);
+
+            var source = new Coordinate(from, Width, Height);
+            var destination = new Coordinate(to, Width, Height);
             var distanceX = Math.Abs(destination.X - source.X);
             var distanceY = Math.Abs(destination.Y - source.Y);
             var currentPosition = source.Position;
@@ -196,6 +134,16 @@ namespace Conreign.Core.Gameplay
             _state.Height = height;
         }
 
+        public IEnumerator<KeyValuePair<long, PlanetData>> GetEnumerator()
+        {
+            return _state.Planets.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
         private void EnsureCoordinateIsValid(int x, int y)
         {
             if (x < 0 || x >= Width)
@@ -208,12 +156,12 @@ namespace Conreign.Core.Gameplay
             }
         }
 
-        private void EnsureCoordinateIsValid(long coordinate)
+        private void EnsurePositionIsValid(long coordinate)
         {
-            if (coordinate >= CellsCount)
+            if (coordinate < 0 || coordinate >= CellsCount)
             {
                 throw new ArgumentOutOfRangeException(nameof(coordinate),
-                    $"Expected coordinate to be between 0 and {CellsCount - 1}.");
+                    $"Expected position to be between 0 and {CellsCount - 1}.");
             }
         }
     }

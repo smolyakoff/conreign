@@ -14,7 +14,6 @@ using Conreign.Core.Gameplay.Battle;
 using Conreign.Core.Gameplay.Validators;
 using Conreign.Core.Presence;
 using Conreign.Core.Utility;
-using Orleans;
 
 namespace Conreign.Core.Gameplay
 {
@@ -28,23 +27,11 @@ namespace Conreign.Core.Gameplay
 
         public Game(GameState state, IUserTopic topic, IBattleStrategy battleStrategy)
         {
-            if (state == null)
-            {
-                throw new ArgumentNullException(nameof(state));
-            }
-            if (topic == null)
-            {
-                throw new ArgumentNullException(nameof(topic));
-            }
-            if (battleStrategy == null)
-            {
-                throw new ArgumentNullException(nameof(battleStrategy));
-            }
-            _topic = topic;
-            _hub = new Hub(state.Hub, topic);
-            _map = new Map(state.Map);
-            _state = state;
-            _battleStrategy = battleStrategy;
+            _state = state ?? throw new ArgumentNullException(nameof(state));
+            _hub = new Hub(_state.Hub, topic);
+            _map = new Map(_state.Map);
+            _topic = topic ?? throw new ArgumentNullException(nameof(topic));
+            _battleStrategy = battleStrategy ?? throw new ArgumentNullException(nameof(battleStrategy));
         }
 
         public bool IsEnded => _state.IsEnded;
@@ -103,9 +90,8 @@ namespace Conreign.Core.Gameplay
             var validator = new LaunchFleetValidator(userId, _map);
             fleet.EnsureIsValid(validator);
             var state = _state.PlayerStates.GetOrCreateDefault(userId, () => new PlayerGameState());
-            ;
             state.WaitingFleets.Add(fleet);
-            var planet = _map.GetPlanetByNameOrNull(fleet.From);
+            var planet = _map[fleet.From];
             planet.Ships -= fleet.Ships;
             return TaskCompleted.Completed;
         }
@@ -254,7 +240,8 @@ namespace Conreign.Core.Gameplay
 
         private bool PlayerShouldDie(Guid userId)
         {
-            return _map.All(x => x.OwnerId != userId) && _state.PlayerStates[userId].MovingFleets.Count == 0;
+            return _map.Planets.All(x => x.OwnerId != userId) && 
+                _state.PlayerStates[userId].MovingFleets.Count == 0;
         }
 
         private async Task MoveFleets(PlayerGameState player)
@@ -266,7 +253,7 @@ namespace Conreign.Core.Gameplay
                     .SkipWhile(x => x != movingFleet.Position)
                     .Skip(1)
                     .First();
-                var destination = _map.GetPlanetPositionByName(movingFleet.Fleet.To);
+                var destination = movingFleet.Fleet.To;
                 if (movingFleet.Position != destination)
                 {
                     continue;
@@ -281,12 +268,12 @@ namespace Conreign.Core.Gameplay
 
         private async Task HandleFleetArrival(FleetData fleet)
         {
-            var attackerPlanet = _map.GetPlanetByName(fleet.From);
+            var attackerPlanet = _map[fleet.From];
             if (attackerPlanet.OwnerId == null)
             {
                 throw new InvalidOperationException($"Attacker planet {attackerPlanet.Name} is neutral.");
             }
-            var defenderPlanet = _map.GetPlanetByName(fleet.To);
+            var defenderPlanet = _map[fleet.To];
             if (attackerPlanet.OwnerId == defenderPlanet.OwnerId)
             {
                 defenderPlanet.Ships += fleet.Ships;
@@ -351,7 +338,7 @@ namespace Conreign.Core.Gameplay
 
         private void CalculateResources()
         {
-            foreach (var planet in _map)
+            foreach (var planet in _map.Planets)
             {
                 planet.Ships += planet.ProductionRate;
                 if (planet.OwnerId != null)
@@ -365,12 +352,11 @@ namespace Conreign.Core.Gameplay
         {
             foreach (var fleet in player.WaitingFleets)
             {
-                var position = _map.GetPlanetPositionByName(fleet.From);
                 var movingFleet = new MovingFleetData
                 {
                     Route = _map.GenerateRoute(fleet.From, fleet.To),
                     Fleet = fleet,
-                    Position = position
+                    Position = fleet.From
                 };
                 player.MovingFleets.Add(movingFleet);
             }
