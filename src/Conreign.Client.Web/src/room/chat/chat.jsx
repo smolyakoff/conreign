@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { keyBy } from 'lodash';
+import { keyBy, noop } from 'lodash';
 
 import './chat.scss';
 import ChatControlPanel from './chat-control-panel';
@@ -81,7 +81,7 @@ Chat.propTypes = {
   renderers: PropTypes.objectOf(PropTypes.func),
   settingsChildren: PropTypes.node,
   settingsOpen: PropTypes.bool,
-  onSettingsToggle: PropTypes.func.isRequired,
+  onSettingsToggle: PropTypes.func,
   onMessageSend: PropTypes.func.isRequired,
 };
 
@@ -91,4 +91,5 @@ Chat.defaultProps = {
   settingsChildren: null,
   settingsOpen: false,
   renderers: {},
+  onSettingsToggle: noop,
 };

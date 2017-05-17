@@ -2,12 +2,14 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Measure from 'react-measure';
 import { compose, withPropsOnChange, withHandlers, withProps } from 'recompose';
-import { mapValues, isNumber, isNil, sumBy } from 'lodash';
+import { mapValues, isNumber, isNil, sumBy, values } from 'lodash';
 
 import {
   Grid,
   GridCell,
   GridMode,
+  Deck,
+  DeckItem,
   Box,
   Widget,
   ThemeSize,
@@ -22,7 +24,8 @@ import {
   getDistance,
   MAP_SELECTION_SHAPE,
 } from './../map';
-import { PLANET_SHAPE, PLAYER_SHAPE } from './../room-schemas';
+import Chat from './../chat';
+import { PLANET_SHAPE, PLAYER_SHAPE, GAME_EVENT_SHAPE } from './../room-schemas';
 import { FLEET_SHAPE } from './game-schemas';
 import {
   launchFleet,
@@ -60,12 +63,15 @@ function GamePage({
   selectedFleetIndex,
   players,
   currentUser,
+  events,
+  eventRenderers,
   onMapCellClick,
   onFleetSelect,
   onFleetFormSubmit,
   onFleetFormChange,
   onCancelFleetClick,
   onEndTurnClick,
+  onMessageSend,
 }) {
   const currentPlayer = players[currentUser.id];
   const sourcePlanet = map.planets[mapSelection.start];
@@ -119,26 +125,47 @@ function GamePage({
               </Widget>
             </GridCell>
             <GridCell>
-              <Widget
-                header="Command Center"
-                className="u-higher"
-              >
-                <CommandCenter
-                  currentPlayer={currentPlayer}
-                  sourcePlanet={sourcePlanet}
-                  destinationPlanet={destinationPlanet}
-                  destinationPlanetOwner={destinationPlanetOwner}
-                  routeDistance={routeDistance}
-                  fleetShips={finalFleetShips}
-                  waitingFleets={waitingFleets}
-                  selectedFleetIndex={selectedFleetIndex}
-                  onFleetClick={onFleetSelect}
-                  onFleetFormSubmit={onFleetFormSubmit}
-                  onFleetFormChange={onFleetFormChange}
-                  onCancelFleetClick={onCancelFleetClick}
-                  onEndTurnClick={onEndTurnClick}
-                />
-              </Widget>
+              <Deck>
+                <DeckItem>
+                  <Widget
+                    header="Command Center"
+                    className="u-higher"
+                  >
+                    <CommandCenter
+                      currentPlayer={currentPlayer}
+                      sourcePlanet={sourcePlanet}
+                      destinationPlanet={destinationPlanet}
+                      destinationPlanetOwner={destinationPlanetOwner}
+                      routeDistance={routeDistance}
+                      fleetShips={finalFleetShips}
+                      waitingFleets={waitingFleets}
+                      selectedFleetIndex={selectedFleetIndex}
+                      onFleetClick={onFleetSelect}
+                      onFleetFormSubmit={onFleetFormSubmit}
+                      onFleetFormChange={onFleetFormChange}
+                      onCancelFleetClick={onCancelFleetClick}
+                      onEndTurnClick={onEndTurnClick}
+                    />
+                  </Widget>
+                </DeckItem>
+                <DeckItem stretch>
+                  <Widget
+                    header="Chat"
+                    className="u-higher u-full-height"
+                    bodyClassName="u-window-box--none"
+                  >
+                    <Chat
+                      currentUserId={currentUser.id}
+                      players={values(players)}
+                      events={events}
+                      renderers={eventRenderers}
+                      onMessageSend={onMessageSend}
+                    />
+                  </Widget>
+
+                </DeckItem>
+              </Deck>
+
             </GridCell>
           </Grid>
         );
@@ -165,14 +192,17 @@ GamePage.propTypes = {
     PropTypes.number,
     PropTypes.string,
   ]),
+  eventRenderers: PropTypes.objectOf(PropTypes.func).isRequired,
   selectedFleetIndex: PropTypes.number,
   waitingFleets: PropTypes.arrayOf(FLEET_SHAPE).isRequired,
+  events: PropTypes.arrayOf(GAME_EVENT_SHAPE).isRequired,
   onMapCellClick: PropTypes.func.isRequired,
   onFleetSelect: PropTypes.func.isRequired,
   onFleetFormSubmit: PropTypes.func.isRequired,
   onFleetFormChange: PropTypes.func.isRequired,
   onCancelFleetClick: PropTypes.func.isRequired,
   onEndTurnClick: PropTypes.func.isRequired,
+  onMessageSend: PropTypes.func.isRequired,
 };
 
 GamePage.defaultProps = {
@@ -247,6 +277,9 @@ const onEndTurnClick = ({ onEndTurnClick: emit, roomId }) => () => {
   emit({ roomId });
 };
 
+const onMessageSend = ({ onMessageSend: emit, roomId }) =>
+  text => emit({ roomId, text });
+
 const enhance = compose(
   connect(null, {
     onFleetSelect: selectFleet,
@@ -275,6 +308,7 @@ const enhance = compose(
     onEndTurnClick,
     onCancelFleetClick,
     onFleetFormSubmit,
+    onMessageSend,
   }),
 );
 

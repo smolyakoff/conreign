@@ -36,7 +36,7 @@ function ChatControlPanel({
           </GridCell>
         )
       }
-      <GridCell gutter={false}>
+      <GridCell gutter={!showSettings}>
         <ChatMessageInput
           value={message}
           onSend={onMessageSend}
