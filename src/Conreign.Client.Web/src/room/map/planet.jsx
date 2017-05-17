@@ -3,7 +3,13 @@ import { pure } from 'recompose';
 import block from 'bem-cn';
 import Color from 'color';
 import { values, kebabCase } from 'lodash';
-import { Progress, PropertyTable, ThemeSize, ThemeColor, Icon } from './../../theme';
+import {
+  Progress,
+  PropertyTable,
+  ThemeSize,
+  ThemeColor,
+  Icon,
+} from './../../theme';
 import './planet.scss';
 import { choosePlanetIcon } from './../icons';
 
@@ -19,6 +25,7 @@ function Planet({
   icons,
   color,
   ships,
+  fleetShips,
   displayMode,
 }) {
   const planet = block('c-planet');
@@ -53,12 +60,19 @@ function Planet({
     mode: kebabCase(displayMode),
   };
   return (
-    <div className={planet()} style={style}>
+    <div className={planet(propModifiers)()} style={style}>
       <span className={planet('name')()}>{name}</span>
+      {
+        displayMode === PlanetDisplayMode.Game && fleetShips > 0 && (
+          <div className={planet('port')()}>
+            ▲{fleetShips}
+          </div>
+        )
+      }
       <div className={planet('icon')()}>
         <Icon name={icon.id} />
       </div>
-      <div className={planet('planet-properties')(propModifiers)()}>
+      <div className={planet('footer')()}>
         {properties}
       </div>
     </div>
@@ -70,6 +84,7 @@ Planet.propTypes = {
   power: PropTypes.number.isRequired,
   productionRate: PropTypes.number.isRequired,
   ships: PropTypes.number.isRequired,
+  fleetShips: PropTypes.number,
   icons: PropTypes.objectOf(PropTypes.string),
   color: PropTypes.string,
   displayMode: PropTypes.oneOf(values(PlanetDisplayMode)),
@@ -77,6 +92,7 @@ Planet.propTypes = {
 
 Planet.defaultProps = {
   color: 'transparent',
+  fleetShips: 0,
   icons: {
     0: 'moon',
     50: 'mars',

@@ -1,4 +1,4 @@
-import { includes, mean } from 'lodash';
+import { includes, mean, groupBy, mapValues } from 'lodash';
 import { createSelector } from 'reselect';
 import { combineEpics } from 'redux-observable';
 
@@ -122,9 +122,22 @@ function reducer(state, action) {
     }
     case CANCEL_FLEET_SUCCEEDED: {
       const { index } = getOriginalPayload(action);
-      const { waitingFleets } = state;
+      const { waitingFleets, map } = state;
+      const fleet = waitingFleets[index];
+      const planets = map.planets;
+      const sourcePlanet = planets[fleet.from];
       return {
         ...state,
+        map: {
+          ...state.map,
+          planets: {
+            ...planets,
+            [fleet.from]: {
+              ...sourcePlanet,
+              ships: sourcePlanet.ships + fleet.ships,
+            },
+          },
+        },
         waitingFleets: [
           ...waitingFleets.slice(0, index),
           ...waitingFleets.slice(index + 1),
@@ -269,6 +282,7 @@ function createEpic({ apiDispatcher }) {
 
 const selectWaitingFleets = state => state.waitingFleets;
 const selectMap = state => state.map;
+const selectMovingFleets = state => state.movingFleets;
 
 export const selectWaitingFleetsWithDetails = createSelector(
   selectWaitingFleets,
@@ -280,6 +294,14 @@ export const selectWaitingFleetsWithDetails = createSelector(
     ships: fleet.ships,
     distance: getDistance(fleet.from, fleet.to, map.width),
   })),
+);
+
+export const selectMovingFleetsByPosition = createSelector(
+  selectMovingFleets,
+  movingFleets => mapValues(
+    groupBy(movingFleets, fleetLocation => fleetLocation.position),
+    locations => locations.map(l => l.fleet),
+  ),
 );
 
 export { launchFleet, cancelFleet, endTurn } from './../../api';

@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Measure from 'react-measure';
 import { compose, withPropsOnChange, withHandlers, withProps } from 'recompose';
-import { mapValues, isNumber, isNil } from 'lodash';
+import { mapValues, isNumber, isNil, sumBy } from 'lodash';
 
 import {
   Grid,
@@ -17,6 +17,7 @@ import {
   Map,
   Planet,
   PlanetDisplayMode,
+  Fleet,
   updateMapSelection,
   getDistance,
   MAP_SELECTION_SHAPE,
@@ -30,6 +31,7 @@ import {
   cancelFleet,
   endTurn,
   selectWaitingFleetsWithDetails,
+  selectMovingFleetsByPosition,
 } from './game';
 import GameStatusBoard from './game-status-board';
 import CommandCenter from './command-center';
@@ -179,19 +181,34 @@ GamePage.defaultProps = {
   selectedFleetIndex: null,
 };
 
-function generateMapCells(planets, players) {
-  const planetCells = mapValues(planets, (planet) => {
+function generateMapCells(planets, players, movingFleets, waitingFleets) {
+  const planetCells = mapValues(planets, (planet, position) => {
     const owner = planet.ownerId ? players[planet.ownerId] : null;
     const color = owner ? owner.color : null;
+    const cellFleets = [
+      ...movingFleets[position],
+      ...waitingFleets.filter(x => x.from.name === planet.name),
+    ].filter(x => x);
+    const fleetShips = sumBy(cellFleets, fleet => fleet.ships);
     return (
       <Planet
         {...planet}
+        fleetShips={fleetShips}
         color={color}
         displayMode={PlanetDisplayMode.Game}
       />
     );
   });
-  return planetCells;
+  const fleetCells = mapValues(movingFleets, (fleets) => {
+    const totalShips = sumBy(fleets, fleet => fleet.ships);
+    return (
+      <Fleet ships={totalShips} />
+    );
+  });
+  return {
+    ...fleetCells,
+    ...planetCells,
+  };
 }
 
 const onMapCellClick =
@@ -240,10 +257,19 @@ const enhance = compose(
   }),
   withProps(props => ({
     waitingFleets: selectWaitingFleetsWithDetails(props),
+    movingFleets: selectMovingFleetsByPosition(props),
   })),
-  withPropsOnChange(['map', 'players'], ({ map, players }) => ({
-    mapCells: generateMapCells(map.planets, players),
-  })),
+  withPropsOnChange(
+    ['map', 'players', 'movingFleets', 'waitingFleets'],
+    ({ map, players, movingFleets, waitingFleets }) => ({
+      mapCells: generateMapCells(
+        map.planets,
+        players,
+        movingFleets,
+        waitingFleets,
+      ),
+    }),
+  ),
   withHandlers({
     onMapCellClick,
     onEndTurnClick,

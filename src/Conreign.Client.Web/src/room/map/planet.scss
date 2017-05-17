@@ -12,9 +12,20 @@ $icon-margin: 15%;
 
   &__name {
     text-shadow: 1px 1px $color-black;
-    z-index: 1;
+    z-index: 2;
     position: relative;
     font-size: $text-font-size-large;
+  }
+
+  &__port {
+    @include window-box--xsmall;
+    background-color: transparentize($badge-brand-background-color, 0.5);
+    border-radius: 0 0 0 5px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1;
+    font-size: $text-font-size-xsmall;
   }
 
   &__icon {
@@ -29,19 +40,23 @@ $icon-margin: 15%;
 
   }
 
-  &__planet-properties {
+  &__footer {
+    @include window-box--xsmall;
     background-color: transparentize($color-black, 0.5);
     box-sizing: border-box;
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
-    &--mode-lobby {
-      @include window-box--small;
+  }
+
+  &--mode-lobby {
+    .c-planet__footer {
       font-size: $text-font-size-xsmall;
     }
-    &--mode-game {
-      @include window-box--xsmall;
+  }
+  &--mode-game {
+    .c-planet__footer {
       font-size: $text-font-size-medium;
       text-align: right;
     }

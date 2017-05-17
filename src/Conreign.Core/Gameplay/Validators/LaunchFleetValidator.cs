@@ -19,7 +19,6 @@ namespace Conreign.Core.Gameplay.Validators
                 .Must(Exist)
                 .Must(BelongToSender);
             RuleFor(x => x.To)
-                .NotEmpty()
                 .Must(Exist)
                 .Must(NotBeTheSameAsFrom);
             RuleFor(x => x.Ships)

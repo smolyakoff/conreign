@@ -108,7 +108,11 @@ namespace Conreign.Core.Gameplay
             var waitingFleets = _state.PlayerStates[userId].WaitingFleets;
             var validator = new CancelFleetValidator(waitingFleets.Count);
             fleetCancelation.EnsureIsValid(validator);
+
+            var fleet = waitingFleets[fleetCancelation.Index];
             waitingFleets.RemoveAt(fleetCancelation.Index);
+            var planet = _map[fleet.From];
+            planet.Ships += fleet.Ships;
             return TaskCompleted.Completed;
         }
 
