@@ -55,7 +55,7 @@ export default function ChatMessage({
               emphasize={TextEmphasize.Loud}
               themeColor={sender ? ThemeColor.Info : ThemeColor.Warning}
             >
-              {sender ? sender.nickname : 'VADER'}
+              {sender ? sender.nickname : 'vader'}
             </Text>
           </DeckItem>
           <DeckItem stretch>

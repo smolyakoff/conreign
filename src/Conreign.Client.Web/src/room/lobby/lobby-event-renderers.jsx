@@ -1,23 +1,15 @@
-import React, { PropTypes } from 'react';
-import { omit } from 'lodash';
+import React from 'react';
 
 import { PLAYER_JOINED, PLAYER_UPDATED } from './../../api';
-import { Text, P } from './../../theme';
-import { PLAYER_SHAPE, PLAYER } from './../room-schemas';
+import { P } from './../../theme';
+import { PLAYER_SHAPE } from './../room-schemas';
+import { Nickname } from './../text';
 
-function Nick({ player }) {
-  const style = { color: player.color };
-  return <Text style={style}>{player.nickname}</Text>;
-}
-
-Nick.propTypes = {
-  player: PropTypes.shape(omit(PLAYER, 'status')).isRequired,
-};
 
 function PlayerJoined({ player }) {
   return (
     <P>
-      <Nick player={player} /> joined the game.
+      <Nickname {...player} /> joined the game.
     </P>
   );
 }
@@ -29,7 +21,7 @@ PlayerJoined.propTypes = {
 function PlayerUpdated({ currentPlayer, previousPlayer }) {
   return (
     <P>
-      <Nick player={previousPlayer} /> has changed the name to <Nick player={currentPlayer} />
+      <Nickname {...previousPlayer} /> has changed the name to <Nickname {...currentPlayer} />
     </P>
   );
 }

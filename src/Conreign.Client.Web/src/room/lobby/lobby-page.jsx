@@ -31,10 +31,15 @@ import { GAME_OPTIONS_SHAPE, PLAYER_OPTIONS_SHAPE } from './lobby-schemas';
 import PlanetCard from './../planet-card';
 import Chat from './../chat';
 import lobbyEventRenderers from './lobby-event-renderers';
+import roomEventRenderers from './../room-event-renderers';
 import GameSettingsForm from './game-settings-form';
 import PlayerSettingsForm from './player-settings-form';
 
 const WIDGET_HEADER_HEIGHT = 35;
+const eventRenderers = {
+  ...lobbyEventRenderers,
+  ...roomEventRenderers,
+};
 
 function calculateMapViewDimensions(viewDimensions) {
   const {
@@ -71,7 +76,6 @@ function LobbyPage({
   mapCells,
   players,
   events,
-  eventRenderers,
   leaderUserId,
   currentUser,
   onMessageSend,
@@ -202,7 +206,6 @@ LobbyPage.propTypes = {
   mapCells: PropTypes.objectOf(PropTypes.node).isRequired,
   players: PropTypes.objectOf(PLAYER_SHAPE).isRequired,
   events: PropTypes.arrayOf(GAME_EVENT_SHAPE).isRequired,
-  eventRenderers: PropTypes.objectOf(PropTypes.func).isRequired,
   leaderUserId: PropTypes.string.isRequired,
   currentUser: PropTypes.shape({
     id: PropTypes.string.isRequired,
@@ -256,12 +259,6 @@ const enhance = compose(
       players,
       planets: map.planets,
     }),
-  })),
-  withPropsOnChange(['eventRenderers'], ({ eventRenderers }) => ({
-    eventRenderers: {
-      ...eventRenderers,
-      ...lobbyEventRenderers,
-    },
   })),
   withHandlers({
     onGameOptionsUpdate: ({ onGameOptionsUpdate, roomId }) =>

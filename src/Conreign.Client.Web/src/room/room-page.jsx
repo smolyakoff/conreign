@@ -12,7 +12,6 @@ import {
 } from './room';
 import { LobbyPage } from './lobby';
 import { GamePage } from './game';
-import renderers from './room-event-renderers';
 
 function RoomPage({ mode, ...otherProps }) {
   return (
@@ -26,17 +25,11 @@ function RoomPage({ mode, ...otherProps }) {
           switch (mode) {
             case RoomMode.Lobby:
               return (
-                <LobbyPage
-                  eventRenderers={renderers}
-                  {...otherProps}
-                />
+                <LobbyPage {...otherProps} />
               );
             case RoomMode.Game:
               return (
-                <GamePage
-                  eventRenderers={renderers}
-                  {...otherProps}
-                />
+                <GamePage {...otherProps} />
               );
             default:
               throw new Error(`Unexpected room mode: ${mode}.`);

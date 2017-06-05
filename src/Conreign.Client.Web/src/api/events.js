@@ -8,3 +8,4 @@ export const GAME_STARTED = 'GameStarted';
 export const GAME_TICKED = 'GameTicked';
 export const TURN_CALCULATION_STARTED = 'TurnCalculationStarted';
 export const TURN_CALCULATION_ENDED = 'TurnCalculationEnded';
+export const ATTACK_HAPPENED = 'AttackHappened';

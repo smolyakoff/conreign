@@ -3,6 +3,7 @@ import { values, pick } from 'lodash';
 import {
   createSucceededAsyncActionType,
   mapEventNameToActionType,
+  getEventNameFromAction,
 } from '../../framework';
 import {
   PLAYER_JOINED,
@@ -152,7 +153,7 @@ function reducer(state, action) {
         events: [
           ...state.events,
           {
-            type: action.meta.$event,
+            type: getEventNameFromAction(action),
             payload: {
               timestamp,
               previousPlayer,

@@ -12,3 +12,8 @@ export const TurnStatus = {
   Thinking: 0,
   Ended: 1,
 };
+
+export const AttackOutcome = {
+  Win: 0,
+  Lose: 1,
+};

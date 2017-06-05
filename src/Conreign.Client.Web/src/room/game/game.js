@@ -1,4 +1,4 @@
-import { includes, mean, groupBy, mapValues } from 'lodash';
+import { includes, mean, groupBy, mapValues, find } from 'lodash';
 import { createSelector } from 'reselect';
 import { combineEpics } from 'redux-observable';
 
@@ -9,12 +9,14 @@ import {
   GAME_TICKED,
   TURN_CALCULATION_STARTED,
   TURN_CALCULATION_ENDED,
+  ATTACK_HAPPENED,
   LAUNCH_FLEET,
   CANCEL_FLEET,
   END_TURN,
 } from './../../api';
 import {
   mapEventNameToActionType,
+  getEventNameFromAction,
   createAsyncActionTypes,
   getOriginalPayload,
   getAsyncOperationCorrelationId,
@@ -32,6 +34,7 @@ const HANDLE_GAME_STARTED = mapEventNameToActionType(GAME_STARTED);
 const HANDLE_GAME_TICKED = mapEventNameToActionType(GAME_TICKED);
 const HANDLE_TURN_CALCULATION_STARTED = mapEventNameToActionType(TURN_CALCULATION_STARTED);
 const HANDLE_TURN_CALCULATION_ENDED = mapEventNameToActionType(TURN_CALCULATION_ENDED);
+const HANDLE_ATTACK_HAPPENED = mapEventNameToActionType(ATTACK_HAPPENED);
 const SET_TURN_TIMER_SECONDS = 'SET_TURN_TIMER_SECONDS';
 const CHANGE_FLEET = 'CHANGE_FLEET';
 const SELECT_FLEET = 'SELECT_FLEET';
@@ -160,6 +163,32 @@ function reducer(state, action) {
         waitingFleets: [],
         selectedFleetIndex: null,
         isCalculating: false,
+      };
+    }
+    case HANDLE_ATTACK_HAPPENED: {
+      const {
+        timestamp,
+        outcome,
+        attackerUserId,
+        defenderUserId,
+        planetName,
+      } = payload;
+      const planet = find(state.map.planets, p => p.name === planetName);
+      return {
+        ...state,
+        events: [
+          ...state.events,
+          {
+            type: getEventNameFromAction(action),
+            payload: {
+              timestamp,
+              outcome,
+              planet,
+              attacker: state.players[attackerUserId],
+              defender: defenderUserId ? state.players[defenderUserId] : null,
+            },
+          },
+        ],
       };
     }
     case SET_TURN_TIMER_SECONDS:

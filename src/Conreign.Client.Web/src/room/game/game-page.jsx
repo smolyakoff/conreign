@@ -25,6 +25,8 @@ import {
   MAP_SELECTION_SHAPE,
 } from './../map';
 import Chat from './../chat';
+import roomEventRenderers from './../room-event-renderers';
+import gameEventRenderers from './game-event-renderers';
 import { PLANET_SHAPE, PLAYER_SHAPE, GAME_EVENT_SHAPE } from './../room-schemas';
 import { FLEET_SHAPE } from './game-schemas';
 import {
@@ -41,6 +43,10 @@ import CommandCenter from './command-center';
 
 const WIDGET_HEADER_HEIGHT = 35;
 const STATUS_BOARD_HEIGHT = 78;
+const eventRenderers = {
+  ...roomEventRenderers,
+  ...gameEventRenderers,
+};
 
 function calculateMapViewDimensions(viewDimensions) {
   const {
@@ -64,7 +70,6 @@ function GamePage({
   players,
   currentUser,
   events,
-  eventRenderers,
   onMapCellClick,
   onFleetSelect,
   onFleetFormSubmit,
@@ -192,7 +197,6 @@ GamePage.propTypes = {
     PropTypes.number,
     PropTypes.string,
   ]),
-  eventRenderers: PropTypes.objectOf(PropTypes.func).isRequired,
   selectedFleetIndex: PropTypes.number,
   waitingFleets: PropTypes.arrayOf(FLEET_SHAPE).isRequired,
   events: PropTypes.arrayOf(GAME_EVENT_SHAPE).isRequired,

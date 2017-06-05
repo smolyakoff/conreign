@@ -12,13 +12,15 @@ export const PLAYER = {
 
 export const PLAYER_SHAPE = PropTypes.shape(PLAYER);
 
-export const PLANET_SHAPE = PropTypes.shape({
+export const PLANET = {
   name: PropTypes.string.isRequired,
   productionRate: PropTypes.number.isRequired,
   power: PropTypes.number.isRequired,
   ships: PropTypes.number.isRequired,
   ownerId: PropTypes.string,
-});
+};
+
+export const PLANET_SHAPE = PropTypes.shape(PLANET);
 
 export const GAME_EVENT_SHAPE = PropTypes.shape({
   type: PropTypes.oneOf(values(events)).isRequired,

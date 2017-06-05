@@ -6,7 +6,7 @@ import serializeError from 'serialize-error';
 import Rx from './../rx';
 import {
   AsyncOperationState,
-  mapEventNameToActionType,
+  createEventAction,
 } from '../framework';
 import errors from './../errors';
 import notifications from './../notifications';
@@ -118,14 +118,7 @@ function createEpic(container) {
     return action$
       .ofType(LISTEN_FOR_SERVER_EVENTS)
       .mergeMap(() => apiClient.events)
-      .map(event => ({
-        ...event,
-        type: mapEventNameToActionType(event.type),
-        meta: {
-          ...event.meta,
-          $event: event.type,
-        },
-      }));
+      .map(createEventAction);
   }
 
   function mapToRouteAction(action) {
