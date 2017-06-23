@@ -1,6 +1,6 @@
+import { combineEpics } from 'redux-observable';
 import { omit } from 'lodash';
 import fp from 'lodash/fp';
-import { combineEpics } from 'redux-observable';
 
 import {
   createSucceededAsyncActionType,
@@ -15,7 +15,7 @@ import {
   GET_ROOM_STATE,
   SEND_MESSAGE,
 } from './../api';
-import { selectUser } from './../auth';
+import { selectCurrentUser } from './../auth';
 import {
   resetMapSelection,
   ensureMapSelection,
@@ -60,11 +60,11 @@ function normalizeRoomState(room) {
       fp.keyBy(p => p.userId),
       fp.mapValues(p => ({
         ...p,
-        status: room.playerStatuses[p.userId],
+        status: room.presenceStatuses[p.userId],
       })),
     )(room.players);
   return {
-    ...omit(room, 'playerStatuses'),
+    ...omit(room, 'presenceStatuses'),
     players,
   };
 }
@@ -139,16 +139,17 @@ const reducer = composeReducers(
 );
 reducer.$key = 'room';
 
-export function selectRoomPage(state) {
+export function selectRoom(state) {
   const room = state[reducer.$key];
-  const currentUser = selectUser(state);
+  const currentUser = selectCurrentUser(state);
+  const mapSelection = ensureMapSelection(
+    room.mapSelection || {},
+    room.map.planets,
+    currentUser,
+  );
   return {
     ...room,
-    mapSelection: ensureMapSelection(
-      room.mapSelection || {},
-      room.map.planets,
-      currentUser,
-    ),
+    mapSelection,
     currentUser,
   };
 }

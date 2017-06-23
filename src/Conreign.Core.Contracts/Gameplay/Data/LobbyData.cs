@@ -12,7 +12,7 @@ namespace Conreign.Core.Contracts.Gameplay.Data
         public RoomMode Mode => RoomMode.Lobby;
         public List<EventEnvelope> Events { get; set; } = new List<EventEnvelope>();
         public List<PlayerData> Players { get; set; } = new List<PlayerData>();
-        public Dictionary<Guid, PresenceStatus> PlayerStatuses { get; set; } = new Dictionary<Guid, PresenceStatus>();
+        public Dictionary<Guid, PresenceStatus> PresenceStatuses { get; set; } = new Dictionary<Guid, PresenceStatus>();
         public MapData Map { get; set; } = new MapData();
         public Guid? LeaderUserId { get; set; }
     }

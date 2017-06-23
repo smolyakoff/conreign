@@ -1,10 +1,11 @@
-import { includes, mean, groupBy, mapValues, find } from 'lodash';
+import { includes, mean, groupBy, mapValues, find, values } from 'lodash';
 import { createSelector } from 'reselect';
 import { combineEpics } from 'redux-observable';
 
 import Rx from './../../rx';
 import {
   RoomMode,
+  TurnStatus,
   GAME_STARTED,
   GAME_TICKED,
   TURN_CALCULATION_STARTED,
@@ -13,6 +14,7 @@ import {
   LAUNCH_FLEET,
   CANCEL_FLEET,
   END_TURN,
+  TURN_ENDED,
 } from './../../api';
 import {
   mapEventNameToActionType,
@@ -23,6 +25,7 @@ import {
   createSucceededAsyncActionType,
   AsyncOperationState,
 } from './../../framework';
+import { count } from './../../util';
 import { getDistance } from './../map';
 
 const AVERAGE_SERVER_TICK_INTERVAL = 5000;
@@ -35,6 +38,7 @@ const HANDLE_GAME_TICKED = mapEventNameToActionType(GAME_TICKED);
 const HANDLE_TURN_CALCULATION_STARTED = mapEventNameToActionType(TURN_CALCULATION_STARTED);
 const HANDLE_TURN_CALCULATION_ENDED = mapEventNameToActionType(TURN_CALCULATION_ENDED);
 const HANDLE_ATTACK_HAPPENED = mapEventNameToActionType(ATTACK_HAPPENED);
+const HANDLE_TURN_ENDED = mapEventNameToActionType(TURN_ENDED);
 const SET_TURN_TIMER_SECONDS = 'SET_TURN_TIMER_SECONDS';
 const CHANGE_FLEET = 'CHANGE_FLEET';
 const SELECT_FLEET = 'SELECT_FLEET';
@@ -155,12 +159,14 @@ function reducer(state, action) {
       };
     case HANDLE_TURN_CALCULATION_ENDED: {
       const { map, turn, movingFleets } = action.payload;
+      const { turnStatuses } = state;
       return {
         ...state,
         map,
         turn: turn + 1,
         movingFleets,
         waitingFleets: [],
+        turnStatuses: mapValues(turnStatuses, () => TurnStatus.Thinking),
         selectedFleetIndex: null,
         isCalculating: false,
       };
@@ -195,6 +201,14 @@ function reducer(state, action) {
       return {
         ...state,
         turnSeconds: action.payload,
+      };
+    case HANDLE_TURN_ENDED:
+      return {
+        ...state,
+        turnStatuses: {
+          ...state.turnStatuses,
+          [payload.userId]: TurnStatus.Ended,
+        },
       };
     default:
       return state;
@@ -312,8 +326,12 @@ function createEpic({ apiDispatcher }) {
 const selectWaitingFleets = state => state.waitingFleets;
 const selectMap = state => state.map;
 const selectMovingFleets = state => state.movingFleets;
+const selectPlayers = state => state.players;
+const selectPlanets = state => state.map.planets;
+const selectDeadPlayerIds = state => state.deadPlayers;
+const selectTurnStatuses = state => state.turnStatuses;
 
-export const selectWaitingFleetsWithDetails = createSelector(
+const selectWaitingFleetsWithDetails = createSelector(
   selectWaitingFleets,
   selectMap,
   (waitingFleets, map) => waitingFleets.map(fleet => ({
@@ -325,12 +343,38 @@ export const selectWaitingFleetsWithDetails = createSelector(
   })),
 );
 
-export const selectMovingFleetsByPosition = createSelector(
+const selectMovingFleetsByPosition = createSelector(
   selectMovingFleets,
   movingFleets => mapValues(
     groupBy(movingFleets, fleetLocation => fleetLocation.position),
     locations => locations.map(l => l.fleet),
   ),
+);
+
+const selectPlayersWithStatistics = createSelector(
+  selectPlayers,
+  selectPlanets,
+  selectDeadPlayerIds,
+  selectTurnStatuses,
+  (players, planets, deadPlayerIds, turnStatuses) => mapValues(players, player => ({
+    ...player,
+    planetsCount: count(values(planets), planet => planet.ownerId === player.userId),
+    isDead: includes(deadPlayerIds, player.userId),
+    turnStatus: turnStatuses[player.userId],
+  })),
+);
+
+export const selectGame = createSelector(
+  selectPlayersWithStatistics,
+  selectMovingFleetsByPosition,
+  selectWaitingFleetsWithDetails,
+  room => room,
+  (players, movingFleets, waitingFleets, room) => ({
+    ...room,
+    movingFleets,
+    waitingFleets,
+    players,
+  }),
 );
 
 export { launchFleet, cancelFleet, endTurn } from './../../api';

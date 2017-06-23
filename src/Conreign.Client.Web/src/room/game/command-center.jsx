@@ -9,6 +9,7 @@ import FleetForm from './fleet-form';
 import FleetList from './fleet-list';
 
 function CommandCenter({
+  canLaunchFleets,
   currentPlayer,
   sourcePlanet,
   destinationPlanet,
@@ -35,7 +36,7 @@ function CommandCenter({
         />
       </DeckItem>
       {
-        destinationPlanet && (
+        destinationPlanet && canLaunchFleets && (
           <DeckItem>
             <FleetForm
               ships={fleetShips}
@@ -58,33 +59,38 @@ function CommandCenter({
           </DeckItem>
         )
       }
-      <DeckItem>
-        <Deck orientation={Orientation.Horizontal}>
-          <DeckItem stretch>
-            <Button
-              fullWidth
-              disabled={!isNumber(selectedFleetIndex)}
-              onClick={onCancelFleetClick}
-            >
-              Cancel Fleet
-            </Button>
+      {
+        canLaunchFleets && (
+          <DeckItem>
+            <Deck orientation={Orientation.Horizontal}>
+              <DeckItem stretch>
+                <Button
+                  fullWidth
+                  disabled={!isNumber(selectedFleetIndex)}
+                  onClick={onCancelFleetClick}
+                >
+                  Cancel Fleet
+                </Button>
+              </DeckItem>
+              <DeckItem stretch>
+                <Button
+                  fullWidth
+                  themeColor={ThemeColor.Brand}
+                  onClick={onEndTurnClick}
+                >
+                  End Turn
+                </Button>
+              </DeckItem>
+            </Deck>
           </DeckItem>
-          <DeckItem stretch>
-            <Button
-              fullWidth
-              themeColor={ThemeColor.Brand}
-              onClick={onEndTurnClick}
-            >
-              End Turn
-            </Button>
-          </DeckItem>
-        </Deck>
-      </DeckItem>
+        )
+      }
     </Deck>
   );
 }
 
 CommandCenter.propTypes = {
+  canLaunchFleets: PropTypes.bool.isRequired,
   currentPlayer: PLAYER_SHAPE.isRequired,
   sourcePlanet: PLANET_SHAPE.isRequired,
   destinationPlanet: PLANET_SHAPE,

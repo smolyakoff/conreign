@@ -50,13 +50,16 @@ export default function Chat({
             <GridCell>
               <ChatMessageArea
                 events={events}
-                players={keyBy(players, x => x.userId)}
+                players={keyBy(players, p => p.userId)}
                 currentUserId={currentUserId}
                 renderers={renderers}
               />
             </GridCell>
             <GridCell className="chat-sidebar" fixedWidth>
-              <PlayerList players={players} />
+              <PlayerList
+                players={players}
+                currentUserId={currentUserId}
+              />
             </GridCell>
           </Grid>
         </DrawerContainer>

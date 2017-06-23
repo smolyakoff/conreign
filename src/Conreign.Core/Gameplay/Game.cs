@@ -65,8 +65,10 @@ namespace Conreign.Core.Gameplay
                 Map = _state.Map,
                 MovingFleets = playerState.MovingFleets,
                 WaitingFleets = playerState.WaitingFleets,
-                PlayerStatuses = _state.Players
+                PresenceStatuses = _state.Players
                     .ToDictionary(x => x.UserId, x => GetPresenceStatus(x.UserId)),
+                TurnStatuses = _state.Players
+                    .ToDictionary(x => x.UserId, x => _state.PlayerStates[x.UserId].TurnStatus),
                 DeadPlayers = _state.PlayerStates
                     .Where(x => x.Value.Statistics.DeathTurn != null)
                     .Select(x => x.Key)

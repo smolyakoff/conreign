@@ -1,15 +1,8 @@
-import { isString, partial } from 'lodash';
+import { partial } from 'lodash';
 
-export function isNonEmptyString(x) {
-  return isString(x) && x.length > 0;
-}
-
-export function composeReducers(...reducers) {
-  return (state, action) => reducers.reduce(
-    (intermediateState, reducer) => reducer(intermediateState, action),
-    state,
-  );
-}
+export { default as composeReducers } from './compose-reducers';
+export { default as isNonEmptyString } from './is-non-empty-string';
+export { default as count } from './count';
 
 // Conditional observable operators
 function applyOperatorIf(operator, predicate, action, ...params) {

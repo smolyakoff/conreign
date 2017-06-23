@@ -80,7 +80,7 @@ function reducer(state = INITIAL_STATE, action) {
 
 reducer.$key = AUTH_REDUCER_KEY;
 
-export function selectUser(state) {
+export function selectCurrentUser(state) {
   const tokenPayload = state[reducer.$key].user;
   return {
     id: tokenPayload.sub,

@@ -5,7 +5,7 @@ import { values } from 'lodash';
 import { Box, BoxType, ThemeSize } from './../theme';
 import {
   RoomMode,
-  selectRoomPage,
+  selectRoom,
   setMapSelection,
   getRoomState,
   sendMessage,
@@ -48,7 +48,7 @@ RoomPage.propTypes = {
 RoomPage.init = ({ params }) => getRoomState(params);
 
 export default connect(
-  (state, { params }) => selectRoomPage(state, params.roomId),
+  selectRoom,
   {
     onMapSelectionChange: setMapSelection,
     onMessageSend: sendMessage,

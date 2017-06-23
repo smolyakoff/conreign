@@ -11,7 +11,7 @@ namespace Conreign.Core.Contracts.Gameplay.Data
         RoomMode Mode { get; }
         List<EventEnvelope> Events { get; }
         List<PlayerData> Players { get; }
-        Dictionary<Guid, PresenceStatus> PlayerStatuses { get; }
+        Dictionary<Guid, PresenceStatus> PresenceStatuses { get; }
         MapData Map { get; }
         Guid? LeaderUserId { get; set; }
     }

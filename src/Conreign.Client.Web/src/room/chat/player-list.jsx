@@ -1,50 +1,29 @@
 import React, { PropTypes } from 'react';
 
-import { PLAYER_SHAPE, PLAYER } from '../room-schemas';
-import {
-  Table,
-  TableBody,
-  TableRow,
-  TableCell,
-} from './../../theme';
-import PlayerIcon from './player-icon';
-
-function PlayerRow({
-  nickname,
-  status,
-  color,
-}) {
-  return (
-    <TableRow>
-      <TableCell fixedWidth>
-        <PlayerIcon color={color} status={status} />
-      </TableCell>
-      <TableCell>
-        {nickname}
-      </TableCell>
-    </TableRow>
-  );
-}
-
-PlayerRow.propTypes = PLAYER;
+import PlayerListItem from './player-list-item';
+import { PLAYER_WITH_OPTIONAL_STATS_SHAPE } from './player-schema';
 
 export default function PlayerList({
   players,
+  currentUserId,
 }) {
-  const rows = players.map(
-    (p, i) => <PlayerRow key={p.userId} index={i} {...p} />,
+  const items = players.map(
+    p => (
+      <PlayerListItem
+        key={p.userId}
+        {...p}
+        isCurrent={p.userId === currentUserId}
+      />
+    ),
   );
   return (
-    <Table>
-      <TableBody>
-        {rows}
-      </TableBody>
-    </Table>
+    <div>{items}</div>
   );
 }
 
 PlayerList.propTypes = {
-  players: PropTypes.arrayOf(PLAYER_SHAPE),
+  players: PropTypes.arrayOf(PLAYER_WITH_OPTIONAL_STATS_SHAPE),
+  currentUserId: PropTypes.string.isRequired,
 };
 
 PlayerList.defaultProps = {

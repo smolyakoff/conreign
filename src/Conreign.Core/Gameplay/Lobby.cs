@@ -78,7 +78,7 @@ namespace Conreign.Core.Gameplay
                 RoomId = _state.RoomId,
                 Events = _hub.GetEvents(userId).Select(x => new EventEnvelope(x)).ToList(),
                 Players = _state.Players,
-                PlayerStatuses = _state.Players
+                PresenceStatuses = _state.Players
                     .ToDictionary(x => x.UserId,
                         x => _hub.IsOnline(x.UserId) ? PresenceStatus.Online : PresenceStatus.Offline),
                 Map = _state.MapEditor.Map,

@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import Measure from 'react-measure';
 import { compose, withPropsOnChange, withHandlers, withProps } from 'recompose';
-import { mapValues, isNumber, isNil, sumBy, values } from 'lodash';
+import { mapValues, isNumber, isNil, sumBy, orderBy } from 'lodash';
 
 import {
   Grid,
@@ -15,6 +15,7 @@ import {
   ThemeSize,
 } from './../../theme';
 
+import { TurnStatus } from './../../api';
 import {
   Map,
   Planet,
@@ -35,8 +36,7 @@ import {
   selectFleet,
   cancelFleet,
   endTurn,
-  selectWaitingFleetsWithDetails,
-  selectMovingFleetsByPosition,
+  selectGame,
 } from './game';
 import GameStatusBoard from './game-status-board';
 import CommandCenter from './command-center';
@@ -90,6 +90,8 @@ function GamePage({
     ? getDistance(mapSelection.start, mapSelection.end, map.width)
     : null;
   const finalFleetShips = isNil(fleetShips) ? sourcePlanet.ships : fleetShips;
+  const sortedPlayers = orderBy(players, ['planetsCount'], ['desc']);
+  const isTurnEnded = players[currentUser.id].turnStatus === TurnStatus.Ended;
   return (
     <Measure>
       {(dimensions) => {
@@ -137,6 +139,7 @@ function GamePage({
                     className="u-higher"
                   >
                     <CommandCenter
+                      canLaunchFleets={!isTurnEnded}
                       currentPlayer={currentPlayer}
                       sourcePlanet={sourcePlanet}
                       destinationPlanet={destinationPlanet}
@@ -161,7 +164,7 @@ function GamePage({
                   >
                     <Chat
                       currentUserId={currentUser.id}
-                      players={values(players)}
+                      players={sortedPlayers}
                       events={events}
                       renderers={eventRenderers}
                       onMessageSend={onMessageSend}
@@ -292,10 +295,7 @@ const enhance = compose(
     onFleetFormChange: changeFleet,
     onEndTurnClick: endTurn,
   }),
-  withProps(props => ({
-    waitingFleets: selectWaitingFleetsWithDetails(props),
-    movingFleets: selectMovingFleetsByPosition(props),
-  })),
+  withProps(selectGame),
   withPropsOnChange(
     ['map', 'players', 'movingFleets', 'waitingFleets'],
     ({ map, players, movingFleets, waitingFleets }) => ({
