@@ -3,6 +3,7 @@
     public enum GameplayError
     {
         GameIsAlreadyInProgress,
-        TurnIsAlreadyEnded
+        TurnIsAlreadyEnded,
+        NotEnoughPlayers
     }
 }

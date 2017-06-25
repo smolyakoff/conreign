@@ -120,6 +120,12 @@ namespace Conreign.Core.Gameplay
             EnsureUserIsOnline(userId);
             EnsureGameIsNotStarted();
 
+            if (_state.Players.Count < 2)
+            {
+                throw UserException.Create(GameplayError.NotEnoughPlayers,
+                    "At least 2 players are required to start the game.");
+            }
+
             _state.IsGameStarted = true;
             var game = await _gameFactory.CreateGame(userId);
             return game;

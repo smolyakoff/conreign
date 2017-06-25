@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { values, mapValues } from 'lodash';
+import { values, mapValues, keys } from 'lodash';
 import Measure from 'react-measure';
 import { compose, withHandlers, withPropsOnChange } from 'recompose';
 
@@ -175,6 +175,7 @@ function LobbyPage({
                           className="u-higher"
                         >
                           <GameSettingsForm
+                            canStart={keys(players).length > 1}
                             values={gameOptions}
                             onSubmit={onGameOptionsUpdate}
                             onChange={onGameOptionsChange}

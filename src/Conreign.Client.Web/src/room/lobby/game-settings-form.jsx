@@ -53,7 +53,13 @@ function createFormProperty(field, values, onChange) {
   };
 }
 
-function GameSettingsForm({ onChange, onSubmit, onStart, values }) {
+function GameSettingsForm({
+  canStart,
+  onChange,
+  onSubmit,
+  onStart,
+  values,
+}) {
   const properties = objectValues(FIELDS)
     .map(field => createFormProperty(field, values, onChange));
   return (
@@ -72,7 +78,11 @@ function GameSettingsForm({ onChange, onSubmit, onStart, values }) {
             </Button>
           </DeckItem>
           <DeckItem>
-            <Button themeColor={ThemeColor.Brand} onClick={onStart}>
+            <Button
+              disabled={!canStart}
+              themeColor={ThemeColor.Brand}
+              onClick={onStart}
+            >
               Start Game
             </Button>
           </DeckItem>
@@ -84,6 +94,7 @@ function GameSettingsForm({ onChange, onSubmit, onStart, values }) {
 
 GameSettingsForm.propTypes = {
   values: GAME_OPTIONS_SHAPE.isRequired,
+  canStart: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   onStart: PropTypes.func.isRequired,
