@@ -26,7 +26,7 @@ import {
   AsyncOperationState,
 } from './../../framework';
 import { count } from './../../util';
-import { getDistance } from './../map';
+import { getDistance, SET_MAP_SELECTION } from './../map';
 
 const AVERAGE_SERVER_TICK_INTERVAL = 5000;
 const SERVER_TICK_RESOLUTION = 5;
@@ -68,6 +68,19 @@ function reducer(state, action) {
   }
   const { payload, type } = action;
   switch (type) {
+    case SET_MAP_SELECTION: {
+      if (state.fleetShips !== 0) {
+        return state;
+      }
+      const sourcePlanet = state.map.planets[payload.start];
+      if (sourcePlanet.ships === 0) {
+        return state;
+      }
+      return {
+        ...state,
+        fleetShips: sourcePlanet.ships,
+      };
+    }
     case CHANGE_FLEET: {
       return {
         ...state,

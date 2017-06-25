@@ -26,7 +26,7 @@ export default function PlayerListItem({
   return (
     <Box
       className={className}
-      themeSize={ThemeSize.XSmall}
+      themeSize={ThemeSize.Small}
     >
       <Grid
         gutter={ThemeSize.Small}
@@ -34,7 +34,6 @@ export default function PlayerListItem({
       >
         <GridCell gutter={false} fixedWidth>
           <PlayerIcon
-            className="u-mt-xsmall"
             color={color}
             status={status}
           />

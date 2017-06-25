@@ -26,7 +26,7 @@ function FleetForm({
   onFormSubmit,
 }) {
   const canSubmit = ships > 0 && ships <= maxShips;
-  const canRaise = ships < maxShips;
+  const canRaise = ships !== maxShips;
   const errorMessage = ships > maxShips
     ? `Only ${maxShips} ships are ready to be dispatched from the source planet.`
     : null;
