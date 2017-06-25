@@ -6,6 +6,7 @@ import {
   GridCell,
   ThemeSize,
   Box,
+  BoxType,
   Text,
   TextEmphasize,
   VerticalAlignment,
@@ -25,6 +26,7 @@ export default function PlayerListItem({
   const className = turnStatus === TurnStatus.Ended ? 'u-bg-success-light' : null;
   return (
     <Box
+      type={BoxType.Pillar}
       className={className}
       themeSize={ThemeSize.Small}
     >
@@ -34,6 +36,7 @@ export default function PlayerListItem({
       >
         <GridCell gutter={false} fixedWidth>
           <PlayerIcon
+            className="u-mt-small"
             color={color}
             status={status}
           />
