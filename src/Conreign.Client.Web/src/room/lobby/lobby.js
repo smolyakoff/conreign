@@ -1,5 +1,5 @@
 import { combineEpics } from 'redux-observable';
-import { values, pick } from 'lodash';
+import { values, pick, mapValues } from 'lodash';
 import {
   createSucceededAsyncActionType,
   mapEventNameToActionType,
@@ -180,7 +180,7 @@ function reducer(state, action) {
           'players',
           'map',
           'leaderUserId',
-          'playerStatuses',
+          'presenceStatuses',
         ]),
         events: [],
         mode: RoomMode.Game,
@@ -190,6 +190,7 @@ function reducer(state, action) {
         waitingFleets: [],
         movingFleets: [],
         turnStatus: TurnStatus.Thinking,
+        turnStatuses: mapValues(state.players, () => TurnStatus.Thinking),
       };
     default:
       return state;
