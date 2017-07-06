@@ -34,7 +34,7 @@ function mapErrorToStatusCode() {
 
 const DUMMY_ERROR = new Error('Nothing to do here 😉');
 
-export function selectErrorPageProps(state, { params }) {
+export function selectErrorPage(state, { params }) {
   const statusCode = parseInt(params.statusCode);
   return {
     statusCode,

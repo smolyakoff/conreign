@@ -7,8 +7,7 @@ unicodeBase(xregexp);
 unicodeCategories(xregexp);
 const HASH_TAG_CHAR_REGEX = xregexp('[\\pL\\d-_]');
 
-// eslint-disable-next-line import/prefer-default-export
-export function sanitizeRoomId(input) {
+export default function sanitizeRoomId(input) {
   return _.filter(input, HASH_TAG_CHAR_REGEX.test.bind(HASH_TAG_CHAR_REGEX))
     .map(x => x.toLowerCase())
     .join('');

@@ -43,6 +43,7 @@ function Planet({
     value: (
       <Progress
         value={power * 100}
+        rounded
         themeSize={ThemeSize.Small}
         themeColor={ThemeColor.Success}
       />

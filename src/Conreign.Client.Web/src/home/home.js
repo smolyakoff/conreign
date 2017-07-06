@@ -1,20 +1,16 @@
-import { isSucceededAsyncAction } from '../framework';
+import { isSucceededAsyncAction, getOriginalPayload } from '../framework';
 
 import { JOIN_ROOM } from '../api';
 
 function createEpic({ apiDispatcher, history }) {
-  function joinRoomThenRedirectOnSuccess(action) {
-    return apiDispatcher(action)
-      .doIf(
-        isSucceededAsyncAction,
-        () => history.push(`/${action.payload.roomId}`),
-      );
-  }
-
   function joinRoomEpic(action$) {
     return action$
       .ofType(JOIN_ROOM)
-      .mergeMap(joinRoomThenRedirectOnSuccess);
+      .mergeMap(apiDispatcher)
+      .doIf(
+        isSucceededAsyncAction,
+        action => history.push(`/${getOriginalPayload(action).roomId}`),
+      );
   }
 
   return joinRoomEpic;

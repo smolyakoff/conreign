@@ -11,11 +11,7 @@ namespace Conreign.Client.Handler.Handlers.Common
             {
                 throw new ArgumentNullException(nameof(command));
             }
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-            Context = context;
+            Context = context ?? throw new ArgumentNullException(nameof(context));
             Command = command;
         }
 

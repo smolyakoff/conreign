@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="ClientHandler.cs" />
     <Compile Include="ContainerExtensions.cs" />
+    <Compile Include="Handlers\Behaviours\SlowConnectionBehaviour%272.cs" />
     <Compile Include="Handlers\CancelFleetHandler.cs" />
     <Compile Include="Handlers\Common\CommandEnvelope%272.cs" />
     <Compile Include="Handlers\Common\HandlerContext.cs" />

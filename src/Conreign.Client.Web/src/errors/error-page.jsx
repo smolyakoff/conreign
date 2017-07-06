@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import block from 'bem-cn';
 
 import { H1, P, Box, ThemeSize } from './../theme';
-import { selectErrorPageProps } from './errors';
+import { selectErrorPage } from './errors';
 import './error-page.scss';
 
 const css = block('c-error-box');
@@ -44,5 +44,5 @@ ErrorPage.defaultProps = {
 };
 
 export default connect(
-  selectErrorPageProps,
+  selectErrorPage,
 )(ErrorPage);

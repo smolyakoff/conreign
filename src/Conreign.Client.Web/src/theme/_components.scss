@@ -61,6 +61,14 @@ a {
   }
 }
 
+// Progress Bars
+.c-progress {
+  // HACK: It's not possible to overwrite SCSS variable for border-radius
+  // Specify the value directly here. Rounded progress is possible
+  // with --rounded modifier
+  border-radius: 0;
+}
+
 // Widgets
 .c-widget {
   display: flex;

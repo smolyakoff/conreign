@@ -6,8 +6,10 @@ import {
   Button,
   InputContainer,
   Input,
+  ThemeSize,
+  ThemeColor,
 } from './../theme';
-import { sanitizeRoomId } from './join-room-form-util';
+import sanitizeRoomId from './sanitize-room-id';
 
 export default class JoinRoomForm extends Component {
   static propTypes = {
@@ -37,7 +39,7 @@ export default class JoinRoomForm extends Component {
           <form onSubmit={e => this.onFormSubmit(e)}>
             <InputContainer
               iconLeft
-              themeSize="large"
+              themeSize={ThemeSize.Large}
               className="u-mb-medium"
             >
               <span className="c-icon">#</span>
@@ -48,8 +50,8 @@ export default class JoinRoomForm extends Component {
               />
             </InputContainer>
             <Button
-              themeSize="large"
-              themeColor="brand"
+              themeSize={ThemeSize.Large}
+              themeColor={ThemeColor.Brand}
               disabled={!roomId}
               type="submit"
             >

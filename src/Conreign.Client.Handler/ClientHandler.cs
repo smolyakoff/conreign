@@ -28,16 +28,8 @@ namespace Conreign.Client.Handler
 
         public ClientHandler(IClientConnection connection, IMediator mediator)
         {
-            if (connection == null)
-            {
-                throw new ArgumentNullException(nameof(connection));
-            }
-            if (mediator == null)
-            {
-                throw new ArgumentNullException(nameof(mediator));
-            }
-            _connection = connection;
-            _mediator = mediator;
+            _connection = connection ?? throw new ArgumentNullException(nameof(connection));
+            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
 
         public IObservable<IClientEvent> Events => _connection.Events;

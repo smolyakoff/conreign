@@ -31,21 +31,13 @@ namespace Conreign.Core.Gameplay
             {
                 throw new ArgumentNullException(nameof(state));
             }
-            if (topic == null)
-            {
-                throw new ArgumentNullException(nameof(topic));
-            }
-            if (gameFactory == null)
-            {
-                throw new ArgumentNullException(nameof(gameFactory));
-            }
             if (string.IsNullOrEmpty(state.RoomId))
             {
                 throw new ArgumentException("Room id should be initialized", nameof(state));
             }
             _state = state;
-            _topic = topic;
-            _gameFactory = gameFactory;
+            _topic = topic ?? throw new ArgumentNullException(nameof(topic));
+            _gameFactory = gameFactory ?? throw new ArgumentNullException(nameof(gameFactory));
             Initialize();
         }
 
