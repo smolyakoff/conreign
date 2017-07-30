@@ -6,10 +6,20 @@ import { decorate, withThemeSizes, withThemeColors } from './decorators';
 const progress = bem('c-progress');
 const bar = progress('bar');
 
-function ProgressBar({ value, className, children }) {
-  const percent = `${value}%`;
+function ProgressBar({
+  value,
+  animated,
+  striped,
+  className,
+  children,
+}) {
+  const modifiers = { animated, striped };
+  const percentValue = `${value}%`;
   return (
-    <div className={bar.mix(className)} style={{ width: percent }}>
+    <div
+      className={bar(modifiers).mix(className)()}
+      style={{ width: percentValue }}
+    >
       {children}
     </div>
   );
@@ -17,12 +27,16 @@ function ProgressBar({ value, className, children }) {
 
 ProgressBar.propTypes = {
   value: PropTypes.number,
+  animated: PropTypes.bool,
+  striped: PropTypes.bool,
   className: PropTypes.string,
   children: PropTypes.node,
 };
 
 ProgressBar.defaultProps = {
   value: 0,
+  animated: false,
+  striped: false,
   className: null,
   children: null,
 };
@@ -31,7 +45,11 @@ const DecoratedProgressBar = decorate(
   withThemeColors(bar()),
 )(ProgressBar);
 
-function Progress({ className, rounded, ...otherProps }) {
+function Progress({
+  className,
+  rounded,
+  ...otherProps
+}) {
   const modifiers = {
     rounded,
   };
@@ -45,6 +63,8 @@ function Progress({ className, rounded, ...otherProps }) {
 Progress.propTypes = {
   value: PropTypes.number,
   rounded: PropTypes.bool,
+  animated: PropTypes.bool,
+  striped: PropTypes.bool,
   className: PropTypes.string,
 };
 
@@ -52,6 +72,8 @@ Progress.defaultProps = {
   className: null,
   value: 0,
   rounded: false,
+  animated: false,
+  striped: false,
 };
 
 export default decorate(

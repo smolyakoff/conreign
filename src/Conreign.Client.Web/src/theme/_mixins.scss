@@ -1,3 +1,7 @@
 @import "~blaze/scss/mixins/_components.links";
 @import "~blaze/scss/mixins/_utilities.boxing";
 @import "~sass-material-colors/sass/_sass-material-colors-function";
+
+@mixin gradient-striped($color: rgba(255,255,255,.15), $angle: 45deg) {
+  background-image: linear-gradient($angle, $color 25%, transparent 25%, transparent 50%, $color 50%, $color 75%, transparent 75%, transparent);
+}

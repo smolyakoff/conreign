@@ -4,7 +4,8 @@ import block from 'bem-cn';
 import TransitionGroup from 'react-addons-css-transition-group';
 
 import { animation, Side } from './../theme';
-import { selectNotifications, hideNotification } from './notifications';
+import { selectNotifications } from './../state';
+import { hideNotification } from './notifications';
 import Notification from './notification';
 import './notification-area.scss';
 

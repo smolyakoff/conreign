@@ -20,43 +20,32 @@ namespace Conreign.Api.Hubs
 {
     public class GameHub : Hub<IObserver<MessageEnvelope>>
     {
-        private static readonly ConcurrentDictionary<string, GameHubConnection> Handlers =
+        private static readonly ConcurrentDictionary<string, GameHubConnection> Connections =
             new ConcurrentDictionary<string, GameHubConnection>();
 
         private readonly OrleansClient _client;
         private readonly GameHubCountersCollection _countersCollection;
-        private readonly IMediator _mediator;
+        private readonly ClientHandlerFactory _clientHandlerFactory;
         private readonly JsonSerializer _errorSerializer;
         private readonly ILogger _logger;
         private readonly IGaugeMeasure _connectionsGauge;
 
-        public GameHub(ILogger logger, OrleansClient client, GameHubCountersCollection countersCollection, IMediator mediator)
+        public GameHub(
+            ILogger logger, 
+            OrleansClient client, 
+            GameHubCountersCollection counters, 
+            ClientHandlerFactory clientHandlerFactory)
         {
-            if (logger == null)
-            {
-                throw new ArgumentNullException(nameof(logger));
-            }
-            if (client == null)
-            {
-                throw new ArgumentNullException(nameof(client));
-            }
-            if (countersCollection == null)
-            {
-                throw new ArgumentNullException(nameof(countersCollection));
-            }
-            if (mediator == null)
-            {
-                throw new ArgumentNullException(nameof(mediator));
-            }
-            _logger = logger;
-            _client = client;
-            _countersCollection = countersCollection;
-            _mediator = mediator;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _client = client ?? throw new ArgumentNullException(nameof(client));
+            _countersCollection = counters ?? throw new ArgumentNullException(nameof(counters));
+            _clientHandlerFactory = clientHandlerFactory ?? throw new ArgumentNullException(nameof(clientHandlerFactory));
+
             _errorSerializer = JsonSerializer.Create(new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.All
             });
-            _connectionsGauge = _logger.GaugeOperation("Hub.Connections", "connection(s)", () => Handlers.Count);
+            _connectionsGauge = _logger.GaugeOperation("Hub.Connections", "connection(s)", () => Connections.Count);
         }
 
 
@@ -101,9 +90,9 @@ namespace Conreign.Api.Hubs
             using (LogContext.PushProperty("ConnectionId", Context.ConnectionId))
             {
                 var connection = await _client.Connect(Guid.Parse(Context.ConnectionId));
-                var handler = new ClientHandler(connection, _mediator);
+                var handler = _clientHandlerFactory.Create(connection);
                 var subscription = handler.Events.Subscribe(new ConnectionObserver(this, Context.ConnectionId));
-                Handlers[Context.ConnectionId] = new GameHubConnection(handler, subscription);
+                Connections[Context.ConnectionId] = new GameHubConnection(connection, handler, subscription);
                 _connectionsGauge.Write();
                 await base.OnConnected();
             }
@@ -120,14 +109,13 @@ namespace Conreign.Api.Hubs
             using (LogContext.PushProperties(props))
             {
                 GameHubConnection hubConnection;
-                var removed = Handlers.TryRemove(Context.ConnectionId, out hubConnection);
+                var removed = Connections.TryRemove(Context.ConnectionId, out hubConnection);
                 if (!removed)
                 {
                     return TaskCompleted.Completed;
                 }
                 _connectionsGauge.Write();
-                hubConnection.Subscription.Dispose();
-                hubConnection.Handler.Dispose();
+                hubConnection.Dispose();
                 return base.OnDisconnected(stopCalled);
             }
         }
@@ -135,7 +123,7 @@ namespace Conreign.Api.Hubs
         private IClientHandler GetHandlerSafely()
         {
             GameHubConnection connection;
-            var exists = Handlers.TryGetValue(Context.ConnectionId, out connection);
+            var exists = Connections.TryGetValue(Context.ConnectionId, out connection);
             if (!exists)
             {
                 throw new InvalidOperationException($"Handler was not found for connection id: {Context.ConnectionId}.");
@@ -185,16 +173,25 @@ namespace Conreign.Api.Hubs
             }
         }
 
-        private class GameHubConnection
+        private class GameHubConnection : IDisposable
         {
-            public GameHubConnection(ClientHandler handler, IDisposable subscription)
+            private readonly IClientConnection _connection;
+            private readonly IDisposable _subscription;
+
+            public GameHubConnection(IClientConnection connection, IClientHandler handler, IDisposable subscription)
             {
                 Handler = handler;
-                Subscription = subscription;
+                _subscription = subscription;
+                _connection = connection;
             }
 
-            public ClientHandler Handler { get; }
-            public IDisposable Subscription { get; }
+            public IClientHandler Handler { get; }
+            
+            public void Dispose()
+            {
+                _connection.Dispose();
+                _subscription.Dispose();
+            }
         }
     }
 }

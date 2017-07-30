@@ -50,45 +50,43 @@ export function changePlayerOptions(payload) {
   };
 }
 
-function createEpic({ apiDispatcher }) {
-  function updateGameOptionsEpic(action$) {
-    return action$
-      .ofType(UPDATE_GAME_OPTIONS)
-      .map(action => ({
-        ...action,
-        payload: {
-          roomId: action.payload.roomId,
-          options: action.payload.options,
-        },
-      }))
-      .mergeMap(apiDispatcher);
-  }
-
-  function updatePlayerOptionsEpic(action$) {
-    return action$
-      .ofType(UPDATE_PLAYER_OPTIONS)
-      .map(action => ({
-        ...action,
-        payload: {
-          roomId: action.payload.roomId,
-          options: action.payload.options,
-        },
-      }))
-      .mergeMap(apiDispatcher);
-  }
-
-  function startGameEpic(action$) {
-    return action$
-      .ofType(START_GAME)
-      .mergeMap(apiDispatcher);
-  }
-
-  return combineEpics(
-    updateGameOptionsEpic,
-    updatePlayerOptionsEpic,
-    startGameEpic,
-  );
+function updateGameOptionsEpic(action$, store, { apiDispatcher }) {
+  return action$
+    .ofType(UPDATE_GAME_OPTIONS)
+    .map(action => ({
+      ...action,
+      payload: {
+        roomId: action.payload.roomId,
+        options: action.payload.options,
+      },
+    }))
+    .mergeMap(apiDispatcher);
 }
+
+function updatePlayerOptionsEpic(action$, store, { apiDispatcher }) {
+  return action$
+    .ofType(UPDATE_PLAYER_OPTIONS)
+    .map(action => ({
+      ...action,
+      payload: {
+        roomId: action.payload.roomId,
+        options: action.payload.options,
+      },
+    }))
+    .mergeMap(apiDispatcher);
+}
+
+function startGameEpic(action$, store, { apiDispatcher }) {
+  return action$
+    .ofType(START_GAME)
+    .mergeMap(apiDispatcher);
+}
+
+const epic = combineEpics(
+  updateGameOptionsEpic,
+  updatePlayerOptionsEpic,
+  startGameEpic,
+);
 
 function reducer(state, action) {
   if (state.mode !== RoomMode.Lobby) {
@@ -205,5 +203,5 @@ export {
 
 export default {
   reducer,
-  createEpic,
+  epic,
 };

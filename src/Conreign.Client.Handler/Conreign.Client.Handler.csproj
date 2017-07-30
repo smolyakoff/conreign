@@ -41,18 +41,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Behaviours\SlowConnectionBehaviourOptions.cs" />
     <Compile Include="ClientHandler.cs" />
+    <Compile Include="ClientHandlerFactory.cs" />
+    <Compile Include="ClientHandlerFactoryOptions.cs" />
     <Compile Include="ContainerExtensions.cs" />
-    <Compile Include="Handlers\Behaviours\SlowConnectionBehaviour%272.cs" />
+    <Compile Include="Behaviours\SlowConnectionBehaviour%272.cs" />
     <Compile Include="Handlers\CancelFleetHandler.cs" />
-    <Compile Include="Handlers\Common\CommandEnvelope%272.cs" />
-    <Compile Include="Handlers\Common\HandlerContext.cs" />
-    <Compile Include="Handlers\Common\ICommandHandler%272.cs" />
-    <Compile Include="Handlers\Common\ICommandPipelineBehaviour%272.cs" />
-    <Compile Include="Handlers\Common\IHandlerContext.cs" />
-    <Compile Include="Handlers\Behaviours\AuthenticationBehaviour%272.cs" />
-    <Compile Include="Handlers\Behaviours\DiagnosticsBehaviour%272.cs" />
-    <Compile Include="Handlers\Behaviours\ErrorLoggingBehaviour%272.cs" />
+    <Compile Include="CommandEnvelope%272.cs" />
+    <Compile Include="HandlerContext.cs" />
+    <Compile Include="Handlers\ICommandHandler%272.cs" />
+    <Compile Include="ICommandPipelineBehaviour%272.cs" />
+    <Compile Include="Behaviours\AuthenticationBehaviour%272.cs" />
+    <Compile Include="Behaviours\DiagnosticsBehaviour%272.cs" />
+    <Compile Include="Behaviours\ErrorLoggingBehaviour%272.cs" />
     <Compile Include="Handlers\EndTurnHandler.cs" />
     <Compile Include="Handlers\GetRoomStateHandler.cs" />
     <Compile Include="Handlers\HandlersMappingProfile.cs" />

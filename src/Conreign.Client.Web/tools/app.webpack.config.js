@@ -24,7 +24,7 @@ function createConfiguration(options) {
   const conreignLibAssets = require('./../build/conreign-lib.assets.json');
   let config = {
     entry: {
-      app: [path.join(PATHS.SRC, 'app')],
+      app: [path.join(PATHS.SRC, 'index.jsx')],
     },
     output: {
       path: PATHS.BUILD,

@@ -4,6 +4,7 @@ using System.Reflection;
 using Conreign.Api.Configuration;
 using Conreign.Api.Hubs;
 using Conreign.Client.Handler;
+using Conreign.Client.Handler.Behaviours;
 using Conreign.Client.Orleans;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
@@ -33,7 +34,11 @@ namespace Conreign.Api
             container.Register<GameHubCountersCollection>(Lifestyle.Singleton);
             container.RegisterCollection<HubPipelineModule>(new[] {Assembly.GetExecutingAssembly()});
             RegisterHubs(container);
-            container.RegisterClientMediator();
+            container.RegisterSingleton(new SlowConnectionBehaviourOptions(TimeSpan.FromSeconds(3)));
+            container.RegisterClientHandlerFactory(c =>
+            {
+                // c.Behaviours.Add(typeof(SlowConnectionBehaviour<,>));
+            });
             return container;
         }
 

@@ -1,9 +1,8 @@
 import serializeError from 'serialize-error';
-import { parseInt, negate } from 'lodash';
+import { negate } from 'lodash';
 import { combineEpics } from 'redux-observable';
 
-import { isFailedAsyncAction } from '../framework';
-import { isRouteLoadingAction } from './../root';
+import { isFailedAsyncAction, isRouteAction } from '../framework';
 import { showNotification } from './../notifications';
 
 const INITIAL_STATE = {
@@ -11,7 +10,7 @@ const INITIAL_STATE = {
 };
 
 function isFailedRouteAsyncAction(action) {
-  return isFailedAsyncAction(action) && isRouteLoadingAction(action);
+  return isFailedAsyncAction(action) && isRouteAction(action);
 }
 
 function reducer(state = INITIAL_STATE, action) {
@@ -23,7 +22,6 @@ function reducer(state = INITIAL_STATE, action) {
   }
   return state;
 }
-reducer.$key = 'errors';
 
 const ERROR_PAGE_PREFIX = '/errors';
 export const ERROR_PAGE_PATH = `${ERROR_PAGE_PREFIX}/:statusCode`;
@@ -32,45 +30,33 @@ function mapErrorToStatusCode() {
   return 500;
 }
 
-const DUMMY_ERROR = new Error('Nothing to do here 😉');
-
-export function selectErrorPage(state, { params }) {
-  const statusCode = parseInt(params.statusCode);
-  return {
-    statusCode,
-    showStack: COMPILATION_MODE === 'debug',
-    error: state.errors.routingError || DUMMY_ERROR,
-  };
+function redirectOnRouteError(action$, state, { history }) {
+  return action$
+    .filter(isFailedRouteAsyncAction)
+    .map(action => action.payload)
+    .map(mapErrorToStatusCode)
+    .do(code => history.push(`${ERROR_PAGE_PREFIX}/${code}`))
+    .ignoreElements();
 }
 
-function createEpic({ history }) {
-  function redirectOnRouteErrorEpic(action$) {
-    return action$
-      .filter(isFailedRouteAsyncAction)
-      .map(action => action.payload)
-      .map(mapErrorToStatusCode)
-      .do(code => history.push(`${ERROR_PAGE_PREFIX}/${code}`))
-      .ignoreElements();
-  }
-
-  function showErrorNotificationEpic(action$) {
-    return action$
-      .filter(action => action.error)
-      .filter(negate(isFailedRouteAsyncAction))
-      .map(action => action.payload)
-      .map(error => showNotification({
-        content: error,
-        rendererName: 'ErrorNotification',
-      }));
-  }
-
-  return combineEpics(
-    redirectOnRouteErrorEpic,
-    showErrorNotificationEpic,
-  );
+function showErrorNotification(action$) {
+  return action$
+    .filter(action => action.error)
+    .filter(negate(isFailedRouteAsyncAction))
+    .map(action => action.payload)
+    .map(error => showNotification({
+      content: error,
+      rendererName: 'ErrorNotification',
+    }));
 }
+
+export function selectRoutingError(state) {
+  return state.routingError;
+}
+
+const epic = combineEpics(redirectOnRouteError, showErrorNotification);
 
 export default {
   reducer,
-  createEpic,
+  epic,
 };

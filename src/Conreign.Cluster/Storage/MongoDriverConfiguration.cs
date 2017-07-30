@@ -26,6 +26,7 @@ namespace Conreign.Cluster.Storage
             BsonClassMap.RegisterClassMap<PlayerState>();
             BsonClassMap.RegisterClassMap<LobbyState>();
             BsonClassMap.RegisterClassMap<GameState>();
+            BsonClassMap.RegisterClassMap<ChatMessageReceived>();
         }
     }
 }

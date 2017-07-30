@@ -2,18 +2,14 @@ import { isSucceededAsyncAction, getOriginalPayload } from '../framework';
 
 import { JOIN_ROOM } from '../api';
 
-function createEpic({ apiDispatcher, history }) {
-  function joinRoomEpic(action$) {
-    return action$
-      .ofType(JOIN_ROOM)
-      .mergeMap(apiDispatcher)
-      .doIf(
-        isSucceededAsyncAction,
-        action => history.push(`/${getOriginalPayload(action).roomId}`),
-      );
-  }
-
-  return joinRoomEpic;
+function joinRoom(action$, state, { apiDispatcher, history }) {
+  return action$
+    .ofType(JOIN_ROOM)
+    .mergeMap(apiDispatcher)
+    .doIf(
+      isSucceededAsyncAction,
+      action => history.push(`/${getOriginalPayload(action).roomId}`),
+    );
 }
 
 function reducer(state) {
@@ -21,6 +17,6 @@ function reducer(state) {
 }
 
 export default {
-  createEpic,
+  epic: joinRoom,
   reducer,
 };

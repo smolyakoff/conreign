@@ -260,81 +260,79 @@ function mapTickActionToEvent(action) {
   }
 }
 
-function createEpic({ apiDispatcher }) {
-  function launchFleetEpic(action$) {
-    return action$
-      .ofType(LAUNCH_FLEET)
-      .mergeMap(apiDispatcher);
-  }
-
-  function cancelFleetEpic(action$) {
-    return action$
-      .ofType(CANCEL_FLEET)
-      .mergeMap(apiDispatcher);
-  }
-
-  function endTurnEpic(action$) {
-    return action$
-      .ofType(END_TURN)
-      .mergeMap(apiDispatcher);
-  }
-
-  function turnTimerEpic(action$) {
-    const serverTickEvents$ = action$
-      .filter(isTickAction)
-      .map(mapTickActionToEvent);
-
-    const serverTicks$ = serverTickEvents$
-      .map(({ tick }) => tick);
-
-    const serverTickIntervals$ = serverTickEvents$
-      .timeInterval()
-      .skip(1)
-      .filter(({ value }) => value.type !== HANDLE_TURN_CALCULATION_ENDED)
-      .map(({ interval }) => interval);
-
-    const avgServerTickIntervals$ = serverTickIntervals$
-      .bufferCount(4, 3)
-      .map(mean)
-      .startWith(AVERAGE_SERVER_TICK_INTERVAL);
-
-    const clientTickIntervals$ = avgServerTickIntervals$
-      .map(x => x / SERVER_TICK_RESOLUTION)
-      .filter(x => Math.abs(AVERAGE_CLIENT_TICK_INTERVAL - x) < TICK_INTERVAL_EPSILON);
-
-    const clientTicks$ = Rx.Observable
-      .combineLatest(serverTicks$, clientTickIntervals$)
-      .switchMap(([tick, interval]) => {
-        if (tick === null) {
-          return Rx.Observable.of(null);
-        }
-        const subTick$ = Rx.Observable.timer(0, interval)
-          .take(SERVER_TICK_RESOLUTION + 1)
-          .map(index => index === SERVER_TICK_RESOLUTION
-            ? null
-            : (tick * SERVER_TICK_RESOLUTION) + index,
-          );
-        return subTick$;
-      })
-      .sampleTime(AVERAGE_CLIENT_TICK_INTERVAL / 2);
-
-    return clientTicks$
-      .map(tick => ({
-        type: SET_TURN_TIMER_SECONDS,
-        payload: tick,
-        meta: {
-          $hideFromDevTools: true,
-        },
-      }));
-  }
-
-  return combineEpics(
-    turnTimerEpic,
-    launchFleetEpic,
-    cancelFleetEpic,
-    endTurnEpic,
-  );
+function launchFleetEpic(action$, store, { apiDispatcher }) {
+  return action$
+    .ofType(LAUNCH_FLEET)
+    .mergeMap(apiDispatcher);
 }
+
+function cancelFleetEpic(action$, store, { apiDispatcher }) {
+  return action$
+    .ofType(CANCEL_FLEET)
+    .mergeMap(apiDispatcher);
+}
+
+function endTurnEpic(action$, store, { apiDispatcher }) {
+  return action$
+    .ofType(END_TURN)
+    .mergeMap(apiDispatcher);
+}
+
+function turnTimerEpic(action$) {
+  const serverTickEvents$ = action$
+    .filter(isTickAction)
+    .map(mapTickActionToEvent);
+
+  const serverTicks$ = serverTickEvents$
+    .map(({ tick }) => tick);
+
+  const serverTickIntervals$ = serverTickEvents$
+    .timeInterval()
+    .skip(1)
+    .filter(({ value }) => value.type !== HANDLE_TURN_CALCULATION_ENDED)
+    .map(({ interval }) => interval);
+
+  const avgServerTickIntervals$ = serverTickIntervals$
+    .bufferCount(4, 3)
+    .map(mean)
+    .startWith(AVERAGE_SERVER_TICK_INTERVAL);
+
+  const clientTickIntervals$ = avgServerTickIntervals$
+    .map(x => x / SERVER_TICK_RESOLUTION)
+    .filter(x => Math.abs(AVERAGE_CLIENT_TICK_INTERVAL - x) < TICK_INTERVAL_EPSILON);
+
+  const clientTicks$ = Rx.Observable
+    .combineLatest(serverTicks$, clientTickIntervals$)
+    .switchMap(([tick, interval]) => {
+      if (tick === null) {
+        return Rx.Observable.of(null);
+      }
+      const subTick$ = Rx.Observable.timer(0, interval)
+        .take(SERVER_TICK_RESOLUTION + 1)
+        .map(index => index === SERVER_TICK_RESOLUTION
+          ? null
+          : (tick * SERVER_TICK_RESOLUTION) + index,
+        );
+      return subTick$;
+    })
+    .sampleTime(AVERAGE_CLIENT_TICK_INTERVAL / 2);
+
+  return clientTicks$
+    .map(tick => ({
+      type: SET_TURN_TIMER_SECONDS,
+      payload: tick,
+      meta: {
+        $hideFromDevTools: true,
+      },
+    }));
+}
+
+const epic = combineEpics(
+  launchFleetEpic,
+  cancelFleetEpic,
+  endTurnEpic,
+  turnTimerEpic,
+);
 
 const selectWaitingFleets = state => state.waitingFleets;
 const selectMap = state => state.map;
@@ -394,5 +392,5 @@ export { launchFleet, cancelFleet, endTurn } from './../../api';
 
 export default {
   reducer,
-  createEpic,
+  epic,
 };

@@ -5,8 +5,11 @@ import ReactDOM from 'react-dom';
 import { browserHistory } from 'react-router';
 import './rx';
 
-import createContainer from './ioc-container';
-import { createStore, AppContainer, listenForServerEvents } from './root';
+import {
+  createStore,
+  AppContainer,
+  createContainer,
+ } from './root';
 
 if (COMPILATION_MODE === 'debug') {
   window.React = React;
@@ -39,7 +42,6 @@ function run() {
     history: browserHistory,
   };
   render(props);
-  store.dispatch(listenForServerEvents());
   return props;
 }
 

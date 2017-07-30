@@ -5,7 +5,7 @@ import {
   createPendingAction,
   createSucceededAction,
   createFailedAction,
-} from './async-action-creators';
+} from './async-actions';
 
 function generateCorrelationId() {
   return uniqueId('async-operation-');

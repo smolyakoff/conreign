@@ -3,12 +3,14 @@ import { connect } from 'react-redux';
 import { values } from 'lodash';
 
 import { Box, BoxType, ThemeSize } from './../theme';
+import { selectRoom, selectAuth } from './../state';
+import { selectUser } from './../auth';
 import {
   RoomMode,
-  selectRoom,
   setMapSelection,
   getRoomState,
   sendMessage,
+  selectRoomOfUser,
 } from './room';
 import { LobbyPage } from './lobby';
 import { GamePage } from './game';
@@ -47,8 +49,15 @@ RoomPage.propTypes = {
 };
 RoomPage.init = ({ params }) => getRoomState(params);
 
+function selectUserRoom(state) {
+  const auth = selectAuth(state);
+  const user = selectUser(auth);
+  const room = selectRoom(state);
+  return selectRoomOfUser(room, user);
+}
+
 export default connect(
-  selectRoom,
+  selectUserRoom,
   {
     onMapSelectionChange: setMapSelection,
     onMessageSend: sendMessage,

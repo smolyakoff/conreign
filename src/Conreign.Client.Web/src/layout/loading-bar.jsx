@@ -1,9 +1,28 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
+import bem from 'bem-cn';
 
-import { Progress } from './../theme';
+import { Progress, ThemeColor } from './../theme';
+import './loading-bar.scss';
 
-export default function LoadingBar() {
+const css = bem('c-loading-bar');
+
+export default function LoadingBar({ isHidden }) {
   return (
-    <Progress value={50} rounded={false} />
+    <Progress
+      className={css({ hidden: isHidden })()}
+      themeColor={ThemeColor.Brand}
+      value={100}
+      rounded={false}
+      animated
+      striped
+    />
   );
 }
+
+LoadingBar.propTypes = {
+  isHidden: PropTypes.bool,
+};
+
+LoadingBar.defaultProps = {
+  isHidden: false,
+};

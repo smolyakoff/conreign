@@ -1,0 +1,9 @@
+.c-loading-bar {
+  height: 0.4em;
+  background-color: transparent;
+  transition-duration: 1s;
+
+  &--hidden {
+    opacity: 0;
+  }
+}

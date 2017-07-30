@@ -2,9 +2,9 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 
 import { PanelContainer, Panel } from './../theme';
+import { selectIsRouteLoading } from './../state';
 import PageLoadingIndicator from './page-loading-indicator';
 import Footer from './footer';
-import { selectLayoutProps } from './layout';
 import './footer-layout.scss';
 
 function FooterLayout({ view, children, isPageLoading }) {
@@ -38,9 +38,8 @@ FooterLayout.defaultProps = {
   isPageLoading: false,
 };
 
-export default connect(
-  (state, ownProps) => ({
-    ...ownProps,
-    ...selectLayoutProps(state),
-  }),
-)(FooterLayout);
+const enhance = connect(state => ({
+  isPageLoading: selectIsRouteLoading(state),
+}));
+
+export default enhance(FooterLayout);

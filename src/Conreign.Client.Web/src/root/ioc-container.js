@@ -1,7 +1,7 @@
 import { get } from 'lodash';
 
-import { createApiClient } from './api';
-import { ValueStore, createAsyncOperationDispatcher } from './framework';
+import { createApiClient } from './../api';
+import { ValueStore, createAsyncOperationDispatcher } from './../framework';
 
 export default function createContainer(imports, config) {
   const { storage, history } = imports;

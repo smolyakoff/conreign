@@ -16,50 +16,48 @@ export function login(payload = { force: false }) {
   };
 }
 
-function createEpic({ apiDispatcher, userStore }) {
-  function loginEpic(action$, store) {
-    return action$
-      .ofType(LOGIN)
-      .filter((action) => {
-        const auth = store.getState()[AUTH_REDUCER_KEY];
-        return action.payload.force || !auth.user;
-      })
-      .map((action) => {
-        const user = userStore.get() || {};
-        return {
-          ...action,
-          payload: {
-            accessToken: user.accessToken,
-          },
-        };
-      })
-      .mergeMap(apiDispatcher)
-      .map((action) => {
-        if (action.type !== LOGIN_SUCCEEDED) {
-          return action;
-        }
-        const { payload } = action;
-        const user = decodeJwt(payload.accessToken);
-        const userWithToken = {
-          user,
-          accessToken: payload.accessToken,
-        };
-        return {
-          ...action,
-          payload: userWithToken,
-        };
-      });
-  }
-
-  function persistUserEpic(action$) {
-    return action$
-      .ofType(LOGIN_SUCCEEDED)
-      .do(action => userStore.set(action.payload))
-      .ignoreElements();
-  }
-
-  return combineEpics(loginEpic, persistUserEpic);
+function loginEpic(action$, store, { userStore, apiDispatcher }) {
+  return action$
+    .ofType(LOGIN)
+    .filter((action) => {
+      const auth = store.getState()[AUTH_REDUCER_KEY];
+      return action.payload.force || !auth.user;
+    })
+    .map((action) => {
+      const user = userStore.get() || {};
+      return {
+        ...action,
+        payload: {
+          accessToken: user.accessToken,
+        },
+      };
+    })
+    .mergeMap(apiDispatcher)
+    .map((action) => {
+      if (action.type !== LOGIN_SUCCEEDED) {
+        return action;
+      }
+      const { payload } = action;
+      const user = decodeJwt(payload.accessToken);
+      const userWithToken = {
+        user,
+        accessToken: payload.accessToken,
+      };
+      return {
+        ...action,
+        payload: userWithToken,
+      };
+    });
 }
+
+function persistUserEpic(action$, store, { userStore }) {
+  return action$
+    .ofType(LOGIN_SUCCEEDED)
+    .do(action => userStore.set(action.payload))
+    .ignoreElements();
+}
+
+const epic = combineEpics(loginEpic, persistUserEpic);
 
 const INITIAL_STATE = {
   accessToken: null,
@@ -87,7 +85,13 @@ export function selectCurrentUser(state) {
   };
 }
 
+export function selectUser(state) {
+  return {
+    id: state.user.sub,
+  };
+}
+
 export default {
-  createEpic,
+  epic,
   reducer,
 };

@@ -61,12 +61,29 @@ a {
   }
 }
 
-// Progress Bars
+@keyframes progress-bar-stripes {
+  from { background-position: $progress-striped-dash-size 0; }
+  to { background-position: 0 0; }
+}
+
 .c-progress {
   // HACK: It's not possible to overwrite SCSS variable for border-radius
   // Specify the value directly here. Rounded progress is possible
   // with --rounded modifier
   border-radius: 0;
+  &--rounded {
+    border-radius: $progress-border-radius;
+  }
+
+  &__bar {
+    &--striped {
+      @include gradient-striped($color-black);
+      background-size: $progress-striped-dash-size $progress-striped-dash-size;
+    }
+    &--animated {
+      animation: progress-bar-stripes 1s linear infinite;
+    }
+  }
 }
 
 // Widgets

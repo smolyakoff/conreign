@@ -15,7 +15,6 @@ import {
   GET_ROOM_STATE,
   SEND_MESSAGE,
 } from './../api';
-import { selectCurrentUser } from './../auth';
 import {
   resetMapSelection,
   ensureMapSelection,
@@ -31,29 +30,24 @@ const HANDLE_LEADER_CHANGED = mapEventNameToActionType(LEADER_CHANGED);
 const HANDLE_CHAT_MESSAGE_RECEIVED = mapEventNameToActionType(CHAT_MESSAGE_RECEIVED);
 const GET_ROOM_STATE_SUCCEEDED = createSucceededAsyncActionType(GET_ROOM_STATE);
 
-
-function createEpic(container) {
-  const { apiDispatcher } = container;
-
-  function getRoomStateEpic(action$) {
-    return action$
-      .ofType(GET_ROOM_STATE)
-      .mergeMap(apiDispatcher);
-  }
-
-  function sendMessageEpic(action$) {
-    return action$
-      .ofType(SEND_MESSAGE)
-      .mergeMap(apiDispatcher);
-  }
-
-  return combineEpics(
-    getRoomStateEpic,
-    sendMessageEpic,
-    lobby.createEpic(container),
-    game.createEpic(container),
-  );
+function getRoomStateEpic(action$, store, { apiDispatcher }) {
+  return action$
+    .ofType(GET_ROOM_STATE)
+    .mergeMap(apiDispatcher);
 }
+
+function sendMessageEpic(action$, store, { apiDispatcher }) {
+  return action$
+    .ofType(SEND_MESSAGE)
+    .mergeMap(apiDispatcher);
+}
+
+const epic = combineEpics(
+  getRoomStateEpic,
+  sendMessageEpic,
+  lobby.epic,
+  game.epic,
+);
 
 function normalizeRoomState(room) {
   const players = fp.flow(
@@ -137,11 +131,8 @@ const reducer = composeReducers(
   lobby.reducer,
   game.reducer,
 );
-reducer.$key = 'room';
 
-export function selectRoom(state) {
-  const room = state[reducer.$key];
-  const currentUser = selectCurrentUser(state);
+export function selectRoomOfUser(room, currentUser) {
   const mapSelection = ensureMapSelection(
     room.mapSelection || {},
     room.map.planets,
@@ -158,6 +149,6 @@ export { RoomMode, sendMessage, getRoomState } from './../api';
 export { setMapSelection } from './map';
 
 export default {
-  createEpic,
+  epic,
   reducer,
 };

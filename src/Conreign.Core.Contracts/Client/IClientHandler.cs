@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Conreign.Core.Contracts.Client
 {
-    public interface IClientHandler : IDisposable
+    public interface IClientHandler
     {
         IObservable<IClientEvent> Events { get; }
         Task<T> Handle<T>(IRequest<T> command, Metadata metadata);

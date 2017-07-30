@@ -1,11 +1,11 @@
 ﻿using System;
 using MediatR;
 
-namespace Conreign.Client.Handler.Handlers.Common
+namespace Conreign.Client.Handler
 {
-    internal class CommandEnvelope<TRequest, TResponse> : IRequest<TResponse> where TRequest : IRequest<TResponse>
+    public class CommandEnvelope<TRequest, TResponse> : IRequest<TResponse> where TRequest : IRequest<TResponse>
     {
-        public CommandEnvelope(TRequest command, IHandlerContext context)
+        public CommandEnvelope(TRequest command, HandlerContext context)
         {
             if (command == null)
             {
@@ -16,6 +16,6 @@ namespace Conreign.Client.Handler.Handlers.Common
         }
 
         public TRequest Command { get; }
-        public IHandlerContext Context { get; }
+        public HandlerContext Context { get; }
     }
 }

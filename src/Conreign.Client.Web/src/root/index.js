@@ -5,5 +5,4 @@ export const AppContainer = TASK === 'run'
   ? require('./app-container-hot').default
   : require('./app-container').default;
 
-export * from './root';
-
+export { default as createContainer } from './ioc-container';

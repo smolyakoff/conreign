@@ -31,11 +31,6 @@ function reducer(state = [], action) {
       return state;
   }
 }
-reducer.$key = 'notifications';
-
-export function selectNotifications(state) {
-  return state[reducer.$key];
-}
 
 export default {
   reducer,

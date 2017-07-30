@@ -3,11 +3,26 @@ import { get, isObject } from 'lodash';
 
 import { isNonEmptyString } from './../../util';
 import AsyncOperationState from './async-operation-state';
-import {
-  createPendingAsyncActionType,
-  createSucceededAsyncActionType,
-  createFailedAsyncActionType,
-} from './async-action-type-conventions';
+
+export function createPendingAsyncActionType(originalType) {
+  return `${originalType}_${AsyncOperationState.Pending}`;
+}
+
+export function createSucceededAsyncActionType(originalType) {
+  return `${originalType}_${AsyncOperationState.Succeeded}`;
+}
+
+export function createFailedAsyncActionType(originalType) {
+  return `${originalType}_${AsyncOperationState.Failed}`;
+}
+
+export function createAsyncActionTypes(originalType) {
+  return {
+    [AsyncOperationState.Pending]: createPendingAsyncActionType(originalType),
+    [AsyncOperationState.Succeeded]: createSucceededAsyncActionType(originalType),
+    [AsyncOperationState.Failed]: createFailedAsyncActionType(originalType),
+  };
+}
 
 export function createPendingAction(originalAction, correlationId) {
   return {

@@ -11,9 +11,11 @@ using Conreign.Core.AI.Battle;
 using Conreign.Core.AI.Behaviours;
 using Conreign.Core.Contracts.Client;
 using Conreign.Core.Contracts.Client.Messages;
+using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Contracts.Gameplay.Data;
 using Orleans.Runtime.Configuration;
 using Serilog;
+using SimpleInjector;
 
 namespace Conreign.Experiments
 {
@@ -26,8 +28,8 @@ namespace Conreign.Experiments
                 .MinimumLevel.Debug()
                 .CreateLogger();
             //Simulate();
-            //TestHandler().Wait();
-            TestSignalR().Wait();
+            TestHandler().Wait();
+            //TestSignalR().Wait();
             Console.WriteLine("Press a key to exit...");
             Console.ReadLine();
         }
@@ -65,12 +67,16 @@ namespace Conreign.Experiments
 
         private static async Task TestHandler()
         {
-            var config = ClientConfiguration.LoadFromFile("OrleansClientConfiguration.xml");
+            var config = ClientConfiguration.LocalhostSilo();
+            config.AddSimpleMessageStreamProvider(StreamConstants.ProviderName);
             var host = new OrleansClientInitializer(config);
             var client = await OrleansClient.Initialize(host);
+            var container = new Container();
+            container.RegisterClientHandlerFactory();
+            var handlerFactory = container.GetInstance<ClientHandlerFactory>();
             using (var connection = await client.Connect(Guid.NewGuid()))
             {
-                var handler = new ClientHandler(connection);
+                var handler = handlerFactory.Create(connection);
                 handler.Events.Subscribe(Write);
                 var meta = new Metadata();
                 var loginResponse = await handler.Handle(new LoginCommand(), meta);

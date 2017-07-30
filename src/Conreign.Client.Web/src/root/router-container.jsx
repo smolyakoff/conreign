@@ -4,35 +4,12 @@ import { Router, Route, IndexRoute } from 'react-router';
 import { isFunction, flatMap, isObject } from 'lodash';
 
 import './../theme';
-import {
-  beginRouteTransaction,
-} from './../root';
+import { executeRouteTransition } from './../framework';
 import { login } from './../auth';
-import { FooterLayout, NavigationMenuLayout } from './../layout';
-import { ErrorPage, ERROR_PAGE_PATH, ErrorNotification } from './../errors';
+import { AppLayout, NavigationMenuLayout } from './../layout';
+import { ErrorPage, ERROR_PAGE_PATH } from './../errors';
 import { HomePage } from './../home';
 import { RoomPage } from './../room';
-import { NotificationArea } from './../notifications';
-
-const NOTIFICATION_RENDERERS = {
-  ErrorNotification,
-};
-
-function AppLayout({ children }) {
-  return (
-    <FooterLayout view={children}>
-      <NotificationArea renderers={NOTIFICATION_RENDERERS} />
-    </FooterLayout>
-  );
-}
-
-AppLayout.propTypes = {
-  children: PropTypes.node,
-};
-
-AppLayout.defaultProps = {
-  children: null,
-};
 
 export default function RouterContainer({ history }, { store }) {
   function collectRouteActions(nextState) {
@@ -52,8 +29,10 @@ export default function RouterContainer({ history }, { store }) {
     if (authRequired) {
       stages.push(login());
     }
-    stages.push(actions);
-    store.dispatch(beginRouteTransaction(stages));
+    if (actions.length > 0) {
+      stages.push(actions);
+    }
+    store.dispatch(executeRouteTransition(stages));
   }
 
   function onRouteChange(prevState, nextState) {

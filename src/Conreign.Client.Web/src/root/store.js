@@ -3,13 +3,13 @@ import { createEpicMiddleware } from 'redux-observable';
 import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly';
 import { get } from 'lodash';
 
-import main from './root';
-
-const { createEpic, reducer } = main;
+import reducer from './../state';
+import epic from './root-epic';
 
 function createEnhancer(container) {
-  const epic = createEpic(container);
-  const epicMiddleware = createEpicMiddleware(epic);
+  const epicMiddleware = createEpicMiddleware(epic, {
+    dependencies: container,
+  });
   const devToolsOptions = {
     predicate: (state, action) => !get(action, 'meta.$hideFromDevTools'),
   };
@@ -20,9 +20,9 @@ function createDebugStore({ state = {}, container }) {
   const enhancer = createEnhancer(container);
   const store = createStore(reducer, state, enhancer);
   if (module.hot) {
-    module.hot.accept('./root', () => {
+    module.hot.accept('./../state', () => {
       // eslint-disable-next-line
-      const updatedReducer = require('./root').default.reducer;
+      const updatedReducer = require('./../state').default;
       store.replaceReducer(updatedReducer);
     });
   }
