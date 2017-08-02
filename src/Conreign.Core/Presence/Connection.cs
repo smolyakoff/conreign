@@ -42,9 +42,9 @@ namespace Conreign.Core.Presence
                 topic = await _topicFactory.Create(previousTopicId);
                 await topic.Send(new Disconnected(_state.ConnectionId));
             }
-            _state.TopicId = topicId;
             topic = await _topicFactory.Create(topicId);
             await topic.Send(new Connected(_state.ConnectionId, topicId));
+            _state.TopicId = topicId;
         }
 
         public async Task Disconnect()

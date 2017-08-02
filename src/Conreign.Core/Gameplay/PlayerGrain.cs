@@ -73,7 +73,7 @@ namespace Conreign.Core.Gameplay
             await _player.Handle(@event);
         }
 
-        public Task Listen()
+        public Task Ping()
         {
             return TaskCompleted.Completed;
         }

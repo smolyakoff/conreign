@@ -1,3 +1,5 @@
+@import "./../theme/mixins";
+
 // n is number of stars required
 @function multiple-box-shadow($n) {
   $value: "#{random(2000)}px #{random(2000)}px #FFF";
@@ -63,4 +65,12 @@ $shadows-medium: multiple-box-shadow(200);
   }
 }
 
-
+.c-join-room-form-container {
+  width: 100%;
+  @include screen--medium-and-up {
+    width: calc(100vw / 1.5);
+  }
+  @include screen--large-and-up {
+    width: calc(100vw / 2.5);
+  }
+}

@@ -22,7 +22,7 @@ function mapToRouteAction(actionOrActions) {
 
 export function isRouteAction(action) {
   const isRoute = get(action, 'meta.$route');
-  return isRoute;
+  return !!isRoute;
 }
 
 export function executeRouteTransition(actionOrActions) {

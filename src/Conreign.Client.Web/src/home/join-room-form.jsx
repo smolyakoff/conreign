@@ -6,6 +6,9 @@ import {
   Button,
   InputContainer,
   Input,
+  P,
+  Text,
+  ValidationState,
   ThemeSize,
   ThemeColor,
 } from './../theme';
@@ -13,7 +16,13 @@ import sanitizeRoomId from './sanitize-room-id';
 
 export default class JoinRoomForm extends Component {
   static propTypes = {
-    onJoin: PropTypes.func.isRequired,
+    isSubmitting: PropTypes.bool,
+    busyRoomId: PropTypes.string,
+    onSubmit: PropTypes.func.isRequired,
+  };
+  static defaultProps = {
+    isSubmitting: false,
+    busyRoomId: null,
   };
   constructor() {
     super();
@@ -21,38 +30,62 @@ export default class JoinRoomForm extends Component {
       roomId: '',
     };
   }
-  onRoomIdChange(roomId) {
-    this.setState({
-      roomId: sanitizeRoomId(roomId),
-    });
-  }
-  onFormSubmit(e) {
+  onInputChange = (event) => {
+    const roomId = sanitizeRoomId(event.target.value);
+    this.setState({ roomId });
+  };
+  onFormSubmit = (e) => {
     e.preventDefault();
-    this.props.onJoin(this.state);
+    const { onSubmit } = this.props;
+    onSubmit(this.state);
     return false;
-  }
+  };
   render() {
+    const { busyRoomId, isSubmitting } = this.props;
     const { roomId } = this.state;
+    const showError = busyRoomId === roomId;
     return (
       <Grid>
-        <GridCell className="u-centered" width={80} offset={10}>
-          <form onSubmit={e => this.onFormSubmit(e)}>
+        <GridCell
+          className="u-centered"
+          width={90}
+          offset={5}
+        >
+          <form onSubmit={this.onFormSubmit}>
+            <div style={{ minHeight: '5em' }}>
+              {
+                showError ? (
+                  <P themeColor={ThemeColor.Warning}>
+                    Galaxy
+                    {' '}
+                    <Text themeColor={ThemeColor.Brand}>{busyRoomId}</Text>
+                    {' '}
+                    is currently unreachable. Try to pick another one!
+                  </P>
+                ) : (
+                  <P themeColor={ThemeColor.Default}>
+                    Choose any hash tag for the galaxy and battle will begin!
+                  </P>
+                )
+              }
+            </div>
             <InputContainer
               iconLeft
-              themeSize={ThemeSize.Large}
-              className="u-mb-medium"
+              themeSize={ThemeSize.XLarge}
+              className="u-mb-large"
             >
               <span className="c-icon">#</span>
               <Input
                 placeholder="your-galaxy-hashtag"
-                onChange={e => this.onRoomIdChange(e.target.value)}
+                onChange={this.onInputChange}
                 value={roomId}
+                validationState={showError ? ValidationState.Error : null}
               />
             </InputContainer>
             <Button
-              themeSize={ThemeSize.Large}
+              themeSize={ThemeSize.XLarge}
               themeColor={ThemeColor.Brand}
-              disabled={!roomId}
+              disabled={!roomId || isSubmitting}
               type="submit"
             >
               Join

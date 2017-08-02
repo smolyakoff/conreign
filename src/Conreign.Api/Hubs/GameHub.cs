@@ -10,6 +10,7 @@ using MediatR;
 using Microsoft.AspNet.SignalR;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using Serilog;
 using Serilog.Context;
 using Serilog.Core;
@@ -43,7 +44,8 @@ namespace Conreign.Api.Hubs
 
             _errorSerializer = JsonSerializer.Create(new JsonSerializerSettings
             {
-                TypeNameHandling = TypeNameHandling.All
+                TypeNameHandling = TypeNameHandling.All,
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
             });
             _connectionsGauge = _logger.GaugeOperation("Hub.Connections", "connection(s)", () => Connections.Count);
         }

@@ -4,6 +4,7 @@ import 'ms-signalr-client';
 import { once, fromPairs, map, startCase } from 'lodash';
 
 import Rx from './../rx';
+import mapError from './map-error';
 
 const signalRConnectionState = $.signalR.connectionState;
 
@@ -60,7 +61,11 @@ function apiClient(accessTokenProvider, options) {
           ...packet.meta,
           ...response.meta,
         },
-      }));
+      }))
+      .catch((error) => {
+        const finalError = mapError(error);
+        throw finalError;
+      });
   }
 
   return {
