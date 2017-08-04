@@ -19,7 +19,7 @@ const { UglifyJsPlugin } = optimize;
 const { PATHS, TASK, COMPILATION_MODE, SIZE_LIMITS } = require('./constants');
 
 function createConfiguration(options) {
-  const { compilationMode } = options;
+  const { compilationMode, task } = options;
   // eslint-disable-next-line global-require
   const conreignLibAssets = require('./../build/conreign-lib.assets.json');
   let config = {
@@ -28,7 +28,7 @@ function createConfiguration(options) {
     },
     output: {
       path: PATHS.BUILD,
-      filename: options.task === TASK.RUN ? 'conreign-[name].js' : 'conreign-[name].[chunkhash].js',
+      filename: task === TASK.RUN ? 'conreign-[name].js' : 'conreign-[name].[chunkhash].js',
       publicPath: '/',
     },
     devtool: compilationMode === COMPILATION_MODE.DEBUG ? 'inline-source-map' : 'source-map',
@@ -43,6 +43,10 @@ function createConfiguration(options) {
           enforce: 'pre',
           loader: 'eslint-loader',
           include: PATHS.SRC,
+          options: {
+            failOnWarning: task === TASK.BUILD,
+            failOnError: task === TASK.BUILD,
+          },
         },
         {
           test: /\.jsx?$/,

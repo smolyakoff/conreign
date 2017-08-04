@@ -14,6 +14,7 @@ const css = bem(CSS_CLASS);
 function Button({
   className,
   children,
+  component,
   fullWidth,
   ghost,
   rounded,
@@ -26,10 +27,11 @@ function Button({
     rounded,
     close,
   };
+  const Tag = component;
   return (
-    <button className={css(modifiers).mix(className)()} {...others}>
+    <Tag className={css(modifiers).mix(className)()} {...others}>
       {children}
-    </button>
+    </Tag>
   );
 }
 
@@ -54,6 +56,10 @@ Button.propTypes = {
   ghost: PropTypes.bool,
   rounded: PropTypes.bool,
   close: PropTypes.bool,
+  component: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.string,
+  ]),
 };
 
 Button.defaultProps = {
@@ -63,4 +69,5 @@ Button.defaultProps = {
   ghost: false,
   rounded: false,
   close: false,
+  component: 'button',
 };

@@ -3,11 +3,11 @@ import { pure } from 'recompose';
 import { noop } from 'lodash';
 
 import {
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
+  FlexTable as FTable,
+  FlexTableHead as FTHead,
+  FlexTableBody as FTBody,
+  FlexTableRow as Row,
+  FlexTableCell as Cell,
   HorizontalAlignment,
 } from './../../theme';
 import { FLEET_SHAPE } from './game-schemas';
@@ -17,21 +17,21 @@ function FleetListItem({
   ...others
 }) {
   return (
-    <TableRow {...others}>
-      <TableCell>
+    <Row {...others}>
+      <Cell>
         {fleet.from.name} ➔ {fleet.to.name}
-      </TableCell>
-      <TableCell
+      </Cell>
+      <Cell
         horizontalAlignment={HorizontalAlignment.Right}
       >
         {fleet.distance}
-      </TableCell>
-      <TableCell
+      </Cell>
+      <Cell
         horizontalAlignment={HorizontalAlignment.Right}
       >
         {fleet.ships}
-      </TableCell>
-    </TableRow>
+      </Cell>
+    </Row>
   );
 }
 
@@ -45,23 +45,23 @@ function FleetList({
   onItemClick,
 }) {
   return (
-    <Table clickable>
-      <TableHead>
-        <TableRow heading>
-          <TableCell>Route</TableCell>
-          <TableCell
+    <FTable clickable>
+      <FTHead>
+        <Row heading>
+          <Cell>Route</Cell>
+          <Cell
             horizontalAlignment={HorizontalAlignment.Right}
           >
             Distance
-          </TableCell>
-          <TableCell
+          </Cell>
+          <Cell
             horizontalAlignment={HorizontalAlignment.Right}
           >
             Ships
-          </TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
+          </Cell>
+        </Row>
+      </FTHead>
+      <FTBody>
         {
           items.map((fleet, index) => (
             <FleetListItem
@@ -72,8 +72,8 @@ function FleetList({
             />
           ))
         }
-      </TableBody>
-    </Table>
+      </FTBody>
+    </FTable>
   );
 }
 

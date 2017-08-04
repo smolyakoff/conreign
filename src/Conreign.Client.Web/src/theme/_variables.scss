@@ -43,6 +43,8 @@ $button-ghost-brand-color: $color-brand;
 $table-heading-background-color: transparent;
 $table-heading-color: $color-info;
 $table-row-clickable-color: $color-default;
+$table-row-striped-background-color: transparentize($color-white, 0.9);
+$table-row-striped-color: $color-white;
 
 // Cards
 $card-background-color: transparentize($color-bg-brand, 0.7);

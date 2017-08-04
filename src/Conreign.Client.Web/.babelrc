@@ -13,7 +13,8 @@
   ],
   "sourceMaps": true,
   "plugins": [
-    "lodash"
+    "lodash",
+    "recharts"
   ],
   "env": {
     "development": {

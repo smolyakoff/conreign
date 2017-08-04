@@ -10,3 +10,4 @@ export const TURN_CALCULATION_STARTED = 'TurnCalculationStarted';
 export const TURN_CALCULATION_ENDED = 'TurnCalculationEnded';
 export const ATTACK_HAPPENED = 'AttackHappened';
 export const TURN_ENDED = 'TurnEnded';
+export const GAME_ENDED = 'GameEnded';

@@ -4,6 +4,7 @@
 @import "~blaze/scss/components.navs";
 @import "~blaze/scss/components.buttons";
 @import "~blaze/scss/components.inputs";
+@import "~blaze/scss/components.input-groups";
 @import "~blaze/scss/components.hints";
 @import "~blaze/scss/components.progress";
 @import "~blaze/scss/components.cards";
@@ -57,6 +58,57 @@ a {
     }
     &--h-align-center {
       justify-content: center;
+    }
+  }
+}
+
+.c-plain-table {
+
+  width: $table-width;
+  margin: $table-margin;
+  padding: $table-padding;
+  border: $table-border;
+  border-collapse: collapse;
+  border-spacing: 0;
+
+  &__body {
+    &--striped {
+      > .c-plain-table__row:nth-of-type(odd) > .c-plain-table__cell {
+        background-color: $table-row-striped-background-color;
+        color: $table-row-striped-color;
+      }
+    }
+  }
+
+  &__row {
+    &--heading {
+      border-bottom: $table-heading-border;
+      background-color: $table-heading-background-color;
+      color: $table-heading-color;
+      font-size: $text-font-size-medium;
+      font-weight: $table-heading-font-weight;
+    }
+    &--text-center {
+      text-align: center;
+    }
+    &--text-right {
+      text-align: right;
+    }
+    &--text-left {
+      text-align: left;
+    }
+  }
+
+  &__cell, &__head-cell {
+    padding: $table-cell-padding;
+    &--text-center {
+      text-align: center;
+    }
+    &--text-right {
+      text-align: right;
+    }
+    &--text-left {
+      text-align: left;
     }
   }
 }

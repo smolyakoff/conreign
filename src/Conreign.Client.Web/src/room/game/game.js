@@ -1,4 +1,13 @@
-import { includes, mean, groupBy, mapValues, find, values } from 'lodash';
+import {
+  includes,
+  mean,
+  groupBy,
+  mapValues,
+  find,
+  values,
+  maxBy,
+  sortBy,
+} from 'lodash';
 import { createSelector } from 'reselect';
 import { combineEpics } from 'redux-observable';
 
@@ -15,6 +24,7 @@ import {
   CANCEL_FLEET,
   END_TURN,
   TURN_ENDED,
+  GAME_ENDED,
 } from './../../api';
 import {
   mapEventNameToActionType,
@@ -39,6 +49,7 @@ const HANDLE_TURN_CALCULATION_STARTED = mapEventNameToActionType(TURN_CALCULATIO
 const HANDLE_TURN_CALCULATION_ENDED = mapEventNameToActionType(TURN_CALCULATION_ENDED);
 const HANDLE_ATTACK_HAPPENED = mapEventNameToActionType(ATTACK_HAPPENED);
 const HANDLE_TURN_ENDED = mapEventNameToActionType(TURN_ENDED);
+const HANDLE_GAME_ENDED = mapEventNameToActionType(GAME_ENDED);
 const SET_TURN_TIMER_SECONDS = 'SET_TURN_TIMER_SECONDS';
 const CHANGE_FLEET = 'CHANGE_FLEET';
 const SELECT_FLEET = 'SELECT_FLEET';
@@ -223,6 +234,11 @@ function reducer(state, action) {
           [payload.userId]: TurnStatus.Ended,
         },
       };
+    case HANDLE_GAME_ENDED:
+      return {
+        ...state,
+        playerStatistics: payload.statistics,
+      };
     default:
       return state;
   }
@@ -341,6 +357,7 @@ const selectPlayers = state => state.players;
 const selectPlanets = state => state.map.planets;
 const selectDeadPlayerIds = state => state.deadPlayers;
 const selectTurnStatuses = state => state.turnStatuses;
+const selectPlayerStatistics = state => state.playerStatistics;
 
 const selectWaitingFleetsWithDetails = createSelector(
   selectWaitingFleets,
@@ -386,6 +403,58 @@ export const selectGame = createSelector(
     waitingFleets,
     players,
   }),
+);
+
+export const GameStatistics = {
+  BattleRatio: 'battleRatio',
+  ShipRatio: 'shipRatio',
+  ShipsProduced: 'shipsProduced',
+};
+
+export const selectExtendedPlayerStatistics = createSelector(
+  selectPlayerStatistics,
+  selectPlayers,
+  (stats, players) => {
+    const playersWithStats = values(players).map((player) => {
+      const {
+        battlesWon,
+        battlesLost,
+        shipsDestroyed,
+        shipsLost,
+      } = stats[player.userId];
+      return {
+        ...player,
+        ...stats[player.userId],
+        battleRatio: battlesWon / battlesLost,
+        shipRatio: shipsDestroyed / shipsLost,
+      };
+    });
+    const maxPlayers = {
+      [GameStatistics.BattleRatio]: maxBy(
+        playersWithStats,
+        p => p[GameStatistics.BattleRatio],
+      ),
+      [GameStatistics.ShipRatio]: maxBy(
+        playersWithStats,
+        p => p[GameStatistics.ShipRatio],
+      ),
+      [GameStatistics.ShipsProduced]: maxBy(
+        playersWithStats,
+        p => p[GameStatistics.ShipsProduced],
+      ),
+    };
+    function isMaxIn(player, statisticsName) {
+      return player.userId === maxPlayers[statisticsName].userId ||
+        player[statisticsName] === maxPlayers[statisticsName][statisticsName];
+    }
+    const extendedStats = playersWithStats.map(player => ({
+      ...player,
+      maxBattleRatio: isMaxIn(player, GameStatistics.BattleRatio),
+      maxShipRatio: isMaxIn(player, GameStatistics.ShipRatio),
+      maxShipProduction: isMaxIn(player, GameStatistics.ShipsProduced),
+    }));
+    return sortBy(extendedStats, s => s.deathTurn || Number.POSITIVE_INFINITY).reverse();
+  },
 );
 
 export { launchFleet, cancelFleet, endTurn } from './../../api';
