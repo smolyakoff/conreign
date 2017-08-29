@@ -10,6 +10,10 @@ export const GameplayErrorCode = {
   GameIsAlreadyInProgress: 'GameIsAlreadyInProgress',
 };
 
+export const ValidationErrorCode = {
+  BadInput: 'BadInput',
+};
+
 export class UserError extends BaseError {
   constructor(data) {
     super(data.message);

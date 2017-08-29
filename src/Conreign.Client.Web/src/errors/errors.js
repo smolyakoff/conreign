@@ -1,9 +1,12 @@
 import serializeError from 'serialize-error';
-import { negate, set, get } from 'lodash';
+import { negate, set, get, cond, matches } from 'lodash';
 import { combineEpics } from 'redux-observable';
 
+import { ValidationErrorCode, UserErrorCategory } from './../api';
 import { isFailedAsyncAction, isRouteAction } from '../framework';
 import { showNotification } from './../notifications';
+import SystemErrorNotification from './system-error-notification';
+import ValidationErrorNotification from './validation-error-notification';
 
 const INITIAL_STATE = {
   routingError: null,
@@ -54,6 +57,21 @@ function redirectOnRouteError(action$, state, { history }) {
     .ignoreElements();
 }
 
+
+const chooseErrorNotificationRenderer = cond([
+  [
+    matches({
+      category: UserErrorCategory.Validation,
+      code: ValidationErrorCode.BadInput,
+    }),
+    () => ValidationErrorNotification.name,
+  ],
+  [
+    () => true,
+    () => SystemErrorNotification.name,
+  ],
+]);
+
 function showErrorNotification(action$) {
   return action$
     .filter(action => action.error)
@@ -62,7 +80,7 @@ function showErrorNotification(action$) {
     .map(action => action.payload)
     .map(error => showNotification({
       content: error,
-      rendererName: 'ErrorNotification',
+      rendererName: chooseErrorNotificationRenderer(error),
     }));
 }
 

@@ -44,7 +44,7 @@ namespace Conreign.Api.Hubs
 
             _errorSerializer = JsonSerializer.Create(new JsonSerializerSettings
             {
-                TypeNameHandling = TypeNameHandling.All,
+                TypeNameHandling = TypeNameHandling.Objects,
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
             });
             _connectionsGauge = _logger.GaugeOperation("Hub.Connections", "connection(s)", () => Connections.Count);

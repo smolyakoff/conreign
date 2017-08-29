@@ -2,10 +2,14 @@ import React, { PropTypes } from 'react';
 
 import FooterLayout from './footer-layout';
 import { NotificationArea } from './../notifications';
-import { ErrorNotification } from './../errors';
+import {
+  SystemErrorNotification,
+  ValidationErrorNotification,
+} from './../errors';
 
 const NOTIFICATION_RENDERERS = {
-  ErrorNotification,
+  SystemErrorNotification,
+  ValidationErrorNotification,
 };
 
 export default function AppLayout({ children }) {

@@ -26,9 +26,9 @@ function NotificationArea({
             return (
               <Renderer
                 key={id}
-                {...content}
                 id={id}
-                onClose={onNotificationClick}
+                onClose={e => onNotificationClick(notification, e)}
+                {...content}
               />
             );
           })

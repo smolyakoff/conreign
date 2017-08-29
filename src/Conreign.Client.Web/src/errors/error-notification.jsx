@@ -1,23 +1,14 @@
 import React, { PropTypes } from 'react';
 import { noop } from 'lodash';
 
-import { Alert, ThemeColor, H2, Code } from './../theme';
+import { Alert, ThemeColor, Code } from './../theme';
 
 export default function ErrorNotification({
-  id,
-  name,
-  message,
+  children,
   stack,
   isWarning,
   onClose,
 }) {
-  const errorNotification = {
-    id,
-    name,
-    message,
-    stack,
-    isWarning,
-  };
   const themeColor = isWarning
     ? ThemeColor.Warning
     : ThemeColor.Error;
@@ -26,15 +17,10 @@ export default function ErrorNotification({
       className="u-window-box--medium"
       hasCloseButton
       themeColor={themeColor}
-      onClick={e => onClose(errorNotification, e)}
-      onCloseClick={e => onClose(errorNotification, e)}
+      onClick={onClose}
+      onCloseClick={onClose}
     >
-      <H2 className="u-window-box--none">
-        {name}
-      </H2>
-      <p>
-        {message}
-      </p>
+      {children}
       {
         stack && (
           <Code multiLine>
@@ -47,16 +33,13 @@ export default function ErrorNotification({
 }
 
 ErrorNotification.propTypes = {
-  id: PropTypes.string.isRequired,
-  name: PropTypes.string,
-  message: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
   stack: PropTypes.string,
   isWarning: PropTypes.bool,
   onClose: PropTypes.func,
 };
 
 ErrorNotification.defaultProps = {
-  name: 'Unexpected Error',
   stack: null,
   isWarning: false,
   onClose: noop,
