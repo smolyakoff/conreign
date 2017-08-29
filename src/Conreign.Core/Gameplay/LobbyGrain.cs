@@ -62,7 +62,6 @@ namespace Conreign.Core.Gameplay
         public async Task<IGame> StartGame(Guid userId)
         {
             var game = await _lobby.StartGame(userId);
-            // DeactivateOnIdle();
             return game;
         }
 
@@ -98,6 +97,7 @@ namespace Conreign.Core.Gameplay
         public override async Task OnDeactivateAsync()
         {
             await _subscription.UnsubscribeAsync();
+            await ClearStateAsync();
             await base.OnDeactivateAsync();
         }
 

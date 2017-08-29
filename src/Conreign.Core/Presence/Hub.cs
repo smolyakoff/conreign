@@ -45,7 +45,11 @@ namespace Conreign.Core.Presence
             var events = WithLeaderCheck(() =>
             {
                 var member = _state.Members.GetOrCreateDefault(userId);
-                member.ConnectionIds.Add(connectionId);
+                var added = member.ConnectionIds.Add(connectionId);
+                if (!added)
+                {
+                    return Enumerable.Empty<IClientEvent>();
+                }
                 var isFirstConnection = member.ConnectionIds.Count == 1;
                 return isFirstConnection ? Join(userId) : Enumerable.Empty<IClientEvent>();
             });
@@ -61,7 +65,11 @@ namespace Conreign.Core.Presence
             var events = WithLeaderCheck(() =>
             {
                 var member = _state.Members.GetOrCreateDefault(userId);
-                member.ConnectionIds.Remove(connectionId);
+                var removed = member.ConnectionIds.Remove(connectionId);
+                if (!removed)
+                {
+                    return Enumerable.Empty<IClientEvent>();
+                }
                 var noConnections = member.ConnectionIds.Count == 0;
                 return noConnections ? Leave(userId) : Enumerable.Empty<IClientEvent>();
             });

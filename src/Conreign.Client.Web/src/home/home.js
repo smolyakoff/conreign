@@ -4,6 +4,7 @@ import {
   isSucceededAsyncAction,
   getOriginalPayload,
   createFailedAsyncActionType,
+  createPendingAsyncActionType,
  } from '../framework';
 import {
   JOIN_ROOM,
@@ -15,6 +16,7 @@ import {
 } from '../errors';
 
 const JOIN_ROOM_FAILED = createFailedAsyncActionType(JOIN_ROOM);
+const JOIN_ROOM_PENDING = createPendingAsyncActionType(JOIN_ROOM);
 
 function joinRoom(action$, state, { apiDispatcher, history }) {
   return action$
@@ -41,11 +43,20 @@ const isGameInProgressErrorAction = conforms({
 });
 
 function reducer(state = initialState, action) {
-  if (isGameInProgressErrorAction(action)) {
-    return {
-      ...state,
-      busyRoomId: getOriginalPayload(action).roomId,
-    };
+  switch (action.type) {
+    case JOIN_ROOM_PENDING:
+      return {
+        ...state,
+        busyRoomId: null,
+      };
+    default: {
+      if (isGameInProgressErrorAction(action)) {
+        return {
+          ...state,
+          busyRoomId: getOriginalPayload(action).roomId,
+        };
+      }
+    }
   }
   return state;
 }

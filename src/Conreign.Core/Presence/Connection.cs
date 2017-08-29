@@ -31,13 +31,9 @@ namespace Conreign.Core.Presence
             {
                 throw new ArgumentException("Topic id cannot be null or empty.", nameof(topicId));
             }
-            if (_state.TopicId == topicId)
-            {
-                return;
-            }
             var previousTopicId = _state.TopicId;
             ITopic topic;
-            if (previousTopicId != null)
+            if (previousTopicId != null && previousTopicId != topicId)
             {
                 topic = await _topicFactory.Create(previousTopicId);
                 await topic.Send(new Disconnected(_state.ConnectionId));
