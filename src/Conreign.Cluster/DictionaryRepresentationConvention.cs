@@ -2,9 +2,9 @@
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Bson.Serialization.Options;
 
-namespace Microsoft.Orleans.Storage.Conventions
+namespace Conreign.Cluster
 {
-    public class DictionaryRepresentationConvention : ConventionBase, IMemberMapConvention
+    internal class DictionaryRepresentationConvention : ConventionBase, IMemberMapConvention
     {
         private readonly DictionaryRepresentation _dictionaryRepresentation;
 

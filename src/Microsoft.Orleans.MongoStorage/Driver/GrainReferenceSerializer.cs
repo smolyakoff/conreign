@@ -9,7 +9,7 @@ using MongoDB.Bson.Serialization.Serializers;
 using Orleans;
 using Orleans.Runtime;
 
-namespace Microsoft.Orleans.Storage.Serialization
+namespace Microsoft.Orleans.MongoStorage.Driver
 {
     public class GrainReferenceSerializer : SerializerBase<GrainReference>
     {

@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Orleans.Storage
+﻿namespace Microsoft.Orleans.MongoStorage
 {
     public enum MongoStorageCode
     {

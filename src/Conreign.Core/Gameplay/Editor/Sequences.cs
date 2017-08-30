@@ -93,7 +93,7 @@ namespace Conreign.Core.Gameplay.Editor
             }
         }
 
-        public static IEnumerable<long> NumbersRangeLong(long start, long count)
+        public static IEnumerable<int> NumbersRangeLong(int start, int count)
         {
             for (var i = start; i < start + count; i++)
             {

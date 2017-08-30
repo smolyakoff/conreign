@@ -26,7 +26,7 @@ namespace Conreign.Core.Gameplay.Validators
                 .Must(BeEnoughShips);
         }
 
-        private static bool NotBeTheSameAsFrom(FleetData fleet, long to)
+        private static bool NotBeTheSameAsFrom(FleetData fleet, int to)
         {
             return to != fleet.From;
         }
@@ -37,12 +37,12 @@ namespace Conreign.Core.Gameplay.Validators
             return availableShips >= ships;
         }
 
-        private bool Exist(long coordinate)
+        private bool Exist(int coordinate)
         {
             return _map.ContainsPlanet(coordinate);
         }
 
-        private bool BelongToSender(long coordinate)
+        private bool BelongToSender(int coordinate)
         {
             return _map[coordinate].OwnerId == _senderId;
         }

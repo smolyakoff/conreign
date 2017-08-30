@@ -100,7 +100,7 @@ namespace Conreign.Core.Gameplay.Editor
             _map[freeCoordinate] = planet;
         }
 
-        private IEnumerable<KeyValuePair<long, PlanetData>> GeneratePlanets()
+        private IEnumerable<KeyValuePair<int, PlanetData>> GeneratePlanets()
         {
             var totalCells = _map.CellsCount;
             var totalPlanets = _state.NeutralPlanetsCount + _state.Players.Count;
@@ -112,14 +112,14 @@ namespace Conreign.Core.Gameplay.Editor
             return planets;
         }
 
-        private KeyValuePair<long, PlanetData> GeneratePlanet(long coordinate, int index)
+        private KeyValuePair<int, PlanetData> GeneratePlanet(int coordinate, int index)
         {
             _namesEnumerator.MoveNext();
             var name = _namesEnumerator.Current;
             var planet = index < _state.Players.Count
                 ? _playerPlanetGenerator.Generate(name, _state.Players[index])
                 : _neutralPlanetGenerator.Generate(name, null);
-            return new KeyValuePair<long, PlanetData>(coordinate, planet);
+            return new KeyValuePair<int, PlanetData>(coordinate, planet);
         }
     }
 }

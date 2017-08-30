@@ -1,7 +1,10 @@
 ﻿using System;
-using Conreign.Cluster.Storage;
+using System.Collections.Generic;
+using System.Reflection;
+using Conreign.Core.Auth;
 using Conreign.Core.Contracts.Communication;
-using Microsoft.Orleans.Storage;
+using Conreign.Core.Gameplay;
+using Microsoft.Orleans.MongoStorage.Configuration;
 using Orleans.Runtime.Configuration;
 
 namespace Conreign.Cluster
@@ -28,8 +31,11 @@ namespace Conreign.Cluster
                         conreignConfiguration.DataStorageConnectionString);
                     break;
                 case StorageType.MongoDb:
-                    orleansConfig.AddMongoDbStorageProvider("Default", 
-                        conreignConfiguration.DataStorageConnectionString);
+                    var grainAssemblies = new List<Assembly> { typeof(GameGrain).Assembly };
+                    var options = new MongoStorageOptions(
+                        conreignConfiguration.DataStorageConnectionString,
+                        grainAssemblies);
+                    orleansConfig.AddMongoDbStorageProvider("Default", options);
                     break;
                 case StorageType.InMemory:
                     orleansConfig.AddMemoryStorageProvider("Default");

@@ -3,9 +3,9 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Orleans.Runtime;
 
-namespace Microsoft.Orleans.Storage
+namespace Microsoft.Orleans.MongoStorage
 {
-    internal static class Keys
+    internal static class Naming
     {
         public static string CollectionNameForGrain(string grainType, string prefix)
         {

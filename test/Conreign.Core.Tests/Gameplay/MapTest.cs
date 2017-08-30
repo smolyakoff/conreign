@@ -30,7 +30,7 @@ namespace Conreign.Core.Tests.Gameplay
             Assert.Equal(destination.Position, route[route.Count - 1]);
 
             // Assert uniqueness
-            Assert.Equal(new HashSet<long>(route).Count, route.Count);
+            Assert.Equal(new HashSet<int>(route).Count, route.Count);
 
             // Assert adjacency
             for (var i = 1; i < route.Count; i++)

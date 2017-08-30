@@ -4,17 +4,21 @@ namespace Conreign.Core.Gameplay
 {
     public struct Coordinate : IEquatable<Coordinate>
     {
-        public Coordinate(long position, int width, int height)
+        public Coordinate(int position, int width, int height)
         {
             if (width <= 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(width), $"Width should be 1 or greater.");
+                throw new ArgumentOutOfRangeException(nameof(width), "Width should be 1 or greater.");
             }
             if (height <= 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(height), "Height should be 1 or greater.");
             }
-            var maxPosition = width*height - 1;
+            if ((width * height) / height != height)
+            {
+                throw new ArgumentOutOfRangeException(nameof(width), "Map is too big.");
+            }
+            var maxPosition = width * height - 1;
             if (position < 0 || position > maxPosition)
             {
                 throw new ArgumentOutOfRangeException(nameof(position),
@@ -48,11 +52,11 @@ namespace Conreign.Core.Gameplay
             Position = x + y*width;
         }
 
-        public long Position { get; }
+        public int Position { get; }
         public int Width { get; }
         public int Height { get; }
-        public int X => (int) (Position%Width);
-        public int Y => (int) (Position/Width);
+        public int X => Position % Width;
+        public int Y => Position / Width;
 
         public Coordinate Move(int x, int y)
         {

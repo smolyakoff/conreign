@@ -7,7 +7,7 @@
     <ProjectGuid>{BA953785-1EFC-461E-9227-AD3E4C07EE7C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Microsoft.Orleans.Storage</RootNamespace>
+    <RootNamespace>Microsoft.Orleans.MongoStorage</RootNamespace>
     <AssemblyName>Microsoft.Orleans.MongoStorage</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -36,20 +36,20 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClusterConfigurationExtensions.cs" />
-    <Compile Include="Keys.cs" />
-    <Compile Include="ConversionExtensions.cs" />
+    <Compile Include="AssemblyLookupExtensions.cs" />
+    <Compile Include="Configuration\ClusterConfigurationExtensions.cs" />
+    <Compile Include="Naming.cs" />
+    <Compile Include="Model\GrainStateConversionExtensions.cs" />
     <Compile Include="MongoStorageCode.cs" />
     <Compile Include="MongoStorage.cs" />
-    <Compile Include="MongoStorageOptions.cs" />
-    <Compile Include="MongoGrain.cs" />
-    <Compile Include="MongoGrainMeta.cs" />
+    <Compile Include="Configuration\MongoStorageOptions.cs" />
+    <Compile Include="Model\MongoGrain.cs" />
+    <Compile Include="Model\MongoGrainMeta.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Serialization\GrainReferenceSerializer.cs" />
-    <Compile Include="Serialization\OrleansSerializerProvider.cs" />
-    <Compile Include="Validator.cs" />
+    <Compile Include="Driver\GrainReferenceSerializer.cs" />
+    <Compile Include="Configuration\MongoStorageOptionsExtensions.cs" />
+    <Compile Include="Driver\OrleansSerializerProvider.cs" />
     <Compile Include="xxHash.cs" />
-    <Compile Include="Conventions\DictionaryRepresentationConvention.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="paket.references" />

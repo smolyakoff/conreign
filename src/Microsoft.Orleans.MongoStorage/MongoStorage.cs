@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Orleans.Storage.Conventions;
-using Microsoft.Orleans.Storage.Serialization;
+using Microsoft.Orleans.MongoStorage.Configuration;
+using Microsoft.Orleans.MongoStorage.Driver;
+using Microsoft.Orleans.MongoStorage.Model;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Bson.Serialization.Options;
@@ -11,16 +13,13 @@ using Orleans.Providers;
 using Orleans.Runtime;
 using Orleans.Storage;
 
-namespace Microsoft.Orleans.Storage
+namespace Microsoft.Orleans.MongoStorage
 {
     public class MongoStorage : IStorageProvider
     {
-        private static bool _isInitialized;
-
+        private static bool _isDriverInitialized;
         private MongoClient _client;
-
         private IMongoDatabase _database;
-
         private MongoStorageOptions _options;
         private Guid _serviceId;
 
@@ -30,18 +29,32 @@ namespace Microsoft.Orleans.Storage
 
         public Task Init(string name, IProviderRuntime providerRuntime, IProviderConfiguration config)
         {
-            EnsureInitialized();
+            EnsureDriverInitialized();
             Name = name;
             _serviceId = providerRuntime.ServiceId;
             Log = providerRuntime.GetLogger($"Storage.MongoStorage.{_serviceId}");
             if (Log.IsVerbose3)
             {
-                Log.Verbose3("Going to initialize mongo storage client.");
+                Log.Verbose3("Going to initialize MongoDB storage.");
             }
-            _options = MongoStorageOptions.Create(config);
+            _options = config.DeserializeToMongoStorageOptions();
+            MongoUrl mongoUrl;
+            try
+            {
+                mongoUrl = MongoUrl.Create(_options.ConnectionString);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Invalid MongoDB connection string, failed to initialize.", ex);
+            }
             _client = new MongoClient(_options.ConnectionString);
-            _database = _client.GetDatabase(_options.DatabaseName);
-            LogInfo($"Initialized mongo client with options: {_options}", MongoStorageCode.InfoInit);
+            _database = _client.GetDatabase(mongoUrl.DatabaseName);
+            // Register class maps if they are not registered yet
+            foreach (var grainStateType in _options.GrainAssemblies.SelectMany(a => a.GetGrainStateTypes()))
+            {
+                BsonClassMap.LookupClassMap(grainStateType);
+            }
+            LogInfo($"Initialized MongoDB storage with options: {_options}.", MongoStorageCode.InfoInit);
             return TaskDone.Done;
         }
 
@@ -49,7 +62,7 @@ namespace Microsoft.Orleans.Storage
         {
             _client = null;
             _database = null;
-            LogInfo("Closed mongo storage provider.");
+            LogInfo("Closed MongoDB storage.");
             return TaskDone.Done;
         }
 
@@ -59,9 +72,9 @@ namespace Microsoft.Orleans.Storage
             var meta = grainState.ToGrainMeta(grainReference, grainType, _serviceId);
             try
             {
-                var collectionName = Keys.CollectionNameForGrain(grainType, _options.CollectionNamePrefix);
+                var collectionName = Naming.CollectionNameForGrain(grainType, _options.CollectionNamePrefix);
                 var collection = _database.GetCollection<MongoGrain>(collectionName);
-                var id = Keys.PrimaryKeyForGrain(_serviceId, grainReference);
+                var id = Naming.PrimaryKeyForGrain(_serviceId, grainReference);
                 LogVerbose3($"Reading data: {meta}", MongoStorageCode.TraceReading);
                 var doc = await collection.Find(x => x.Id == id).FirstOrDefaultAsync();
                 if (doc == null)
@@ -86,7 +99,7 @@ namespace Microsoft.Orleans.Storage
             var meta = grainState.ToGrainMeta(grainReference, grainType, _serviceId);
             try
             {
-                var collectionName = Keys.CollectionNameForGrain(grainType, _options.CollectionNamePrefix);
+                var collectionName = Naming.CollectionNameForGrain(grainType, _options.CollectionNamePrefix);
                 var collection = _database.GetCollection<MongoGrain>(collectionName);
                 LogVerbose3($"Writing data: {meta}", MongoStorageCode.TraceWriting);
                 if (string.IsNullOrEmpty(grainState.ETag))
@@ -98,7 +111,7 @@ namespace Microsoft.Orleans.Storage
                 }
                 else
                 {
-                    var id = Keys.PrimaryKeyForGrain(_serviceId, grainReference);
+                    var id = Naming.PrimaryKeyForGrain(_serviceId, grainReference);
                     // Update data and generate new timestamp
                     var update = Builders<MongoGrain>.Update
                         .Set(x => x.Data, grainState.State)
@@ -136,10 +149,10 @@ namespace Microsoft.Orleans.Storage
             var meta = grainState.ToGrainMeta(grainReference, grainType, _serviceId);
             try
             {
-                var collectionName = Keys.CollectionNameForGrain(grainType, _options.CollectionNamePrefix);
+                var collectionName = Naming.CollectionNameForGrain(grainType, _options.CollectionNamePrefix);
                 var collection = _database.GetCollection<MongoGrain>(collectionName);
                 LogVerbose3($"Deleting data: {meta}", MongoStorageCode.TraceDeleting);
-                var id = Keys.PrimaryKeyForGrain(_serviceId, grainReference);
+                var id = Naming.PrimaryKeyForGrain(_serviceId, grainReference);
                 await collection.DeleteOneAsync(x => x.Id == id);
                 grainState.ETag = null;
                 LogVerbose3($"Deleted data: {meta}", MongoStorageCode.TraceDelete);
@@ -151,18 +164,13 @@ namespace Microsoft.Orleans.Storage
             }
         }
 
-        public static void EnsureInitialized()
+        private static void EnsureDriverInitialized()
         {
-            if (_isInitialized)
+            if (_isDriverInitialized)
             {
                 return;
             }
-            _isInitialized = true;
-            var conventions = new ConventionPack
-            {
-                new DictionaryRepresentationConvention(DictionaryRepresentation.ArrayOfArrays)
-            };
-            ConventionRegistry.Register("Orleans", conventions, x => true);
+            _isDriverInitialized = true;
             BsonSerializer.RegisterSerializationProvider(new OrleansSerializerProvider());
         }
 
@@ -172,7 +180,7 @@ namespace Microsoft.Orleans.Storage
             {
                 LogWarn("Invoked ReadStateAsync() when database instance is null.",
                     MongoStorageCode.ErrorInvalidOperation);
-                throw new ObjectDisposedException($"MongoProvider has been already closed.");
+                throw new ObjectDisposedException("MongoProvider has been already closed.");
             }
         }
 

@@ -1,12 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using Orleans.Runtime.Configuration;
 
-namespace Microsoft.Orleans.Storage
+namespace Microsoft.Orleans.MongoStorage.Configuration
 {
     public static class ClusterConfigurationExtensions
     {
-        public static void AddMongoDbStorageProvider(this ClusterConfiguration config, string providerName = "Default", string connectionString = null) 
+        public static void AddMongoDbStorageProvider(
+            this ClusterConfiguration config,
+            string providerName = "Default",
+            MongoStorageOptions options = null) 
         {
             if (config == null)
             {
@@ -16,10 +18,8 @@ namespace Microsoft.Orleans.Storage
             {
                 throw new ArgumentException("Provider name cannot be null or whitespace.", nameof(providerName));
             }
-            config.Globals.RegisterStorageProvider<MongoStorage>(providerName, new Dictionary<string, string>
-            {
-                ["ConnectionString"] = connectionString
-            });
+            options = options ?? new MongoStorageOptions();
+            config.Globals.RegisterStorageProvider<MongoStorage>(providerName, options.ToDictionary());
         }
     }
 }

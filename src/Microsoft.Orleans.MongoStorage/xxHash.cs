@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using System;
 
-namespace Microsoft.Orleans.Storage
+namespace Microsoft.Orleans.MongoStorage
 {
     public class xxHash
     {

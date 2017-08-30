@@ -5,7 +5,7 @@ using Conreign.Core.Contracts.Gameplay.Data;
 
 namespace Conreign.Core.Gameplay
 {
-    public class Map : IEnumerable<KeyValuePair<long, PlanetData>>
+    public class Map : IEnumerable<KeyValuePair<int, PlanetData>>
     {
         private readonly MapData _state;
 
@@ -16,10 +16,10 @@ namespace Conreign.Core.Gameplay
 
         public int Width => _state.Width;
         public int Height => _state.Height;
-        public long FreeCellsCount => CellsCount - _state.Planets.Count;
-        public long CellsCount => (long) _state.Width*_state.Height;
+        public int FreeCellsCount => CellsCount - _state.Planets.Count;
+        public int CellsCount => _state.Width*_state.Height;
 
-        public long MaxDistance
+        public int MaxDistance
         {
             get
             {
@@ -30,7 +30,7 @@ namespace Conreign.Core.Gameplay
 
         public IEnumerable<PlanetData> Planets => _state.Planets.Values;
 
-        public PlanetData this[long position]
+        public PlanetData this[int position]
         {
             get
             {
@@ -68,12 +68,12 @@ namespace Conreign.Core.Gameplay
             }
         }
 
-        public bool ContainsPlanet(long position)
+        public bool ContainsPlanet(int position)
         {
             return _state.Planets.ContainsKey(position);
         }
 
-        public long CalculateDistance(long from, long to)
+        public int CalculateDistance(int from, int to)
         {
             EnsurePositionIsValid(from);
             EnsurePositionIsValid(to);
@@ -85,7 +85,7 @@ namespace Conreign.Core.Gameplay
             return distanceX + distanceY + 1;
         }
 
-        public List<long> GenerateRoute(long from, long to)
+        public List<int> GenerateRoute(int from, int to)
         {
             EnsurePositionIsValid(from);
             EnsurePositionIsValid(to);
@@ -96,7 +96,7 @@ namespace Conreign.Core.Gameplay
             var distanceY = Math.Abs(destination.Y - source.Y);
             var currentPosition = source.Position;
             var destinationPosition = destination.Position;
-            var path = new List<long>(distanceX + distanceY + 1) {currentPosition};
+            var path = new List<int>(distanceX + distanceY + 1) {currentPosition};
             var dx = destination.X >= source.X ? 1 : -1;
             var dy = destination.Y >= source.Y ? Width : -Width;
             (var delta, var nextDelta) = distanceX > distanceY ? (dx, dy) : (dy, dx);
@@ -134,7 +134,7 @@ namespace Conreign.Core.Gameplay
             _state.Height = height;
         }
 
-        public IEnumerator<KeyValuePair<long, PlanetData>> GetEnumerator()
+        public IEnumerator<KeyValuePair<int, PlanetData>> GetEnumerator()
         {
             return _state.Planets.GetEnumerator();
         }
@@ -156,7 +156,7 @@ namespace Conreign.Core.Gameplay
             }
         }
 
-        private void EnsurePositionIsValid(long coordinate)
+        private void EnsurePositionIsValid(int coordinate)
         {
             if (coordinate < 0 || coordinate >= CellsCount)
             {
