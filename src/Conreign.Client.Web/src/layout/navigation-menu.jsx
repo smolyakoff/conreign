@@ -7,15 +7,17 @@ import { Nav, NavItem, NavContent, Icon } from './../theme';
 export default function NavigationMenu(props) {
   return (
     <Nav {...props} inline>
-      <NavItem>
-        <Link to="/">Home</Link>
-      </NavItem>
+      <Link to="/">
+        <NavItem>
+          Home
+        </NavItem>
+      </Link>
       <NavContent className="u-window-box--small">
         <Icon name={logo} />
       </NavContent>
-      <NavItem>
-        <Link to="/$/rules">Rules</Link>
-      </NavItem>
+      <Link to="/$/rules">
+        <NavItem>Rules</NavItem>
+      </Link>
     </Nav>
   );
 }
