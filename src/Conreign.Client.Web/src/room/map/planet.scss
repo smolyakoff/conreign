@@ -14,6 +14,9 @@ $icon-margin: 15%;
     text-shadow: 1px 1px $color-black;
     z-index: 2;
     position: relative;
+    @include screen--large-and-up {
+      font-size: $text-font-size-xlarge;
+    }
     font-size: $text-font-size-large;
   }
 
@@ -52,6 +55,9 @@ $icon-margin: 15%;
 
   &--mode-lobby {
     .c-planet__footer {
+      @include screen--large-and-up {
+        font-size: $text-font-size-small;
+      }
       font-size: $text-font-size-xsmall;
     }
   }

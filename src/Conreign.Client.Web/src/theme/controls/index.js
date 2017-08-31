@@ -9,6 +9,7 @@ export { default as IconButton } from './icon-button';
 export * from './input';
 export { default as InputGroup } from './input-group';
 export * from './text';
+export * from './list';
 export * from './grid';
 export * from './flex-table';
 export * from './table';

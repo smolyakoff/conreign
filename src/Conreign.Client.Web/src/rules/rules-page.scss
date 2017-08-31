@@ -1,0 +1,10 @@
+@import "./../theme/variables";
+
+.c-planet-info-table {
+  border-spacing: 0 1em;
+  border-collapse: separate;
+  tbody > tr > td:first-child {
+    background-color: $color-default;
+    white-space: nowrap;
+  }
+}

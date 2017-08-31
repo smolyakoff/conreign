@@ -10,6 +10,7 @@ import { AppLayout, NavigationMenuLayout } from './../layout';
 import { ErrorPage, ERROR_PAGE_PATH } from './../errors';
 import { HomePage } from './../home';
 import { RoomPage } from './../room';
+import RulesPage from './../rules';
 
 export default function RouterContainer({ history }, { store }) {
   function collectRouteActions(nextState) {
@@ -56,6 +57,7 @@ export default function RouterContainer({ history }, { store }) {
             onEnter={onRouteEnter}
           >
             <IndexRoute component={HomePage} />
+            <Route path="/$/rules" component={RulesPage} />
             <Route path="/:roomId" component={RoomPage} />
           </Route>
           <Route path={ERROR_PAGE_PATH} component={ErrorPage} />

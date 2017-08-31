@@ -14,7 +14,7 @@ export default function NavigationMenu(props) {
         <Icon name={logo} />
       </NavContent>
       <NavItem>
-        <Link to="/rules">Rules</Link>
+        <Link to="/$/rules">Rules</Link>
       </NavItem>
     </Nav>
   );
