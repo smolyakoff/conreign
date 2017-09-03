@@ -27,7 +27,6 @@ namespace Conreign.Host.Azure
             {
                 throw new InvalidOperationException("Silo was not started.");
             }
-            conreignSilo.Initialize();
             _silo.Run();
         }
 
