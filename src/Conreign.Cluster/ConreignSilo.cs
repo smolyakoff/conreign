@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Conreign.Core.Auth;
 using Conreign.Core.Contracts.Communication;
 using Conreign.Core.Gameplay;
 using Microsoft.Orleans.MongoStorage.Configuration;
@@ -24,6 +23,7 @@ namespace Conreign.Cluster
             orleansConfig.Globals.DataConnectionStringForReminders = conreignConfiguration.SystemStorageConnectionString;
             orleansConfig.AddSimpleMessageStreamProvider(StreamConstants.ProviderName);
             orleansConfig.AddMemoryStorageProvider("PubSubStore");
+            orleansConfig.Globals.RegisterBootstrapProvider<MongoDriverBootstrapProvider>("MongoDriver");
             switch (conreignConfiguration.DataStorageType)
             {
                 case StorageType.AzureTable:
@@ -50,11 +50,6 @@ namespace Conreign.Cluster
         {
             OrleansConfiguration = orleansConfiguration;
             Configuration = configuration;
-        }
-
-        public void Initialize()
-        {
-            MongoDriverConfiguration.EnsureInitialized();
         }
     }
 }

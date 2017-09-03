@@ -45,7 +45,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StorageType.cs" />
     <Compile Include="DictionaryRepresentationConvention.cs" />
-    <Compile Include="MongoDriverConfiguration.cs" />
+    <Compile Include="MongoDriverBootstrapProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="paket.references" />

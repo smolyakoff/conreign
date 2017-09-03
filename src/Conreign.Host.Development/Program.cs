@@ -55,7 +55,6 @@ namespace Conreign.Host.Development
             var started = _silo.StartOrleansSilo();
             if (started)
             {
-                cluster.Initialize();
                 return;
             }
             var message = $"Failed to start Orleans silo '{_silo.Name}' as a {_silo.Type}.";

@@ -5,8 +5,6 @@ using Microsoft.Orleans.MongoStorage.Configuration;
 using Microsoft.Orleans.MongoStorage.Driver;
 using Microsoft.Orleans.MongoStorage.Model;
 using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Conventions;
-using MongoDB.Bson.Serialization.Options;
 using MongoDB.Driver;
 using Orleans;
 using Orleans.Providers;
@@ -17,7 +15,8 @@ namespace Microsoft.Orleans.MongoStorage
 {
     public class MongoStorage : IStorageProvider
     {
-        private static bool _isDriverInitialized;
+        private bool _isDriverInitialized;
+        private readonly object _driverInitializationLock = new object();
         private MongoClient _client;
         private IMongoDatabase _database;
         private MongoStorageOptions _options;
@@ -29,7 +28,6 @@ namespace Microsoft.Orleans.MongoStorage
 
         public Task Init(string name, IProviderRuntime providerRuntime, IProviderConfiguration config)
         {
-            EnsureDriverInitialized();
             Name = name;
             _serviceId = providerRuntime.ServiceId;
             Log = providerRuntime.GetLogger($"Storage.MongoStorage.{_serviceId}");
@@ -49,11 +47,6 @@ namespace Microsoft.Orleans.MongoStorage
             }
             _client = new MongoClient(_options.ConnectionString);
             _database = _client.GetDatabase(mongoUrl.DatabaseName);
-            // Register class maps if they are not registered yet
-            foreach (var grainStateType in _options.GrainAssemblies.SelectMany(a => a.GetGrainStateTypes()))
-            {
-                BsonClassMap.LookupClassMap(grainStateType);
-            }
             LogInfo($"Initialized MongoDB storage with options: {_options}.", MongoStorageCode.InfoInit);
             return TaskDone.Done;
         }
@@ -69,6 +62,7 @@ namespace Microsoft.Orleans.MongoStorage
         public async Task ReadStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
         {
             EnsureNotClosed();
+            EnsureDriverInitialized();
             var meta = grainState.ToGrainMeta(grainReference, grainType, _serviceId);
             try
             {
@@ -96,6 +90,7 @@ namespace Microsoft.Orleans.MongoStorage
         public async Task WriteStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
         {
             EnsureNotClosed();
+            EnsureDriverInitialized();
             var meta = grainState.ToGrainMeta(grainReference, grainType, _serviceId);
             try
             {
@@ -146,6 +141,7 @@ namespace Microsoft.Orleans.MongoStorage
         public async Task ClearStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
         {
             EnsureNotClosed();
+            EnsureDriverInitialized();
             var meta = grainState.ToGrainMeta(grainReference, grainType, _serviceId);
             try
             {
@@ -164,14 +160,24 @@ namespace Microsoft.Orleans.MongoStorage
             }
         }
 
-        private static void EnsureDriverInitialized()
+        // Driver is initialized late to give chance for custom conventions and class maps to be registered
+        // StorageProvider Init() is called before any custom bootstrap provider
+        private void EnsureDriverInitialized()
         {
             if (_isDriverInitialized)
             {
                 return;
             }
-            _isDriverInitialized = true;
-            BsonSerializer.RegisterSerializationProvider(new OrleansSerializerProvider());
+            lock (_driverInitializationLock)
+            {
+                BsonSerializer.RegisterSerializationProvider(new OrleansSerializerProvider());
+                // Register class maps if they are not registered yet
+                foreach (var grainStateType in _options.GrainAssemblies.SelectMany(a => a.GetGrainStateTypes()))
+                {
+                    BsonClassMap.LookupClassMap(grainStateType);
+                }
+                _isDriverInitialized = true;
+            }
         }
 
         private void EnsureNotClosed()

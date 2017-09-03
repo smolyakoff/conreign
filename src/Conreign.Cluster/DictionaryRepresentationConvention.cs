@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson.Serialization;
+﻿using System;
+using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Bson.Serialization.Options;
 
@@ -15,6 +16,7 @@ namespace Conreign.Cluster
 
         public void Apply(BsonMemberMap memberMap)
         {
+            Console.WriteLine(memberMap.ClassMap.ClassType);
             memberMap.SetSerializer(ConfigureSerializer(memberMap.GetSerializer()));
         }
 

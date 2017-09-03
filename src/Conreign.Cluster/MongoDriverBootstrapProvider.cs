@@ -1,21 +1,17 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using Conreign.Core.Contracts.Communication;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Bson.Serialization.Options;
+using Orleans.Providers;
 
 namespace Conreign.Cluster
 {
-    public static class MongoDriverConfiguration
+    internal class MongoDriverBootstrapProvider : IBootstrapProvider
     {
-        private static bool _isInitialized;
-
-        public static void EnsureInitialized()
+        public Task Init(string name, IProviderRuntime providerRuntime, IProviderConfiguration config)
         {
-            if (_isInitialized)
-            {
-                return;
-            }
             var contractsAssembly = typeof(IClientEvent).Assembly;
             var eventTypes = contractsAssembly
                 .GetExportedTypes()
@@ -30,10 +26,17 @@ namespace Conreign.Cluster
                 new DictionaryRepresentationConvention(DictionaryRepresentation.ArrayOfArrays),
             };
             ConventionRegistry.Register(
-                "Conreign", 
-                conventionPack, 
-                t => t.Namespace != null && t.Namespace.StartsWith("Conreign"));
-            _isInitialized = true;          
+                "Conreign",
+                conventionPack,
+                t => true);
+            return Task.FromResult(0);
         }
+
+        public Task Close()
+        {
+            return Task.FromResult(0);
+        }
+
+        public string Name { get; } = "MongoDriverBootstrapProvider";
     }
 }
