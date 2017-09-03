@@ -15,10 +15,10 @@ namespace Microsoft.Orleans.MongoStorage
 {
     public class MongoStorage : IStorageProvider
     {
-        private bool _isDriverInitialized;
         private readonly object _driverInitializationLock = new object();
         private MongoClient _client;
         private IMongoDatabase _database;
+        private bool _isDriverInitialized;
         private MongoStorageOptions _options;
         private Guid _serviceId;
 
@@ -173,9 +173,7 @@ namespace Microsoft.Orleans.MongoStorage
                 BsonSerializer.RegisterSerializationProvider(new OrleansSerializerProvider());
                 // Register class maps if they are not registered yet
                 foreach (var grainStateType in _options.GrainAssemblies.SelectMany(a => a.GetGrainStateTypes()))
-                {
                     BsonClassMap.LookupClassMap(grainStateType);
-                }
                 _isDriverInitialized = true;
             }
         }

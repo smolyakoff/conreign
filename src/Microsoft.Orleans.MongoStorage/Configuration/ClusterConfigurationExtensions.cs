@@ -8,7 +8,7 @@ namespace Microsoft.Orleans.MongoStorage.Configuration
         public static void AddMongoDbStorageProvider(
             this ClusterConfiguration config,
             string providerName = "Default",
-            MongoStorageOptions options = null) 
+            MongoStorageOptions options = null)
         {
             if (config == null)
             {

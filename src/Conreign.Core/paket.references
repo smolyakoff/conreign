@@ -1,11 +1,2 @@
 System.ValueTuple
-System.Reactive.Core
-System.Reactive.Linq
-Microsoft.Tpl.Dataflow
-Polly
-Serilog
-SerilogMetrics
-SimpleInjector
-JWT
 FluentValidation
-Microsoft.Orleans.OrleansCodeGenerator.Build

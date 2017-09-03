@@ -1,11 +1,10 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.12
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Core.Contracts", "src\Conreign.Core.Contracts\Conreign.Core.Contracts.csproj", "{00409622-346B-4926-B745-E5F595BD3BB7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Contracts", "src\Conreign.Contracts\Conreign.Contracts.csproj", "{00409622-346B-4926-B745-E5F595BD3BB7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Core", "src\Conreign.Core\Conreign.Core.csproj", "{DFDBF49B-30FA-424E-9AD2-85B35F39A053}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Server", "src\Conreign.Server\Conreign.Server.csproj", "{DFDBF49B-30FA-424E-9AD2-85B35F39A053}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "App", "App", "{420E0885-10E8-44C7-899B-FF39004DEADE}"
 EndProject
@@ -23,9 +22,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Host", "Host", "{2397B05B-F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Experiments", "src\Conreign.Experiments\Conreign.Experiments.csproj", "{D2AD8837-45D2-4DA4-A1E2-6D4F6651B5DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Core.Tests", "test\Conreign.Core.Tests\Conreign.Core.Tests.csproj", "{C686208A-C834-4679-AE0D-9B01AEEE69DD}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Api", "src\Conreign.Api\Conreign.Api.csproj", "{02028666-9775-48C2-BEFF-A16F4DABE704}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Server.Api", "src\Conreign.Server.Api\Conreign.Server.Api.csproj", "{02028666-9775-48C2-BEFF-A16F4DABE704}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Client.SignalR", "src\Conreign.Client.SignalR\Conreign.Client.SignalR.csproj", "{F7B51B22-239C-4507-A0B7-B9F7199C060F}"
 EndProject
@@ -37,15 +34,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Azure", "Azure", "{461F0F71
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Local", "Local", "{B0E35D13-E3A0-4C9A-BE64-4AD54370A274}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Host.Azure", "src\Conreign.Host.Azure\Conreign.Host.Azure.csproj", "{5D54B9E4-56B3-4083-BEA1-BB3EA25069C1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Server.Host.Azure.Silo", "src\Conreign.Server.Host.Azure.Silo\Conreign.Server.Host.Azure.Silo.csproj", "{5D54B9E4-56B3-4083-BEA1-BB3EA25069C1}"
 EndProject
-Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "Conreign.Api.Azure", "src\Conreign.Api.Azure\Conreign.Api.Azure.ccproj", "{287775A1-6A4A-4B0C-A3BD-C56BCCE90D31}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Api.Host.Azure", "src\Conreign.Api.Host.Azure\Conreign.Api.Host.Azure.csproj", "{A29CEA9B-0EA4-487F-838E-25CB696276DF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Server.Host.Azure.Api", "src\Conreign.Server.Host.Azure.Api\Conreign.Server.Host.Azure.Api.csproj", "{A29CEA9B-0EA4-487F-838E-25CB696276DF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.LoadTest", "src\Conreign.LoadTest\Conreign.LoadTest.csproj", "{434AFA37-5C10-42CA-922F-F9772FDC8574}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Cluster", "src\Conreign.Cluster\Conreign.Cluster.csproj", "{93FBA3E0-25AD-498F-A17E-B79BE6410CFB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Server.Silo", "src\Conreign.Server.Silo\Conreign.Server.Silo.csproj", "{93FBA3E0-25AD-498F-A17E-B79BE6410CFB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Utility.Configuration", "src\Conreign.Utility.Configuration\Conreign.Utility.Configuration.csproj", "{33D5CDCB-B448-4D96-A956-5BC731BEF3FA}"
 EndProject
@@ -81,9 +76,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Research", "Research", "{01
 		research\notebook.fsx = research\notebook.fsx
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Host.Development", "src\Conreign.Host.Development\Conreign.Host.Development.csproj", "{764D9960-6EA5-42BF-B1E0-95837AC656BB}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Load Test", "Load Test", "{7994B3D5-21E4-4FDF-BD66-9EB6D5542096}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Server.Contracts", "src\Conreign.Server.Contracts\Conreign.Server.Contracts.csproj", "{060324B4-145F-4989-9B72-4B908A6C46CF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Client.Contracts", "src\Conreign.Client.Contracts\Conreign.Client.Contracts.csproj", "{9764E726-5E8C-4A53-8221-9A452F1C7CE9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Core", "src\Conreign.Core\Conreign.Core.csproj", "{56E6C647-CD9F-4432-9D2E-D0C00E79850B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Core.Tests", "test\Conreign.Core.Tests\Conreign.Core.Tests.csproj", "{D7DAC5CA-A5D1-4462-AD78-644677E1DEDE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Server.Host.Development", "src\Conreign.Server.Host.Development\Conreign.Server.Host.Development.csproj", "{764D9960-6EA5-42BF-B1E0-95837AC656BB}"
+EndProject
+Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "Conreign.Server.Host.Azure", "src\Conreign.Server.Host.Azure\Conreign.Server.Host.Azure.ccproj", "{287775A1-6A4A-4B0C-A3BD-C56BCCE90D31}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -107,10 +112,6 @@ Global
 		{D2AD8837-45D2-4DA4-A1E2-6D4F6651B5DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D2AD8837-45D2-4DA4-A1E2-6D4F6651B5DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D2AD8837-45D2-4DA4-A1E2-6D4F6651B5DA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C686208A-C834-4679-AE0D-9B01AEEE69DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C686208A-C834-4679-AE0D-9B01AEEE69DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C686208A-C834-4679-AE0D-9B01AEEE69DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C686208A-C834-4679-AE0D-9B01AEEE69DD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{02028666-9775-48C2-BEFF-A16F4DABE704}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{02028666-9775-48C2-BEFF-A16F4DABE704}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02028666-9775-48C2-BEFF-A16F4DABE704}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -131,10 +132,6 @@ Global
 		{5D54B9E4-56B3-4083-BEA1-BB3EA25069C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5D54B9E4-56B3-4083-BEA1-BB3EA25069C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5D54B9E4-56B3-4083-BEA1-BB3EA25069C1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{287775A1-6A4A-4B0C-A3BD-C56BCCE90D31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{287775A1-6A4A-4B0C-A3BD-C56BCCE90D31}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{287775A1-6A4A-4B0C-A3BD-C56BCCE90D31}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{287775A1-6A4A-4B0C-A3BD-C56BCCE90D31}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A29CEA9B-0EA4-487F-838E-25CB696276DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A29CEA9B-0EA4-487F-838E-25CB696276DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A29CEA9B-0EA4-487F-838E-25CB696276DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -155,10 +152,30 @@ Global
 		{7A3BFF9F-8BC0-43D7-9223-8A1C37A5142A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A3BFF9F-8BC0-43D7-9223-8A1C37A5142A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A3BFF9F-8BC0-43D7-9223-8A1C37A5142A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{060324B4-145F-4989-9B72-4B908A6C46CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{060324B4-145F-4989-9B72-4B908A6C46CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{060324B4-145F-4989-9B72-4B908A6C46CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{060324B4-145F-4989-9B72-4B908A6C46CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9764E726-5E8C-4A53-8221-9A452F1C7CE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9764E726-5E8C-4A53-8221-9A452F1C7CE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9764E726-5E8C-4A53-8221-9A452F1C7CE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9764E726-5E8C-4A53-8221-9A452F1C7CE9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56E6C647-CD9F-4432-9D2E-D0C00E79850B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56E6C647-CD9F-4432-9D2E-D0C00E79850B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56E6C647-CD9F-4432-9D2E-D0C00E79850B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56E6C647-CD9F-4432-9D2E-D0C00E79850B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7DAC5CA-A5D1-4462-AD78-644677E1DEDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7DAC5CA-A5D1-4462-AD78-644677E1DEDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7DAC5CA-A5D1-4462-AD78-644677E1DEDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7DAC5CA-A5D1-4462-AD78-644677E1DEDE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{764D9960-6EA5-42BF-B1E0-95837AC656BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{764D9960-6EA5-42BF-B1E0-95837AC656BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{764D9960-6EA5-42BF-B1E0-95837AC656BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{764D9960-6EA5-42BF-B1E0-95837AC656BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{287775A1-6A4A-4B0C-A3BD-C56BCCE90D31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{287775A1-6A4A-4B0C-A3BD-C56BCCE90D31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{287775A1-6A4A-4B0C-A3BD-C56BCCE90D31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{287775A1-6A4A-4B0C-A3BD-C56BCCE90D31}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -168,7 +185,6 @@ Global
 		{DFDBF49B-30FA-424E-9AD2-85B35F39A053} = {420E0885-10E8-44C7-899B-FF39004DEADE}
 		{BA953785-1EFC-461E-9227-AD3E4C07EE7C} = {420E0885-10E8-44C7-899B-FF39004DEADE}
 		{D2AD8837-45D2-4DA4-A1E2-6D4F6651B5DA} = {7994B3D5-21E4-4FDF-BD66-9EB6D5542096}
-		{C686208A-C834-4679-AE0D-9B01AEEE69DD} = {420E0885-10E8-44C7-899B-FF39004DEADE}
 		{02028666-9775-48C2-BEFF-A16F4DABE704} = {420E0885-10E8-44C7-899B-FF39004DEADE}
 		{F7B51B22-239C-4507-A0B7-B9F7199C060F} = {420E0885-10E8-44C7-899B-FF39004DEADE}
 		{628C9319-88CE-44EC-955D-F0FADD9C7CD3} = {420E0885-10E8-44C7-899B-FF39004DEADE}
@@ -176,14 +192,18 @@ Global
 		{461F0F71-2CB8-4368-ADEE-329687A05CE3} = {2397B05B-F57A-4F01-9531-43496876623A}
 		{B0E35D13-E3A0-4C9A-BE64-4AD54370A274} = {2397B05B-F57A-4F01-9531-43496876623A}
 		{5D54B9E4-56B3-4083-BEA1-BB3EA25069C1} = {461F0F71-2CB8-4368-ADEE-329687A05CE3}
-		{287775A1-6A4A-4B0C-A3BD-C56BCCE90D31} = {461F0F71-2CB8-4368-ADEE-329687A05CE3}
 		{A29CEA9B-0EA4-487F-838E-25CB696276DF} = {461F0F71-2CB8-4368-ADEE-329687A05CE3}
 		{434AFA37-5C10-42CA-922F-F9772FDC8574} = {7994B3D5-21E4-4FDF-BD66-9EB6D5542096}
 		{93FBA3E0-25AD-498F-A17E-B79BE6410CFB} = {420E0885-10E8-44C7-899B-FF39004DEADE}
 		{33D5CDCB-B448-4D96-A956-5BC731BEF3FA} = {420E0885-10E8-44C7-899B-FF39004DEADE}
 		{7A3BFF9F-8BC0-43D7-9223-8A1C37A5142A} = {7994B3D5-21E4-4FDF-BD66-9EB6D5542096}
-		{764D9960-6EA5-42BF-B1E0-95837AC656BB} = {B0E35D13-E3A0-4C9A-BE64-4AD54370A274}
 		{7994B3D5-21E4-4FDF-BD66-9EB6D5542096} = {012CCA39-8A43-4DFD-AF75-5A9BEFFC93A7}
+		{060324B4-145F-4989-9B72-4B908A6C46CF} = {420E0885-10E8-44C7-899B-FF39004DEADE}
+		{9764E726-5E8C-4A53-8221-9A452F1C7CE9} = {420E0885-10E8-44C7-899B-FF39004DEADE}
+		{56E6C647-CD9F-4432-9D2E-D0C00E79850B} = {420E0885-10E8-44C7-899B-FF39004DEADE}
+		{D7DAC5CA-A5D1-4462-AD78-644677E1DEDE} = {420E0885-10E8-44C7-899B-FF39004DEADE}
+		{764D9960-6EA5-42BF-B1E0-95837AC656BB} = {B0E35D13-E3A0-4C9A-BE64-4AD54370A274}
+		{287775A1-6A4A-4B0C-A3BD-C56BCCE90D31} = {461F0F71-2CB8-4368-ADEE-329687A05CE3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8

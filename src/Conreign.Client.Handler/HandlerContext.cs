@@ -1,6 +1,6 @@
 ﻿using System;
-using Conreign.Core.Contracts.Client;
-using Conreign.Core.Contracts.Gameplay;
+using Conreign.Client.Contracts;
+using Conreign.Contracts.Gameplay;
 
 namespace Conreign.Client.Handler
 {

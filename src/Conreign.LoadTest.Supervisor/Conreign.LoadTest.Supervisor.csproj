@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -58,9 +58,9 @@
     <None Include="paket.references" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Conreign.Core\Conreign.Core.csproj">
+    <ProjectReference Include="..\Conreign.Server\Conreign.Server.csproj">
       <Project>{dfdbf49b-30fa-424e-9ad2-85b35f39a053}</Project>
-      <Name>Conreign.Core</Name>
+      <Name>Conreign.Server</Name>
     </ProjectReference>
     <ProjectReference Include="..\Conreign.LoadTest\Conreign.LoadTest.csproj">
       <Project>{434afa37-5c10-42ca-922f-f9772fdc8574}</Project>

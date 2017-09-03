@@ -2,7 +2,12 @@ System.ComponentModel.TypeConverter copy_local: true
 Microsoft.Extensions.Configuration.Binder
 Microsoft.Extensions.Configuration.CommandLine
 Microsoft.Extensions.Configuration.Json
+Microsoft.Tpl.Dataflow
+System.Reactive.Core
+System.Reactive.Linq
 DotNetZip
+Polly
 Serilog.Sinks.Literate
 Serilog.Sinks.File
 Serilog.Sinks.ElasticSearch
+SerilogMetrics

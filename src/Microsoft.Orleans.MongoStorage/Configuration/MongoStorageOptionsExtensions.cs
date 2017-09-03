@@ -15,7 +15,8 @@ namespace Microsoft.Orleans.MongoStorage.Configuration
                 throw new ArgumentNullException(nameof(config));
             }
             var options = new MongoStorageOptions();
-            var connectionString = config.GetProperty(nameof(options.ConnectionString), MongoStorageOptions.DefaultConnectionString);
+            var connectionString = config.GetProperty(nameof(options.ConnectionString),
+                MongoStorageOptions.DefaultConnectionString);
             var collectionNamePrefix = config.GetProperty(nameof(options.CollectionNamePrefix), null);
             var grainAssembliesCsv = config.GetProperty(nameof(options.GrainAssemblies), string.Empty);
             options.ConnectionString = connectionString;

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
-using Conreign.Core.Contracts.Client;
-using Conreign.Core.Contracts.Client.Exceptions;
+using Conreign.Client.Contracts;
+using Conreign.Client.SignalR.Logging;
 using Microsoft.AspNet.SignalR.Client;
 using Polly;
 using Polly.Retry;
@@ -11,9 +11,9 @@ namespace Conreign.Client.SignalR
 {
     public class SignalRClient : IClient
     {
+        private readonly RetryPolicy _connectionPolicy;
         private readonly ConcurrentDictionary<Guid, Task<IClientConnection>> _connections;
         private readonly SignalRClientOptions _options;
-        private readonly RetryPolicy _connectionPolicy;
 
         public SignalRClient(SignalRClientOptions options)
         {
@@ -23,10 +23,10 @@ namespace Conreign.Client.SignalR
             }
             _options = options;
             _connections = new ConcurrentDictionary<Guid, Task<IClientConnection>>();
-            _connectionPolicy = 
-            _connectionPolicy = Policy
-                .Handle<Exception>()
-                .WaitAndRetryAsync(5, attempt => TimeSpan.FromSeconds(attempt*2));
+            _connectionPolicy =
+                _connectionPolicy = Policy
+                    .Handle<Exception>()
+                    .WaitAndRetryAsync(5, attempt => TimeSpan.FromSeconds(attempt * 2));
         }
 
         public Task<IClientConnection> Connect(Guid connectionId)
@@ -37,7 +37,7 @@ namespace Conreign.Client.SignalR
                 {
                     TraceLevel = TraceLevels.All,
                     TraceWriter = new SerilogTextWriter(),
-                    ConnectionId = connectionId.ToString(),
+                    ConnectionId = connectionId.ToString()
                 };
                 var gameHub = hubConnection.CreateHubProxy("GameHub");
                 try

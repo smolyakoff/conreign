@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using Conreign.Core.Contracts.Client.Exceptions;
-using Conreign.Core.Contracts.Validation;
+using Conreign.Contracts.Errors;
+using Conreign.Contracts.Errors.Validation;
 using FluentValidation;
 using FluentValidation.Results;
-using ValidationFailure = Conreign.Core.Contracts.Validation.ValidationFailure;
+using ValidationFailure = Conreign.Contracts.Errors.Validation.ValidationFailure;
 
 namespace Conreign.Core.Utility
 {
-    internal static class ValidationExtensions
+    public static class ValidationExtensions
     {
         public static void EnsureIsValid<T>(this T value, IValidator<T> validator)
         {

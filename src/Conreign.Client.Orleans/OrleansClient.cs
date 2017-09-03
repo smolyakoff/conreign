@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Conreign.Core.Contracts.Client;
-using Conreign.Core.Contracts.Client.Exceptions;
+using Conreign.Client.Contracts;
 using Orleans;
 using Polly;
 
@@ -38,8 +37,8 @@ namespace Conreign.Client.Orleans
                 throw new ArgumentNullException(nameof(initializer));
             }
             var policy = Policy
-                    .Handle<Exception>()
-                    .WaitAndRetry(5, attempt => TimeSpan.FromSeconds(attempt * 3));
+                .Handle<Exception>()
+                .WaitAndRetry(5, attempt => TimeSpan.FromSeconds(attempt * 3));
             var result = policy.ExecuteAndCapture(initializer.Initialize);
             if (result.Outcome == OutcomeType.Failure)
             {

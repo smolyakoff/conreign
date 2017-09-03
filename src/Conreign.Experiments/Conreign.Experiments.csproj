@@ -52,6 +52,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Conreign.Client.Contracts\Conreign.Client.Contracts.csproj">
+      <Project>{9764E726-5E8C-4A53-8221-9A452F1C7CE9}</Project>
+      <Name>Conreign.Client.Contracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Conreign.Client.Handler\Conreign.Client.Handler.csproj">
       <Project>{beef0347-534c-4987-9bb4-b7b038d71505}</Project>
       <Name>Conreign.Client.Handler</Name>
@@ -64,13 +68,21 @@
       <Project>{f7b51b22-239c-4507-a0b7-b9f7199c060f}</Project>
       <Name>Conreign.Client.SignalR</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Conreign.Core.Contracts\Conreign.Core.Contracts.csproj">
+    <ProjectReference Include="..\Conreign.Contracts\Conreign.Contracts.csproj">
       <Project>{00409622-346B-4926-B745-E5F595BD3BB7}</Project>
-      <Name>Conreign.Core.Contracts</Name>
+      <Name>Conreign.Contracts</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Conreign.Core\Conreign.Core.csproj">
+    <ProjectReference Include="..\Conreign.LoadTest\Conreign.LoadTest.csproj">
+      <Project>{434AFA37-5C10-42CA-922F-F9772FDC8574}</Project>
+      <Name>Conreign.LoadTest</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Conreign.Server.Contracts\Conreign.Server.Contracts.csproj">
+      <Project>{060324b4-145f-4989-9b72-4b908a6c46cf}</Project>
+      <Name>Conreign.Server.Contracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Conreign.Server\Conreign.Server.csproj">
       <Project>{dfdbf49b-30fa-424e-9ad2-85b35f39a053}</Project>
-      <Name>Conreign.Core</Name>
+      <Name>Conreign.Server</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

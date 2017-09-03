@@ -1,0 +1,7 @@
+System.ValueTuple
+Polly
+Serilog
+SimpleInjector
+JWT
+FluentValidation
+Microsoft.Orleans.OrleansCodeGenerator.Build

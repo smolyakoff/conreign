@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Conreign.Core.Contracts.Client.Messages;
+using Conreign.Client.Contracts.Messages;
 
 namespace Conreign.Client.Handler.Handlers
 {

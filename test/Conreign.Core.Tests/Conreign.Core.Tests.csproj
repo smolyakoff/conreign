@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C686208A-C834-4679-AE0D-9B01AEEE69DD}</ProjectGuid>
+    <ProjectGuid>{D7DAC5CA-A5D1-4462-AD78-644677E1DEDE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Conreign.Core.Tests</RootNamespace>
@@ -44,12 +44,12 @@
     <None Include="paket.references" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Conreign.Core.Contracts\Conreign.Core.Contracts.csproj">
+    <ProjectReference Include="..\..\src\Conreign.Contracts\Conreign.Contracts.csproj">
       <Project>{00409622-346B-4926-B745-E5F595BD3BB7}</Project>
-      <Name>Conreign.Core.Contracts</Name>
+      <Name>Conreign.Contracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Conreign.Core\Conreign.Core.csproj">
-      <Project>{dfdbf49b-30fa-424e-9ad2-85b35f39a053}</Project>
+      <Project>{56e6c647-cd9f-4432-9d2e-d0c00e79850b}</Project>
       <Name>Conreign.Core</Name>
     </ProjectReference>
   </ItemGroup>

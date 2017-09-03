@@ -23,9 +23,7 @@ namespace Conreign.Utility.Configuration
                 throw new ArgumentException("Configuration keys should not be null.", nameof(keys));
             }
             foreach (var key in keys)
-            {
                 Options.SettingKeys.Add(key);
-            }
         }
     }
 }

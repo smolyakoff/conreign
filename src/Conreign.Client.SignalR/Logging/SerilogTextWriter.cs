@@ -3,12 +3,12 @@ using System.Text;
 using Serilog;
 using Serilog.Events;
 
-namespace Conreign.Client.SignalR
+namespace Conreign.Client.SignalR.Logging
 {
     internal class SerilogTextWriter : TextWriter
     {
-        private readonly string _prefix;
         private readonly ILogger _logger;
+        private readonly string _prefix;
 
         public SerilogTextWriter(string prefix = "", ILogger logger = null)
         {
@@ -17,6 +17,8 @@ namespace Conreign.Client.SignalR
             Encoding = Encoding.UTF8;
         }
 
+        public override Encoding Encoding { get; }
+
         public override void WriteLine(string value)
         {
             if (_logger.IsEnabled(LogEventLevel.Verbose))
@@ -24,7 +26,5 @@ namespace Conreign.Client.SignalR
                 _logger.Verbose($"{_prefix}{value}");
             }
         }
-
-        public override Encoding Encoding { get; }
     }
 }

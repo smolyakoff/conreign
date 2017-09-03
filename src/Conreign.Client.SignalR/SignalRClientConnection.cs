@@ -5,10 +5,10 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
+using Conreign.Client.Contracts;
+using Conreign.Client.Contracts.Messages;
 using Conreign.Client.SignalR.Proxies;
-using Conreign.Core.Contracts.Client;
-using Conreign.Core.Contracts.Client.Messages;
-using Conreign.Core.Contracts.Communication;
+using Conreign.Contracts.Communication;
 using Microsoft.AspNet.SignalR.Client;
 
 namespace Conreign.Client.SignalR
@@ -16,15 +16,14 @@ namespace Conreign.Client.SignalR
     public sealed class SignalRClientConnection : IClientConnection
     {
         private readonly HubConnection _connection;
+        private readonly IDisposable _disposable;
         private readonly IHubProxy _hub;
         private readonly SignalRSender _sender;
-        private readonly IDisposable _disposable;
         private readonly Subject<IClientEvent> _subject;
         private bool _isDisposed;
 
         internal SignalRClientConnection(HubConnection connection, IHubProxy hub)
         {
-
             if (connection == null)
             {
                 throw new ArgumentNullException(nameof(connection));
@@ -74,7 +73,7 @@ namespace Conreign.Client.SignalR
         public async Task<LoginResult> Login(string accessToken = null)
         {
             EnsureIsNotDisposed();
-            var login = new LoginCommand { AccessToken =  accessToken };
+            var login = new LoginCommand {AccessToken = accessToken};
             var response = await _sender.Send(login);
             return await Authenticate(response.AccessToken);
         }

@@ -80,7 +80,7 @@ namespace Conreign.LoadTest.Supervisor
                     tasks = await client
                         .JobOperations
                         .ListTasks(job.Id, new ODATADetailLevel(selectClause: "id"))
-                        .ToListAsync(cancellationToken: timeoutCts.Token);
+                        .ToListAsync(timeoutCts.Token);
                     await monitor.WhenAll(tasks, TaskState.Running, timeoutCts.Token);
                     logger.Information("All tasks are {TaskState}.", TaskState.Running);
                     var watchCts = new CancellationTokenSource();
@@ -134,7 +134,8 @@ namespace Conreign.LoadTest.Supervisor
             }
         }
 
-        private static async Task DownloadLogs(string jobOutputDirectory, IEnumerable<CloudTask> tasks, int? maxDegreeOfParallelism)
+        private static async Task DownloadLogs(string jobOutputDirectory, IEnumerable<CloudTask> tasks,
+            int? maxDegreeOfParallelism)
         {
             var minProgressDelta = 500.Kilobytes().Bytes;
             var logFileNames = new HashSet<string> {"log.zip", "log.json"};
@@ -162,7 +163,8 @@ namespace Conreign.LoadTest.Supervisor
                     logger.Information("Task {TaskId} log file size is {LogFileSizeMB:f2} MB.",
                         f.TaskId,
                         totalBytes.Bytes().Megabytes);
-                    using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Write, 4096, true))
+                    using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Write, 4096,
+                        true))
                     {
                         double? lastProgress = null;
                         var progressTracker = new Progress<ProgressStreamEventArgs>(progressInfo =>
@@ -173,8 +175,9 @@ namespace Conreign.LoadTest.Supervisor
                                 return;
                             }
                             lastProgress = progress;
-                            var percents = (double)progressInfo.WrittenBytes / totalBytes;
-                            logger.Information("Downloading log file from task [{TaskId}]: {DownloadedMB:f2} / {TotalMB:f2} MB ({ProgressPercents:P}).",
+                            var percents = (double) progressInfo.WrittenBytes / totalBytes;
+                            logger.Information(
+                                "Downloading log file from task [{TaskId}]: {DownloadedMB:f2} / {TotalMB:f2} MB ({ProgressPercents:P}).",
                                 f.TaskId,
                                 progress.Bytes().Megabytes,
                                 totalBytes.Bytes().Megabytes,
@@ -183,11 +186,13 @@ namespace Conreign.LoadTest.Supervisor
                         var adapter = new ProgressStreamAdapter(fs, progressTracker);
                         await f.LogFile.CopyToStreamAsync(adapter);
                     }
-                    logger.Information("Downloaded log file from task [{TaskId}] to {TaskLogFilePath}.", f.TaskId, filePath);
+                    logger.Information("Downloaded log file from task [{TaskId}] to {TaskLogFilePath}.", f.TaskId,
+                        filePath);
                 }
                 catch (Exception ex)
                 {
-                    logger.Error(ex, "Failed to download log file from task [{TaskId}] to {TaskLogFilePath}.", f.TaskId, filePath);
+                    logger.Error(ex, "Failed to download log file from task [{TaskId}] to {TaskLogFilePath}.", f.TaskId,
+                        filePath);
                 }
                 return filePath;
             }, maxDegreeOfParallelism);
@@ -203,9 +208,7 @@ namespace Conreign.LoadTest.Supervisor
                 {
                     var nodes = await pool.ListComputeNodes().ToListAsync();
                     foreach (var node in nodes)
-                    {
                         Log.Logger.Information("Node {NodeId} is {NodeState}.", node.Id, node.State);
-                    }
                     if (nodes.All(x => x.State == ComputeNodeState.Idle))
                     {
                         break;
@@ -215,17 +218,18 @@ namespace Conreign.LoadTest.Supervisor
             }
         }
 
-        private static async void WatchStatistics(ILogger logger, List<CloudTask> tasks, TimeSpan interval, CancellationToken cancellationToken)
+        private static async void WatchStatistics(ILogger logger, List<CloudTask> tasks, TimeSpan interval,
+            CancellationToken cancellationToken)
         {
             await Task.Delay(TimeSpan.FromSeconds(1));
             var completedTaskIds = new HashSet<string>();
             while (!cancellationToken.IsCancellationRequested)
-            {
                 try
                 {
                     foreach (var task in tasks.Where(x => !completedTaskIds.Contains(x.Id)))
                     {
-                        await task.RefreshAsync(new ODATADetailLevel(selectClause: "id,stats,state"), null, cancellationToken);
+                        await task.RefreshAsync(new ODATADetailLevel(selectClause: "id,stats,state"), null,
+                            cancellationToken);
                         logger.Information("Task {TaskId} statistics: {@Statistics}", task.Id, task.Statistics);
                         if (task.State == TaskState.Completed)
                         {
@@ -239,7 +243,6 @@ namespace Conreign.LoadTest.Supervisor
                 {
                     // Do nothing
                 }
-            }
         }
     }
 }

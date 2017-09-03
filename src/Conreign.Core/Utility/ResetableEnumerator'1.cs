@@ -12,11 +12,7 @@ namespace Conreign.Core.Utility
 
         public ResetableEnumerator(Func<IEnumerable<T>> reset)
         {
-            if (reset == null)
-            {
-                throw new ArgumentNullException(nameof(reset));
-            }
-            _reset = reset;
+            _reset = reset ?? throw new ArgumentNullException(nameof(reset));
             _current = reset().GetEnumerator();
         }
 

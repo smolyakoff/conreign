@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Conreign.Core.Contracts.Client.Exceptions;
+using Conreign.Contracts.Errors;
 using MediatR;
 using Serilog;
 using Serilog.Events;

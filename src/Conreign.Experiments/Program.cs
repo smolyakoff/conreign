@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Conreign.Client.Contracts;
+using Conreign.Client.Contracts.Messages;
 using Conreign.Client.Handler;
 using Conreign.Client.Orleans;
 using Conreign.Client.SignalR;
-using Conreign.Core.AI;
-using Conreign.Core.AI.Battle;
-using Conreign.Core.AI.Behaviours;
-using Conreign.Core.Contracts.Client;
-using Conreign.Core.Contracts.Client.Messages;
-using Conreign.Core.Contracts.Communication;
-using Conreign.Core.Contracts.Gameplay.Data;
+using Conreign.Contracts.Gameplay.Data;
+using Conreign.LoadTest.Core;
+using Conreign.LoadTest.Core.Battle;
+using Conreign.LoadTest.Core.Behaviours;
+using Conreign.Server.Contracts.Communication;
 using Orleans.Runtime.Configuration;
 using Serilog;
 using SimpleInjector;
@@ -143,7 +143,7 @@ namespace Conreign.Experiments
             var behaviours = new List<IBotBehaviour>
             {
                 new LoginBehaviour(),
-                new JoinRoomBehaviour(roomId,  isLeader ? TimeSpan.Zero : TimeSpan.FromSeconds(0.5)),
+                new JoinRoomBehaviour(roomId, isLeader ? TimeSpan.Zero : TimeSpan.FromSeconds(0.5)),
                 new BattleBehaviour(new RankingBotBattleStrategy(options)),
                 new StopOnGameEndBehaviour()
             };

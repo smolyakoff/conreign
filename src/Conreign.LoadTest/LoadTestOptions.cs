@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Net;
-using Conreign.Core.AI.LoadTest;
+using Conreign.LoadTest.Core;
 using Microsoft.Extensions.Configuration;
 using Serilog.Events;
 

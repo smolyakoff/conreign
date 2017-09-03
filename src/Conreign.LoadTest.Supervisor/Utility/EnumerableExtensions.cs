@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +10,7 @@ namespace Conreign.LoadTest.Supervisor.Utility
     {
         public static async Task<IEnumerable<TOutput>> SelectAsync<TInput, TOutput>(
             this IEnumerable<TInput> enumerable,
-            Func<TInput, Task<TOutput>> selector, 
+            Func<TInput, Task<TOutput>> selector,
             int? maxDegreeOfParallelism = null)
         {
             if (enumerable == null)
@@ -42,7 +41,7 @@ namespace Conreign.LoadTest.Supervisor.Utility
                     return results;
                 })
                 .ToList();
-            var outputPairLists  = await Task.WhenAll(tasks);
+            var outputPairLists = await Task.WhenAll(tasks);
             return outputPairLists.SelectMany(x => x).OrderBy(x => x.Key).Select(x => x.Value);
         }
     }

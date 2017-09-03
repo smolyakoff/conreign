@@ -2,12 +2,12 @@ using System;
 using System.Reactive.Subjects;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Conreign.Core.Contracts.Auth;
-using Conreign.Core.Contracts.Client;
-using Conreign.Core.Contracts.Client.Exceptions;
-using Conreign.Core.Contracts.Communication;
-using Conreign.Core.Contracts.Gameplay;
-using Conreign.Core.Contracts.Presence;
+using Conreign.Client.Contracts;
+using Conreign.Contracts.Communication;
+using Conreign.Server.Contracts.Auth;
+using Conreign.Server.Contracts.Communication;
+using Conreign.Server.Contracts.Gameplay;
+using Conreign.Server.Contracts.Presence;
 using Orleans;
 using Orleans.Streams;
 

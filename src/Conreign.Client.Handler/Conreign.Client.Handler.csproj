@@ -71,9 +71,13 @@
     <None Include="paket.references" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Conreign.Core.Contracts\Conreign.Core.Contracts.csproj">
+    <ProjectReference Include="..\Conreign.Client.Contracts\Conreign.Client.Contracts.csproj">
+      <Project>{9764e726-5e8c-4a53-8221-9a452f1c7ce9}</Project>
+      <Name>Conreign.Client.Contracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Conreign.Contracts\Conreign.Contracts.csproj">
       <Project>{00409622-346b-4926-b745-e5f595bd3bb7}</Project>
-      <Name>Conreign.Core.Contracts</Name>
+      <Name>Conreign.Contracts</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

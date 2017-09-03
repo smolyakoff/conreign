@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Conreign.Core.Contracts.Gameplay.Data;
-using Conreign.Core.Gameplay;
+using Conreign.Contracts.Gameplay.Data;
 using Xunit;
 
 namespace Conreign.Core.Tests.Gameplay

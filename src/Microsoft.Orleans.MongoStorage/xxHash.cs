@@ -89,15 +89,15 @@ namespace Microsoft.Orleans.MongoStorage
 
             while (index <= len - 4)
             {
-                h32 += BitConverter.ToUInt32(buf, index)*PRIME32_3;
-                h32 = RotateLeft(h32, 17)*PRIME32_4;
+                h32 += BitConverter.ToUInt32(buf, index) * PRIME32_3;
+                h32 = RotateLeft(h32, 17) * PRIME32_4;
                 index += 4;
             }
 
             while (index < len)
             {
-                h32 += buf[index]*PRIME32_5;
-                h32 = RotateLeft(h32, 11)*PRIME32_1;
+                h32 += buf[index] * PRIME32_5;
+                h32 = RotateLeft(h32, 11) * PRIME32_1;
                 index++;
             }
 
@@ -205,15 +205,15 @@ namespace Microsoft.Orleans.MongoStorage
 
             while (index <= _state.memsize - 4)
             {
-                h32 += BitConverter.ToUInt32(_state.memory, index)*PRIME32_3;
-                h32 = RotateLeft(h32, 17)*PRIME32_4;
+                h32 += BitConverter.ToUInt32(_state.memory, index) * PRIME32_3;
+                h32 = RotateLeft(h32, 17) * PRIME32_4;
                 index += 4;
             }
 
             while (index < _state.memsize)
             {
-                h32 += _state.memory[index]*PRIME32_5;
-                h32 = RotateLeft(h32, 11)*PRIME32_1;
+                h32 += _state.memory[index] * PRIME32_5;
+                h32 = RotateLeft(h32, 11) * PRIME32_1;
                 index++;
             }
 
@@ -229,7 +229,7 @@ namespace Microsoft.Orleans.MongoStorage
         private static uint CalcSubHash(uint value, byte[] buf, int index)
         {
             var read_value = BitConverter.ToUInt32(buf, index);
-            value += read_value*PRIME32_2;
+            value += read_value * PRIME32_2;
             value = RotateLeft(value, 13);
             value *= PRIME32_1;
             return value;

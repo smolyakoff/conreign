@@ -6,8 +6,8 @@ namespace Conreign.LoadTest.Supervisor.Utility
 {
     public class ProgressStreamAdapter : Stream
     {
-        private readonly Stream _stream;
         private readonly IProgress<ProgressStreamEventArgs> _progress;
+        private readonly Stream _stream;
         private int _read;
         private int _written;
 
@@ -19,6 +19,17 @@ namespace Conreign.LoadTest.Supervisor.Utility
             }
             _stream = stream;
             _progress = progress;
+        }
+
+        public override bool CanRead => _stream.CanRead;
+        public override bool CanSeek => _stream.CanSeek;
+        public override bool CanWrite => _stream.CanWrite;
+        public override long Length => _stream.Length;
+
+        public override long Position
+        {
+            get => _stream.Position;
+            set => _stream.Position = value;
         }
 
         public override void Flush()
@@ -49,17 +60,6 @@ namespace Conreign.LoadTest.Supervisor.Utility
             _stream.Write(buffer, offset, count);
             Interlocked.Add(ref _written, count);
             _progress.Report(new ProgressStreamEventArgs(_written, _read));
-        }
-
-        public override bool CanRead => _stream.CanRead;
-        public override bool CanSeek => _stream.CanSeek;
-        public override bool CanWrite => _stream.CanWrite;
-        public override long Length => _stream.Length;
-
-        public override long Position
-        {
-            get { return _stream.Position; }
-            set { _stream.Position = value; }
         }
     }
 }

@@ -86,9 +86,7 @@ namespace Microsoft.Orleans.MongoStorage.Driver
             choices.AddRange(nominalType.GetInterfaces());
             choices.RemoveAll(x => !typeof(IGrain).GetTypeInfo().IsAssignableFrom(x));
             foreach (var choice in choices)
-            {
                 yield return choice;
-            }
             yield return Type.GetType(serializedName, false);
         }
     }

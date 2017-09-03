@@ -1,8 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using AutoMapper;
-using Conreign.Core.Contracts.Client.Messages;
-using Conreign.Core.Contracts.Gameplay.Data;
+using Conreign.Client.Contracts.Messages;
+using Conreign.Contracts.Gameplay.Data;
 using MediatR;
 
 namespace Conreign.Client.Handler.Handlers
@@ -13,11 +13,7 @@ namespace Conreign.Client.Handler.Handlers
 
         public CancelFleetHandler(IMapper mapper)
         {
-            if (mapper == null)
-            {
-                throw new ArgumentNullException(nameof(mapper));
-            }
-            _mapper = mapper;
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         public async Task<Unit> Handle(CommandEnvelope<CancelFleetCommand, Unit> message)

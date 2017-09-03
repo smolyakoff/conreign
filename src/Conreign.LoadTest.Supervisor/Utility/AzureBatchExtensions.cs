@@ -14,11 +14,10 @@ namespace Conreign.LoadTest.Supervisor.Utility
 {
     public static class AzureBatchExtensions
     {
-        private static readonly ILogger Logger = Log.Logger.ForContext(typeof(AzureBatchExtensions));
-
         private const string ApplicationId = "conreign-loadtest";
         private const string WindowsServer = "4";
         private const int MaxTasksPerNode = 2;
+        private static readonly ILogger Logger = Log.Logger.ForContext(typeof(AzureBatchExtensions));
 
         public static CloudJob CreateLoadTestJob(this BatchClient client, LoadTestSupervisorOptions options)
         {
@@ -49,11 +48,12 @@ namespace Conreign.LoadTest.Supervisor.Utility
 
             var job = client.JobOperations.CreateJob(jobId, poolInfo);
             job.DisplayName = $"Run load test ({jobId})";
-            job.Constraints = new JobConstraints(maxWallClockTime: options.JobTimeout);
+            job.Constraints = new JobConstraints(options.JobTimeout);
             return job;
         }
 
-        public static async Task<CloudPool> GetOrCreateLoadTestPool(this BatchClient client, LoadTestSupervisorOptions options)
+        public static async Task<CloudPool> GetOrCreateLoadTestPool(this BatchClient client,
+            LoadTestSupervisorOptions options)
         {
             var spec = CreatePoolSpecification(options);
             CloudPool pool;
@@ -94,7 +94,8 @@ namespace Conreign.LoadTest.Supervisor.Utility
             var taskId = $"loadtest__{options.Name}__{index}";
             var instanceOptions = options.InstanceOptions;
             var builder = new StringBuilder();
-            builder.Append($"cmd /c %AZ_BATCH_APP_PACKAGE_CONREIGN-LOADTEST#{options.ApplicationVersion}%\\Conreign.LoadTest.exe");
+            builder.Append(
+                $"cmd /c %AZ_BATCH_APP_PACKAGE_CONREIGN-LOADTEST#{options.ApplicationVersion}%\\Conreign.LoadTest.exe");
             var arguments = new List<CommandLineArgument>
             {
                 new CommandLineArgument(nameof(instanceOptions.InstanceId), taskId),
@@ -110,7 +111,8 @@ namespace Conreign.LoadTest.Supervisor.Utility
                     $"{nameof(instanceOptions.BotOptions)}:{nameof(instanceOptions.BotOptions.RoomPrefix)}",
                     $"{taskId}:"),
                 new CommandLineArgument(nameof(instanceOptions.MinimumConsoleLogLevel), LogEventLevel.Warning),
-                new CommandLineArgument(nameof(instanceOptions.LogFileName), Path.Combine("%AZ_BATCH_TASK_DIR%", instanceOptions.LogFileName)),
+                new CommandLineArgument(nameof(instanceOptions.LogFileName),
+                    Path.Combine("%AZ_BATCH_TASK_DIR%", instanceOptions.LogFileName)),
                 new CommandLineArgument(nameof(instanceOptions.Timeout), instanceOptions.Timeout)
             };
             var args = arguments.Where(x => x.Value != null).ToList();
@@ -122,7 +124,7 @@ namespace Conreign.LoadTest.Supervisor.Utility
                 ApplicationId = ApplicationId,
                 Version = options.ApplicationVersion
             };
-            task.Constraints = new TaskConstraints(maxWallClockTime: maxExecutionTime);
+            task.Constraints = new TaskConstraints(maxExecutionTime);
             task.ApplicationPackageReferences = new List<ApplicationPackageReference> {app};
             task.DisplayName = $"Execute load test ({taskId})";
             return task;
@@ -146,15 +148,13 @@ namespace Conreign.LoadTest.Supervisor.Utility
             };
             return new PoolSpecification
             {
-                TargetDedicated = (int)Math.Ceiling((double)options.Instances / MaxTasksPerNode),
+                TargetDedicated = (int) Math.Ceiling((double) options.Instances / MaxTasksPerNode),
                 MaxTasksPerComputeNode = MaxTasksPerNode,
                 DisplayName = jobId == null ? "Load test pool" : $"Load test pool ({jobId})",
-                ApplicationPackageReferences = new List<ApplicationPackageReference> { applicationPackage },
-                CloudServiceConfiguration = new CloudServiceConfiguration(osFamily: WindowsServer),
+                ApplicationPackageReferences = new List<ApplicationPackageReference> {applicationPackage},
+                CloudServiceConfiguration = new CloudServiceConfiguration(WindowsServer),
                 VirtualMachineSize = options.MachineSize
             };
         }
     }
-
-
 }

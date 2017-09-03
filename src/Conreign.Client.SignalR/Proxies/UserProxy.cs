@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Conreign.Core.Contracts.Client.Messages;
-using Conreign.Core.Contracts.Gameplay;
+using Conreign.Client.Contracts.Messages;
+using Conreign.Contracts.Gameplay;
 
 namespace Conreign.Client.SignalR.Proxies
 {
@@ -11,11 +11,7 @@ namespace Conreign.Client.SignalR.Proxies
 
         public UserProxy(SignalRSender context)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         public async Task<IPlayer> JoinRoom(string roomId, Guid connectionId)

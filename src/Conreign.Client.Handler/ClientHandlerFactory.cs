@@ -1,7 +1,6 @@
 using System;
-using Conreign.Core.Contracts.Client;
+using Conreign.Client.Contracts;
 using MediatR;
-using SimpleInjector;
 
 namespace Conreign.Client.Handler
 {

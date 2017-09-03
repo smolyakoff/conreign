@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Conreign.Core.Contracts.Client.Messages;
-using Conreign.Core.Contracts.Gameplay.Data;
+using Conreign.Client.Contracts.Messages;
+using Conreign.Contracts.Gameplay.Data;
 
 namespace Conreign.Client.Handler.Handlers
 {

@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Conreign.Client.SignalR;
-using Conreign.Core.AI;
-using Conreign.Core.AI.LoadTest;
+using Conreign.LoadTest.Core;
 using Ionic.Zip;
 using Serilog;
+using Serilog.Debugging;
 using Serilog.Formatting.Json;
 using Serilog.Sinks.Elasticsearch;
-using CompressionLevel = Ionic.Zlib.CompressionLevel;
 
 namespace Conreign.LoadTest
 {
@@ -35,7 +33,7 @@ namespace Conreign.LoadTest
             if (options.LogToConsole)
             {
                 loggerConfiguration.WriteTo
-                    .LiterateConsole(restrictedToMinimumLevel: options.MinimumConsoleLogLevel);
+                    .LiterateConsole(options.MinimumConsoleLogLevel);
             }
             if (!string.IsNullOrEmpty(options.LogFileName))
             {
@@ -60,7 +58,7 @@ namespace Conreign.LoadTest
                 .CreateLogger()
                 .ForContext("ApplicationId", "Conreign.LoadTest")
                 .ForContext("InstanceId", options.InstanceId);
-            Serilog.Debugging.SelfLog.Enable(msg => Trace.WriteLine(msg));
+            SelfLog.Enable(msg => Trace.WriteLine(msg));
             var logger = Log.Logger;
             try
             {
@@ -78,7 +76,6 @@ namespace Conreign.LoadTest
                 cts.CancelAfter(options.Timeout);
                 await farm.Run(cts.Token);
                 logger.Information("Load test complete.");
-
             }
             catch (Exception ex)
             {

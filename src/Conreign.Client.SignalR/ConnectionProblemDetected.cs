@@ -1,5 +1,5 @@
 ﻿using System;
-using Conreign.Core.Contracts.Communication;
+using Conreign.Contracts.Communication;
 
 namespace Conreign.Client.SignalR
 {

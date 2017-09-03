@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Conreign.Core.Contracts.Client;
-using Conreign.Core.Contracts.Communication;
+using Conreign.Client.Contracts;
+using Conreign.Contracts.Communication;
 using MediatR;
 
 namespace Conreign.Client.Handler
