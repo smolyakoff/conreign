@@ -14,7 +14,7 @@ namespace Conreign.Core
             {
                 throw new ArgumentOutOfRangeException(nameof(height), "Height should be 1 or greater.");
             }
-            if (width * height / height != height)
+            if (width * height / height != width)
             {
                 throw new ArgumentOutOfRangeException(nameof(width), "Map is too big.");
             }
