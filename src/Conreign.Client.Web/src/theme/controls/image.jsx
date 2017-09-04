@@ -1,8 +1,9 @@
 import bem from 'bem-cn';
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 
 export default function Image({ className, ...others }) {
-  // eslint-disable-next-line jsx-a11y/img-has-alt
+  // eslint-disable-next-line jsx-a11y/alt-text
   return <img className={bem('o-image').mix(className)()} {...others} />;
 }
 

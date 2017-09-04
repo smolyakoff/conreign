@@ -1,5 +1,6 @@
 import bem from 'bem-cn';
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 
 export function PanelContainer({ className, children, ...others }) {
   const css = bem('o-panel-container');

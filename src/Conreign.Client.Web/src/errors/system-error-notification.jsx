@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 
 import ErrorNotification from './error-notification';
 import { H2 } from './../theme';

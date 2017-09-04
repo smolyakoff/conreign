@@ -5,7 +5,7 @@ import {
   getOriginalPayload,
   createFailedAsyncActionType,
   createPendingAsyncActionType,
- } from '../framework';
+} from '../framework';
 import {
   JOIN_ROOM,
   UserErrorCategory,

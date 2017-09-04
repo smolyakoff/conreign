@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { isNumber } from 'lodash';
 
 import { PLANET_SHAPE, PLAYER_SHAPE } from './../room-schemas';

@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Measure from 'react-measure';
 import { compose, withPropsOnChange, withHandlers, withProps } from 'recompose';
@@ -250,17 +251,17 @@ function generateMapCells(planets, players, movingFleets, waitingFleets) {
 
 const onMapCellClick =
   ({ onMapSelectionChange, map, mapSelection, currentUser }) =>
-  ({ cellIndex }) => {
-    const updatedSelection = updateMapSelection({
-      cellIndex,
-      mapSelection,
-      planets: map.planets,
-      currentUserId: currentUser.id,
-    });
-    if (updatedSelection !== mapSelection) {
-      onMapSelectionChange(updatedSelection);
-    }
-  };
+    ({ cellIndex }) => {
+      const updatedSelection = updateMapSelection({
+        cellIndex,
+        mapSelection,
+        planets: map.planets,
+        currentUserId: currentUser.id,
+      });
+      if (updatedSelection !== mapSelection) {
+        onMapSelectionChange(updatedSelection);
+      }
+    };
 
 const onFleetFormSubmit = ({ onFleetLaunch, mapSelection, roomId }) => ({ ships }) => {
   onFleetLaunch({

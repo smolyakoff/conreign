@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 
 import {
   Box,
@@ -15,8 +16,7 @@ import FleetRouteLabel,
 {
   PlanetOwnerType,
   FleetRoutePointType,
-}
-from './fleet-route-label';
+} from './fleet-route-label';
 
 function selectOwnerType(planet, currentUserId) {
   if (!planet.ownerId) {

@@ -1,5 +1,4 @@
 import React from 'react';
-import { omit } from 'lodash';
 
 import { Text } from './../../theme';
 import { PLAYER } from './../room-schemas';
@@ -9,4 +8,7 @@ export default function Nickname({ color, nickname }) {
   return <Text style={style}>{nickname}</Text>;
 }
 
-Nickname.propTypes = omit(PLAYER, 'status');
+Nickname.propTypes = {
+  color: PLAYER.color.isRequired,
+  nickname: PLAYER.nickname.isRequired,
+};

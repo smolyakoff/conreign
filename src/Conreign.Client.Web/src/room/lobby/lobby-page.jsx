@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { values, mapValues, keys } from 'lodash';
 import Measure from 'react-measure';
@@ -190,7 +191,7 @@ function LobbyPage({
             </Grid>
           );
         }
-    }
+      }
     </Measure>
   );
 }
@@ -241,7 +242,7 @@ function generateMapCells({ planets, players }) {
 
 const onMapCellClick =
   ({ onMapSelectionChange, mapSelection }) =>
-  ({ cellIndex }) => onMapSelectionChange({ ...mapSelection, start: cellIndex });
+    ({ cellIndex }) => onMapSelectionChange({ ...mapSelection, start: cellIndex });
 
 const enhance = compose(
   connect(

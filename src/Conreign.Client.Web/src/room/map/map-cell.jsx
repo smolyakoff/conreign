@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { withHandlers, compose, pure } from 'recompose';
 import { isString, values, noop } from 'lodash';
 import bem from 'bem-cn';

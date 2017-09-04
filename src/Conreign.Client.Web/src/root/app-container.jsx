@@ -1,5 +1,6 @@
 /* eslint-disable react/forbid-prop-types */
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Provider } from 'react-redux';
 
 import RouterContainer from './router-container';

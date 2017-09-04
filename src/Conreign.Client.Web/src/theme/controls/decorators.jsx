@@ -1,5 +1,6 @@
 import cn from 'classnames';
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { values, flow, each, isFunction, flatten, defaults, omit, isUndefined } from 'lodash';
 
 import { isNonEmptyString } from './util';

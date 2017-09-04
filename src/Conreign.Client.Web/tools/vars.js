@@ -48,7 +48,7 @@ const load = _.memoize(() => {
       arg: 'port',
     },
   });
-  config.validate({ strict: true });
+  config.validate({ allowed: 'strict' });
   const props = config.getProperties();
   _.extend(props, {
     version: {

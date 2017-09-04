@@ -1,5 +1,6 @@
 /* eslint-disable react/forbid-prop-types */
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Router, Route, IndexRoute } from 'react-router';
 import { isFunction, flatMap, isObject } from 'lodash';
 

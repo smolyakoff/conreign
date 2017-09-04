@@ -1,4 +1,4 @@
-import { PropTypes } from 'react';
+import PropTypes from 'prop-types';
 import { values } from 'lodash';
 
 import { PresenceStatus, events } from './../api';

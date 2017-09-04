@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import { connect } from 'react-redux';
 import { compose, withHandlers } from 'recompose';
@@ -61,8 +62,8 @@ const selectLegendItems = createSelector(
     color: stats.color,
     type: 'square',
     id: stats.userId,
-  }),
-));
+  })),
+);
 
 function GameStatistics({
   playerStatistics,

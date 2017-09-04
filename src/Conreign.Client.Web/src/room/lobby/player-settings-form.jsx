@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { compose, withHandlers, withProps } from 'recompose';
 import { isEmpty, includes, isEqual } from 'lodash';
 import {
@@ -16,7 +17,7 @@ import {
   ThemeSize,
   ThemeColor,
   Orientation,
- } from './../../theme';
+} from './../../theme';
 import { PLAYER_OPTIONS_SHAPE } from './lobby-schemas';
 
 const FIELD = {

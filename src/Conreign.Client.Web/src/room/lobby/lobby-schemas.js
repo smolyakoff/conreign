@@ -1,4 +1,4 @@
-import { PropTypes } from 'react';
+import PropTypes from 'prop-types';
 
 export const GAME_OPTIONS_SHAPE = PropTypes.shape({
   mapWidth: PropTypes.number.isRequired,

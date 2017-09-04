@@ -51,12 +51,12 @@ const epic = combineEpics(
 
 function normalizeRoomState(room) {
   const players = fp.flow(
-      fp.keyBy(p => p.userId),
-      fp.mapValues(p => ({
-        ...p,
-        status: room.presenceStatuses[p.userId],
-      })),
-    )(room.players);
+    fp.keyBy(p => p.userId),
+    fp.mapValues(p => ({
+      ...p,
+      status: room.presenceStatuses[p.userId],
+    })),
+  )(room.players);
   return {
     ...omit(room, 'presenceStatuses'),
     players,

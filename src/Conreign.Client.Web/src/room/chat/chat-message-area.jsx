@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { AutoSizer, CellMeasurer, List, CellMeasurerCache } from 'react-virtualized';
 import { drop, some } from 'lodash';
 

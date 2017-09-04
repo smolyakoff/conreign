@@ -9,7 +9,7 @@ import {
   createStore,
   AppContainer,
   createContainer,
- } from './root';
+} from './root';
 
 if (COMPILATION_MODE === 'debug') {
   window.React = React;

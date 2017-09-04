@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 
 import PlayerListItem from './player-list-item';
 import { PLAYER_WITH_OPTIONAL_STATS_SHAPE } from './player-schema';
