@@ -14,7 +14,10 @@ function Fleet({
   return (
     <div className={block()}>
       <div className={block('icon')()}>
-        <Icon name={ufo} />
+        <Icon
+          name={ufo.id}
+          viewBox={ufo.viewBox}
+        />
       </div>
       <div className={block('text')()}>
         {ships}

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using SimpleInjector;
-using SimpleInjector.Extensions.ExecutionContextScoping;
+using SimpleInjector.Lifestyles;
 
 namespace Conreign.Server.Api.Infrastructure
 {
@@ -40,7 +40,7 @@ namespace Conreign.Server.Api.Infrastructure
 
         private Task Invoke(Func<Task> method)
         {
-            using (_container.BeginExecutionContextScope())
+            using (AsyncScopedLifestyle.BeginScope(_container))
             {
                 return method();
             }

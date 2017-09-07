@@ -42,7 +42,8 @@ export default function ChatMessage({
             : (
               <Icon
                 className="c-vader-icon"
-                name={vader}
+                name={vader.id}
+                viewBox={vader.viewBox}
               />
             )
         }

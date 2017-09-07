@@ -72,7 +72,7 @@ function Planet({
         )
       }
       <div className={planet('icon')()}>
-        <Icon name={icon.id} />
+        <Icon name={icon.id} viewBox={icon.viewBox} />
       </div>
       <div className={planet('footer')()}>
         {properties}

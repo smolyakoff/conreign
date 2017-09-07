@@ -3,7 +3,14 @@ redirects: on
 
 nuget System.ValueTuple
 nuget Humanizer
-nuget Microsoft.Extensions.Configuration
+
+# START HACK
+# Locked dependency to v1 because of Paket issue https://github.com/fsprojects/Paket/issues/2705
+nuget Microsoft.Extensions.Configuration ~> 1
+nuget Microsoft.Extensions.Configuration.Abstractions ~> 1
+nuget Microsoft.Extensions.Primitives ~> 1
+# END HACK
+
 nuget Microsoft.Extensions.Configuration.Binder
 nuget Microsoft.Extensions.Configuration.CommandLine
 nuget Microsoft.Extensions.Configuration.Json
@@ -27,7 +34,6 @@ nuget FluentValidation
 nuget JWT
 nuget AutoMapper
 nuget SimpleInjector
-nuget SimpleInjector.Extensions.ExecutionContextScoping
 nuget MediatR
 
 nuget MongoDB.Driver

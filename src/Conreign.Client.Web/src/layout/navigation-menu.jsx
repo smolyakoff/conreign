@@ -13,7 +13,7 @@ export default function NavigationMenu(props) {
         </NavItem>
       </Link>
       <NavContent className="u-window-box--small">
-        <Icon name={logo} />
+        <Icon name={logo.id} viewBox={logo.viewBox} />
       </NavContent>
       <Link to="/$/rules">
         <NavItem>Rules</NavItem>

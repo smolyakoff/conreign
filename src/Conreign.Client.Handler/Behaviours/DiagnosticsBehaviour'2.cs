@@ -41,7 +41,7 @@ namespace Conreign.Client.Handler.Behaviours
                 new PropertyEnricher("ConnectionId", context.Connection.Id),
                 new PropertyEnricher("CommandType", message.Command.GetType().Name)
             };
-            using (LogContext.PushProperties(diagnosticProperties))
+            using (LogContext.Push(diagnosticProperties))
             {
                 try
                 {

@@ -16,6 +16,7 @@ const button = bem('c-icon-button');
 function IconButton({
   className,
   iconName,
+  iconViewBox,
   children,
   ...others
 }) {
@@ -33,11 +34,13 @@ IconButton.propTypes = {
   className: PropTypes.string,
   children: PropTypes.node,
   iconName: PropTypes.string.isRequired,
+  iconViewBox: PropTypes.string,
 };
 
 IconButton.defaultProps = {
   className: null,
   children: null,
+  iconViewBox: null,
 };
 
 export default decorate(

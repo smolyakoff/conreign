@@ -1,7 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { Text } from './../../theme';
-import { PLAYER } from './../room-schemas';
 
 export default function Nickname({ color, nickname }) {
   const style = { color };
@@ -9,6 +9,6 @@ export default function Nickname({ color, nickname }) {
 }
 
 Nickname.propTypes = {
-  color: PLAYER.color.isRequired,
-  nickname: PLAYER.nickname.isRequired,
+  color: PropTypes.string.isRequired,
+  nickname: PropTypes.string.isRequired,
 };

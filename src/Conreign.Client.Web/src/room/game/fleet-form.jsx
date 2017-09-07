@@ -40,7 +40,8 @@ function FleetForm({
         <GridCell fixedWidth>
           <IconButton
             disabled={!canRaise}
-            iconName={arrows}
+            iconName={arrows.id}
+            iconViewBox={arrows.viewBox}
             themeSize={ThemeSize.Small}
             themeColor={ThemeColor.Info}
             onClick={onRaiseButtonClick}

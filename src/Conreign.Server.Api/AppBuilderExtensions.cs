@@ -7,7 +7,7 @@ using Microsoft.AspNet.SignalR.Hubs;
 using Newtonsoft.Json;
 using Owin;
 using SimpleInjector;
-using SimpleInjector.Extensions.ExecutionContextScoping;
+using SimpleInjector.Lifestyles;
 
 namespace Conreign.Server.Api
 {
@@ -31,7 +31,7 @@ namespace Conreign.Server.Api
                 throw new ArgumentNullException(nameof(configuration));
             }
             var container = new Container();
-            container.Options.DefaultScopedLifestyle = new ExecutionContextScopeLifestyle();
+            container.Options.DefaultScopedLifestyle = new AsyncScopedLifestyle();
             container.RegisterConreignApi(initializer, configuration);
             var hubConfiguration = ConfigureSignalR(container);
             builder.UseWelcomePage("/");

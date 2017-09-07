@@ -45,7 +45,7 @@ namespace Conreign.Server.Host.Azure.Api
                 new PropertyEnricher("DeploymentId", RoleEnvironment.DeploymentId),
                 new PropertyEnricher("InstanceId", RoleEnvironment.CurrentRoleInstance.Id)
             };
-            _serilogDisposable = LogContext.PushProperties(logProperties);
+            _serilogDisposable = LogContext.Push(logProperties);
             // Starting appplication
             var endpoint = RoleEnvironment.CurrentRoleInstance.InstanceEndpoints["PublicApi"];
             var baseUri = $"{endpoint.Protocol}://{endpoint.IPEndpoint}";

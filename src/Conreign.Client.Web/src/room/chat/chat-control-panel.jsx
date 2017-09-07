@@ -33,7 +33,11 @@ function ChatControlPanel({
       {
         showSettings && (
           <GridCell fixedWidth>
-            <IconButton iconName={gear} onClick={onSettingsClick} />
+            <IconButton
+              iconName={gear.id}
+              iconViewBox={gear.viewBox}
+              onClick={onSettingsClick}
+            />
           </GridCell>
         )
       }
@@ -47,7 +51,8 @@ function ChatControlPanel({
       </GridCell>
       <GridCell fixedWidth>
         <IconButton
-          iconName={comment}
+          iconName={comment.id}
+          iconViewBox={comment.viewBox}
           onClick={onSendClick}
         >
           Send

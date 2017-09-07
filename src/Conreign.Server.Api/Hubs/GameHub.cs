@@ -108,10 +108,9 @@ namespace Conreign.Server.Api.Hubs
                 new PropertyEnricher("ConnectionId", Context.ConnectionId),
                 new PropertyEnricher("StopCalled", stopCalled)
             };
-            using (LogContext.PushProperties(props))
+            using (LogContext.Push(props))
             {
-                GameHubConnection hubConnection;
-                var removed = Connections.TryRemove(Context.ConnectionId, out hubConnection);
+                var removed = Connections.TryRemove(Context.ConnectionId, out GameHubConnection hubConnection);
                 if (!removed)
                 {
                     return TaskCompleted.Completed;
@@ -124,8 +123,7 @@ namespace Conreign.Server.Api.Hubs
 
         private IClientHandler GetHandlerSafely()
         {
-            GameHubConnection connection;
-            var exists = Connections.TryGetValue(Context.ConnectionId, out connection);
+            var exists = Connections.TryGetValue(Context.ConnectionId, out GameHubConnection connection);
             if (!exists)
             {
                 throw new InvalidOperationException(

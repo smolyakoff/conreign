@@ -35,7 +35,7 @@ namespace Conreign.LoadTest.Core.Behaviours
                 new PropertyEnricher("UserId", context.UserId),
                 new PropertyEnricher("EventType", notification.Event.GetType().Name)
             };
-            using (LogContext.PushProperties(diagnosticProperties))
+            using (LogContext.Push(diagnosticProperties))
             {
                 context.Logger.Debug("[Bot:{BotId}:{UserId}] Started to handle {EventType}.",
                     context.BotId,

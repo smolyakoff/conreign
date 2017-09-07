@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Orleans.MongoStorage.Configuration;
 using Microsoft.Orleans.MongoStorage.Driver;
 using Microsoft.Orleans.MongoStorage.Model;
@@ -21,6 +22,7 @@ namespace Microsoft.Orleans.MongoStorage
         private bool _isDriverInitialized;
         private MongoStorageOptions _options;
         private Guid _serviceId;
+        private IGrainReferenceConverter _grainReferenceConverter;
 
         public string Name { get; private set; }
 
@@ -30,6 +32,7 @@ namespace Microsoft.Orleans.MongoStorage
         {
             Name = name;
             _serviceId = providerRuntime.ServiceId;
+            _grainReferenceConverter = providerRuntime.ServiceProvider.GetRequiredService<IGrainReferenceConverter>();
             Log = providerRuntime.GetLogger($"Storage.MongoStorage.{_serviceId}");
             if (Log.IsVerbose3)
             {
@@ -48,7 +51,7 @@ namespace Microsoft.Orleans.MongoStorage
             _client = new MongoClient(_options.ConnectionString);
             _database = _client.GetDatabase(mongoUrl.DatabaseName);
             LogInfo($"Initialized MongoDB storage with options: {_options}.", MongoStorageCode.InfoInit);
-            return TaskDone.Done;
+            return Task.CompletedTask;
         }
 
         public Task Close()
@@ -56,7 +59,7 @@ namespace Microsoft.Orleans.MongoStorage
             _client = null;
             _database = null;
             LogInfo("Closed MongoDB storage.");
-            return TaskDone.Done;
+            return Task.CompletedTask;
         }
 
         public async Task ReadStateAsync(string grainType, GrainReference grainReference, IGrainState grainState)
@@ -170,7 +173,7 @@ namespace Microsoft.Orleans.MongoStorage
             }
             lock (_driverInitializationLock)
             {
-                BsonSerializer.RegisterSerializationProvider(new OrleansSerializerProvider());
+                BsonSerializer.RegisterSerializationProvider(new OrleansSerializerProvider(_grainReferenceConverter));
                 // Register class maps if they are not registered yet
                 foreach (var grainStateType in _options.GrainAssemblies.SelectMany(a => a.GetGrainStateTypes()))
                     BsonClassMap.LookupClassMap(grainStateType);

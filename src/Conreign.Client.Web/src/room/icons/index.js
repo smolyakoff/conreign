@@ -26,7 +26,7 @@ export function choosePlanetIcon(power, limits = PLANET_ICON_LIMITS) {
   )(limits);
   return {
     name,
-    id: ICON[name],
+    ...ICON[name],
   };
 }
 

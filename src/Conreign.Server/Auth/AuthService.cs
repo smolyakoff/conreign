@@ -4,9 +4,10 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Conreign.Contracts.Auth;
 using Conreign.Contracts.Errors;
-using Conreign.Server.Auth.Serialization;
 using Conreign.Server.Contracts.Auth;
 using JWT;
+using JWT.Algorithms;
+using JWT.Serializers;
 using Serilog;
 
 namespace Conreign.Server.Auth
@@ -15,12 +16,18 @@ namespace Conreign.Server.Auth
     {
         private readonly ILogger _logger;
         private readonly AuthOptions _options;
+        private readonly IJwtEncoder _jwtEncoder;
+        private readonly IJwtDecoder _jwtDecoder;
 
         public AuthService(AuthOptions options)
         {
-            JsonWebToken.JsonSerializer = new JsonNetSerializer();
             _options = options ?? throw new ArgumentNullException(nameof(options));
             _logger = Log.Logger.ForContext(GetType());
+            var jwtSerializer = new JsonNetSerializer();
+            var jwtValidator = new JwtValidator(jwtSerializer, new UtcDateTimeProvider());
+            var jwtUrlEncoder = new JwtBase64UrlEncoder();
+            _jwtEncoder = new JwtEncoder(new HMACSHA256Algorithm(), jwtSerializer, jwtUrlEncoder);
+            _jwtDecoder = new JwtDecoder(jwtSerializer, jwtValidator, jwtUrlEncoder);
         }
 
         public Task<ClaimsIdentity> Authenticate(string accessToken)
@@ -29,8 +36,7 @@ namespace Conreign.Server.Auth
             {
                 throw new ArgumentException("Access token cannot be null or empty.", nameof(accessToken));
             }
-            ClaimsIdentity identity;
-            var exception = TryAuthenticate(accessToken, out identity);
+            var exception = TryAuthenticate(accessToken, out ClaimsIdentity identity);
             if (exception != null)
             {
                 throw exception;
@@ -40,9 +46,8 @@ namespace Conreign.Server.Auth
 
         public Task<string> Login(string accessToken = null)
         {
-            ClaimsIdentity identity;
             Guid userId;
-            if (string.IsNullOrEmpty(accessToken) || TryAuthenticate(accessToken, out identity) != null)
+            if (string.IsNullOrEmpty(accessToken) || TryAuthenticate(accessToken, out ClaimsIdentity identity) != null)
             {
                 userId = Guid.NewGuid();
             }
@@ -54,7 +59,7 @@ namespace Conreign.Server.Auth
             }
             var lifetime = TimeSpan.FromSeconds(_options.TokenLifetimeInSeconds);
             var payload = JwtTokenPayload.Create(userId.ToString(), lifetime);
-            var token = JsonWebToken.Encode(payload, _options.JwtSecret, JwtHashAlgorithm.HS512);
+            var token = _jwtEncoder.Encode(payload, _options.JwtSecret);
             return Task.FromResult(token);
         }
 
@@ -64,7 +69,7 @@ namespace Conreign.Server.Auth
             identity = null;
             try
             {
-                payload = JsonWebToken.DecodeToObject<JwtTokenPayload>(accessToken, _options.JwtSecret, false);
+                payload = _jwtDecoder.DecodeToObject<JwtTokenPayload>(accessToken, _options.JwtSecret, false);
             }
             catch (Exception ex)
             {
@@ -75,8 +80,7 @@ namespace Conreign.Server.Auth
             {
                 return UserException.Create(AuthenticationError.ExpiredToken, "Authentication token is expired.");
             }
-            Guid userId;
-            var parsed = Guid.TryParse(payload.Subject, out userId);
+            var parsed = Guid.TryParse(payload.Subject, out Guid userId);
             if (!parsed)
             {
                 return UserException.Create(AuthenticationError.BadToken, "Invalid subject.");

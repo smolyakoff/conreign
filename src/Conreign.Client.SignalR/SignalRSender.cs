@@ -57,7 +57,7 @@ namespace Conreign.Client.SignalR
                 new PropertyEnricher("TraceId", meta.TraceId),
                 new PropertyEnricher("CommandType", command.GetType().Name)
             };
-            using (LogContext.PushProperties(diagnosticProperties))
+            using (LogContext.Push(diagnosticProperties))
             {
                 var result = await _retryPolicy.ExecuteAsync(async () =>
                 {

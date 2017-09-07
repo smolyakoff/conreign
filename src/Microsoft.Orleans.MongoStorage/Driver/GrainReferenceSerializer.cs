@@ -13,12 +13,18 @@ namespace Microsoft.Orleans.MongoStorage.Driver
 {
     public class GrainReferenceSerializer : SerializerBase<GrainReference>
     {
+        private readonly IGrainReferenceConverter _grainReferenceConverter;
         private const string InterfaceNameField = "grain_interface";
         private const string KeyField = "grain_key";
 
         private static readonly MethodInfo DeserializationMethod = typeof(GrainExtensions).GetMethod(
             "Cast",
             BindingFlags.Static | BindingFlags.Public);
+
+        public GrainReferenceSerializer(IGrainReferenceConverter grainReferenceConverter)
+        {
+            _grainReferenceConverter = grainReferenceConverter ?? throw new ArgumentNullException(nameof(grainReferenceConverter));
+        }
 
         public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args,
             GrainReference value)
@@ -67,7 +73,7 @@ namespace Microsoft.Orleans.MongoStorage.Driver
                     $"Expected ${InterfaceNameField} and ${KeyField} fields in the document. " +
                     $"Got ${InterfaceNameField}={interfaceName}, {KeyField}={grainKey}.");
             }
-            var grainReference = GrainReference.FromKeyString(grainKey);
+            var grainReference = _grainReferenceConverter.GetGrainFromKeyString(grainKey);
             var grainInterfaceType = LookupGrainInterfaces(interfaceName, args.NominalType)
                 .FirstOrDefault(x => x != null);
             if (grainInterfaceType == null)
