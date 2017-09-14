@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Orleans;
+using Orleans.MongoStorageProvider.Driver;
 
-namespace Microsoft.Orleans.MongoStorage
+namespace Orleans.MongoStorageProvider
 {
     internal static class AssemblyLookupExtensions
     {
@@ -14,6 +14,21 @@ namespace Microsoft.Orleans.MongoStorage
                 .GetExportedTypes()
                 .Where(IsGrainWithStateType)
                 .Select(GetGrainStateType);
+        }
+
+        public static IEnumerable<IMongoDriverBootstrap> GetMongoDriverBootstraps(this Assembly assembly)
+        {
+            return assembly
+                .GetTypes()
+                .Where(IsMongoDriverBootstrapType)
+                .Select(Activator.CreateInstance)
+                .Cast<IMongoDriverBootstrap>();
+        }
+
+        private static bool IsMongoDriverBootstrapType(Type type)
+        {
+            return typeof(IMongoDriverBootstrap).IsAssignableFrom(type) &&
+                type.GetConstructor(Type.EmptyTypes) != null;
         }
 
         private static bool IsGrainWithStateType(Type type)

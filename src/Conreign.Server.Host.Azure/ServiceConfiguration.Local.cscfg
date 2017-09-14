@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ServiceConfiguration serviceName="Conreign.Cloud.Api" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceConfiguration" osFamily="4" osVersion="*" schemaVersion="2015-04.2.6">
-  <Role name="Conreign.Host.Azure">
+<ServiceConfiguration serviceName="Conreign.Server.Host.Azure" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceConfiguration" osFamily="4" osVersion="*" schemaVersion="2015-04.2.6">
+  <Role name="Conreign.Server.Host.Azure.Silo">
     <Instances count="1" />
     <ConfigurationSettings>
       <Setting name="Environment" value="emulator" />
@@ -9,7 +9,7 @@
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
     </ConfigurationSettings>
   </Role>
-  <Role name="Conreign.Api.Host.Azure">
+  <Role name="Conreign.Server.Host.Azure.Api">
     <Instances count="1" />
     <ConfigurationSettings>
       <Setting name="Environment" value="emulator" />

@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Orleans.Runtime;
 
-namespace Microsoft.Orleans.MongoStorage
+namespace Orleans.MongoStorageProvider
 {
     internal static class Naming
     {

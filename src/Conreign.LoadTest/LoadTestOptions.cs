@@ -14,7 +14,6 @@ namespace Conreign.LoadTest
         public LoadTestOptions()
         {
             ConnectionUri = "http://localhost:3000";
-            ElasticSearchUri = "http://localhost:9200";
             MinimumLogLevel = LogEventLevel.Information;
             var process = Process.GetCurrentProcess();
             InstanceId = $"{Dns.GetHostName()}({process.Id})";

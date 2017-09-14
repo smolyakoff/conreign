@@ -24,7 +24,7 @@ let TargetSlot = getBuildParamOrDefault "Slot" "production"
 let GitHash = Fake.Git.Information.getCurrentSHA1(SolutionDir)
 let Timestamp = DateTime.Now.ToString("s").Replace(":", "-").Replace("T", "__")
 
-let BackendProjectName = "Conreign.Api.Azure"
+let BackendProjectName = "Conreign.Server.Host.Azure"
 let BackendProjectFile = !! (SourceDir @@ BackendProjectName @@ "*.ccproj") |> Seq.head
 let BackendProjectBuildDir = BuildDir @@ BackendProjectName
 let BackendProjectVersion = sprintf "%s-%s__%s" Versions.Api GitHash Timestamp

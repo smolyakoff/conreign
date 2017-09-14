@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.12
+VisualStudioVersion = 15.0.26730.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Contracts", "src\Conreign.Contracts\Conreign.Contracts.csproj", "{00409622-346B-4926-B745-E5F595BD3BB7}"
 EndProject
@@ -16,7 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{B07536
 		versions.json = versions.json
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.Orleans.MongoStorage", "src\Microsoft.Orleans.MongoStorage\Microsoft.Orleans.MongoStorage.csproj", "{BA953785-1EFC-461E-9227-AD3E4C07EE7C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orleans.MongoStorageProvider", "src\Orleans.MongoStorageProvider\Orleans.MongoStorageProvider.csproj", "{BA953785-1EFC-461E-9227-AD3E4C07EE7C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Host", "Host", "{2397B05B-F57A-4F01-9531-43496876623A}"
 EndProject
@@ -30,7 +30,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Client.Orleans", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Client.Handler", "src\Conreign.Client.Handler\Conreign.Client.Handler.csproj", "{BEEF0347-534C-4987-9BB4-B7B038D71505}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Azure", "Azure", "{461F0F71-2CB8-4368-ADEE-329687A05CE3}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Azure Cloud Service", "Azure Cloud Service", "{461F0F71-2CB8-4368-ADEE-329687A05CE3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Local", "Local", "{B0E35D13-E3A0-4C9A-BE64-4AD54370A274}"
 EndProject
@@ -207,5 +207,6 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8
+		SolutionGuid = {7621FD16-5A3A-4ADB-9D0A-73D58F2A8793}
 	EndGlobalSection
 EndGlobal

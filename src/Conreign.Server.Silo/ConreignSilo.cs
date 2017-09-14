@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Conreign.Server.Contracts.Communication;
 using Conreign.Server.Gameplay;
-using Microsoft.Orleans.MongoStorage.Configuration;
+using Orleans.MongoStorageProvider.Configuration;
 using Orleans.Runtime.Configuration;
 
 namespace Conreign.Server.Silo
@@ -32,7 +32,6 @@ namespace Conreign.Server.Silo
                 conreignConfiguration.SystemStorageConnectionString;
             orleansConfig.AddSimpleMessageStreamProvider(StreamConstants.ProviderName);
             orleansConfig.AddMemoryStorageProvider("PubSubStore");
-            orleansConfig.Globals.RegisterBootstrapProvider<MongoDriverBootstrapProvider>("MongoDriver");
             switch (conreignConfiguration.DataStorageType)
             {
                 case StorageType.AzureTable:
@@ -41,9 +40,11 @@ namespace Conreign.Server.Silo
                     break;
                 case StorageType.MongoDb:
                     var grainAssemblies = new List<Assembly> {typeof(GameGrain).Assembly};
+                    var bootstrapAssemblies = new List<Assembly> {Assembly.GetExecutingAssembly()};
                     var options = new MongoStorageOptions(
                         conreignConfiguration.DataStorageConnectionString,
-                        grainAssemblies);
+                        grainAssemblies,
+                        bootstrapAssemblies);
                     orleansConfig.AddMongoDbStorageProvider("Default", options);
                     break;
                 case StorageType.InMemory:

@@ -8,10 +8,10 @@
     <ProjectGuid>287775a1-6a4a-4b0c-a3bd-c56bcce90d31</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Conreign.Cloud.Api</RootNamespace>
-    <AssemblyName>Conreign.Cloud.Api</AssemblyName>
+    <RootNamespace>Conreign.Server.Host.Azure</RootNamespace>
+    <AssemblyName>Conreign.Server.Host.Azure</AssemblyName>
     <StartDevelopmentStorage>True</StartDevelopmentStorage>
-    <Name>Conreign.Cloud.Api</Name>
+    <Name>Conreign.Server.Host.Azure</Name>
     <UseWebProjectPorts>True</UseWebProjectPorts>
     <PackageEnableRemoteDebugger>False</PackageEnableRemoteDebugger>
   </PropertyGroup>
@@ -45,7 +45,7 @@
       <Project>{a29cea9b-0ea4-487f-838e-25cb696276df}</Project>
       <Private>True</Private>
       <RoleType>Worker</RoleType>
-      <RoleName>Conreign.Api.Host.Azure</RoleName>
+      <RoleName>Conreign.Server.Host.Azure.Api</RoleName>
       <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
     </ProjectReference>
     <ProjectReference Include="..\Conreign.Server.Host.Azure.Silo\Conreign.Server.Host.Azure.Silo.csproj">
@@ -53,18 +53,12 @@
       <Project>{5d54b9e4-56b3-4083-bea1-bb3ea25069c1}</Project>
       <Private>True</Private>
       <RoleType>Worker</RoleType>
-      <RoleName>Conreign.Host.Azure</RoleName>
+      <RoleName>Conreign.Server.Host.Azure.Silo</RoleName>
       <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Conreign.Api.Host.AzureContent\" />
-    <Folder Include="Conreign.Host.AzureContent\" />
     <Folder Include="Profiles" />
-  </ItemGroup>
-  <ItemGroup>
-    <DiagnosticsConfiguration Include="Conreign.Api.Host.AzureContent\diagnostics.wadcfgx" />
-    <DiagnosticsConfiguration Include="Conreign.Host.AzureContent\diagnostics.wadcfgx" />
   </ItemGroup>
   <!-- Import the target files for this project template -->
   <PropertyGroup>

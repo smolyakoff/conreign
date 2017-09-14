@@ -12,7 +12,7 @@ let PackageCloudService projectPath outputPath version =
             ("Configuration", "Release");
             ("TargetProfile", "Cloud")
         ]
-    MSBuild outputPath "Publish" props [projectPath] |> Log "[BUILD] "
+    MSBuild outputPath "Clean,Publish" props [projectPath] |> Log "[BUILD] "
     let path = !! (outputPath + "app.publish" @@ "*.cspkg") |> Seq.head
     let info = new FileInfo(path)
     let newPath = info.DirectoryName @@ (sprintf "%s__%s.cspkg" (Path.GetFileNameWithoutExtension(info.Name)) version)

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Orleans.Providers;
 
-namespace Microsoft.Orleans.MongoStorage.Configuration
+namespace Orleans.MongoStorageProvider.Configuration
 {
     internal static class MongoStorageOptionsExtensions
     {
@@ -18,24 +18,12 @@ namespace Microsoft.Orleans.MongoStorage.Configuration
             var connectionString = config.GetProperty(nameof(options.ConnectionString),
                 MongoStorageOptions.DefaultConnectionString);
             var collectionNamePrefix = config.GetProperty(nameof(options.CollectionNamePrefix), null);
-            var grainAssembliesCsv = config.GetProperty(nameof(options.GrainAssemblies), string.Empty);
+            var grainAssemblies = config.GetProperty(nameof(options.GrainAssemblies), string.Empty);
+            var bootstrapAssemblies = config.GetProperty(nameof(options.BootstrapAssemblies), string.Empty);
             options.ConnectionString = connectionString;
             options.CollectionNamePrefix = collectionNamePrefix;
-            options.GrainAssemblies = grainAssembliesCsv
-                .Split(new[] {';'}, StringSplitOptions.RemoveEmptyEntries)
-                .Select(x => x.Trim())
-                .Select(name =>
-                {
-                    try
-                    {
-                        return Assembly.Load(name);
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new InvalidOperationException($"Failed to load grain assembly {name}. {ex.Message}", ex);
-                    }
-                })
-                .ToList();
+            options.GrainAssemblies = LoadAssemblies(grainAssemblies);
+            options.BootstrapAssemblies = LoadAssemblies(bootstrapAssemblies);
             return options;
         }
 
@@ -49,8 +37,28 @@ namespace Microsoft.Orleans.MongoStorage.Configuration
             {
                 [nameof(options.ConnectionString)] = options.ConnectionString,
                 [nameof(options.CollectionNamePrefix)] = options.CollectionNamePrefix,
-                [nameof(options.GrainAssemblies)] = string.Join(";", options.GrainAssemblies.Select(a => a.FullName))
+                [nameof(options.GrainAssemblies)] = string.Join(";", options.GrainAssemblies.Select(a => a.FullName)),
+                [nameof(options.BootstrapAssemblies)] = string.Join(";", options.BootstrapAssemblies.Select(a => a.FullName))
             };
+        }
+
+        private static List<Assembly> LoadAssemblies(string assemblies)
+        {
+            return assemblies
+                .Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => x.Trim())
+                .Select(name =>
+                {
+                    try
+                    {
+                        return Assembly.Load(name);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new InvalidOperationException($"Orleans MongoDB storage provider failed to load assembly {name}. {ex.Message}", ex);
+                    }
+                })
+                .ToList();
         }
     }
 }

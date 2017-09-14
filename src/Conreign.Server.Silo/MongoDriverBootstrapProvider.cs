@@ -1,16 +1,15 @@
 ﻿using System.Linq;
-using System.Threading.Tasks;
 using Conreign.Contracts.Communication;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Bson.Serialization.Options;
-using Orleans.Providers;
+using Orleans.MongoStorageProvider.Driver;
 
 namespace Conreign.Server.Silo
 {
-    internal class MongoDriverBootstrapProvider : IBootstrapProvider
+    internal class MongoDriverBootstrapProvider : IMongoDriverBootstrap
     {
-        public Task Init(string name, IProviderRuntime providerRuntime, IProviderConfiguration config)
+        public void Init()
         {
             var contractsAssembly = typeof(IClientEvent).Assembly;
             var eventTypes = contractsAssembly
@@ -27,14 +26,6 @@ namespace Conreign.Server.Silo
                 "Conreign",
                 conventionPack,
                 t => true);
-            return Task.FromResult(0);
         }
-
-        public Task Close()
-        {
-            return Task.FromResult(0);
-        }
-
-        public string Name { get; } = "MongoDriverBootstrapProvider";
     }
 }

@@ -4,37 +4,45 @@ using System.Linq;
 using System.Reflection;
 using MongoDB.Driver;
 
-namespace Microsoft.Orleans.MongoStorage.Configuration
+namespace Orleans.MongoStorageProvider.Configuration
 {
     public class MongoStorageOptions
     {
         public const string DefaultConnectionString = "mongodb://localhost:27017/orleans_grains";
 
-        public MongoStorageOptions() : this(DefaultConnectionString, new List<Assembly>(0))
+        public MongoStorageOptions() : this(DefaultConnectionString)
         {
         }
 
-        public MongoStorageOptions(string connectionString) : this(connectionString, new List<Assembly>(0))
+        public MongoStorageOptions(string connectionString) 
+            : this(connectionString, new List<Assembly>(0))
         {
         }
 
-        public MongoStorageOptions(string connectionString, IEnumerable<Assembly> grainAssemblies)
+        public MongoStorageOptions(string connectionString, IEnumerable<Assembly> grainAssemblies) 
+            : this(connectionString, grainAssemblies, new List<Assembly>(0))
+        {
+        }
+
+        public MongoStorageOptions(
+            string connectionString, 
+            IEnumerable<Assembly> grainAssemblies, 
+            IEnumerable<Assembly> bootstrapAssemblies)
         {
             if (string.IsNullOrEmpty(connectionString))
             {
                 throw new ArgumentNullException(nameof(connectionString));
             }
-            if (grainAssemblies == null)
-            {
-                throw new ArgumentNullException(nameof(grainAssemblies));
-            }
             ConnectionString = connectionString;
-            GrainAssemblies = grainAssemblies.ToList();
+            GrainAssemblies = grainAssemblies?.ToList() ?? throw new ArgumentNullException(nameof(grainAssemblies));
+            BootstrapAssemblies = bootstrapAssemblies?.ToList() ?? throw new ArgumentNullException(nameof(bootstrapAssemblies));
         }
 
         public string ConnectionString { get; set; }
 
         public List<Assembly> GrainAssemblies { get; set; }
+
+        public List<Assembly> BootstrapAssemblies { get; set; }
 
         public string CollectionNamePrefix { get; set; }
 

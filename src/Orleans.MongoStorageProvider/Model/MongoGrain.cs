@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 
-namespace Microsoft.Orleans.MongoStorage.Model
+namespace Orleans.MongoStorageProvider.Model
 {
     internal class MongoGrain
     {

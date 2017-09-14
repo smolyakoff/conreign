@@ -2,7 +2,7 @@
 using MongoDB.Bson.Serialization;
 using Orleans.Runtime;
 
-namespace Microsoft.Orleans.MongoStorage.Driver
+namespace Orleans.MongoStorageProvider.Driver
 {
     public class OrleansSerializerProvider : IBsonSerializationProvider
     {

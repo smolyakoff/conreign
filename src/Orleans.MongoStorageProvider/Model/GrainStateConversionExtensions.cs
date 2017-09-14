@@ -1,8 +1,7 @@
 ﻿using System;
-using Orleans;
 using Orleans.Runtime;
 
-namespace Microsoft.Orleans.MongoStorage.Model
+namespace Orleans.MongoStorageProvider.Model
 {
     internal static class GrainStateConversionExtensions
     {
