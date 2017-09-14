@@ -46,6 +46,8 @@ nuget Microsoft.Owin.Cors
 nuget Microsoft.Owin.Diagnostics
 nuget Microsoft.AspNet.SignalR.Client
 nuget Microsoft.AspNet.SignalR.SelfHost
+nuget Topshelf
+nuget Etg.Yams
 
 group Build
 	source https://nuget.org/api/v2
