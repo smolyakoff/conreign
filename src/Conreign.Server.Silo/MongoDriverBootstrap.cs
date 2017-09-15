@@ -7,7 +7,7 @@ using Orleans.MongoStorageProvider.Driver;
 
 namespace Conreign.Server.Silo
 {
-    internal class MongoDriverBootstrapProvider : IMongoDriverBootstrap
+    internal class MongoDriverBootstrap : IMongoDriverBootstrap
     {
         public void Init()
         {

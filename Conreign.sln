@@ -55,6 +55,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{7F373F
 		config\silo.config.json = config\silo.config.json
 		config\silo.emulator.config.json = config\silo.emulator.config.json
 		config\silo.production.config.json = config\silo.production.config.json
+		config\yams.config.json = config\yams.config.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{E7B4CE72-E772-4EF0-9E83-C66EFB25C425}"
@@ -86,11 +87,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Core", "src\Conrei
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Core.Tests", "test\Conreign.Core.Tests\Conreign.Core.Tests.csproj", "{D7DAC5CA-A5D1-4462-AD78-644677E1DEDE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Server.Host.Development", "src\Conreign.Server.Host.Development\Conreign.Server.Host.Development.csproj", "{764D9960-6EA5-42BF-B1E0-95837AC656BB}"
-EndProject
 Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "Conreign.Server.Host.Azure", "src\Conreign.Server.Host.Azure\Conreign.Server.Host.Azure.ccproj", "{287775A1-6A4A-4B0C-A3BD-C56BCCE90D31}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Server.Host.Yams", "src\Conreign.Server.Host.Yams\Conreign.Server.Host.Yams.csproj", "{A81F8077-C050-47A8-835A-13C6D79B2FBC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Server.Host.Console.Silo", "src\Conreign.Server.Host.Console.Silo\Conreign.Server.Host.Console.Silo.csproj", "{AD08BE02-E5B1-4034-B5DA-89964F4FF63D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Server.Host.Console.Api", "src\Conreign.Server.Host.Console.Api\Conreign.Server.Host.Console.Api.csproj", "{C1B8E5A8-AA8E-416D-BF33-1A845E4B7F2F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Server.Host.Console.All", "src\Conreign.Server.Host.Console.All\Conreign.Server.Host.Console.All.csproj", "{764D9960-6EA5-42BF-B1E0-95837AC656BB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -170,10 +175,6 @@ Global
 		{D7DAC5CA-A5D1-4462-AD78-644677E1DEDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D7DAC5CA-A5D1-4462-AD78-644677E1DEDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D7DAC5CA-A5D1-4462-AD78-644677E1DEDE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{764D9960-6EA5-42BF-B1E0-95837AC656BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{764D9960-6EA5-42BF-B1E0-95837AC656BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{764D9960-6EA5-42BF-B1E0-95837AC656BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{764D9960-6EA5-42BF-B1E0-95837AC656BB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{287775A1-6A4A-4B0C-A3BD-C56BCCE90D31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{287775A1-6A4A-4B0C-A3BD-C56BCCE90D31}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{287775A1-6A4A-4B0C-A3BD-C56BCCE90D31}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -182,6 +183,18 @@ Global
 		{A81F8077-C050-47A8-835A-13C6D79B2FBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A81F8077-C050-47A8-835A-13C6D79B2FBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A81F8077-C050-47A8-835A-13C6D79B2FBC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD08BE02-E5B1-4034-B5DA-89964F4FF63D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD08BE02-E5B1-4034-B5DA-89964F4FF63D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD08BE02-E5B1-4034-B5DA-89964F4FF63D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD08BE02-E5B1-4034-B5DA-89964F4FF63D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1B8E5A8-AA8E-416D-BF33-1A845E4B7F2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1B8E5A8-AA8E-416D-BF33-1A845E4B7F2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1B8E5A8-AA8E-416D-BF33-1A845E4B7F2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1B8E5A8-AA8E-416D-BF33-1A845E4B7F2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{764D9960-6EA5-42BF-B1E0-95837AC656BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{764D9960-6EA5-42BF-B1E0-95837AC656BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{764D9960-6EA5-42BF-B1E0-95837AC656BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{764D9960-6EA5-42BF-B1E0-95837AC656BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -208,12 +221,14 @@ Global
 		{9764E726-5E8C-4A53-8221-9A452F1C7CE9} = {420E0885-10E8-44C7-899B-FF39004DEADE}
 		{56E6C647-CD9F-4432-9D2E-D0C00E79850B} = {420E0885-10E8-44C7-899B-FF39004DEADE}
 		{D7DAC5CA-A5D1-4462-AD78-644677E1DEDE} = {420E0885-10E8-44C7-899B-FF39004DEADE}
-		{764D9960-6EA5-42BF-B1E0-95837AC656BB} = {B0E35D13-E3A0-4C9A-BE64-4AD54370A274}
 		{287775A1-6A4A-4B0C-A3BD-C56BCCE90D31} = {461F0F71-2CB8-4368-ADEE-329687A05CE3}
 		{A81F8077-C050-47A8-835A-13C6D79B2FBC} = {B0E35D13-E3A0-4C9A-BE64-4AD54370A274}
+		{AD08BE02-E5B1-4034-B5DA-89964F4FF63D} = {B0E35D13-E3A0-4C9A-BE64-4AD54370A274}
+		{C1B8E5A8-AA8E-416D-BF33-1A845E4B7F2F} = {B0E35D13-E3A0-4C9A-BE64-4AD54370A274}
+		{764D9960-6EA5-42BF-B1E0-95837AC656BB} = {B0E35D13-E3A0-4C9A-BE64-4AD54370A274}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8
 		SolutionGuid = {7621FD16-5A3A-4ADB-9D0A-73D58F2A8793}
+		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8
 	EndGlobalSection
 EndGlobal

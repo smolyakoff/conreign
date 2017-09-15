@@ -4,26 +4,35 @@ using System.Reflection;
 using Conreign.Server.Contracts.Communication;
 using Conreign.Server.Gameplay;
 using Orleans.MongoStorageProvider.Configuration;
+using Orleans.Runtime;
 using Orleans.Runtime.Configuration;
+using Orleans.Telemetry.SerilogConsumer;
+using Serilog;
 
 namespace Conreign.Server.Silo
 {
     public class ConreignSilo
     {
-        private ConreignSilo(ClusterConfiguration orleansConfiguration, ConreignSiloConfiguration configuration)
+        private ConreignSilo(
+            ClusterConfiguration orleansConfiguration, 
+            ConreignSiloConfiguration configuration,
+            ILogger logger)
         {
             OrleansConfiguration = orleansConfiguration;
             Configuration = configuration;
+            Logger = logger;
         }
 
         public ClusterConfiguration OrleansConfiguration { get; }
         public ConreignSiloConfiguration Configuration { get; }
+        public ILogger Logger { get; }
 
-        public static ConreignSilo Configure(ClusterConfiguration baseOrleansConfiguration = null,
+        public static ConreignSilo Create(
+            ClusterConfiguration baseOrleansConfiguration = null,
             ConreignSiloConfiguration conreignConfiguration = null)
         {
-            conreignConfiguration = conreignConfiguration ??
-                                    ConreignSiloConfiguration.Load(Environment.CurrentDirectory);
+            conreignConfiguration = conreignConfiguration ?? 
+                ConreignSiloConfiguration.Load(Environment.CurrentDirectory, ConreignSiloConfiguration.DefaultEnvironment);
             var orleansConfig = baseOrleansConfiguration ?? ClusterConfiguration.LocalhostPrimarySilo();
             orleansConfig.Globals.LivenessType = conreignConfiguration.LivenessStorageType;
             orleansConfig.Globals.DataConnectionString = conreignConfiguration.SystemStorageConnectionString;
@@ -53,7 +62,17 @@ namespace Conreign.Server.Silo
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            return new ConreignSilo(orleansConfig, conreignConfiguration);
+            var logger = new LoggerConfiguration()
+                .MinimumLevel.Is(conreignConfiguration.MinimumLogLevel)
+                .Enrich.FromLogContext()
+                .WriteTo.LiterateConsole()
+                .CreateLogger()
+                .ForContext("ApplicationId", "Conreign.Silo");
+            // HACK: Side-effect here but what can I do with static classes :(
+            var consumer = new SerilogConsumer(logger);
+            LogManager.LogConsumers.Add(consumer);
+            LogManager.TelemetryConsumers.Add(consumer);
+            return new ConreignSilo(orleansConfig, conreignConfiguration, logger);
         }
     }
 }

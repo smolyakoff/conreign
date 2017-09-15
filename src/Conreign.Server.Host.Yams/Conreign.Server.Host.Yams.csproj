@@ -42,11 +42,12 @@
     <Compile Include="YamsServiceConfiguration.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="paket.references" />
-    <None Include="yams.config.json">
+    <None Include="..\..\config\yams.config.json">
+      <Link>yams.config.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="App.config" />
+    <None Include="paket.references" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Choose>

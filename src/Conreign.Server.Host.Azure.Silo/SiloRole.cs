@@ -20,7 +20,7 @@ namespace Conreign.Server.Host.Azure.Silo
             var config = ConreignSiloConfiguration.Load(Environment.CurrentDirectory, env);
             var orleansConfiguration = new ClusterConfiguration();
             orleansConfiguration.Globals.DeploymentId = RoleEnvironment.DeploymentId;
-            var conreignSilo = ConreignSilo.Configure(orleansConfiguration, config);
+            var conreignSilo = ConreignSilo.Create(orleansConfiguration, config);
             _silo = new AzureSilo();
             var started = _silo.Start(conreignSilo.OrleansConfiguration,
                 conreignSilo.Configuration.SystemStorageConnectionString);

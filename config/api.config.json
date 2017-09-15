@@ -1,4 +1,3 @@
 {
-  "MinimumLogLevel": "Information",
-  "ElasticSearchUri": "http://localhost:9200"
+  "MinimumLogLevel": "Information"
 }

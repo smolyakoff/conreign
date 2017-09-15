@@ -1,5 +1,4 @@
-﻿Serilog.Sinks.Literate
+﻿Serilog
 Microsoft.Orleans.Core
-Microsoft.Orleans.Server
 Microsoft.Owin.Cors
 Microsoft.AspNet.SignalR.SelfHost

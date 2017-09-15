@@ -41,6 +41,7 @@ nuget Microsoft.Orleans.OrleansCodeGenerator.Build
 nuget Microsoft.Orleans.Server
 nuget Microsoft.Orleans.OrleansAzureUtils
 nuget Microsoft.Orleans.Client
+nuget Orleans.Telemetry.SerilogConsumer
 
 nuget Microsoft.Owin.Cors
 nuget Microsoft.Owin.Diagnostics

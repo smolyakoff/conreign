@@ -10,11 +10,7 @@ namespace Conreign.Client.Orleans
 
         public OrleansClientInitializer(ClientConfiguration configuration)
         {
-            if (configuration == null)
-            {
-                throw new ArgumentNullException(nameof(configuration));
-            }
-            _configuration = configuration;
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
         public void Initialize()
