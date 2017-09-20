@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Net;
 using System.Threading;
-using Conreign.Server.Silo;
-using Orleans.Runtime.Configuration;
-using Orleans.Runtime.Host;
 
 namespace Conreign.Server.Host.Console.Silo
 {
@@ -13,7 +9,8 @@ namespace Conreign.Server.Host.Console.Silo
         private static void Main(string[] args)
         {
             var exitEvent = new ManualResetEvent(false);
-            System.Console.CancelKeyPress += (sender, eventArgs) => {
+            System.Console.CancelKeyPress += (sender, eventArgs) =>
+            {
                 eventArgs.Cancel = true;
                 exitEvent.Set();
             };

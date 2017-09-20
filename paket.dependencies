@@ -55,7 +55,7 @@ group Build
 
 	nuget FAKE
 	nuget FSharp.Data
-	nuget WindowsAzure.Storage 8.0.0.0
+	nuget WindowsAzure.Storage
 	nuget Microsoft.Azure.Storage.DataMovement
 	nuget Microsoft.WindowsAzure.Management.Libraries
 	nuget Microsoft.Bcl.Async

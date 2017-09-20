@@ -239,5 +239,6 @@ paket-files
 
 # Project Specific
 build
+temp
 logs
 config/**/*secrets.*

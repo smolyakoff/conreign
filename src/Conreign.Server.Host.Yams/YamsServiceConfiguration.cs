@@ -20,6 +20,7 @@ namespace Conreign.Server.Host.Yams
         {
             Environment = environment;
             InstanceId = System.Environment.MachineName;
+            InstanceUpdateDomain = InstanceId;
             ApplicationInstallDirectory = Path.Combine(System.Environment.CurrentDirectory, "Applications");
             UpdatePeriodInSeconds = 15;
             RestartCount = 3;

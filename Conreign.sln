@@ -60,13 +60,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{7F373F
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{E7B4CE72-E772-4EF0-9E83-C66EFB25C425}"
 	ProjectSection(SolutionItems) = preProject
-		tools\azure.fsx = tools\azure.fsx
-		tools\build.fsx = tools\build.fsx
 		tools\config.fsx = tools\config.fsx
-		do.bat = do.bat
-		tools\do.fsx = tools\do.fsx
+		make.bat = make.bat
+		tools\make.fsx = tools\make.fsx
 		tools\run-loadtest.ps1 = tools\run-loadtest.ps1
-		tools\vars.fsx = tools\vars.fsx
+		tools\tasks.fsx = tools\tasks.fsx
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.LoadTest.Supervisor", "src\Conreign.LoadTest.Supervisor\Conreign.LoadTest.Supervisor.csproj", "{7A3BFF9F-8BC0-43D7-9223-8A1C37A5142A}"

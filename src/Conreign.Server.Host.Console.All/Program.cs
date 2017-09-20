@@ -9,7 +9,8 @@ namespace Conreign.Server.Host.Console.All
         public static void Main(string[] args)
         {
             var exitEvent = new ManualResetEvent(false);
-            System.Console.CancelKeyPress += (sender, eventArgs) => {
+            System.Console.CancelKeyPress += (sender, eventArgs) =>
+            {
                 eventArgs.Cancel = true;
                 exitEvent.Set();
             };
