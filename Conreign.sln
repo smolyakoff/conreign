@@ -95,6 +95,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Server.Host.Consol
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign.Server.Host.Console.All", "src\Conreign.Server.Host.Console.All\Conreign.Server.Host.Console.All.csproj", "{764D9960-6EA5-42BF-B1E0-95837AC656BB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{CC09864D-42E3-43EF-99B7-654D9A36213F}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "Conreign.Server.Host.Docker", "src\Conreign.Server.Host.Docker\Conreign.Server.Host.Docker.dcproj", "{7BA8A9AB-5A39-4864-888B-DA02D910EAF9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -193,6 +197,10 @@ Global
 		{764D9960-6EA5-42BF-B1E0-95837AC656BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{764D9960-6EA5-42BF-B1E0-95837AC656BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{764D9960-6EA5-42BF-B1E0-95837AC656BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BA8A9AB-5A39-4864-888B-DA02D910EAF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BA8A9AB-5A39-4864-888B-DA02D910EAF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BA8A9AB-5A39-4864-888B-DA02D910EAF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BA8A9AB-5A39-4864-888B-DA02D910EAF9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -224,9 +232,11 @@ Global
 		{AD08BE02-E5B1-4034-B5DA-89964F4FF63D} = {B0E35D13-E3A0-4C9A-BE64-4AD54370A274}
 		{C1B8E5A8-AA8E-416D-BF33-1A845E4B7F2F} = {B0E35D13-E3A0-4C9A-BE64-4AD54370A274}
 		{764D9960-6EA5-42BF-B1E0-95837AC656BB} = {B0E35D13-E3A0-4C9A-BE64-4AD54370A274}
+		{CC09864D-42E3-43EF-99B7-654D9A36213F} = {2397B05B-F57A-4F01-9531-43496876623A}
+		{7BA8A9AB-5A39-4864-888B-DA02D910EAF9} = {CC09864D-42E3-43EF-99B7-654D9A36213F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {7621FD16-5A3A-4ADB-9D0A-73D58F2A8793}
 		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.TransientFaultHandling.6.0.1304.0\lib\portable-net45+win+wp8
+		SolutionGuid = {7621FD16-5A3A-4ADB-9D0A-73D58F2A8793}
 	EndGlobalSection
 EndGlobal

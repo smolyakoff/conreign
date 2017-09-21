@@ -22,8 +22,9 @@ namespace Conreign.Server.Host.Console.Silo
                     exitEvent.WaitOne();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                System.Console.WriteLine(ex.ToString());
                 Environment.Exit(-1);
             }
         }

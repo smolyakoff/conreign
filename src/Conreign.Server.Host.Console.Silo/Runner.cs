@@ -10,7 +10,7 @@ namespace Conreign.Server.Host.Console.Silo
         public static IDisposable Run(string[] args)
         {
             var conreignConfiguration = ConreignSiloConfiguration.Load(
-                Environment.CurrentDirectory,
+                ApplicationPath.CurrentDirectory,
                 args
             );
             var orleansConfiguration = ClusterConfiguration.LocalhostPrimarySilo();

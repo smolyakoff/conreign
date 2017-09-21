@@ -17,16 +17,8 @@ namespace Conreign.Server.Presence
 
         public Hub(HubState state, IUserTopic topic)
         {
-            if (state == null)
-            {
-                throw new ArgumentNullException(nameof(state));
-            }
-            if (topic == null)
-            {
-                throw new ArgumentNullException(nameof(topic));
-            }
-            _state = state;
-            _topic = topic;
+            _state = state ?? throw new ArgumentNullException(nameof(state));
+            _topic = topic ?? throw new ArgumentNullException(nameof(topic));
         }
 
         public Guid? LeaderUserId
@@ -130,7 +122,7 @@ namespace Conreign.Server.Presence
         {
             if (events.Length == 0)
             {
-                return TaskCompleted.Completed;
+                return Task.CompletedTask;
             }
             var ids = _state.Members.Select(x => x.Key).ToHashSet();
             ids.ExceptWith(userIds);

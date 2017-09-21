@@ -76,7 +76,7 @@ namespace Conreign.Server.Gameplay
 
         public Task Ping()
         {
-            return TaskCompleted.Completed;
+            return Task.CompletedTask;
         }
 
         public async Task Handle(GameEnded @event)
@@ -103,14 +103,13 @@ namespace Conreign.Server.Gameplay
 
         private Task InitializeState()
         {
-            string roomId;
-            State.UserId = this.GetPrimaryKey(out roomId);
+            State.UserId = this.GetPrimaryKey(out string roomId);
             State.RoomId = roomId;
             if (State.Lobby == null)
             {
                 State.Lobby = GrainFactory.GetGrain<ILobbyGrain>(roomId);
             }
-            return TaskCompleted.Completed;
+            return Task.CompletedTask;
         }
     }
 }

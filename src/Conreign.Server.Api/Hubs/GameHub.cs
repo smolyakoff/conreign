@@ -113,7 +113,7 @@ namespace Conreign.Server.Api.Hubs
                 var removed = Connections.TryRemove(Context.ConnectionId, out GameHubConnection hubConnection);
                 if (!removed)
                 {
-                    return TaskCompleted.Completed;
+                    return Task.CompletedTask;
                 }
                 _connectionsGauge.Write();
                 hubConnection.Dispose();

@@ -41,9 +41,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Common\TaskCompleted.cs">
-      <Link>TaskCompleted.cs</Link>
-    </Compile>
     <Compile Include="OrleansClientInitializer.cs" />
     <Compile Include="OrleansClient.cs" />
     <Compile Include="OrleansClientConnection.cs" />

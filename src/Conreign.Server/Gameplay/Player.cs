@@ -56,7 +56,7 @@ namespace Conreign.Server.Gameplay
             {
                 _state.Game = null;
             }
-            return TaskCompleted.Completed;
+            return Task.CompletedTask;
         }
 
         public Task Handle(GameStartedServer @event)
@@ -65,7 +65,7 @@ namespace Conreign.Server.Gameplay
             {
                 _state.Game = @event.Game;
             }
-            return TaskCompleted.Completed;
+            return Task.CompletedTask;
         }
 
         public Task UpdateOptions(PlayerOptionsData options)

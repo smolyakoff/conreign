@@ -8,7 +8,7 @@ namespace Conreign.LoadTest.Core.Behaviours
         public Task Handle(IBotNotification<GameEnded> notification)
         {
             notification.Context.Complete();
-            return TaskCompleted.Completed;
+            return Task.CompletedTask;
         }
     }
 }

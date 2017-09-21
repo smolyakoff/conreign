@@ -25,7 +25,7 @@ namespace Conreign.Server.Communication
         {
             if (!_types.Any(x => x.IsInstanceOfType(item)))
             {
-                return TaskCompleted.Completed;
+                return Task.CompletedTask;
             }
             dynamic h = _grain;
             return (Task) h.Handle((dynamic) item);
@@ -33,12 +33,12 @@ namespace Conreign.Server.Communication
 
         public Task OnCompletedAsync()
         {
-            return TaskCompleted.Completed;
+            return Task.CompletedTask;
         }
 
         public Task OnErrorAsync(Exception ex)
         {
-            return TaskCompleted.Completed;
+            return Task.CompletedTask;
         }
     }
 }

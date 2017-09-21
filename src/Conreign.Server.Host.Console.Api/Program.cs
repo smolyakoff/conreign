@@ -22,8 +22,9 @@ namespace Conreign.Server.Host.Console.Api
                     exitEvent.WaitOne();
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                System.Console.WriteLine(ex.ToString());
                 Environment.Exit(-1);
             }
         }

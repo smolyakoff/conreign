@@ -94,13 +94,13 @@ namespace Conreign.Client.Orleans
         private Task OnNext(IClientEvent @event, StreamSequenceToken token)
         {
             _subject.OnNext(@event);
-            return TaskCompleted.Completed;
+            return Task.CompletedTask;
         }
 
         private Task OnError(Exception exception)
         {
             _subject.OnError(exception);
-            return TaskCompleted.Completed;
+            return Task.CompletedTask;
         }
 
         private async Task OnCompleted()

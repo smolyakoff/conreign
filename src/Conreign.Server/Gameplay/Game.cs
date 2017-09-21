@@ -99,7 +99,7 @@ namespace Conreign.Server.Gameplay
             state.WaitingFleets.Add(fleet);
             var planet = _map[fleet.From];
             planet.Ships -= fleet.Ships;
-            return TaskCompleted.Completed;
+            return Task.CompletedTask;
         }
 
         public Task CancelFleet(Guid userId, FleetCancelationData fleetCancelation)
@@ -119,7 +119,7 @@ namespace Conreign.Server.Gameplay
             waitingFleets.RemoveAt(fleetCancelation.Index);
             var planet = _map[fleet.From];
             planet.Ships += fleet.Ships;
-            return TaskCompleted.Completed;
+            return Task.CompletedTask;
         }
 
         public Task EndTurn(Guid userId)
@@ -173,7 +173,7 @@ namespace Conreign.Server.Gameplay
             _state.Turn = 0;
             _map = new Map(_state.Map);
             _hub = new Hub(_state.Hub, _topic);
-            return TaskCompleted.Completed;
+            return Task.CompletedTask;
         }
 
         public async Task CalculateTurn()
@@ -238,7 +238,7 @@ namespace Conreign.Server.Gameplay
                 .Count(x => x.Statistics.DeathTurn == null);
             if (alivePlayerCount > 1)
             {
-                return TaskCompleted.Completed;
+                return Task.CompletedTask;
             }
             _state.IsEnded = true;
             _state.IsStarted = false;

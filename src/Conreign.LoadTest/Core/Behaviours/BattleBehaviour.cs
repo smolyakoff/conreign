@@ -21,17 +21,13 @@ namespace Conreign.LoadTest.Core.Behaviours
 
         public BattleBehaviour(IBotBattleStrategy strategy)
         {
-            if (strategy == null)
-            {
-                throw new ArgumentNullException(nameof(strategy));
-            }
-            _strategy = strategy;
+            _strategy = strategy ?? throw new ArgumentNullException(nameof(strategy));
         }
 
         public Task Handle(IBotNotification<GameEnded> notification)
         {
             _ended = true;
-            return TaskCompleted.Completed;
+            return Task.CompletedTask;
         }
 
         public async Task Handle(IBotNotification<GameStarted> notification)
@@ -52,10 +48,10 @@ namespace Conreign.LoadTest.Core.Behaviours
             var @event = notification.Event;
             if (@event.UserId != context.UserId)
             {
-                return TaskCompleted.Completed;
+                return Task.CompletedTask;
             }
             _ended = true;
-            return TaskCompleted.Completed;
+            return Task.CompletedTask;
         }
 
         public async Task Handle(IBotNotification<TurnCalculationEnded> notification)

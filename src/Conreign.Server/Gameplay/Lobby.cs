@@ -44,7 +44,7 @@ namespace Conreign.Server.Gameplay
         public Task Handle(GameEnded @event)
         {
             Reset();
-            return TaskCompleted.Completed;
+            return Task.CompletedTask;
         }
 
         public Task Notify(ISet<Guid> userIds, params IEvent[] events)

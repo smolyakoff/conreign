@@ -30,6 +30,7 @@ namespace Conreign.Server.Host.Yams
         public static YamsServiceConfiguration Load(string baseDirectory = null, string environment = DefaultEnvironment)
         {
             baseDirectory = string.IsNullOrEmpty(baseDirectory) ? System.Environment.CurrentDirectory : baseDirectory;
+            var files = Directory.GetFiles(System.Environment.CurrentDirectory);
             var builder = new ConfigurationBuilder();
             builder
                 .SetBasePath(baseDirectory)
