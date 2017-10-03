@@ -1,7 +1,6 @@
 using System;
 using Conreign.Server.Silo;
 using Microsoft.WindowsAzure.ServiceRuntime;
-using Orleans.Runtime.Configuration;
 using Orleans.Runtime.Host;
 
 namespace Conreign.Server.Host.Azure.Silo
@@ -18,12 +17,12 @@ namespace Conreign.Server.Host.Azure.Silo
                 throw new InvalidOperationException("Unable to determine environment.");
             }
             var config = ConreignSiloConfiguration.Load(Environment.CurrentDirectory, env);
-            var orleansConfiguration = new ClusterConfiguration();
-            orleansConfiguration.Globals.DeploymentId = RoleEnvironment.DeploymentId;
-            var conreignSilo = ConreignSilo.Create(orleansConfiguration, config);
+            config.ClusterId = RoleEnvironment.DeploymentId;
+            config.InstanceId = RoleEnvironment.CurrentRoleInstance.Id;
+            var app = ConreignSilo.Create(config);
+            var orleansConfiguration = app.CreateOrleansConfiguration();
             _silo = new AzureSilo();
-            var started = _silo.Start(conreignSilo.OrleansConfiguration,
-                conreignSilo.Configuration.SystemStorageConnectionString);
+            var started = _silo.Start(orleansConfiguration, app.Configuration.SystemStorageConnectionString);
             if (!started)
             {
                 throw new InvalidOperationException("Silo was not started.");

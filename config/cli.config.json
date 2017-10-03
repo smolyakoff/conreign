@@ -6,7 +6,8 @@
   "Environments": {
     "Production": {
       "CloudServiceName": "conreign",
-      "StorageConnectionString": null
+      "IisSiteName": "Conreign",
+      "IisHost": "conreign.win"
     }
   }
 }

@@ -28,6 +28,7 @@ nuget Serilog.Sinks.Literate
 nuget Serilog.Sinks.AzureTableStorage
 nuget Serilog.Sinks.ElasticSearch
 nuget SerilogMetrics
+nuget SerilogTraceListener
 nuget DotNetZip
 nuget Polly
 nuget FluentValidation

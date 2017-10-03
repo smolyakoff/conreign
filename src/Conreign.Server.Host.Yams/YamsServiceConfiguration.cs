@@ -5,9 +5,6 @@ namespace Conreign.Server.Host.Yams
 {
     public class YamsServiceConfiguration
     {
-        public const string DefaultEnvironment = "local";
-
-        public string Environment { get; }
         public string ClusterId { get; set; }
         public string InstanceId { get; set; }
         public string InstanceUpdateDomain { get; set; }
@@ -16,29 +13,25 @@ namespace Conreign.Server.Host.Yams
         public int RestartCount { get; set; }
         public string AzureStorageConnectionString { get; set; }
 
-        private YamsServiceConfiguration(string environment = DefaultEnvironment)
+        private YamsServiceConfiguration()
         {
-            Environment = environment;
             InstanceId = System.Environment.MachineName;
             InstanceUpdateDomain = InstanceId;
-            ApplicationInstallDirectory = Path.Combine(System.Environment.CurrentDirectory, "Applications");
+            ApplicationInstallDirectory = Path.Combine(ApplicationPath.CurrentDirectory, "Applications");
             UpdatePeriodInSeconds = 15;
             RestartCount = 3;
             AzureStorageConnectionString = "UseDevelopmentStorage=true";
         }
 
-        public static YamsServiceConfiguration Load(string baseDirectory = null, string environment = DefaultEnvironment)
+        public static YamsServiceConfiguration Load(string baseDirectory = null)
         {
-            baseDirectory = string.IsNullOrEmpty(baseDirectory) ? System.Environment.CurrentDirectory : baseDirectory;
-            var files = Directory.GetFiles(System.Environment.CurrentDirectory);
+            baseDirectory = string.IsNullOrEmpty(baseDirectory) ? ApplicationPath.CurrentDirectory : baseDirectory;
             var builder = new ConfigurationBuilder();
             builder
                 .SetBasePath(baseDirectory)
                 .AddJsonFile("yams.config.json", false)
-                .AddJsonFile("yams.secrets.json", true)
-                .AddJsonFile($"yams.{environment}.config.json", true)
-                .AddJsonFile($"yams.{environment}.secrets.json", true);
-            var config = new YamsServiceConfiguration(environment);
+                .AddJsonFile("yams.secrets.json", true);
+            var config = new YamsServiceConfiguration();
             var configRoot = builder.Build();
             configRoot.Bind(config);
             return config;

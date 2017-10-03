@@ -241,4 +241,3 @@ paket-files
 build
 temp
 logs
-config/**/*secrets.*

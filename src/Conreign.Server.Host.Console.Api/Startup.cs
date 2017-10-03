@@ -12,8 +12,8 @@ namespace Conreign.Server.Host.Console.Api
         public void Configuration(IAppBuilder builder)
         {
             builder.UseCors(CorsOptions.AllowAll);
-
-            var initializer = new OrleansClientInitializer(Api.OrleansConfiguration);
+            var orleansConfig = Api.CreateOrleansConfiguration();
+            var initializer = new OrleansClientInitializer(orleansConfig);
             builder.MapConreignApi(initializer, Api.Configuration);
         }
     }

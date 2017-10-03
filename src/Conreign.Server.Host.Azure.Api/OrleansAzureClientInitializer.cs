@@ -11,11 +11,7 @@ namespace Conreign.Server.Host.Azure.Api
 
         public OrleansAzureClientInitializer(ClientConfiguration config)
         {
-            if (config == null)
-            {
-                throw new ArgumentNullException(nameof(config));
-            }
-            _config = config;
+            _config = config ?? throw new ArgumentNullException(nameof(config));
         }
 
         public void Initialize()

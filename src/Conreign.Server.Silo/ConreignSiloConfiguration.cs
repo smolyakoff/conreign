@@ -10,16 +10,18 @@ namespace Conreign.Server.Silo
     {
         public const string DefaultEnvironment = "local";
 
-        public ConreignSiloConfiguration()
+        private  ConreignSiloConfiguration(string environment)
         {
+            Environment = environment;
+            ClusterId = environment;
+            InstanceId = System.Environment.MachineName;
+            MinimumLogLevel = LogEventLevel.Information;
             LivenessStorageType = GlobalConfiguration.LivenessProviderType.MembershipTableGrain;
             RemindersStorageType = GlobalConfiguration.ReminderServiceProviderType.ReminderTableGrain;
-            DataStorageType = StorageType.InMemory;
-            MinimumLogLevel = LogEventLevel.Information;
-            InstanceId = System.Environment.MachineName;
+            DataStorageType = StorageType.MongoDb;
         }
 
-        public string Environment { get; set; }
+        public string Environment { get; }
         public string ClusterId { get; set; }
         public string InstanceId { get; set; }
         public LogEventLevel MinimumLogLevel { get; set; }
@@ -39,24 +41,19 @@ namespace Conreign.Server.Silo
             {
                 throw new ArgumentException("Environment cannot be null or empty.", nameof(environment));
             }
-            var options = new ConreignSiloConfiguration
-            {
-                Environment = environment
-            };
+            var options = new ConreignSiloConfiguration(environment);
             var builder = new ConfigurationBuilder();
             builder.SetBasePath(baseDirectory)
                 .AddJsonFile("silo.config.json", false)
-                .AddJsonFile($"silo.{environment}.config.json", true)
                 .AddJsonFile("silo.secrets.json", true)
+                .AddJsonFile($"silo.{environment}.config.json", true)
                 .AddJsonFile($"silo.{environment}.secrets.json", true)
                 .AddCommandLine(args ?? Array.Empty<string>())
                 .AddCloudConfiguration(c => c.UseKeys(
                     "SystemStorageConnectionString",
-                    "DataStorageConnectionString",
-                    "ElasticSearchUri"));
+                    "DataStorageConnectionString"));
             var configRoot = builder.Build();
             configRoot.Bind(options);
-            options.Environment = environment;
             return options;
         }
 

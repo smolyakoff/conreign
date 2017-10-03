@@ -14,6 +14,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const AddAssetToHtmlPlugin = require('add-asset-html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 const { UglifyJsPlugin } = optimize;
 const { PATHS, TASK, COMPILATION_MODE, SIZE_LIMITS } = require('./constants');
@@ -84,6 +85,7 @@ function createConfiguration(options) {
       }),
       new HtmlWebpackPlugin({
         template: path.join(PATHS.SRC, 'index.html'),
+        favicon: path.join(PATHS.SRC, 'favicon.ico'),
       }),
       new AddAssetToHtmlPlugin({
         filepath: path.join(PATHS.BUILD, conreignLibAssets.lib.js),
@@ -108,6 +110,9 @@ function createConfiguration(options) {
         paths: true,
         currying: true,
       }),
+      new CopyPlugin([{
+        from: path.join(PATHS.SRC, 'web.config'),
+      }]),
     ],
     performance: _.extend({}, SIZE_LIMITS, {
       hints: options.compilationMode === COMPILATION_MODE.RELEASE ? 'warning' : false,

@@ -6,7 +6,7 @@
   "scripts": {
     "develop": "gulp develop",
     "lint": "eslint src tools",
-    "build": "gulp build",
+    "build": "gulp build --mode=release --apiServerUrl=http://conreign.win:3000",
     "test": "test"
   },
   "repository": {
@@ -76,6 +76,7 @@
     "babel-preset-stage-2": "^6.24.1",
     "bluebird": "^3.5.0",
     "convict": "^4.0.0",
+    "copy-webpack-plugin": "^4.1.0",
     "css-loader": "^0.28.7",
     "del": "^3.0.0",
     "eslint": "^4.6.1",

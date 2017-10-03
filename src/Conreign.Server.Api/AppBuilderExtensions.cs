@@ -35,7 +35,7 @@ namespace Conreign.Server.Api
             container.RegisterConreignApi(initializer, configuration);
             var hubConfiguration = ConfigureSignalR(container);
             builder.UseWelcomePage("/");
-            builder.MapSignalR<SimpleInjectorHubDispatcher>(configuration.Path, hubConfiguration);
+            builder.MapSignalR<SimpleInjectorHubDispatcher>(string.Empty, hubConfiguration);
             return builder;
         }
 

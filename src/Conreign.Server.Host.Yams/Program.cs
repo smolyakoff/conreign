@@ -1,8 +1,13 @@
 ﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Security.Permissions;
 using Etg.Yams;
+using Serilog;
+using Serilog.Events;
 using Topshelf;
+
 
 namespace Conreign.Server.Host.Yams
 {
@@ -14,13 +19,15 @@ namespace Conreign.Server.Host.Yams
             ServicePointManager.DefaultConnectionLimit = 10000;
             HostFactory.Run(host =>
             {
-                var configurationDirectory = Environment.CurrentDirectory;
-                var environment = YamsServiceConfiguration.DefaultEnvironment;
-
+                var configurationDirectory = ApplicationPath.CurrentDirectory;
                 host.AddCommandLineDefinition("config", x => configurationDirectory = x);
-                host.AddCommandLineDefinition("env", x => environment = x);
                 host.ApplyCommandLine();
-                var configuration = YamsServiceConfiguration.Load(configurationDirectory, environment);
+                var configuration = YamsServiceConfiguration.Load(configurationDirectory);
+                var logger = new LoggerConfiguration()
+                    .WriteTo.RollingFile(Path.Combine(ApplicationPath.CurrentDirectory, "logs", "yams-{Date}.log"))
+                    .MinimumLevel.Is(LogEventLevel.Debug)
+                    .CreateLogger();
+                Trace.Listeners.Add(new SerilogTraceListener.SerilogTraceListener(logger));
 
                 host.Service<IYamsService>(service =>
                 {

@@ -1,36 +1,43 @@
 ﻿using System;
+using System.IO;
 using Conreign.Server.Api.Configuration;
 using Conreign.Server.Contracts.Communication;
 using Orleans.Runtime.Configuration;
 using Serilog;
+using Serilog.Core.Enrichers;
 using Serilog.Sinks.Elasticsearch;
 
 namespace Conreign.Server.Api
 {
     public class ConreignApi
     {
-        private ConreignApi(ClientConfiguration orleansConfiguration, ConreignApiConfiguration apiConfiguration,
-            ILogger logger)
+        private ConreignApi(ConreignApiConfiguration apiConfiguration, ILogger logger)
         {
-            OrleansConfiguration = orleansConfiguration;
             Configuration = apiConfiguration;
             Logger = logger;
         }
 
-        public ClientConfiguration OrleansConfiguration { get; }
         public ConreignApiConfiguration Configuration { get; }
         public ILogger Logger { get; }
 
-        public static ConreignApi Create(
-            ClientConfiguration baseOrleansConfiguration = null,
-            ConreignApiConfiguration apiConfiguration = null)
+        public ClientConfiguration CreateOrleansConfiguration()
         {
-            var orleansConfig = baseOrleansConfiguration ?? ClientConfiguration.LocalhostSilo();
-            apiConfiguration = apiConfiguration ?? ConreignApiConfiguration.Load();
-            orleansConfig.GatewayProvider = apiConfiguration.SystemStorageType;
-            orleansConfig.DataConnectionString = apiConfiguration.SystemStorageConnectionString;
-            orleansConfig.AddSimpleMessageStreamProvider(StreamConstants.ProviderName);
+            var config = Configuration.SystemStorageType == ClientConfiguration.GatewayProviderType.Config
+                ? ClientConfiguration.LocalhostSilo()
+                : new ClientConfiguration();
+            config.DeploymentId = Configuration.ClusterId;
+            config.GatewayProvider = Configuration.SystemStorageType;
+            config.DataConnectionString = Configuration.SystemStorageConnectionString;
+            config.AddSimpleMessageStreamProvider(StreamConstants.ProviderName);
+            return config;
+        }
 
+        public static ConreignApi Create(ConreignApiConfiguration apiConfiguration)
+        {
+            if (apiConfiguration == null)
+            {
+                throw new ArgumentNullException(nameof(apiConfiguration));
+            }
             var loggerConfiguration = new LoggerConfiguration();
             if (!string.IsNullOrEmpty(apiConfiguration.ElasticSearchUri))
             {
@@ -41,13 +48,19 @@ namespace Conreign.Server.Api
                 };
                 loggerConfiguration.WriteTo.Elasticsearch(elasticOptions);
             }
-            loggerConfiguration.WriteTo.LiterateConsole();
             var logger = loggerConfiguration
+                .WriteTo.LiterateConsole()
+                .WriteTo.RollingFile(Path.Combine(ApplicationPath.CurrentDirectory, "logs", "conreign-api-{Date}.log"))
                 .MinimumLevel.Is(apiConfiguration.MinimumLogLevel)
                 .Enrich.FromLogContext()
                 .CreateLogger()
-                .ForContext("ApplicationId", "Conreign.Api");
-            return new ConreignApi(orleansConfig, apiConfiguration, logger);
+                .ForContext(new []
+                {
+                    new PropertyEnricher("ApplicationId", "Conreign.Api"),
+                    new PropertyEnricher("ClusterId", apiConfiguration.ClusterId),
+                    new PropertyEnricher("InstanceId", apiConfiguration.InstanceId) 
+                });
+            return new ConreignApi(apiConfiguration, logger);
         }
     }
 }

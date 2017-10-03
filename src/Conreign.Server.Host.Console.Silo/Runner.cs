@@ -1,6 +1,5 @@
 ﻿using System;
 using Conreign.Server.Silo;
-using Orleans.Runtime.Configuration;
 using Orleans.Runtime.Host;
 
 namespace Conreign.Server.Host.Console.Silo
@@ -9,17 +8,17 @@ namespace Conreign.Server.Host.Console.Silo
     {
         public static IDisposable Run(string[] args)
         {
-            var conreignConfiguration = ConreignSiloConfiguration.Load(
+            var configuration = ConreignSiloConfiguration.Load(
                 ApplicationPath.CurrentDirectory,
                 args
             );
-            var orleansConfiguration = ClusterConfiguration.LocalhostPrimarySilo();
-            var silo = ConreignSilo.Create(orleansConfiguration, conreignConfiguration);
+            var silo = ConreignSilo.Create(configuration);
             var logger = silo.Logger;
-            var siloHost = new SiloHost(Environment.MachineName, silo.OrleansConfiguration);
+            var orleansConfiguration = silo.CreateOrleansConfiguration();
+            var siloHost = new SiloHost(Environment.MachineName, orleansConfiguration);
             try
             {
-                siloHost.DeploymentId = conreignConfiguration.ClusterId;
+                siloHost.DeploymentId = configuration.ClusterId;
                 siloHost.InitializeOrleansSilo();
                 siloHost.StartOrleansSilo(false);
                 logger.Information("Silo is started.");

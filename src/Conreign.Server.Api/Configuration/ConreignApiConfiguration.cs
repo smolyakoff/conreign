@@ -10,22 +10,26 @@ namespace Conreign.Server.Api.Configuration
     {
         public const string DefaultEnvironment = "local";
 
-        public ConreignApiConfiguration()
+        private ConreignApiConfiguration(string environment)
         {
-            Path = string.Empty;
+            Environment = environment;
             MinimumLogLevel = LogEventLevel.Information;
             SystemStorageType = ClientConfiguration.GatewayProviderType.Config;
+            ClusterId = environment;
+            InstanceId = System.Environment.MachineName;
         }
 
-        public string Environment { get; set; }
-        public string Path { get; set; }
+        public string Environment { get; }
+        public bool IsLocalEnvironment => Environment == DefaultEnvironment;
+        public string ClusterId { get; set; }
+        public string InstanceId { get; set; }
         public int Port { get; set; } = 3000;
         public LogEventLevel MinimumLogLevel { get; set; }
+        public string ElasticSearchUri { get; set; }
         public ClientConfiguration.GatewayProviderType SystemStorageType { get; set; }
         public string SystemStorageConnectionString { get; set; }
-        public string ElasticSearchUri { get; set; }
 
-        public static ConreignApiConfiguration Load(string baseDirectory, string[] args)
+        public static ConreignApiConfiguration Load(string baseDirectory, string[] args = null)
         {
             args = args ?? Array.Empty<string>();
             var envConfig = new ConfigurationBuilder()
@@ -35,12 +39,16 @@ namespace Conreign.Server.Api.Configuration
             return Load(baseDirectory, environment, args);
         }
 
-        public static ConreignApiConfiguration Load(
-            string baseDirectory = null, 
-            string environment = DefaultEnvironment, 
-            string[] args = null)
+        public static ConreignApiConfiguration Load(string baseDirectory, string environment, string[] args = null)
         {
-            baseDirectory = string.IsNullOrEmpty(baseDirectory) ? System.Environment.CurrentDirectory : baseDirectory;
+            if (string.IsNullOrEmpty(baseDirectory))
+            {
+                throw new ArgumentException("Base directory cannot be null or empty.", nameof(baseDirectory));
+            }
+            if (string.IsNullOrEmpty(environment))
+            {
+                throw new ArgumentException("Environment cannot be null or empty.", nameof(environment));
+            }
             var builder = new ConfigurationBuilder();
             builder
                 .SetBasePath(baseDirectory)
@@ -54,13 +62,9 @@ namespace Conreign.Server.Api.Configuration
                     "SystemStorageConnectionString",
                     "ElasticSearchUri"
                 ));
-            var config = new ConreignApiConfiguration
-            {
-                Environment = environment
-            };
+            var config = new ConreignApiConfiguration(environment);
             var configRoot = builder.Build();
             configRoot.Bind(config);
-            config.Environment = environment;
             return config;
         }
     }

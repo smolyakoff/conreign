@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Net;
 using System.Threading;
 
@@ -25,6 +26,11 @@ namespace Conreign.Server.Host.Console.Silo
             catch (Exception ex)
             {
                 System.Console.WriteLine(ex.ToString());
+                if (Debugger.IsAttached)
+                {
+                    System.Console.WriteLine("Press enter to exit...");
+                    System.Console.ReadLine();
+                }
                 Environment.Exit(-1);
             }
         }

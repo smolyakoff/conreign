@@ -68,11 +68,12 @@ Target "deploy-silo" (fun _ ->
     let options = 
         {
             PackagePath = Some(SiloArtifactPath);
-            AdditionalFiles = [!!(ConfigDir @@ "silo*")];
+            AdditionalFiles = [SiloConfigFiles];
             TempDirectory = TempDir;
-            StorageConnectionString = "UseDevelopmentStorage=true";
-            ClusterId = "conreign-production";
+            StorageConnectionString = TargetEnvironmentConfig.StorageConnectionString;
+            ClusterId = DeployClusterId;
             Environment = TargetEnvironment;
+            ParallelConnections = DefaultConfig.TransferParallelConnectionsOption
         }
     DeployPackageToYams options |> ignore
 )
@@ -92,7 +93,55 @@ Target "package-api" (fun _ ->
     PackageProject ApiBuildDir BuildDir
 )
 
-Target "package-api-azure" (fun _ ->
+Target "deploy-api" (fun _ -> 
+    let options = 
+        {
+            PackagePath = Some(ApiArtifactPath)
+            AdditionalFiles = [ApiConfigFiles]
+            TempDirectory = TempDir
+            StorageConnectionString = TargetEnvironmentConfig.StorageConnectionString
+            ClusterId = DeployClusterId
+            Environment = TargetEnvironment
+            ParallelConnections = DefaultConfig.TransferParallelConnectionsOption
+        }
+    DeployPackageToYams options |> ignore
+)
+
+Target "build-web" (fun _ ->
+    CleanDir JsClientOutputBuildDir
+    let options = 
+        {
+            ProjectDirectory = JsClientProjectDir
+            ProjectBuildDirectory = JsClientBuildDir
+            OutputDirectory = JsClientOutputBuildDir
+            BuildCommand = "build"
+        }
+    BuildJsProject options
+)
+
+Target "deploy-web" (fun _ ->
+    let options = {
+        SourcePath = JsClientOutputBuildDir
+        Host = TargetEnvironmentConfig.IisHost
+        WebsiteName = TargetEnvironmentConfig.IisSiteName
+        Username = TargetEnvironmentConfig.IisUsername
+        Password = TargetEnvironmentConfig.IisPassword
+    }
+    DeployStaticWebsite options
+)
+
+Target "build-yams" (fun _ ->
+    let options = 
+        {DefaultBuildOptions with
+            Name = YamsLabel
+            ProjectPath = YamsProjectFile
+            OutputPath = YamsBuildDir
+            Version = YamsVersion
+        }
+    BuildProject options
+)
+
+Target "package-backend-azure" (fun _ ->
     let path = 
         PackageCloudService 
             AzureProjectFile 
@@ -103,9 +152,9 @@ Target "package-api-azure" (fun _ ->
     tracefn "Created azure cloud service package at %s." path
 )
 
-Target "deploy-api-azure" (fun _ ->
+Target "deploy-backend-azure" (fun _ ->
     let packagePath = if AzureDeployLatestExisting then null else AzureDeploymentPackagePath
-    let label = "conreign-api"
+    let label = "conreign-backend"
     let options = 
         {
             Credentials = azureCreds;
@@ -122,16 +171,17 @@ Target "deploy-api-azure" (fun _ ->
     DeployCloudService options  
 )
 
-Target "delete-api-azure" (fun _ ->
+Target "delete-backend-azure" (fun _ ->
     let deployment = { ServiceName = envOptions.CloudServiceName; Slot = TargetSlot }
     let opts = { Credentials = azureCreds; Deployment = deployment }
     DeleteCloudService opts
 )
 
 "build-load-test" ==> "package-load-test"
-"package-api-azure" =?> ("deploy-api-azure", shouldCreateApiAzurePackage)
+"package-backend-azure" =?> ("deploy-backend-azure", shouldCreateApiAzurePackage)
 "build-silo" ==> "package-silo" ==> "deploy-silo"
-"build-api" ==> "package-api"
+"build-api" ==> "package-api" ==> "deploy-api"
+"build-web" ==> "deploy-web"
 
 Target "help" PrintTargets
 

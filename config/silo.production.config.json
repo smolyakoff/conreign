@@ -1,4 +1,3 @@
 {
-  "LivenessStorageType": "AzureTable",
-  "RemindersStorageType": "AzureTable"
+  "DataStorageType": "InMemory"
 }

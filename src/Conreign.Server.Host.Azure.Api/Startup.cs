@@ -9,7 +9,8 @@ namespace Conreign.Server.Host.Azure.Api
         public void Configuration(IAppBuilder builder)
         {
             builder.UseCors(CorsOptions.AllowAll);
-            var initializer = new OrleansAzureClientInitializer(OwinRole.Api.OrleansConfiguration);
+            var orleansConfiguration = OwinRole.Api.CreateOrleansConfiguration();
+            var initializer = new OrleansAzureClientInitializer(orleansConfiguration);
             builder.MapConreignApi(initializer, OwinRole.Api.Configuration);
         }
     }

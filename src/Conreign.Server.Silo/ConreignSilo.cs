@@ -8,71 +8,78 @@ using Orleans.Runtime;
 using Orleans.Runtime.Configuration;
 using Orleans.Telemetry.SerilogConsumer;
 using Serilog;
+using Serilog.Core.Enrichers;
 
 namespace Conreign.Server.Silo
 {
     public class ConreignSilo
     {
-        private ConreignSilo(
-            ClusterConfiguration orleansConfiguration, 
-            ConreignSiloConfiguration configuration,
-            ILogger logger)
+        private ConreignSilo(ConreignSiloConfiguration configuration, ILogger logger)
         {
-            OrleansConfiguration = orleansConfiguration;
             Configuration = configuration;
             Logger = logger;
         }
 
-        public ClusterConfiguration OrleansConfiguration { get; }
         public ConreignSiloConfiguration Configuration { get; }
         public ILogger Logger { get; }
 
-        public static ConreignSilo Create(
-            ClusterConfiguration baseOrleansConfiguration = null,
-            ConreignSiloConfiguration conreignConfiguration = null)
+        public ClusterConfiguration CreateOrleansConfiguration()
         {
-            conreignConfiguration = conreignConfiguration ?? 
-                ConreignSiloConfiguration.Load(Environment.CurrentDirectory, ConreignSiloConfiguration.DefaultEnvironment);
-            var orleansConfig = baseOrleansConfiguration ?? ClusterConfiguration.LocalhostPrimarySilo();
-            orleansConfig.Globals.LivenessType = conreignConfiguration.LivenessStorageType;
-            orleansConfig.Globals.DataConnectionString = conreignConfiguration.SystemStorageConnectionString;
-            orleansConfig.Globals.ReminderServiceType = conreignConfiguration.RemindersStorageType;
-            orleansConfig.Globals.DataConnectionStringForReminders =
-                conreignConfiguration.SystemStorageConnectionString;
-            orleansConfig.AddSimpleMessageStreamProvider(StreamConstants.ProviderName);
-            orleansConfig.AddMemoryStorageProvider("PubSubStore");
-            switch (conreignConfiguration.DataStorageType)
+            var config = Configuration.LivenessStorageType == GlobalConfiguration.LivenessProviderType.MembershipTableGrain
+                ? ClusterConfiguration.LocalhostPrimarySilo()
+                : new ClusterConfiguration();
+            config.Globals.DeploymentId = Configuration.ClusterId;
+            config.Globals.LivenessType = Configuration.LivenessStorageType;
+            config.Globals.DataConnectionString = Configuration.SystemStorageConnectionString;
+            config.Globals.ReminderServiceType = Configuration.RemindersStorageType;
+            config.Globals.DataConnectionStringForReminders = Configuration.SystemStorageConnectionString;
+            config.AddSimpleMessageStreamProvider(StreamConstants.ProviderName);
+            config.AddMemoryStorageProvider("PubSubStore");
+            switch (Configuration.DataStorageType)
             {
                 case StorageType.AzureTable:
-                    orleansConfig.AddAzureTableStorageProvider("Default",
-                        conreignConfiguration.DataStorageConnectionString);
+                    config.AddAzureTableStorageProvider("Default", Configuration.DataStorageConnectionString);
                     break;
                 case StorageType.MongoDb:
-                    var grainAssemblies = new List<Assembly> {typeof(GameGrain).Assembly};
-                    var bootstrapAssemblies = new List<Assembly> {Assembly.GetExecutingAssembly()};
+                    var grainAssemblies = new List<Assembly> { typeof(GameGrain).Assembly };
+                    var bootstrapAssemblies = new List<Assembly> { Assembly.GetExecutingAssembly() };
                     var options = new MongoStorageOptions(
-                        conreignConfiguration.DataStorageConnectionString,
+                        Configuration.DataStorageConnectionString,
                         grainAssemblies,
                         bootstrapAssemblies);
-                    orleansConfig.AddMongoDbStorageProvider("Default", options);
+                    config.AddMongoDbStorageProvider("Default", options);
                     break;
                 case StorageType.InMemory:
-                    orleansConfig.AddMemoryStorageProvider("Default");
+                    config.AddMemoryStorageProvider("Default");
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+            return config;
+        }
+
+        public static ConreignSilo Create(ConreignSiloConfiguration configuration)
+        {
+            if (configuration == null)
+            {
+                throw new ArgumentNullException(nameof(configuration));
+            }
             var logger = new LoggerConfiguration()
-                .MinimumLevel.Is(conreignConfiguration.MinimumLogLevel)
+                .MinimumLevel.Is(configuration.MinimumLogLevel)
                 .Enrich.FromLogContext()
                 .WriteTo.LiterateConsole()
                 .CreateLogger()
-                .ForContext("ApplicationId", "Conreign.Silo");
+                .ForContext(new []
+                {
+                    new PropertyEnricher("ApplicationId", "Conreign.Silo"), 
+                    new PropertyEnricher("ClusterId", configuration.ClusterId),
+                    new PropertyEnricher("InstanceId", configuration.InstanceId) 
+                });
             // HACK: Side-effect here but what can I do with static classes :(
             var consumer = new SerilogConsumer(logger);
             LogManager.LogConsumers.Add(consumer);
             LogManager.TelemetryConsumers.Add(consumer);
-            return new ConreignSilo(orleansConfig, conreignConfiguration, logger);
+            return new ConreignSilo(configuration, logger);
         }
     }
 }
