@@ -101,6 +101,7 @@ namespace Conreign.Server.Gameplay
             InitializeState();
             var topic = Topic.Room(GetStreamProvider(StreamConstants.ProviderName), this.GetPrimaryKeyString());
             _logger = _logger.ForContext(nameof(State.RoomId), State.RoomId);
+            _logger.Information("Lobby is activated.", State.RoomId);
             _lobby = new Lobby(State, topic, this);
             _subscription = await topic.EnsureIsSubscribedOnce(this);
             var inactivityTimerInterval = TimeSpan.FromTicks(_options.MaxInactivityPeriod.Ticks / 2);
@@ -125,7 +126,7 @@ namespace Conreign.Server.Gameplay
             if (_lobby.EveryoneOfflinePeriod > _options.MaxInactivityPeriod)
             {
                 _logger.Information(
-                    "Going to deactivate due to inactivity. Inactivity period was {InactivityPeriod}.", 
+                    "Going to deactivate lobby due to inactivity. Inactivity period was {InactivityPeriod}.", 
                     _lobby.EveryoneOfflinePeriod);
                 _inactivityTimer?.Dispose();
                 _inactivityTimer = null;

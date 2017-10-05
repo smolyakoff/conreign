@@ -1,5 +1,6 @@
 Serilog
 Serilog.Sinks.Literate
+Serilog.Sinks.MongoDB
 Microsoft.Extensions.Configuration.Binder
 Microsoft.Extensions.Configuration.Json
 Microsoft.Extensions.Configuration.CommandLine

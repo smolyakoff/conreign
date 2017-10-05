@@ -25,8 +25,8 @@ nuget System.IdentityModel.Tokens.Jwt
 
 nuget Serilog.Sinks.Trace
 nuget Serilog.Sinks.Literate
-nuget Serilog.Sinks.AzureTableStorage
 nuget Serilog.Sinks.ElasticSearch
+nuget Serilog.Sinks.MongoDB
 nuget SerilogMetrics
 nuget SerilogTraceListener
 nuget DotNetZip

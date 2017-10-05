@@ -34,6 +34,11 @@ namespace Conreign.Server.Gameplay
             var gameStarted = new GameStartedServer(this.AsReference<IGameGrain>());
             await _game.NotifyEverybodyExcept(data.InitiatorId, gameStarted);
             await WriteStateAsync();
+            _logger.Information(
+                "Game initialized. Map size is {MapWidth}x{MapHeight}. There are {PlayerCount} players.",
+                data.Map.Width,
+                data.Map.Height,
+                data.Players.Count);
             ScheduleTimer();
         }
 
@@ -117,10 +122,14 @@ namespace Conreign.Server.Gameplay
             StopTimer();
             var isEnded = await _game.CalculateTurn();
             var isInactive = _game.EveryoneOfflinePeriod > _options.MaxInactivityPeriod;
+            if (isEnded)
+            {
+                _logger.Information("Game ended in {TurnCount} turns.", _game.Turn + 1);
+            }
             if (isInactive)
             {
                 _logger.Information(
-                    "Going to deactivate due to inactivity. Inactivity period was {InactivityPeriod}.",
+                    "Going to deactivate game due to inactivity. Inactivity period was {InactivityPeriod}.",
                     _game.EveryoneOfflinePeriod);
             }
             if (isEnded || isInactive)

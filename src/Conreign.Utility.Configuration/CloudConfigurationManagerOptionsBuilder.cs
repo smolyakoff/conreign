@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reflection;
 
 namespace Conreign.Utility.Configuration
 {
@@ -12,7 +13,7 @@ namespace Conreign.Utility.Configuration
 
         public CloudConfigurationManagerOptions Options { get; }
 
-        public void UseKeys(params string[] keys)
+        public CloudConfigurationManagerOptionsBuilder UseKeys(params string[] keys)
         {
             if (keys == null)
             {
@@ -23,7 +24,19 @@ namespace Conreign.Utility.Configuration
                 throw new ArgumentException("Configuration keys should not be null.", nameof(keys));
             }
             foreach (var key in keys)
+            {
                 Options.SettingKeys.Add(key);
+            }
+            return this;
+        }
+
+        public CloudConfigurationManagerOptionsBuilder UseKeysFrom<T>()
+        {
+            var names = typeof(T)
+                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .Select(x => x.Name)
+                .ToArray();
+            return UseKeys(names);
         }
     }
 }

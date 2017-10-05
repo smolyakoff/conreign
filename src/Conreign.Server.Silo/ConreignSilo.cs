@@ -9,6 +9,7 @@ using Orleans.Runtime.Configuration;
 using Orleans.Telemetry.SerilogConsumer;
 using Serilog;
 using Serilog.Core.Enrichers;
+using Serilog.Events;
 
 namespace Conreign.Server.Silo
 {
@@ -65,10 +66,7 @@ namespace Conreign.Server.Silo
             {
                 throw new ArgumentNullException(nameof(configuration));
             }
-            var logger = new LoggerConfiguration()
-                .MinimumLevel.Is(configuration.MinimumLogLevel)
-                .Enrich.FromLogContext()
-                .WriteTo.LiterateConsole()
+            var rootLogger = CreateLoggerConfiguration(configuration.MinimumLogLevel, configuration.LogStorageMongoDbUrl)
                 .CreateLogger()
                 .ForContext(new []
                 {
@@ -76,13 +74,34 @@ namespace Conreign.Server.Silo
                     new PropertyEnricher("ClusterId", configuration.ClusterId),
                     new PropertyEnricher("InstanceId", configuration.InstanceId) 
                 });
+            var orleansLogger = CreateLoggerConfiguration(LogEventLevel.Warning, configuration.LogStorageMongoDbUrl)
+                .CreateLogger();
             // HACK: Side-effects here but what can I do with static classes :(
-            var consumer = new SerilogConsumer(logger);
+            var orleansTelemetryAndLogConsumer = new SerilogConsumer(orleansLogger);
             SiloStartup.Configuration = configuration;
-            LogManager.LogConsumers.Add(consumer);
-            LogManager.TelemetryConsumers.Add(consumer);
-            Log.Logger = logger;
-            return new ConreignSilo(configuration, logger);
+            LogManager.LogConsumers.Add(orleansTelemetryAndLogConsumer);
+            LogManager.TelemetryConsumers.Add(orleansTelemetryAndLogConsumer);
+            Log.Logger = rootLogger;
+            return new ConreignSilo(configuration, rootLogger);
+        }
+
+        private static LoggerConfiguration CreateLoggerConfiguration(
+            LogEventLevel minimumLogLevel,
+            string mongoDbUrl)
+        {
+            var loggerConfiguration = new LoggerConfiguration()
+                .MinimumLevel.Is(minimumLogLevel)
+                .Enrich.FromLogContext()
+                .WriteTo.LiterateConsole();
+            if (mongoDbUrl != null)
+            {
+                loggerConfiguration.WriteTo.MongoDBCapped(
+                    mongoDbUrl,
+                    // This size should fit free instance on MongoLab :)
+                    cappedMaxSizeMb: 400
+                );
+            }
+            return loggerConfiguration;
         }
     }
 }

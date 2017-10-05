@@ -30,6 +30,7 @@ namespace Conreign.Server.Silo
         public StorageType DataStorageType { get; set; }
         public string SystemStorageConnectionString { get; set; }
         public string DataStorageConnectionString { get; set; }
+        public string LogStorageMongoDbUrl { get; set; }
 
         public static ConreignSiloConfiguration Load(string baseDirectory, string environment, string[] args = null)
         {
@@ -49,9 +50,7 @@ namespace Conreign.Server.Silo
                 .AddJsonFile($"silo.{environment}.config.json", true)
                 .AddJsonFile($"silo.{environment}.secrets.json", true)
                 .AddCommandLine(args ?? Array.Empty<string>())
-                .AddCloudConfiguration(c => c.UseKeys(
-                    "SystemStorageConnectionString",
-                    "DataStorageConnectionString"));
+                .AddCloudConfiguration(c => c.UseKeysFrom<ConreignSiloConfiguration>());
             var configRoot = builder.Build();
             configRoot.Bind(options);
             return options;
