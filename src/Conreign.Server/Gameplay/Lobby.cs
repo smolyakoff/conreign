@@ -41,6 +41,8 @@ namespace Conreign.Server.Gameplay
             Initialize();
         }
 
+        public TimeSpan EveryoneOfflinePeriod => _hub.EveryoneOfflinePeriod;
+
         public Task Handle(GameEnded @event)
         {
             Reset();

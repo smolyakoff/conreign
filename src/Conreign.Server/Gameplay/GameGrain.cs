@@ -10,17 +10,23 @@ using Conreign.Server.Contracts.Communication;
 using Conreign.Server.Contracts.Gameplay;
 using Conreign.Server.Presence;
 using Orleans;
+using Serilog;
 
 namespace Conreign.Server.Gameplay
 {
     public class GameGrain : Grain<GameState>, IGameGrain
     {
-        private const int TurnLengthInTicks = 12;
-        private static readonly TimeSpan TickInterval = TimeSpan.FromSeconds(5);
-
+        private readonly GameGrainOptions _options;
         private Game _game;
         private int _tick;
         private IDisposable _timer;
+        private ILogger _logger;
+
+        public GameGrain(ILogger logger, GameGrainOptions options)
+        {
+            _logger = logger.ForContext(GetType());
+            _options = options ?? throw new ArgumentNullException(nameof(options));
+        }
 
         public async Task Initialize(InitialGameData data)
         {
@@ -53,11 +59,6 @@ namespace Conreign.Server.Gameplay
             {
                 await CalculateTurnInternal();
             }
-            if (_game.IsEnded)
-            {
-                DeactivateOnIdle();
-                await ClearStateAsync();
-            }
         }
 
         public Task Notify(ISet<Guid> userIds, params IEvent[] events)
@@ -89,6 +90,7 @@ namespace Conreign.Server.Gameplay
         {
             State.RoomId = this.GetPrimaryKeyString();
             var topic = Topic.Room(GetStreamProvider(StreamConstants.ProviderName), this.GetPrimaryKeyString());
+            _logger = _logger.ForContext(nameof(State.RoomId), State.RoomId);
             _game = new Game(State, topic, new CoinBattleStrategy());
             return base.OnActivateAsync();
         }
@@ -99,13 +101,8 @@ namespace Conreign.Server.Gameplay
             {
                 return;
             }
-            if (_game.IsEnded)
-            {
-                StopTimer();
-                return;
-            }
             _tick++;
-            if (_tick == TurnLengthInTicks)
+            if (_tick == _options.TurnLengthInTicks)
             {
                 await CalculateTurnInternal();
             }
@@ -118,14 +115,31 @@ namespace Conreign.Server.Gameplay
         private async Task CalculateTurnInternal()
         {
             StopTimer();
-            await _game.CalculateTurn();
+            var isEnded = await _game.CalculateTurn();
+            var isInactive = _game.EveryoneOfflinePeriod > _options.MaxInactivityPeriod;
+            if (isInactive)
+            {
+                _logger.Information(
+                    "Going to deactivate due to inactivity. Inactivity period was {InactivityPeriod}.",
+                    _game.EveryoneOfflinePeriod);
+            }
+            if (isEnded || isInactive)
+            {
+                await ClearStateAsync();
+                DeactivateOnIdle();
+                return;
+            }
             await WriteStateAsync();
             ScheduleTimer();
         }
 
         private void ScheduleTimer()
         {
-            _timer = RegisterTimer(Tick, null, TickInterval, TickInterval);
+            _timer = RegisterTimer(
+                Tick,
+                null,
+                _options.TickInterval,
+                _options.TickInterval);
         }
 
         private void StopTimer()

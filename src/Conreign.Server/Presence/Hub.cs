@@ -7,6 +7,7 @@ using Conreign.Contracts.Presence;
 using Conreign.Contracts.Presence.Events;
 using Conreign.Core.Utility;
 using Conreign.Server.Contracts.Communication;
+using Conreign.Server.Utility;
 
 namespace Conreign.Server.Presence
 {
@@ -14,11 +15,18 @@ namespace Conreign.Server.Presence
     {
         private readonly HubState _state;
         private readonly IUserTopic _topic;
+        private readonly ITimeProvider _timeProvider;
 
-        public Hub(HubState state, IUserTopic topic)
+        public Hub(HubState state, IUserTopic topic) 
+            : this(state, topic, new SystemTimeProvider())
+        {
+        }
+
+        public Hub(HubState state, IUserTopic topic, ITimeProvider timeProvider)
         {
             _state = state ?? throw new ArgumentNullException(nameof(state));
             _topic = topic ?? throw new ArgumentNullException(nameof(topic));
+            _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
         }
 
         public Guid? LeaderUserId
@@ -43,6 +51,7 @@ namespace Conreign.Server.Presence
                 {
                     return Enumerable.Empty<IClientEvent>();
                 }
+                member.ConnectionsChangedAt = _timeProvider.UtcNow;
                 var isFirstConnection = member.ConnectionIds.Count == 1;
                 return isFirstConnection ? Join(userId) : Enumerable.Empty<IClientEvent>();
             });
@@ -63,6 +72,7 @@ namespace Conreign.Server.Presence
                 {
                     return Enumerable.Empty<IClientEvent>();
                 }
+                member.ConnectionsChangedAt = _timeProvider.UtcNow;
                 var noConnections = member.ConnectionIds.Count == 0;
                 return noConnections ? Leave(userId) : Enumerable.Empty<IClientEvent>();
             });
@@ -133,6 +143,32 @@ namespace Conreign.Server.Presence
         {
             return _state.Members.ContainsKey(userId) &&
                    _state.Members[userId].ConnectionIds.Count > 0;
+        }
+
+        public bool IsEveryoneOffline
+        {
+            get
+            {
+                return _state.Members.Values.All(m => m.ConnectionIds.Count == 0);
+            }
+        }
+
+        public TimeSpan EveryoneOfflinePeriod
+        {
+            get
+            {
+                if (!IsEveryoneOffline)
+                {
+                    return TimeSpan.Zero;
+                }
+                var now = _timeProvider.UtcNow;
+                var lastDisconnectionTime = _state.Members
+                    .Values
+                    .OrderByDescending(x => x.ConnectionsChangedAt)
+                    .Select(x => x.ConnectionsChangedAt)
+                    .First();
+                return now - lastDisconnectionTime;
+            }
         }
 
         public IEnumerable<IClientEvent> GetEvents(Guid userId)

@@ -1,6 +1,5 @@
 Serilog
 Serilog.Sinks.Literate
-System.ComponentModel.TypeConverter copy_local: true
 Microsoft.Extensions.Configuration.Binder
 Microsoft.Extensions.Configuration.Json
 Microsoft.Extensions.Configuration.CommandLine

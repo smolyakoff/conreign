@@ -55,6 +55,7 @@ namespace Conreign.Server.Silo
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+            config.UseStartupType<SiloStartup>();
             return config;
         }
 
@@ -75,10 +76,12 @@ namespace Conreign.Server.Silo
                     new PropertyEnricher("ClusterId", configuration.ClusterId),
                     new PropertyEnricher("InstanceId", configuration.InstanceId) 
                 });
-            // HACK: Side-effect here but what can I do with static classes :(
+            // HACK: Side-effects here but what can I do with static classes :(
             var consumer = new SerilogConsumer(logger);
+            SiloStartup.Configuration = configuration;
             LogManager.LogConsumers.Add(consumer);
             LogManager.TelemetryConsumers.Add(consumer);
+            Log.Logger = logger;
             return new ConreignSilo(configuration, logger);
         }
     }

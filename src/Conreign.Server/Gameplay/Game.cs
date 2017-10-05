@@ -36,14 +36,14 @@ namespace Conreign.Server.Gameplay
             _battleStrategy = battleStrategy ?? throw new ArgumentNullException(nameof(battleStrategy));
         }
 
-        public bool IsEnded => _state.IsEnded;
-
         public bool IsOnlinePlayersThinking => _state.PlayerStates
             .Where(kv => _hub.IsOnline(kv.Key))
             .Select(kv => kv.Value)
             .Any(p => p.TurnStatus == TurnStatus.Thinking);
 
         public int Turn => _state.Turn;
+
+        public TimeSpan EveryoneOfflinePeriod => _hub.EveryoneOfflinePeriod;
 
         public Task Connect(Guid userId, Guid connectionId)
         {
@@ -176,7 +176,7 @@ namespace Conreign.Server.Gameplay
             return Task.CompletedTask;
         }
 
-        public async Task CalculateTurn()
+        public async Task<bool> CalculateTurn()
         {
             EnsureGameIsInProgress();
 
@@ -206,14 +206,18 @@ namespace Conreign.Server.Gameplay
                 })
                 .ToList();
             await Task.WhenAll(tasks);
+            if (_state.IsEnded)
+            {
+                return true;
+            }
             _state.Turn += 1;
+            return false;
         }
 
         private PresenceStatus GetPresenceStatus(Guid userId)
         {
             return _hub.IsOnline(userId) ? PresenceStatus.Online : PresenceStatus.Offline;
         }
-
 
         private Task MarkDeadPlayers()
         {
