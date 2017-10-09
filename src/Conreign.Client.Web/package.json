@@ -22,7 +22,7 @@
     "name": "Konstantin Smolyakov",
     "email": "smolyakoff.ko@gmail.com"
   },
-  "license": "UNLICENSED",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/smolyakoff/conreign/issues"
   },
@@ -36,6 +36,7 @@
     "color": "^1.0.3",
     "date-fns": "^1.28.5",
     "evil-icons": "^1.9.0",
+    "history": "^4.7.2",
     "jquery": "^3.2.1",
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.4",
@@ -48,7 +49,8 @@
     "react-dom": "^15.6.1",
     "react-measure": "^1.4.5",
     "react-redux": "^5.0.6",
-    "react-router": "^3.0.2",
+    "react-router-config": "^1.0.0-beta.4",
+    "react-router-dom": "^4.2.2",
     "react-virtualized": "^9.9.0",
     "recharts": "^1.0.0-alpha.2",
     "recompose": "^0.25.0",

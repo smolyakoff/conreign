@@ -1,15 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { renderRoutes } from 'react-router-config';
 
 import { selectPendingActionCount } from './../state';
+import { ROUTE_SHAPE } from './../framework';
 import { PanelContainer, Panel } from './../theme';
+import { login } from './../auth';
 import NavigationMenu from './navigation-menu';
 import LoadingBar from './loading-bar';
 import './navigation-menu-layout.scss';
 
 function NavigationMenuLayout({
-  children,
+  route,
   isLoading,
 }) {
   return (
@@ -17,19 +20,20 @@ function NavigationMenuLayout({
       <NavigationMenu className="u-centered" />
       <LoadingBar isHidden={!isLoading} />
       <Panel className="o-nav-view">
-        { children }
+        { renderRoutes(route.routes) }
       </Panel>
     </PanelContainer>
   );
 }
 
+NavigationMenuLayout.init = login;
+
 NavigationMenuLayout.propTypes = {
-  children: PropTypes.node,
+  route: ROUTE_SHAPE.isRequired,
   isLoading: PropTypes.bool,
 };
 
 NavigationMenuLayout.defaultProps = {
-  children: null,
   isLoading: false,
 };
 

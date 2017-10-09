@@ -36,9 +36,9 @@ function ErrorPage({ error, statusCode, showStack }) {
 
 const DUMMY_ERROR = new Error('Nothing to do here 😉');
 
-function selectErrorPage(state, { params }) {
+function selectErrorPage(state, { match }) {
   const routingError = flow(selectErrors, selectRoutingError)(state);
-  const statusCode = parseInt(params.statusCode);
+  const statusCode = parseInt(match.params.statusCode);
   return {
     statusCode,
     showStack: COMPILATION_MODE === 'debug',

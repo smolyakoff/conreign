@@ -1,78 +1,95 @@
-/* eslint-disable react/forbid-prop-types */
-import React from 'react';
+import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { Router, Route, IndexRoute } from 'react-router';
-import { isFunction, flatMap, isObject } from 'lodash';
+import { withRouter } from 'react-router-dom';
+import { renderRoutes } from 'react-router-config';
+import { compose } from 'recompose';
+import { connect } from 'react-redux';
 
 import './../theme';
 import { executeRouteTransition } from './../framework';
-import { login } from './../auth';
 import { AppLayout, NavigationMenuLayout } from './../layout';
 import { ErrorPage, ERROR_PAGE_PATH } from './../errors';
 import { HomePage } from './../home';
 import { RoomPage } from './../room';
 import RulesPage from './../rules';
 
-export default function RouterContainer({ history }, { store }) {
-  function collectRouteActions(nextState) {
-    const storeState = store.getState();
-    const components = nextState.routes.map(route => route.component);
-    const initializers = components
-      .map(x => x.init)
-      .filter(isFunction);
-    const actions = flatMap(initializers, init => init(nextState, storeState))
-      .filter(isObject);
-    return actions;
-  }
+const routes = [{
+  component: AppLayout,
+  routes: [
+    {
+      path: ERROR_PAGE_PATH,
+      exact: true,
+      component: ErrorPage,
+    },
+    {
+      path: '/',
+      component: NavigationMenuLayout,
+      routes: [
+        {
+          path: '/',
+          exact: true,
+          component: HomePage,
+        },
+        {
+          path: '/$/rules',
+          exact: true,
+          component: RulesPage,
+        },
+        {
+          path: '/:roomId',
+          exact: true,
+          component: RoomPage,
+        },
+      ],
+    },
+  ],
+}];
 
-  function dispatchRouteTransaction(nextState, authRequired) {
-    const actions = collectRouteActions(nextState);
-    const stages = [];
-    if (authRequired) {
-      stages.push(login());
+class RouterContainer extends PureComponent {
+  componentWillMount() {
+    const { location, onRouteChange, state } = this.props;
+    onRouteChange(routes, state, location);
+  }
+  componentWillReceiveProps({ location: nextLocation }) {
+    const {
+      location: previousLocation,
+      onRouteChange,
+      state,
+    } = this.props;
+    const locationChanged = nextLocation !== previousLocation;
+    if (!locationChanged) {
+      return;
     }
-    if (actions.length > 0) {
-      stages.push(actions);
-    }
-    store.dispatch(executeRouteTransition(stages));
+    onRouteChange(
+      routes,
+      state,
+      nextLocation,
+      previousLocation,
+    );
   }
-
-  function onRouteChange(prevState, nextState) {
-    dispatchRouteTransaction(nextState, false);
+  render() {
+    return (
+      <div className="u-full-height">
+        {renderRoutes(routes)}
+      </div>
+    );
   }
-
-  function onRouteEnter(nextState) {
-    dispatchRouteTransaction(nextState, true);
-  }
-
-  return (
-    <div className="u-full-height">
-      <Router history={history}>
-        <Route
-          path="/"
-          component={AppLayout}
-        >
-          <Route
-            component={NavigationMenuLayout}
-            onChange={onRouteChange}
-            onEnter={onRouteEnter}
-          >
-            <IndexRoute component={HomePage} />
-            <Route path="/$/rules" component={RulesPage} />
-            <Route path="/:roomId" component={RoomPage} />
-          </Route>
-          <Route path={ERROR_PAGE_PATH} component={ErrorPage} />
-        </Route>
-      </Router>
-    </div>
-  );
 }
 
 RouterContainer.propTypes = {
-  history: PropTypes.object.isRequired,
-
+  /* eslint-disable react/forbid-prop-types */
+  state: PropTypes.object.isRequired,
+  location: PropTypes.object.isRequired,
+  /* eslint-enable react/forbid-prop-types */
+  onRouteChange: PropTypes.func.isRequired,
 };
 
-RouterContainer.contextTypes = {
-  store: PropTypes.object.isRequired,
-};
+const enhance = compose(
+  withRouter,
+  connect(
+    state => ({ state }),
+    { onRouteChange: executeRouteTransition },
+  ),
+);
+
+export default enhance(RouterContainer);

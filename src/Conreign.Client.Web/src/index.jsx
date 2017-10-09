@@ -2,7 +2,7 @@
 import 'babel-polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { browserHistory } from 'react-router';
+import { createBrowserHistory } from 'history';
 import './rx';
 
 import {
@@ -26,10 +26,11 @@ function render({ RootComponent, store, history }) {
 }
 
 function run() {
+  const history = createBrowserHistory();
   const state = {};
   const imports = {
     storage: window.localStorage,
-    history: browserHistory,
+    history,
   };
   const container = createContainer(imports, {
     ...BUILD_CONFIG,
@@ -39,7 +40,7 @@ function run() {
   const props = {
     RootComponent: AppContainer,
     store,
-    history: browserHistory,
+    history,
   };
   render(props);
   return props;
@@ -58,17 +59,6 @@ if (TASK === 'run') {
         RootComponent: UpdatedRoot,
       });
     }
-
-    // HACK: react-router v3 is incompatible with hot reload, so need to hide some odd messages
-    // https://github.com/gaearon/react-hot-loader/issues/298
-    const _ = require('lodash');
-    const originalConsoleError = console.error.bind(console);
-    console.error = (message) => {
-      if (_.isString(message) && message.indexOf('You cannot change <Router routes>;') >= 0) {
-        return;
-      }
-      originalConsoleError(message);
-    };
 
     module.hot.accept('./root/app-container-hot', update);
     module.hot.accept('./root/index', update);

@@ -34,6 +34,9 @@ export default function transitionRoute(action$) {
   return action$
     .ofType(EXECUTE_ROUTE_TRANSITION)
     .mergeMap(({ payload: { actions } }) => {
+      if (actions.length === 0) {
+        return Rx.Observable.empty();
+      }
       const epics = actions
         .map(x => isArray(x) ? x : [x])
         .map(x => Rx.Observable.concat(
