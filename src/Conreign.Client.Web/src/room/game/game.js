@@ -10,8 +10,8 @@ import {
 } from 'lodash';
 import { createSelector } from 'reselect';
 import { combineEpics } from 'redux-observable';
+import Rx from 'rxjs/Rx';
 
-import Rx from './../../rx';
 import {
   RoomMode,
   TurnStatus,
