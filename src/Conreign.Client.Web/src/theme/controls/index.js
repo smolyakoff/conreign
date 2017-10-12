@@ -23,3 +23,4 @@ export { default as Spinner } from './spinner';
 export { default as Alert } from './alert';
 export { default as Progress } from './progress';
 export { default as PropertyTable } from './property-table';
+export * from './animations';

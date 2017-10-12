@@ -56,7 +56,7 @@ export function GridCell({
     };
   }
   return (
-    <div className={b(modifiers).mix(className)} {...others} style={style}>
+    <div className={b(modifiers).mix(className)()} {...others} style={style}>
       {children}
     </div>
   );

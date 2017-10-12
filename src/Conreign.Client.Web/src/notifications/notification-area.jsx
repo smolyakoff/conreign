@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import block from 'bem-cn';
-import TransitionGroup from 'react-addons-css-transition-group';
+import { TransitionGroup } from 'react-transition-group';
 
-import { animation, Side } from './../theme';
+import { Side, SlideTransition } from './../theme';
 import { selectNotifications } from './../state';
 import { hideNotification } from './notifications';
 import Notification from './notification';
@@ -19,18 +19,19 @@ function NotificationArea({
 }) {
   return (
     <div className={css.mix('u-small')()}>
-      <TransitionGroup {...animation.slide({ side: Side.Right })}>
+      <TransitionGroup>
         {
           notifications.map((notification) => {
             const { id, content, rendererName } = notification;
             const Renderer = renderers[rendererName] || Notification;
             return (
-              <Renderer
-                key={id}
-                id={id}
-                onClose={e => onNotificationClick(notification, e)}
-                {...content}
-              />
+              <SlideTransition key={id} side={Side.Right}>
+                <Renderer
+                  id={id}
+                  onClose={e => onNotificationClick(notification, e)}
+                  {...content}
+                />
+              </SlideTransition>
             );
           })
         }

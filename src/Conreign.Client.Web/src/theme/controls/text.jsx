@@ -96,7 +96,7 @@ const headings = range(1, 6).map((i) => {
   const Tag = `h${i}`;
   function Heading({ children, className }) {
     return (
-      <Tag className={heading.mix(className)}>
+      <Tag className={heading.mix(className)()}>
         {children}
       </Tag>
     );

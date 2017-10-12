@@ -4,7 +4,7 @@ import 'jquery';
 import 'ms-signalr-client';
 import 'rxjs/Rx';
 import 'react';
-import 'react-addons-css-transition-group';
+import 'react-transition-group';
 import 'react-dom';
 import 'redux';
 import 'recompose';

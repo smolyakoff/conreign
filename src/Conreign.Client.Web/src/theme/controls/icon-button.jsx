@@ -22,7 +22,7 @@ function IconButton({
 }) {
   return (
     <button className={button.mix(className)()} {...others}>
-      <div className={button('content')}>
+      <div className={button('content')()}>
         <Icon className={button('icon')()} name={iconName} />
         {children}
       </div>

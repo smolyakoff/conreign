@@ -66,7 +66,7 @@ function Map({
     : null;
   const pathSet = path === null ? null : new Set(path);
   return (
-    <div className={block.mix(className)} style={style}>
+    <div className={block.mix(className)()} style={style}>
       {
         range(0, height * width).map((cellIndex) => {
           const content = cells[cellIndex];

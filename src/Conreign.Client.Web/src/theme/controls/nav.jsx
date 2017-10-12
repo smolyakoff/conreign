@@ -91,7 +91,7 @@ function NavItemBase({
   };
   const Tag = tagName;
   return (
-    <Tag className={css('item', modifiers).mix(className)} {...others}>
+    <Tag className={css('item', modifiers).mix(className)()} {...others}>
       {children}
     </Tag>
   );
