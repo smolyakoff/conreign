@@ -16,7 +16,7 @@ function createEnhancer(container) {
   return composeWithDevTools(devToolsOptions)(applyMiddleware(epicMiddleware));
 }
 
-function createDebugStore({ state = {}, container }) {
+export default function createApplicationStore({ container, state }) {
   const enhancer = createEnhancer(container);
   const store = createStore(reducer, state, enhancer);
   if (module.hot) {
@@ -28,17 +28,3 @@ function createDebugStore({ state = {}, container }) {
   }
   return store;
 }
-
-function createReleaseStore({ state = {}, container }) {
-  const enhancer = createEnhancer(container);
-  return createStore(reducer, state, enhancer);
-}
-
-export function createApplicationStore(options) {
-  const store = process.env.NODE_ENV === 'production'
-    ? createReleaseStore(options)
-    : createDebugStore(options);
-  return store;
-}
-
-export default createApplicationStore;

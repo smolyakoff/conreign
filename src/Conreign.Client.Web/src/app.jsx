@@ -44,13 +44,16 @@ export default function createApplication(config) {
 
   function start() {
     render(AppContainer);
-    function update() {
-      // eslint-disable-next-line global-require
-      const UpdatedRoot = require('./root/app-container-hot').default;
-      render(UpdatedRoot);
+    if (module.hot) {
+      // eslint-disable-next-line no-inner-declarations
+      function update() {
+        // eslint-disable-next-line global-require
+        const UpdatedRoot = require('./root/app-container').default;
+        render(UpdatedRoot);
+      }
+      module.hot.accept('./root/app-container', update);
+      module.hot.accept('./root/index', update);
     }
-    module.hot.accept('./root/app-container-hot', update);
-    module.hot.accept('./root/index', update);
   }
 
   return start;
