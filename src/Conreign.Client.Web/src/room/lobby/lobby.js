@@ -1,5 +1,5 @@
 import { combineEpics } from 'redux-observable';
-import { values, pick, mapValues } from 'lodash';
+import { values, pick, mapValues, keys } from 'lodash';
 import {
   createSucceededAsyncActionType,
   mapEventNameToActionType,
@@ -17,6 +17,7 @@ import {
   RoomMode,
   TurnStatus,
 } from '../../api';
+import { createWelcomeMessageEvent } from './welcome-message-event';
 
 const CHANGE_GAME_OPTIONS = 'CHANGE_GAME_OPTIONS';
 const CHANGE_PLAYER_OPTIONS = 'CHANGE_PLAYER_OPTIONS';
@@ -53,26 +54,12 @@ export function changePlayerOptions(payload) {
 function updateGameOptionsEpic(action$, store, { apiDispatcher }) {
   return action$
     .ofType(UPDATE_GAME_OPTIONS)
-    .map(action => ({
-      ...action,
-      payload: {
-        roomId: action.payload.roomId,
-        options: action.payload.options,
-      },
-    }))
     .mergeMap(apiDispatcher);
 }
 
 function updatePlayerOptionsEpic(action$, store, { apiDispatcher }) {
   return action$
     .ofType(UPDATE_PLAYER_OPTIONS)
-    .map(action => ({
-      ...action,
-      payload: {
-        roomId: action.payload.roomId,
-        options: action.payload.options,
-      },
-    }))
     .mergeMap(apiDispatcher);
 }
 
@@ -87,6 +74,17 @@ const epic = combineEpics(
   updatePlayerOptionsEpic,
   startGameEpic,
 );
+
+function initializeEvents(room) {
+  const { players, events } = room;
+  if (keys(players).length !== 1) {
+    return events;
+  }
+  return [
+    createWelcomeMessageEvent(),
+    ...events,
+  ];
+}
 
 function reducer(state, action) {
   if (state.mode !== RoomMode.Lobby) {
@@ -104,6 +102,7 @@ function reducer(state, action) {
             .filter(planet => !planet.ownerId)
             .length,
         },
+        events: initializeEvents(state),
       };
     }
     case CHANGE_GAME_OPTIONS:

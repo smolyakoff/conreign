@@ -30,10 +30,35 @@ const HANDLE_LEADER_CHANGED = mapEventNameToActionType(LEADER_CHANGED);
 const HANDLE_CHAT_MESSAGE_RECEIVED = mapEventNameToActionType(CHAT_MESSAGE_RECEIVED);
 const GET_ROOM_STATE_SUCCEEDED = createSucceededAsyncActionType(GET_ROOM_STATE);
 
+function initializeRoomState(room) {
+  const players = fp.flow(
+    fp.keyBy(p => p.userId),
+    fp.mapValues(p => ({
+      ...p,
+      status: room.presenceStatuses[p.userId],
+    })),
+  )(room.players);
+  return {
+    ...omit(room, 'presenceStatuses'),
+    players,
+  };
+}
+
+function mapGetRoomStateAction(action) {
+  if (action.type !== GET_ROOM_STATE_SUCCEEDED) {
+    return action;
+  }
+  return {
+    ...action,
+    payload: initializeRoomState(action.payload),
+  };
+}
+
 function getRoomStateEpic(action$, store, { apiDispatcher }) {
   return action$
     .ofType(GET_ROOM_STATE)
-    .mergeMap(apiDispatcher);
+    .mergeMap(apiDispatcher)
+    .map(mapGetRoomStateAction);
 }
 
 function sendMessageEpic(action$, store, { apiDispatcher }) {
@@ -49,19 +74,6 @@ const epic = combineEpics(
   game.epic,
 );
 
-function normalizeRoomState(room) {
-  const players = fp.flow(
-    fp.keyBy(p => p.userId),
-    fp.mapValues(p => ({
-      ...p,
-      status: room.presenceStatuses[p.userId],
-    })),
-  )(room.players);
-  return {
-    ...omit(room, 'presenceStatuses'),
-    players,
-  };
-}
 
 function roomReducer(state = {}, action) {
   if (action.error) {
@@ -69,7 +81,7 @@ function roomReducer(state = {}, action) {
   }
   switch (action.type) {
     case GET_ROOM_STATE_SUCCEEDED:
-      return normalizeRoomState(action.payload);
+      return action.payload;
     case SET_MAP_SELECTION:
       return {
         ...state,
