@@ -35,8 +35,7 @@ const load = _.memoize(() => {
     },
     apiServerUrl: {
       doc: 'API server base url.',
-      format: 'url',
-      default: 'http://localhost:3000',
+      default: '/$/api',
       env: 'API_SERVER_URL',
       arg: 'apiServerUrl',
     },

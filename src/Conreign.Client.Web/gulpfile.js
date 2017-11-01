@@ -44,6 +44,12 @@ function runWebpackServer(configFactory) {
     contentBase: PATHS.BUILD,
     stats: vars.traceLevel,
     historyApiFallback: true,
+    proxy: {
+      '/$/api': {
+        target: 'http://localhost:3000',
+        ws: true,
+      },
+    },
   });
   server.listen(vars.devServerPort);
   log(`Webpack dev server is listening on ${vars.devServerPort}.`);

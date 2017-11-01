@@ -6,7 +6,7 @@
   "scripts": {
     "develop": "gulp develop",
     "lint": "eslint src tools",
-    "build": "gulp build --mode=release --apiServerUrl=http://conreign.win:3000",
+    "build": "gulp build --mode=release",
     "test": "test"
   },
   "repository": {
