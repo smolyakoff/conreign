@@ -13,7 +13,9 @@ export default function createApplication(config) {
     apiServerUrl,
   } = config;
 
-  const history = createBrowserHistory();
+  const history = createBrowserHistory({
+    basename: window.location.pathname,
+  });
   const storage = window.localStorage;
   const userStore = new ValueStore(storage, { key: userStorageKey });
   const accessTokenProvider = () => get(userStore.get(), 'accessToken');
