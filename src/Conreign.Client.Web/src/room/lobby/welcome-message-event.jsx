@@ -1,17 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { memoize } from 'lodash';
 
 import { P, Text, ThemeColor } from './../../theme';
 
 export const WELCOME_MESSAGE_RECEIVED = 'WelcomeMessageReceived';
 
-export function createWelcomeMessageEvent() {
+const isInIFrame = memoize(() => {
+  try {
+    return window.self !== window.top;
+  } catch (e) {
+    return true;
+  }
+});
+
+export function createWelcomeMessageEvent(roomId) {
+  const finalLink = isInIFrame()
+    ? `http://conreign.win/${roomId}`
+    : `${window.location.protocol}//${window.location.host}/${roomId}`;
   return {
     type: WELCOME_MESSAGE_RECEIVED,
     payload: {
       senderId: null,
       timestamp: new Date().toISOString(),
-      link: window.location.href,
+      link: finalLink,
     },
   };
 }

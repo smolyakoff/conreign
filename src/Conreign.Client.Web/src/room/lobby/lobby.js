@@ -76,12 +76,12 @@ const epic = combineEpics(
 );
 
 function initializeEvents(room) {
-  const { players, events } = room;
+  const { players, events, roomId } = room;
   if (keys(players).length !== 1) {
     return events;
   }
   return [
-    createWelcomeMessageEvent(),
+    createWelcomeMessageEvent(roomId),
     ...events,
   ];
 }
