@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using Conreign.Contracts.Gameplay.Data;
 using FluentValidation;
 
-namespace Conreign.Core.Editor.Validators
+namespace Conreign.Core.Editor
 {
     public class PlayerOptionsValidator : AbstractValidator<PlayerOptionsData>
     {

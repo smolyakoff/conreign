@@ -23,11 +23,11 @@ namespace Conreign.Server.Gameplay
     {
         private readonly IBattleStrategy _battleStrategy;
         private readonly GameState _state;
-        private readonly IUserTopic _topic;
+        private readonly IBroadcastTopic _topic;
         private Hub _hub;
         private Map _map;
 
-        public Game(GameState state, IUserTopic topic, IBattleStrategy battleStrategy)
+        public Game(GameState state, IBroadcastTopic topic, IBattleStrategy battleStrategy)
         {
             _state = state ?? throw new ArgumentNullException(nameof(state));
             _hub = new Hub(_state.Hub, topic);
@@ -94,7 +94,7 @@ namespace Conreign.Server.Gameplay
             EnsureTurnIsInProgress(userId);
 
             var validator = new LaunchFleetValidator(userId, _map);
-            fleet.EnsureIsValid(validator);
+            validator.EnsureIsValid(fleet);
             var state = _state.PlayerStates.GetOrCreateDefault(userId, () => new PlayerGameState());
             state.WaitingFleets.Add(fleet);
             var planet = _map[fleet.From];
@@ -113,7 +113,7 @@ namespace Conreign.Server.Gameplay
             EnsureTurnIsInProgress(userId);
             var waitingFleets = _state.PlayerStates[userId].WaitingFleets;
             var validator = new CancelFleetValidator(waitingFleets.Count);
-            fleetCancelation.EnsureIsValid(validator);
+            validator.EnsureIsValid(fleetCancelation);
 
             var fleet = waitingFleets[fleetCancelation.Index];
             waitingFleets.RemoveAt(fleetCancelation.Index);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Conreign.Contracts.Gameplay.Data;
 
 namespace Conreign.Core
@@ -12,30 +13,30 @@ namespace Conreign.Core
         public Map(MapData state)
         {
             _state = state ?? throw new ArgumentNullException(nameof(state));
+            // TODO: Ensure state is valid
         }
 
+        public MapSize Size => new MapSize(_state.Width, _state.Height);
         public int Width => _state.Width;
         public int Height => _state.Height;
         public int FreeCellsCount => CellsCount - _state.Planets.Count;
-        public int CellsCount => _state.Width * _state.Height;
-
-        public int MaxDistance
-        {
-            get
-            {
-                var dim = Width < Height ? Width : Height;
-                return 2 * dim - 2 + Math.Abs(Width - Height);
-            }
-        }
+        public int CellsCount => Size.CellsCount;
+        public int MaximumDistance => Size.MaximumDistance;
+        public bool HasMaximumSize => Size.IsMaximum;
+        public IEnumerable<Guid> PlayerIds => _state.Planets
+            .Values
+            .Where(x => x.OwnerId != null)
+            .Select(x => x.OwnerId.Value);
 
         public IEnumerable<PlanetData> Planets => _state.Planets.Values;
+        public int NeutralPlanetsCount => _state.Planets.Values.Count(x => x.OwnerId == null);
 
         public PlanetData this[int position]
         {
             get
             {
                 EnsurePositionIsValid(position);
-                if (!ContainsPlanet(position))
+                if (!ContainsPlanetAtPosition(position))
                 {
                     throw new ArgumentException($"There is no planet at {position}", nameof(position));
                 }
@@ -43,11 +44,13 @@ namespace Conreign.Core
             }
             set
             {
+                EnsurePositionIsValid(position);
                 if (value == null)
                 {
                     _state.Planets.Remove(position);
                     return;
                 }
+
                 _state.Planets[position] = value;
             }
         }
@@ -78,9 +81,14 @@ namespace Conreign.Core
             return GetEnumerator();
         }
 
-        public bool ContainsPlanet(int position)
+        public bool ContainsPlanetAtPosition(int position)
         {
             return _state.Planets.ContainsKey(position);
+        }
+
+        public bool ContainsPlanetOwnedBy(Guid ownerId)
+        {
+            return _state.Planets.Values.Any(x => x.OwnerId == ownerId);
         }
 
         public int CalculateDistance(int from, int to)
@@ -124,24 +132,16 @@ namespace Conreign.Core
             return path;
         }
 
-        public void Reset()
+        public void ClearAndResize(MapSize mapSize)
         {
-            _state.Planets.Clear();
+            Clear();
+            _state.Width = mapSize.Width;
+            _state.Height = mapSize.Height;
         }
 
-        public void Reset(int width, int height)
+        private void Clear()
         {
-            if (width <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(width), "Width should be 1 or greater");
-            }
-            if (height <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(height), "Height should be 1 or greater");
-            }
-            Reset();
-            _state.Width = width;
-            _state.Height = height;
+            _state.Planets.Clear();
         }
 
         private void EnsureCoordinateIsValid(int x, int y)
@@ -156,11 +156,11 @@ namespace Conreign.Core
             }
         }
 
-        private void EnsurePositionIsValid(int coordinate)
+        private void EnsurePositionIsValid(int position)
         {
-            if (coordinate < 0 || coordinate >= CellsCount)
+            if (position < 0 || position >= CellsCount)
             {
-                throw new ArgumentOutOfRangeException(nameof(coordinate),
+                throw new ArgumentOutOfRangeException(nameof(position),
                     $"Expected position to be between 0 and {CellsCount - 1}.");
             }
         }

@@ -8,10 +8,13 @@ using Conreign.Contracts.Gameplay;
 using Conreign.Contracts.Gameplay.Data;
 using Conreign.Contracts.Gameplay.Events;
 using Conreign.Contracts.Presence;
+using Conreign.Core;
 using Conreign.Core.Editor;
+using Conreign.Core.Utility;
 using Conreign.Server.Communication;
 using Conreign.Server.Contracts.Communication;
 using Conreign.Server.Contracts.Gameplay;
+using Conreign.Server.Gameplay.Validators;
 using Conreign.Server.Presence;
 
 namespace Conreign.Server.Gameplay
@@ -20,12 +23,12 @@ namespace Conreign.Server.Gameplay
     {
         private readonly IGameFactory _gameFactory;
         private readonly LobbyState _state;
-        private readonly IUserTopic _topic;
+        private readonly IBroadcastTopic _topic;
         private Hub _hub;
         private MapEditor _mapEditor;
         private PlayerListEditor _playerListEditor;
 
-        public Lobby(LobbyState state, IUserTopic topic, IGameFactory gameFactory)
+        public Lobby(LobbyState state, IBroadcastTopic topic, IGameFactory gameFactory)
         {
             if (state == null)
             {
@@ -75,7 +78,7 @@ namespace Conreign.Server.Gameplay
                 PresenceStatuses = _state.Players
                     .ToDictionary(x => x.UserId,
                         x => _hub.IsOnline(x.UserId) ? PresenceStatus.Online : PresenceStatus.Offline),
-                Map = _state.MapEditor.Map,
+                Map = _state.Map,
                 LeaderUserId = _hub.LeaderUserId
             };
             return Task.FromResult<IRoomData>(state);
@@ -86,8 +89,16 @@ namespace Conreign.Server.Gameplay
             EnsureUserIsOnline(userId);
             EnsureGameIsNotStarted();
 
-            _mapEditor.Generate(options);
-            var mapUpdated = new MapUpdated(_state.RoomId, _state.MapEditor.Map);
+            var validator = new GameOptionsValidator(_playerListEditor.HumansCount);
+            validator.EnsureIsValid(options);
+
+           _playerListEditor.AdjustBotCount(options.BotsCount);
+           var mapSize = new MapSize(options.MapWidth, options.MapHeight);
+           _mapEditor.GenerateMap(
+               mapSize,
+               _playerListEditor.PlayerIds.ToHashSet(), 
+               options.NeutralPlanetsCount);
+            var mapUpdated = new MapUpdated(_state.RoomId, _state.Map);
             await _hub.NotifyEverybody(mapUpdated);
         }
 
@@ -96,11 +107,7 @@ namespace Conreign.Server.Gameplay
             EnsureUserIsOnline(userId);
             EnsureGameIsNotStarted();
 
-            if (!_playerListEditor.Contains(userId))
-            {
-                return;
-            }
-            var updated = _playerListEditor.Update(userId, options);
+            var updated = _playerListEditor.UpdateHumanOptions(userId, options);
             if (!updated)
             {
                 return;
@@ -130,26 +137,18 @@ namespace Conreign.Server.Gameplay
         {
             EnsureGameIsNotStarted();
 
-            if (!_playerListEditor.Contains(userId))
+            if (!_playerListEditor.ContainsPlayerWithUserId(userId))
             {
-                var player = _playerListEditor.Add(userId);
+                var planetPlaced = _mapEditor.TryPlacePlanet(userId);
+                if (!planetPlaced)
+                {
+                    throw UserException.Create(
+                        GameplayError.NoFreeMapCells,
+                        "No free map cells available.");
+                }
+                var player = _playerListEditor.AddHuman(userId);
                 var playerJoined = new PlayerJoined(_state.RoomId, player);
-                if (_playerListEditor.Count == 1)
-                {
-                    _mapEditor.Generate();
-                }
-                if (!_mapEditor.CanPlacePlanet)
-                {
-                    var options = new GameOptionsData
-                    {
-                        MapWidth = _mapEditor.MapWidth + 1,
-                        MapHeight = _mapEditor.MapHeigth + 1,
-                        NeutralPlanetsCount = _mapEditor.NeutralPlanetsCount
-                    };
-                    _mapEditor.Generate(options);
-                }
-                _mapEditor.PlacePlanet(userId);
-                var mapUpdated = new MapUpdated(_state.RoomId, _state.MapEditor.Map);
+                var mapUpdated = new MapUpdated(_state.RoomId, _state.Map);
                 await _hub.NotifyEverybodyExcept(userId, playerJoined, mapUpdated);
             }
             await _hub.Connect(userId, connectionId);
@@ -163,7 +162,7 @@ namespace Conreign.Server.Gameplay
         private void Reset()
         {
             _state.IsGameStarted = false;
-            _state.MapEditor = new MapEditorState();
+            _state.Map = new MapData();
             _state.Hub = new HubState {Id = _state.RoomId};
             _state.Players = new List<PlayerData>();
             Initialize();
@@ -173,7 +172,7 @@ namespace Conreign.Server.Gameplay
         {
             _hub = new Hub(_state.Hub, _topic);
             _mapEditor = new MapEditor(
-                _state.MapEditor,
+                _state.Map,
                 new UniformRandomPlanetGenerator(UniformRandomPlanetGeneratorOptions.PlayerPlanetDefaults),
                 new UniformRandomPlanetGenerator(UniformRandomPlanetGeneratorOptions.NeutralPlanetDefaults));
             _playerListEditor = new PlayerListEditor(_state.Players);

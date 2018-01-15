@@ -10,7 +10,7 @@ namespace Conreign.Core.Utility
 {
     public static class ValidationExtensions
     {
-        public static void EnsureIsValid<T>(this T value, IValidator<T> validator)
+        public static void EnsureIsValid<T>(this IValidator<T> validator, T value)
         {
             if (value == null)
             {
@@ -37,7 +37,7 @@ namespace Conreign.Core.Utility
                 throw new ArgumentNullException(nameof(value));
             }
             var validator = new TValidator();
-            value.EnsureIsValid(validator);
+            validator.EnsureIsValid(value);
         }
 
         private static ValidationErrorDetails ToConreignValidationErrorDetails(this ValidationResult result)

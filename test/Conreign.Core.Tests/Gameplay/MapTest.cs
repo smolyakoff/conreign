@@ -10,7 +10,7 @@ namespace Conreign.Core.Tests.Gameplay
         [Theory]
         [InlineData(6, 4, 1, 2, 3, 0)]
         [InlineData(4, 4, 1, 3, 0, 3)]
-        [InlineData(3, 10, 2, 1, 2, 9)]
+        [InlineData(4, 10, 2, 1, 2, 9)]
         public void CalculateRoute__Generates_Contiguous_Path(int width, int height, int fromX, int fromY, int toX,
             int toY)
         {

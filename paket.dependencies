@@ -52,16 +52,16 @@ nuget Topshelf
 nuget Etg.Yams
 
 group Build
-	source https://nuget.org/api/v2
+source https://nuget.org/api/v2
 
-	nuget FAKE
-	nuget FSharp.Data
-	nuget WindowsAzure.Storage
-	nuget Microsoft.Azure.Storage.DataMovement
-	nuget Microsoft.WindowsAzure.Management.Libraries
-	nuget Microsoft.Bcl.Async
+nuget FAKE
+nuget FSharp.Data
+nuget WindowsAzure.Storage
+nuget Microsoft.Azure.Storage.DataMovement
+nuget Microsoft.WindowsAzure.Management.Libraries
+nuget Microsoft.Bcl.Async
 
 group Test
-	source https://nuget.org/api/v2
-
-	nuget xunit
+source https://nuget.org/api/v2
+nuget Moq
+nuget xunit

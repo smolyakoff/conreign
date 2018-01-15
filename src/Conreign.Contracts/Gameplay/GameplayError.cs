@@ -4,6 +4,7 @@
     {
         GameIsAlreadyInProgress,
         TurnIsAlreadyEnded,
-        NotEnoughPlayers
+        NotEnoughPlayers,
+        NoFreeMapCells
     }
 }

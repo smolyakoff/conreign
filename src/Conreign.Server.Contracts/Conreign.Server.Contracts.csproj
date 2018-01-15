@@ -50,7 +50,7 @@
     <Compile Include="Communication\IHub.cs" />
     <Compile Include="Communication\ITopic.cs" />
     <Compile Include="Communication\ITopicFactory.cs" />
-    <Compile Include="Communication\IUserTopic.cs" />
+    <Compile Include="Communication\IBroadcastTopic.cs" />
     <Compile Include="Communication\StreamConstants.cs" />
     <Compile Include="Gameplay\GameStarted.cs" />
     <Compile Include="Gameplay\IGame.cs" />

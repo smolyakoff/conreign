@@ -81,7 +81,7 @@ namespace Conreign.Server.Gameplay
             var game = GrainFactory.GetGrain<IGameGrain>(this.GetPrimaryKeyString());
             var command = new InitialGameData(
                 userId,
-                State.MapEditor.Map,
+                State.Map,
                 State.Players,
                 State.Hub.Members.ToDictionary(x => x.Key, x => x.Value.ConnectionIds),
                 State.Hub.JoinOrder

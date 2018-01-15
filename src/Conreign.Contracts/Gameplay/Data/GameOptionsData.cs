@@ -4,16 +4,17 @@ namespace Conreign.Contracts.Gameplay.Data
 {
     public class GameOptionsData : IEquatable<GameOptionsData>
     {
-        public GameOptionsData()
-        {
-            MapHeight = Defaults.MapHeight;
-            MapWidth = Defaults.MapWidth;
-            NeutralPlanetsCount = Defaults.NeutralPlayersCount;
-        }
+        public const int DefaultNeutralPlayersCount = 10;
+        public const int DefaultBotsCount = 0;
+        public const int DefaultMapWidth = 8;
+        public const int DefaultMapHeight = 8;
+        public const int MinumumMapSize = 4;
+        public const int MaximumMapSize = 20;
 
-        public int MapWidth { get; set; }
-        public int MapHeight { get; set; }
-        public int NeutralPlanetsCount { get; set; }
+        public int MapWidth { get; set; } = DefaultMapWidth;
+        public int MapHeight { get; set; } = DefaultMapHeight;
+        public int NeutralPlanetsCount { get; set; } = DefaultNeutralPlayersCount;
+        public int BotsCount { get; set; } = DefaultBotsCount;
 
         public bool Equals(GameOptionsData other)
         {
@@ -26,7 +27,7 @@ namespace Conreign.Contracts.Gameplay.Data
                 return true;
             }
             return MapWidth == other.MapWidth && MapHeight == other.MapHeight &&
-                   NeutralPlanetsCount == other.NeutralPlanetsCount;
+                   NeutralPlanetsCount == other.NeutralPlanetsCount && BotsCount == other.BotsCount;
         }
 
         public override bool Equals(object obj)
@@ -39,11 +40,7 @@ namespace Conreign.Contracts.Gameplay.Data
             {
                 return true;
             }
-            if (obj.GetType() != GetType())
-            {
-                return false;
-            }
-            return Equals((GameOptionsData) obj);
+            return obj.GetType() == GetType() && Equals((GameOptionsData) obj);
         }
 
         public override int GetHashCode()
@@ -53,6 +50,7 @@ namespace Conreign.Contracts.Gameplay.Data
                 var hashCode = MapWidth;
                 hashCode = (hashCode * 397) ^ MapHeight;
                 hashCode = (hashCode * 397) ^ NeutralPlanetsCount;
+                hashCode = (hashCode * 397) ^ BotsCount;
                 return hashCode;
             }
         }

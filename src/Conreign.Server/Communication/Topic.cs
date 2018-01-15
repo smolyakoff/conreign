@@ -10,7 +10,7 @@ using Orleans.Streams;
 
 namespace Conreign.Server.Communication
 {
-    public class Topic : IUserTopic
+    public class Topic : IBroadcastTopic
     {
         private readonly Dictionary<Guid, IAsyncStream<IServerEvent>> _childrenStreams;
         private readonly Dictionary<Guid, IAsyncStream<IClientEvent>> _clientStreams;

@@ -99,11 +99,5 @@ namespace Conreign.Core.Editor
                 // ReSharper disable once IteratorNeverReturns
             }
         }
-
-        public static IEnumerable<int> NumbersRangeLong(int start, int count)
-        {
-            for (var i = start; i < start + count; i++)
-                yield return i;
-        }
     }
 }

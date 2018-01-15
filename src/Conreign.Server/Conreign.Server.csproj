@@ -45,6 +45,7 @@
     <Compile Include="Communication\StreamExtensions.cs" />
     <Compile Include="Gameplay\GameGrainOptions.cs" />
     <Compile Include="Gameplay\LobbyGrainOptions.cs" />
+    <Compile Include="Gameplay\Validators\GameOptionsValidator.cs" />
     <Compile Include="Presence\ConnectionState.cs" />
     <Compile Include="Presence\HubMemberState.cs" />
     <Compile Include="Properties\orleans.codegen.cs" />

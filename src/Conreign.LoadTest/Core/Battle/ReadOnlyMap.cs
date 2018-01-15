@@ -22,7 +22,7 @@ namespace Conreign.LoadTest.Core.Battle
             new ReadOnlyPlanetData(_map[x, y], new Coordinate(x, y, Width, Height).Position);
 
         public int Height => _map.Height;
-        public int MaxDistance => _map.MaxDistance;
+        public int MaxDistance => _map.MaximumDistance;
         public int Width => _map.Width;
 
         public IEnumerator<ReadOnlyPlanetData> GetEnumerator()

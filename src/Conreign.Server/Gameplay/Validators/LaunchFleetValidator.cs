@@ -39,7 +39,7 @@ namespace Conreign.Server.Gameplay.Validators
 
         private bool Exist(int coordinate)
         {
-            return _map.ContainsPlanet(coordinate);
+            return _map.ContainsPlanetAtPosition(coordinate);
         }
 
         private bool BelongToSender(int coordinate)

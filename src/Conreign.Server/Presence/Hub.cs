@@ -14,15 +14,15 @@ namespace Conreign.Server.Presence
     public class Hub : IHub
     {
         private readonly HubState _state;
-        private readonly IUserTopic _topic;
+        private readonly IBroadcastTopic _topic;
         private readonly ITimeProvider _timeProvider;
 
-        public Hub(HubState state, IUserTopic topic) 
+        public Hub(HubState state, IBroadcastTopic topic) 
             : this(state, topic, new SystemTimeProvider())
         {
         }
 
-        public Hub(HubState state, IUserTopic topic, ITimeProvider timeProvider)
+        public Hub(HubState state, IBroadcastTopic topic, ITimeProvider timeProvider)
         {
             _state = state ?? throw new ArgumentNullException(nameof(state));
             _topic = topic ?? throw new ArgumentNullException(nameof(topic));
