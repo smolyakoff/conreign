@@ -4,7 +4,7 @@ using Conreign.Contracts.Communication;
 namespace Conreign.Contracts.Gameplay.Events
 {
     [Serializable]
-    public class GameStarted : IClientEvent
+    public class GameStarted : IServerEvent, IClientEvent
     {
         public GameStarted()
         {

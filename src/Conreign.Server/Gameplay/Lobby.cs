@@ -21,14 +21,13 @@ namespace Conreign.Server.Gameplay
 {
     public class Lobby : ILobby, IEventHandler<GameEnded>
     {
-        private readonly IGameFactory _gameFactory;
         private readonly LobbyState _state;
         private readonly IBroadcastTopic _topic;
         private Hub _hub;
         private MapEditor _mapEditor;
         private PlayerListEditor _playerListEditor;
 
-        public Lobby(LobbyState state, IBroadcastTopic topic, IGameFactory gameFactory)
+        public Lobby(LobbyState state, IBroadcastTopic topic)
         {
             if (state == null)
             {
@@ -40,7 +39,6 @@ namespace Conreign.Server.Gameplay
             }
             _state = state;
             _topic = topic ?? throw new ArgumentNullException(nameof(topic));
-            _gameFactory = gameFactory ?? throw new ArgumentNullException(nameof(gameFactory));
             Initialize();
         }
 
@@ -116,7 +114,7 @@ namespace Conreign.Server.Gameplay
             await _hub.NotifyEverybody(playerUpdated);
         }
 
-        public async Task<IGame> StartGame(Guid userId)
+        public Task StartGame(Guid userId)
         {
             EnsureUserIsOnline(userId);
             EnsureGameIsNotStarted();
@@ -129,8 +127,7 @@ namespace Conreign.Server.Gameplay
             }
 
             _state.IsGameStarted = true;
-            var game = await _gameFactory.CreateGame(userId);
-            return game;
+            return Task.CompletedTask;
         }
 
         public async Task Connect(Guid userId, Guid connectionId)
@@ -176,6 +173,7 @@ namespace Conreign.Server.Gameplay
                 new UniformRandomPlanetGenerator(UniformRandomPlanetGeneratorOptions.PlayerPlanetDefaults),
                 new UniformRandomPlanetGenerator(UniformRandomPlanetGeneratorOptions.NeutralPlanetDefaults));
             _playerListEditor = new PlayerListEditor(_state.Players);
+            _mapEditor.GenerateMap(GameOptionsData.DefaultNeutralPlayersCount);
         }
 
         private void EnsureUserIsOnline(Guid userId)

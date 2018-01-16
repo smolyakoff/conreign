@@ -12,14 +12,15 @@ using Conreign.Server.Gameplay.Validators;
 namespace Conreign.Server.Gameplay
 {
     public class Player : IPlayer,
-        IEventHandler<GameStartedServer>,
+        IEventHandler<GameStarted>,
         IEventHandler<GameEnded>,
         IEventHandler<Connected>,
         IEventHandler<Disconnected>
     {
         private readonly PlayerState _state;
+        private readonly Func<IRoom> _roomProvider;
 
-        public Player(PlayerState state)
+        public Player(PlayerState state, Func<IRoom> roomProvider)
         {
             if (state == null)
             {
@@ -33,38 +34,31 @@ namespace Conreign.Server.Gameplay
             {
                 throw new ArgumentException("User id should be initialized", nameof(state));
             }
-            if (state.Room == null)
-            {
-                throw new ArgumentException("Room should be initialized", nameof(state));
-            }
             _state = state;
+            _roomProvider = roomProvider ?? throw new ArgumentNullException(nameof(roomProvider));
         }
+
+        private IRoom Room => _roomProvider();
 
         public Task Handle(Connected @event)
         {
-            return _state.Room.Connect(_state.UserId, @event.ConnectionId);
+            return Room.Connect(_state.UserId, @event.ConnectionId);
         }
 
         public Task Handle(Disconnected @event)
         {
-            return _state.Room.Disconnect(_state.UserId, @event.ConnectionId);
+            return Room.Disconnect(_state.UserId, @event.ConnectionId);
         }
 
         public Task Handle(GameEnded @event)
         {
-            if (_state.Game != null)
-            {
-                _state.Game = null;
-            }
+            _state.RoomMode = RoomMode.Lobby;
             return Task.CompletedTask;
         }
 
-        public Task Handle(GameStartedServer @event)
+        public Task Handle(GameStarted @event)
         {
-            if (_state.Game == null)
-            {
-                _state.Game = @event.Game;
-            }
+            _state.RoomMode = RoomMode.Game;
             return Task.CompletedTask;
         }
 
@@ -83,9 +77,9 @@ namespace Conreign.Server.Gameplay
         public async Task StartGame()
         {
             var lobby = EnsureIsInLobby();
-            var game = await lobby.StartGame(_state.UserId);
-            _state.Game = game;
-            await game.NotifyEverybody(new GameStarted());
+            await lobby.StartGame(_state.UserId);
+            _state.RoomMode = RoomMode.Game;
+            await Room.NotifyEverybody(new GameStarted());
         }
 
         public Task LaunchFleet(FleetData fleet)
@@ -114,18 +108,18 @@ namespace Conreign.Server.Gameplay
             }
             textMessage.EnsureIsValid<TextMessageData, TextMessageValidator>();
             var @event = new ChatMessageReceived(_state.RoomId, _state.UserId, textMessage);
-            return _state.Room.NotifyEverybody(@event);
+            return Room.NotifyEverybody(@event);
         }
 
         public async Task<IRoomData> GetState()
         {
-            var state = await _state.Room.GetState(_state.UserId);
+            var state = await Room.GetState(_state.UserId);
             return state;
         }
 
         private ILobby EnsureIsInLobby()
         {
-            var lobby = _state.Room as ILobby;
+            var lobby = Room as ILobby;
             if (lobby == null)
             {
                 throw new InvalidOperationException("Player should be in lobby to perform this action.");
@@ -135,7 +129,7 @@ namespace Conreign.Server.Gameplay
 
         private IGame EnsureIsInGame()
         {
-            var game = _state.Room as IGame;
+            var game = Room as IGame;
             if (game == null)
             {
                 throw new InvalidOperationException("Player should be in game to perform this action.");

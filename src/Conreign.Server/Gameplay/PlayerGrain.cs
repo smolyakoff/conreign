@@ -18,6 +18,18 @@ namespace Conreign.Server.Gameplay
         private Player _player;
         private StreamSubscriptionHandle<IServerEvent> _subscription;
 
+        private IRoom Room
+        {
+            get
+            {
+                if (State.RoomMode == RoomMode.Lobby)
+                {
+                    return GrainFactory.GetGrain<ILobbyGrain>(State.RoomId);
+                }
+                return GrainFactory.GetGrain<IGameGrain>(State.RoomId);
+            }
+        }
+
         public Task UpdateOptions(PlayerOptionsData options)
         {
             return _player.UpdateOptions(options);
@@ -56,10 +68,10 @@ namespace Conreign.Server.Gameplay
 
         public async Task<IRoomData> GetState()
         {
-            return await State.Room.GetState(State.UserId);
+            return await Room.GetState(State.UserId);
         }
 
-        public Task Handle(GameStartedServer @event)
+        public Task Handle(GameStarted @event)
         {
             return _player.Handle(@event);
         }
@@ -90,7 +102,7 @@ namespace Conreign.Server.Gameplay
             await InitializeState();
             var provider = GetStreamProvider(StreamConstants.ProviderName);
             var stream = provider.GetServerStream(TopicIds.Player(State.UserId, State.RoomId));
-            _player = new Player(State);
+            _player = new Player(State, () => Room);
             _subscription = await this.EnsureIsSubscribedOnce(stream);
             await base.OnActivateAsync();
         }
@@ -105,10 +117,7 @@ namespace Conreign.Server.Gameplay
         {
             State.UserId = this.GetPrimaryKey(out string roomId);
             State.RoomId = roomId;
-            if (State.Lobby == null)
-            {
-                State.Lobby = GrainFactory.GetGrain<ILobbyGrain>(roomId);
-            }
+            State.RoomMode = RoomMode.Lobby;
             return Task.CompletedTask;
         }
     }

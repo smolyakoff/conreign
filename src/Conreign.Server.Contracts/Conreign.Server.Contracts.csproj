@@ -52,9 +52,7 @@
     <Compile Include="Communication\ITopicFactory.cs" />
     <Compile Include="Communication\IBroadcastTopic.cs" />
     <Compile Include="Communication\StreamConstants.cs" />
-    <Compile Include="Gameplay\GameStarted.cs" />
     <Compile Include="Gameplay\IGame.cs" />
-    <Compile Include="Gameplay\IGameFactory.cs" />
     <Compile Include="Gameplay\IGameGrain.cs" />
     <Compile Include="Gameplay\ILobby.cs" />
     <Compile Include="Gameplay\ILobbyGrain.cs" />

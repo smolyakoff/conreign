@@ -34,6 +34,11 @@ namespace Conreign.Core.Editor
             _map = new Map(state);
         }
 
+        public void GenerateMap(int neutralPlanetsCount)
+        {
+            GenerateMap(_map.Size, _map.PlayerIds.ToHashSet(), neutralPlanetsCount);
+        }
+
         public void GenerateMap(MapSize mapSize, HashSet<Guid> playerIds, int neutralPlanetsCount)
         {
             if (playerIds == null)

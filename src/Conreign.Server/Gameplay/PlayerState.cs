@@ -1,5 +1,5 @@
 using System;
-using Conreign.Server.Contracts.Gameplay;
+using Conreign.Contracts.Gameplay.Data;
 
 namespace Conreign.Server.Gameplay
 {
@@ -7,8 +7,6 @@ namespace Conreign.Server.Gameplay
     {
         public Guid UserId { get; set; }
         public string RoomId { get; set; }
-        public ILobby Lobby { get; set; }
-        public IGame Game { get; set; }
-        public IRoom Room => Game as IRoom ?? Lobby;
+        public RoomMode RoomMode { get; set; }
     }
 }

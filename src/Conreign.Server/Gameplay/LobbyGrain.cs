@@ -70,14 +70,9 @@ namespace Conreign.Server.Gameplay
             await WriteStateAsync();
         }
 
-        public async Task<IGame> StartGame(Guid userId)
+        public async Task StartGame(Guid userId)
         {
-            var game = await _lobby.StartGame(userId);
-            return game;
-        }
-
-        public async Task<IGame> CreateGame(Guid userId)
-        {
+            await _lobby.StartGame(userId);
             var game = GrainFactory.GetGrain<IGameGrain>(this.GetPrimaryKeyString());
             var command = new InitialGameData(
                 userId,
@@ -87,7 +82,6 @@ namespace Conreign.Server.Gameplay
                 State.Hub.JoinOrder
             );
             await game.Initialize(command);
-            return game;
         }
 
         public async Task Handle(GameEnded @event)
@@ -102,7 +96,7 @@ namespace Conreign.Server.Gameplay
             var topic = Topic.Room(GetStreamProvider(StreamConstants.ProviderName), this.GetPrimaryKeyString());
             _logger = _logger.ForContext(nameof(State.RoomId), State.RoomId);
             _logger.Information("Lobby is activated.", State.RoomId);
-            _lobby = new Lobby(State, topic, this);
+            _lobby = new Lobby(State, topic);
             _subscription = await topic.EnsureIsSubscribedOnce(this);
             var inactivityTimerInterval = TimeSpan.FromTicks(_options.MaxInactivityPeriod.Ticks / 2);
             _inactivityTimer = RegisterTimer(

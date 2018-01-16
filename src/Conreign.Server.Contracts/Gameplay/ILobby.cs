@@ -8,6 +8,6 @@ namespace Conreign.Server.Contracts.Gameplay
     {
         Task UpdateGameOptions(Guid userId, GameOptionsData options);
         Task UpdatePlayerOptions(Guid userId, PlayerOptionsData options);
-        Task<IGame> StartGame(Guid userId);
+        Task StartGame(Guid userId);
     }
 }

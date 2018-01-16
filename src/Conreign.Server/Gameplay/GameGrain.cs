@@ -8,7 +8,6 @@ using Conreign.Core.Battle;
 using Conreign.Server.Communication;
 using Conreign.Server.Contracts.Communication;
 using Conreign.Server.Contracts.Gameplay;
-using Conreign.Server.Presence;
 using Orleans;
 using Serilog;
 
@@ -31,8 +30,6 @@ namespace Conreign.Server.Gameplay
         public async Task Initialize(InitialGameData data)
         {
             await _game.Initialize(data);
-            var gameStarted = new GameStartedServer(this.AsReference<IGameGrain>());
-            await _game.NotifyEverybodyExcept(data.InitiatorId, gameStarted);
             await WriteStateAsync();
             _logger.Information(
                 "Game initialized. Map size is {MapWidth}x{MapHeight}. There are {PlayerCount} players.",
