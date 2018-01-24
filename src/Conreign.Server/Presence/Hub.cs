@@ -14,10 +14,10 @@ namespace Conreign.Server.Presence
     public class Hub : IHub
     {
         private readonly HubState _state;
-        private readonly IBroadcastTopic _topic;
         private readonly ITimeProvider _timeProvider;
+        private readonly IBroadcastTopic _topic;
 
-        public Hub(HubState state, IBroadcastTopic topic) 
+        public Hub(HubState state, IBroadcastTopic topic)
             : this(state, topic, new SystemTimeProvider())
         {
         }
@@ -29,15 +29,69 @@ namespace Conreign.Server.Presence
             _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
         }
 
+        private IEnumerable<Guid> ClientUserIds => _state.Members
+            .Select(x => x.Key)
+            .Where(IsClientUserId);
+
+        private IEnumerable<Guid> ServerUserIds => _state.Members
+            .Select(x => x.Key)
+            .Where(IsServerUserId);
+
+        private IEnumerable<HubMemberState> ClientMembers => _state.Members.Values
+            .Where(x => x.Type == HubMemberType.Client);
+
         public Guid? LeaderUserId
         {
             get
             {
-                return _state.Members
-                    .Select(x => x.Key)
+                return ClientUserIds
                     .OrderBy(x => _state.JoinOrder.IndexOf(x))
                     .Where(IsOnline)
                     .FirstOrDefault();
+            }
+        }
+
+        public bool IsEveryoneOffline
+        {
+            get { return ClientMembers.All(m => m.ConnectionIds.Count == 0); }
+        }
+
+        public TimeSpan EveryoneOfflinePeriod
+        {
+            get
+            {
+                if (!IsEveryoneOffline)
+                {
+                    return TimeSpan.Zero;
+                }
+                var now = _timeProvider.UtcNow;
+                var lastDisconnectionTime = ClientMembers
+                    .Where(x => x.ConnectionIdsChangedAt != null)
+                    .OrderByDescending(x => x.ConnectionIdsChangedAt)
+                    .Select(x => x.ConnectionIdsChangedAt)
+                    .FirstOrDefault();
+                return now - (lastDisconnectionTime ?? _state.CreatedAt);
+            }
+        }
+
+        public void EnsureServerMembersConnected(HashSet<Guid> userIdsToBeConnected)
+        {
+            if (userIdsToBeConnected == null)
+            {
+                throw new ArgumentNullException(nameof(userIdsToBeConnected));
+            }
+            var existingUserIds = ServerUserIds.ToHashSet();
+            var userIdsToConnect = new HashSet<Guid>(userIdsToBeConnected);
+            userIdsToConnect.ExceptWith(existingUserIds);
+            var userIdsToDisconnect = new HashSet<Guid>(existingUserIds);
+            userIdsToDisconnect.ExceptWith(userIdsToBeConnected);
+            foreach (var userId in userIdsToConnect)
+            {
+                _state.Members[userId] = new HubMemberState {Type = HubMemberType.Server};
+            }
+            foreach (var userId in userIdsToDisconnect)
+            {
+                _state.Members.Remove(userId);
             }
         }
 
@@ -45,13 +99,13 @@ namespace Conreign.Server.Presence
         {
             var events = WithLeaderCheck(() =>
             {
-                var member = _state.Members.GetOrCreateDefault(userId);
+                var member = GetOrCreateClient(userId);
                 var added = member.ConnectionIds.Add(connectionId);
                 if (!added)
                 {
                     return Enumerable.Empty<IClientEvent>();
                 }
-                member.ConnectionsChangedAt = _timeProvider.UtcNow;
+                member.ConnectionIdsChangedAt = _timeProvider.UtcNow;
                 var isFirstConnection = member.ConnectionIds.Count == 1;
                 return isFirstConnection ? Join(userId) : Enumerable.Empty<IClientEvent>();
             });
@@ -66,13 +120,13 @@ namespace Conreign.Server.Presence
             }
             var events = WithLeaderCheck(() =>
             {
-                var member = _state.Members.GetOrCreateDefault(userId);
+                var member = GetOrCreateClient(userId);
                 var removed = member.ConnectionIds.Remove(connectionId);
                 if (!removed)
                 {
                     return Enumerable.Empty<IClientEvent>();
                 }
-                member.ConnectionsChangedAt = _timeProvider.UtcNow;
+                member.ConnectionIdsChangedAt = _timeProvider.UtcNow;
                 var noConnections = member.ConnectionIds.Count == 0;
                 return noConnections ? Leave(userId) : Enumerable.Empty<IClientEvent>();
             });
@@ -139,36 +193,12 @@ namespace Conreign.Server.Presence
             return Notify(ids, events);
         }
 
+
         public bool IsOnline(Guid userId)
         {
-            return _state.Members.ContainsKey(userId) &&
-                   _state.Members[userId].ConnectionIds.Count > 0;
-        }
-
-        public bool IsEveryoneOffline
-        {
-            get
-            {
-                return _state.Members.Values.All(m => m.ConnectionIds.Count == 0);
-            }
-        }
-
-        public TimeSpan EveryoneOfflinePeriod
-        {
-            get
-            {
-                if (!IsEveryoneOffline)
-                {
-                    return TimeSpan.Zero;
-                }
-                var now = _timeProvider.UtcNow;
-                var lastDisconnectionTime = _state.Members
-                    .Values
-                    .OrderByDescending(x => x.ConnectionsChangedAt)
-                    .Select(x => x.ConnectionsChangedAt)
-                    .First();
-                return now - lastDisconnectionTime;
-            }
+            var exists = _state.Members.TryGetValue(userId, out HubMemberState member);
+            return exists &&
+                   (member.Type == HubMemberType.Server || member.ConnectionIds.Count > 0);
         }
 
         public IEnumerable<IClientEvent> GetEvents(Guid userId)
@@ -176,6 +206,28 @@ namespace Conreign.Server.Presence
             return _state.Events
                 .Where(x => x.Event.IsPublic() || x.Recipients.Contains(userId))
                 .Select(x => x.Event);
+        }
+
+        private HubMemberState GetOrCreateClient(Guid userId)
+        {
+            var member = _state.Members.GetOrCreateDefault(userId);
+            if (member.Type != HubMemberType.Client)
+            {
+                throw new InvalidOperationException($"Expected user with id '{userId}' to be a client member.");
+            }
+            return member;
+        }
+
+        private bool IsClientUserId(Guid userId)
+        {
+            return _state.Members.ContainsKey(userId) && 
+                _state.Members[userId].Type == HubMemberType.Client;
+        }
+
+        private bool IsServerUserId(Guid userId)
+        {
+            return _state.Members.ContainsKey(userId) &&
+                   _state.Members[userId].Type == HubMemberType.Server;
         }
 
         private IEnumerable<IClientEvent> Join(Guid userId)
@@ -209,7 +261,9 @@ namespace Conreign.Server.Presence
         {
             var previousLeader = LeaderUserId;
             foreach (var @event in func())
+            {
                 yield return @event;
+            }
             var currentLeader = LeaderUserId;
             if (previousLeader == currentLeader)
             {

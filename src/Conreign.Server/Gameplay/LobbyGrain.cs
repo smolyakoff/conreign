@@ -70,18 +70,11 @@ namespace Conreign.Server.Gameplay
             await WriteStateAsync();
         }
 
-        public async Task StartGame(Guid userId)
+        public async Task<InitialGameData> InitializeGame(Guid userId)
         {
-            await _lobby.StartGame(userId);
-            var game = GrainFactory.GetGrain<IGameGrain>(this.GetPrimaryKeyString());
-            var command = new InitialGameData(
-                userId,
-                State.Map,
-                State.Players,
-                State.Hub.Members.ToDictionary(x => x.Key, x => x.Value.ConnectionIds),
-                State.Hub.JoinOrder
-            );
-            await game.Initialize(command);
+            var data = await _lobby.InitializeGame(userId);
+            await WriteStateAsync();
+            return data;
         }
 
         public async Task Handle(GameEnded @event)
@@ -93,7 +86,7 @@ namespace Conreign.Server.Gameplay
         public override async Task OnActivateAsync()
         {
             InitializeState();
-            var topic = Topic.Room(GetStreamProvider(StreamConstants.ProviderName), this.GetPrimaryKeyString());
+            var topic = BroadcastTopic.Room(GetStreamProvider(StreamConstants.ProviderName), this.GetPrimaryKeyString());
             _logger = _logger.ForContext(nameof(State.RoomId), State.RoomId);
             _logger.Information("Lobby is activated.", State.RoomId);
             _lobby = new Lobby(State, topic);

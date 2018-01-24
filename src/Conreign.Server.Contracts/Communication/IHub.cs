@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Conreign.Contracts.Communication;
-using Conreign.Contracts.Presence;
+using Conreign.Server.Contracts.Presence;
 
 namespace Conreign.Server.Contracts.Communication
 {

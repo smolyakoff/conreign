@@ -5,7 +5,7 @@ namespace Conreign.Contracts.Gameplay.Data
     public class GameOptionsData : IEquatable<GameOptionsData>
     {
         public const int DefaultNeutralPlayersCount = 10;
-        public const int DefaultBotsCount = 0;
+        public const int DefaultBotsCount = 1;
         public const int DefaultMapWidth = 8;
         public const int DefaultMapHeight = 8;
         public const int MinumumMapSize = 4;

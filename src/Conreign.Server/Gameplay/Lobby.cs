@@ -90,7 +90,8 @@ namespace Conreign.Server.Gameplay
             var validator = new GameOptionsValidator(_playerListEditor.HumansCount);
             validator.EnsureIsValid(options);
 
-           _playerListEditor.AdjustBotCount(options.BotsCount);
+           var (botsAdded, botsRemoved) = _playerListEditor.AdjustBotCount(options.BotsCount);
+            _hub.EnsureServerMembersConnected(_playerListEditor.BotIds.ToHashSet());
            var mapSize = new MapSize(options.MapWidth, options.MapHeight);
            _mapEditor.GenerateMap(
                mapSize,
@@ -114,7 +115,7 @@ namespace Conreign.Server.Gameplay
             await _hub.NotifyEverybody(playerUpdated);
         }
 
-        public Task StartGame(Guid userId)
+        public Task<InitialGameData> InitializeGame(Guid userId)
         {
             EnsureUserIsOnline(userId);
             EnsureGameIsNotStarted();
@@ -127,7 +128,16 @@ namespace Conreign.Server.Gameplay
             }
 
             _state.IsGameStarted = true;
-            return Task.CompletedTask;
+            var data = new InitialGameData(
+                userId,
+                _state.Map,
+                _state.Players,
+                _state.Hub.Members
+                    .Where(x => x.Value.Type == HubMemberType.Client)
+                    .ToDictionary(x => x.Key, x => x.Value.ConnectionIds),
+                _state.Hub.JoinOrder
+            );
+            return Task.FromResult(data);
         }
 
         public async Task Connect(Guid userId, Guid connectionId)
@@ -173,7 +183,11 @@ namespace Conreign.Server.Gameplay
                 new UniformRandomPlanetGenerator(UniformRandomPlanetGeneratorOptions.PlayerPlanetDefaults),
                 new UniformRandomPlanetGenerator(UniformRandomPlanetGeneratorOptions.NeutralPlanetDefaults));
             _playerListEditor = new PlayerListEditor(_state.Players);
-            _mapEditor.GenerateMap(GameOptionsData.DefaultNeutralPlayersCount);
+            _playerListEditor.AdjustBotCount(GameOptionsData.DefaultBotsCount);
+            _hub.EnsureServerMembersConnected(_playerListEditor.BotIds.ToHashSet());
+            _mapEditor.GenerateMap(
+                _playerListEditor.PlayerIds.ToHashSet(), 
+                GameOptionsData.DefaultNeutralPlayersCount);
         }
 
         private void EnsureUserIsOnline(Guid userId)

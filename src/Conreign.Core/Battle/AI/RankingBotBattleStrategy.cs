@@ -4,18 +4,20 @@ using System.Linq;
 using Conreign.Contracts.Gameplay.Data;
 using Conreign.Core.Utility;
 
-namespace Conreign.LoadTest.Core.Battle
+namespace Conreign.Core.Battle.AI
 {
     public class RankingBotBattleStrategy : IBotBattleStrategy
     {
         private readonly RankingBotBattleStrategyOptions _options;
+        private readonly PropertyComparer<IPlanetData, string> _planetNameComparer;
 
         public RankingBotBattleStrategy(RankingBotBattleStrategyOptions options)
         {
+            _planetNameComparer = new PropertyComparer<IPlanetData, string>(x => x.Name);
             _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
-        public List<FleetData> ChooseFleetsToLaunch(Guid userId, ReadOnlyMap map)
+        public List<FleetData> ChooseFleetsToLaunch(Guid userId, IReadOnlyMap map)
         {
             if (map == null)
             {
@@ -25,12 +27,12 @@ namespace Conreign.LoadTest.Core.Battle
             {
                 return new List<FleetData>();
             }
-            var planetComparer = new PropertyComparer<ReadOnlyPlanetData, string>(x => x.Name);
+            
             var myPlanets = map
                 .Where(x => x.OwnerId == userId)
-                .ToHashSet(planetComparer);
+                .ToHashSet(_planetNameComparer);
             var allPlanets = map
-                .ToHashSet(planetComparer);
+                .ToHashSet(_planetNameComparer);
             if (myPlanets.Count == 0)
             {
                 return new List<FleetData>();
@@ -42,7 +44,7 @@ namespace Conreign.LoadTest.Core.Battle
                 .SelectMany(source =>
                 {
                     var otherPlanets = allPlanets
-                        .Except(new[] {source}, planetComparer);
+                        .Except(new[] {source}, _planetNameComparer);
                     return GetCandidates(map, source, otherPlanets, myTopPlanet, topPlanet);
                 })
                 .OrderByDescending(Rank)
@@ -58,8 +60,8 @@ namespace Conreign.LoadTest.Core.Battle
                 }
                 fleets.Add(new FleetData
                 {
-                    From = candidate.Source.Position,
-                    To = candidate.Destination.Position,
+                    From = map.GetPosition(candidate.Source),
+                    To = map.GetPosition(candidate.Destination),
                     Ships = candidate.Ships
                 });
                 sentShips[candidate.Source.Name] += candidate.Ships;
@@ -68,11 +70,11 @@ namespace Conreign.LoadTest.Core.Battle
         }
 
         private IEnumerable<Candidate> GetCandidates(
-            ReadOnlyMap map,
-            ReadOnlyPlanetData source,
-            IEnumerable<ReadOnlyPlanetData> otherPlanets,
-            ReadOnlyPlanetData myTopPlanet,
-            ReadOnlyPlanetData topPlanet)
+            IReadOnlyMap map,
+            IPlanetData source,
+            IEnumerable<IPlanetData> otherPlanets,
+            IPlanetData myTopPlanet,
+            IPlanetData topPlanet)
         {
             return otherPlanets
                 .Select(destination => new Candidate
@@ -86,20 +88,20 @@ namespace Conreign.LoadTest.Core.Battle
                 .Where(fleet => fleet.Ships > 0);
         }
 
-        private int ShouldLaunchShips(ReadOnlyMap map, ReadOnlyPlanetData source, ReadOnlyPlanetData destination)
+        private int ShouldLaunchShips(IReadOnlyMap map, IPlanetData source, IPlanetData destination)
         {
             if (!IsVisible(map, source, destination))
             {
                 return 0;
             }
             return source.OwnerId == destination.OwnerId
-                ? ShouldLaunchReinforcementShips(map, source, destination)
+                ? ShouldLaunchReinforcementShips(source, destination)
                 : ShouldLaunchAttackShips(map, source, destination);
         }
 
-        private int ShouldLaunchAttackShips(ReadOnlyMap map, ReadOnlyPlanetData source, ReadOnlyPlanetData destination)
+        private int ShouldLaunchAttackShips(IReadOnlyMap map, IPlanetData source, IPlanetData destination)
         {
-            var distance = map.CalculateDistance(source.Position, destination.Position);
+            var distance = map.CalculateDistance(source, destination);
             var enemyExpectedPower = (destination.Ships + destination.ProductionRate * distance) * destination.Power;
             var requiredShips = (int) Math.Ceiling(enemyExpectedPower / source.Power * _options.ClevernessFactor);
             var enoughShips = source.Ships >= requiredShips;
@@ -116,8 +118,8 @@ namespace Conreign.LoadTest.Core.Battle
             return requiredShips + addition;
         }
 
-        private int ShouldLaunchReinforcementShips(ReadOnlyMap map, ReadOnlyPlanetData source,
-            ReadOnlyPlanetData destination)
+        private int ShouldLaunchReinforcementShips(IPlanetData source,
+            IPlanetData destination)
         {
             var stupidPower = (1 - source.Power) * (1 - _options.ClevernessFactor);
             var powerRatio = (source.Power + stupidPower) / destination.Power;
@@ -130,9 +132,9 @@ namespace Conreign.LoadTest.Core.Battle
             return ships;
         }
 
-        private bool IsVisible(ReadOnlyMap map, ReadOnlyPlanetData source, ReadOnlyPlanetData destination)
+        private bool IsVisible(IReadOnlyMap map, IPlanetData source, IPlanetData destination)
         {
-            var distance = map.CalculateDistance(source.Position, destination.Position);
+            var distance = map.CalculateDistance(source, destination);
             return distance < map.MaxDistance * _options.VisionFactor;
         }
 
@@ -155,7 +157,7 @@ namespace Conreign.LoadTest.Core.Battle
             return RankPlanet(destination) / RankPlanet(candidate.MyTopPlanet);
         }
 
-        private static double RankPlanet(ReadOnlyPlanetData planet)
+        private static double RankPlanet(IPlanetData planet)
         {
             return planet.Power * planet.ProductionRate;
         }
@@ -163,10 +165,10 @@ namespace Conreign.LoadTest.Core.Battle
         private class Candidate
         {
             public int Ships { get; set; }
-            public ReadOnlyPlanetData Source { get; set; }
-            public ReadOnlyPlanetData Destination { get; set; }
-            public ReadOnlyPlanetData MyTopPlanet { get; set; }
-            public ReadOnlyPlanetData TopPlanet { get; set; }
+            public IPlanetData Source { get; set; }
+            public IPlanetData Destination { get; set; }
+            public IPlanetData MyTopPlanet { get; set; }
+            public IPlanetData TopPlanet { get; set; }
         }
     }
 }

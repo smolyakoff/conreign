@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Conreign.Contracts.Presence
+namespace Conreign.Server.Contracts.Presence
 {
     public interface IConnection
     {

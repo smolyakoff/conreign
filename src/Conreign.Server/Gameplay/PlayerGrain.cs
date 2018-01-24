@@ -86,7 +86,7 @@ namespace Conreign.Server.Gameplay
             await _player.Handle(@event);
         }
 
-        public Task Ping()
+        public Task EnsureIsListening()
         {
             return Task.CompletedTask;
         }
@@ -99,26 +99,23 @@ namespace Conreign.Server.Gameplay
 
         public override async Task OnActivateAsync()
         {
-            await InitializeState();
+            InitializeState();
             var provider = GetStreamProvider(StreamConstants.ProviderName);
             var stream = provider.GetServerStream(TopicIds.Player(State.UserId, State.RoomId));
             _player = new Player(State, () => Room);
-            _subscription = await this.EnsureIsSubscribedOnce(stream);
-            await base.OnActivateAsync();
+            _subscription = await this.EnsureIsSubscribedOnce(stream);;
         }
 
-        public override async Task OnDeactivateAsync()
+        public override Task OnDeactivateAsync()
         {
-            await _subscription.UnsubscribeAsync();
-            await base.OnDeactivateAsync();
+            return _subscription.UnsubscribeAsync();
         }
 
-        private Task InitializeState()
+        private void InitializeState()
         {
             State.UserId = this.GetPrimaryKey(out string roomId);
             State.RoomId = roomId;
             State.RoomMode = RoomMode.Lobby;
-            return Task.CompletedTask;
         }
     }
 }

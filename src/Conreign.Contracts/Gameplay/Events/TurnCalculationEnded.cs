@@ -8,7 +8,7 @@ namespace Conreign.Contracts.Gameplay.Events
 {
     [Serializable]
     [Immutable]
-    public class TurnCalculationEnded : IClientEvent, IRoomEvent
+    public class TurnCalculationEnded : IRoomEvent, IClientEvent, IServerEvent
     {
         public TurnCalculationEnded(string roomId, int turn, MapData map, List<MovingFleetData> movingFleets)
         {
@@ -23,7 +23,6 @@ namespace Conreign.Contracts.Gameplay.Events
         public MapData Map { get; }
         public List<MovingFleetData> MovingFleets { get; }
         public DateTime Timestamp { get; }
-
         public string RoomId { get; }
     }
 }

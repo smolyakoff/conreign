@@ -23,7 +23,7 @@ namespace Conreign.Server.Presence
 
         public Task<ITopic> Create(string id)
         {
-            var topic = new Topic(GetStreamProvider(StreamConstants.ProviderName), id);
+            var topic = new BroadcastTopic(GetStreamProvider(StreamConstants.ProviderName), id);
             return Task.FromResult((ITopic) topic);
         }
 

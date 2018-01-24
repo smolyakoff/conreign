@@ -35,6 +35,12 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Battle\AI\IBotBattleStrategy.cs" />
+    <Compile Include="Battle\AI\BotMap.cs" />
+    <Compile Include="Battle\AI\IReadOnlyMap.cs" />
+    <Compile Include="Utility\PropertyComparer%272.cs" />
+    <Compile Include="Battle\AI\RankingBotBattleStrategy.cs" />
+    <Compile Include="Battle\AI\RankingBotBattleStrategyOptions.cs" />
     <Compile Include="Battle\BattleFleet.cs" />
     <Compile Include="Battle\BattleOutcome.cs" />
     <Compile Include="Battle\CoinBattleStrategy.cs" />

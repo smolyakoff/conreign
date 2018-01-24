@@ -18,7 +18,7 @@ namespace Conreign.Server.Gameplay
             var connection = GrainFactory.GetGrain<IConnectionGrain>(connectionId);
             var topicId = TopicIds.Player(userId, roomId);
             var player = GrainFactory.GetGrain<IPlayerGrain>(userId, roomId, null);
-            await player.Ping();
+            await player.EnsureIsListening();
             await connection.Connect(topicId);
             return player;
         }

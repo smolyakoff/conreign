@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Conreign.Contracts.Gameplay.Data;
 using Orleans.Concurrency;
 
-namespace Conreign.Contracts.Gameplay.Data
+namespace Conreign.Server.Contracts.Gameplay
 {
     [Serializable]
     [Immutable]
@@ -12,20 +13,20 @@ namespace Conreign.Contracts.Gameplay.Data
             Guid initiatorId,
             MapData map,
             List<PlayerData> players,
-            Dictionary<Guid, HashSet<Guid>> hubMembers,
+            Dictionary<Guid, HashSet<Guid>> clientConnections,
             List<Guid> hubJoinOrder)
         {
             InitiatorId = initiatorId;
             Map = map ?? throw new ArgumentNullException(nameof(map));
             Players = players ?? throw new ArgumentNullException(nameof(players));
-            HubMembers = hubMembers ?? throw new ArgumentNullException(nameof(hubMembers));
+            ClientConnectionIds = clientConnections ?? throw new ArgumentNullException(nameof(clientConnections));
             HubJoinOrder = hubJoinOrder ?? throw new ArgumentNullException(nameof(hubJoinOrder));
         }
 
         public Guid InitiatorId { get; }
         public MapData Map { get; }
         public List<PlayerData> Players { get; }
-        public Dictionary<Guid, HashSet<Guid>> HubMembers { get; }
+        public Dictionary<Guid, HashSet<Guid>> ClientConnectionIds { get; }
         public List<Guid> HubJoinOrder { get; }
     }
 }

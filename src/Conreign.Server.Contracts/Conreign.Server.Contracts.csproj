@@ -52,14 +52,18 @@
     <Compile Include="Communication\ITopicFactory.cs" />
     <Compile Include="Communication\IBroadcastTopic.cs" />
     <Compile Include="Communication\StreamConstants.cs" />
+    <Compile Include="Gameplay\IBotGrain.cs" />
     <Compile Include="Gameplay\IGame.cs" />
     <Compile Include="Gameplay\IGameGrain.cs" />
     <Compile Include="Gameplay\ILobby.cs" />
     <Compile Include="Gameplay\ILobbyGrain.cs" />
+    <Compile Include="Gameplay\InitialGameData.cs" />
     <Compile Include="Gameplay\IPlayerFactory.cs" />
     <Compile Include="Gameplay\IPlayerGrain.cs" />
     <Compile Include="Gameplay\IRoom.cs" />
     <Compile Include="Gameplay\IUserGrain.cs" />
+    <Compile Include="Presence\IConnectable.cs" />
+    <Compile Include="Presence\IConnection.cs" />
     <Compile Include="Presence\IConnectionGrain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

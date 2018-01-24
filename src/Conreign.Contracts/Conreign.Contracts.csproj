@@ -48,6 +48,7 @@
     <Compile Include="Errors\UserException%272.cs" />
     <Compile Include="Errors\UserException.cs" />
     <Compile Include="Errors\UserExceptionExtensions.cs" />
+    <Compile Include="Gameplay\Data\IPlanetData.cs" />
     <Compile Include="Gameplay\Data\PlayerType.cs" />
     <Compile Include="Gameplay\Events\IRoomEvent.cs" />
     <Compile Include="Presence\Events\IPresenceEvent.cs" />
@@ -55,13 +56,11 @@
     <Compile Include="Errors\Validation\ValidationFailure.cs" />
     <Compile Include="Communication\IClientEvent.cs" />
     <Compile Include="Gameplay\Data\FleetCancelationData.cs" />
-    <Compile Include="Presence\IConnectable.cs" />
     <Compile Include="Communication\IEvent.cs" />
     <Compile Include="Errors\Validation\ValidationError.cs" />
     <Compile Include="Gameplay\Data\AttackOutcome.cs" />
     <Compile Include="Gameplay\Data\GameData.cs" />
     <Compile Include="Gameplay\Data\GameStatisticsData.cs" />
-    <Compile Include="Gameplay\Data\InitialGameData.cs" />
     <Compile Include="Gameplay\Data\LobbyData.cs" />
     <Compile Include="Gameplay\Data\MapData.cs" />
     <Compile Include="Gameplay\Data\MovingFleetData.cs" />
@@ -83,7 +82,6 @@
     <Compile Include="Gameplay\Events\TurnEnded.cs" />
     <Compile Include="Gameplay\Data\TextMessageData.cs" />
     <Compile Include="Presence\Events\LeaderChanged.cs" />
-    <Compile Include="Presence\IConnection.cs" />
     <Compile Include="Presence\PresenceStatus.cs" />
     <Compile Include="Gameplay\Events\ChatMessageReceived.cs" />
     <Compile Include="Gameplay\Data\FleetData.cs" />

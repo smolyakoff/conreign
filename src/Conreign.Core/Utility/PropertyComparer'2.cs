@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Conreign.LoadTest.Core
+namespace Conreign.Core.Utility
 {
     public class PropertyComparer<TObject, TProperty> : IEqualityComparer<TObject>
         where TProperty : IEquatable<TProperty>
@@ -10,11 +10,7 @@ namespace Conreign.LoadTest.Core
 
         public PropertyComparer(Func<TObject, TProperty> selector)
         {
-            if (selector == null)
-            {
-                throw new ArgumentNullException(nameof(selector));
-            }
-            _selector = selector;
+            _selector = selector ?? throw new ArgumentNullException(nameof(selector));
         }
 
         public bool Equals(TObject x, TObject y)

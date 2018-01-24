@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Conreign.Contracts.Presence;
 using Conreign.Server.Contracts.Communication;
 using Conreign.Server.Contracts.Communication.Events;
+using Conreign.Server.Contracts.Presence;
 
 namespace Conreign.Server.Presence
 {

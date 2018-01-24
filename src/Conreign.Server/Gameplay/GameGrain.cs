@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Conreign.Contracts.Communication;
 using Conreign.Contracts.Gameplay.Data;
@@ -9,10 +10,13 @@ using Conreign.Server.Communication;
 using Conreign.Server.Contracts.Communication;
 using Conreign.Server.Contracts.Gameplay;
 using Orleans;
+using Orleans.Concurrency;
 using Serilog;
 
 namespace Conreign.Server.Gameplay
 {
+    // TODO: No re-entrant
+    [Reentrant]
     public class GameGrain : Grain<GameState>, IGameGrain
     {
         private readonly GameGrainOptions _options;
@@ -27,9 +31,18 @@ namespace Conreign.Server.Gameplay
             _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
-        public async Task Initialize(InitialGameData data)
+        public Task<MapData> GetMap()
         {
-            await _game.Initialize(data);
+            return _game.GetMap();
+        }
+
+        public async Task Start(Guid userId, InitialGameData data)
+        {
+            var botGrains = data.Players
+                .Where(x => x.Type == PlayerType.Bot)
+                .Select(x => GrainFactory.GetGrain<IBotGrain>(x.UserId, State.RoomId, null));
+            await Task.WhenAll(botGrains.Select(x => x.EnsureIsListening()));
+            await _game.Start(userId, data);
             await WriteStateAsync();
             _logger.Information(
                 "Game initialized. Map size is {MapWidth}x{MapHeight}. There are {PlayerCount} players.",
@@ -47,6 +60,11 @@ namespace Conreign.Server.Gameplay
         public Task LaunchFleet(Guid userId, FleetData fleet)
         {
             return _game.LaunchFleet(userId, fleet);
+        }
+
+        public Task EndTurn(Guid userId, List<FleetData> fleets)
+        {
+            return _game.EndTurn(userId, fleets);
         }
 
         public Task CancelFleet(Guid userId, FleetCancelationData fleet)
@@ -91,7 +109,7 @@ namespace Conreign.Server.Gameplay
         public override Task OnActivateAsync()
         {
             State.RoomId = this.GetPrimaryKeyString();
-            var topic = Topic.Room(GetStreamProvider(StreamConstants.ProviderName), this.GetPrimaryKeyString());
+            var topic = BroadcastTopic.Room(GetStreamProvider(StreamConstants.ProviderName), this.GetPrimaryKeyString());
             _logger = _logger.ForContext(nameof(State.RoomId), State.RoomId);
             _game = new Game(State, topic, new CoinBattleStrategy());
             return base.OnActivateAsync();

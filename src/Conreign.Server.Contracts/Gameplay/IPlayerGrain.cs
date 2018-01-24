@@ -15,6 +15,6 @@ namespace Conreign.Server.Contracts.Gameplay
         IEventHandler<Connected>,
         IEventHandler<Disconnected>
     {
-        Task Ping();
+        Task EnsureIsListening();
     }
 }

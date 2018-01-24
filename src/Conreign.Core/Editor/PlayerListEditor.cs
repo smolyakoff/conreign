@@ -19,6 +19,7 @@ namespace Conreign.Core.Editor
         public int BotsCount => _state.Count(x => x.Type == PlayerType.Bot);
         public int HumansCount => _state.Count(x => x.Type == PlayerType.Human);
         public IEnumerable<Guid> PlayerIds => _state.Select(x => x.UserId);
+        public IEnumerable<Guid> BotIds => _state.Where(x => x.Type == PlayerType.Bot).Select(x => x.UserId);
 
         public PlayerData this[Guid userId]
         {
@@ -45,7 +46,7 @@ namespace Conreign.Core.Editor
             return player;
         }
 
-        public void AdjustBotCount(int desiredBotsCount)
+        public (IEnumerable<PlayerData> BotsAdded, IEnumerable<PlayerData> BotsRemoved) AdjustBotCount(int desiredBotsCount)
         {
             if (desiredBotsCount < 0)
             {
@@ -56,7 +57,7 @@ namespace Conreign.Core.Editor
             }
             if (BotsCount == desiredBotsCount)
             {
-                return;
+                return (Enumerable.Empty<PlayerData>(), Enumerable.Empty<PlayerData>());
             }
             var difference = Math.Abs(desiredBotsCount - BotsCount);
             if (BotsCount > desiredBotsCount)
@@ -69,14 +70,13 @@ namespace Conreign.Core.Editor
                 {
                     _state.Remove(bot);
                 }
+                return (Enumerable.Empty<PlayerData>(), botsToRemove);
             }
-            else
-            {
-                var botsToAdd = Enumerable.Range(0, difference)
-                    .Select(_ => GenerateBot())
-                    .ToList();
-                _state.AddRange(botsToAdd);
-            }
+            var botsToAdd = Enumerable.Range(0, difference)
+                .Select(_ => GenerateBot())
+                .ToList();
+            _state.AddRange(botsToAdd);
+            return (botsToAdd, Enumerable.Empty<PlayerData>());
         }
 
         public bool UpdateHumanOptions(Guid userId, PlayerOptionsData options)

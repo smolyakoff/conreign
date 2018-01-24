@@ -83,6 +83,11 @@ namespace Conreign.Server.Gameplay
             return Task.FromResult<IRoomData>(data);
         }
 
+        public Task<MapData> GetMap()
+        {
+            return Task.FromResult(_state.Map);
+        }
+
         public Task LaunchFleet(Guid userId, FleetData fleet)
         {
             if (fleet == null)
@@ -95,11 +100,27 @@ namespace Conreign.Server.Gameplay
 
             var validator = new LaunchFleetValidator(userId, _map);
             validator.EnsureIsValid(fleet);
-            var state = _state.PlayerStates.GetOrCreateDefault(userId, () => new PlayerGameState());
-            state.WaitingFleets.Add(fleet);
-            var planet = _map[fleet.From];
-            planet.Ships -= fleet.Ships;
+            LaunchFleetInternal(userId, fleet);
             return Task.CompletedTask;
+        }
+
+        public Task EndTurn(Guid userId, List<FleetData> fleets)
+        {
+            if (fleets == null)
+            {
+                throw new ArgumentNullException(nameof(fleets));
+            }
+            EnsureGameIsInProgress();
+            EnsureUserIsOnline(userId);
+            EnsureTurnIsInProgress(userId);
+
+            var validator = new LaunchFleetValidator(userId, _map);
+            foreach (var fleet in fleets)
+            {
+                validator.EnsureIsValid(fleet);
+                LaunchFleetInternal(userId, fleet);
+            }
+            return EndTurnInternal(userId);
         }
 
         public Task CancelFleet(Guid userId, FleetCancelationData fleetCancelation)
@@ -127,9 +148,7 @@ namespace Conreign.Server.Gameplay
             EnsureGameIsInProgress();
             EnsureUserIsOnline(userId);
 
-            var state = _state.PlayerStates.GetOrCreateDefault(userId);
-            state.TurnStatus = TurnStatus.Ended;
-            return _hub.NotifyEverybody(new TurnEnded(_state.RoomId, userId));
+            return EndTurnInternal(userId);
         }
 
         public Task Notify(ISet<Guid> userIds, params IEvent[] events)
@@ -147,7 +166,7 @@ namespace Conreign.Server.Gameplay
             return _hub.NotifyEverybodyExcept(userIds, events);
         }
 
-        public Task Initialize(InitialGameData data)
+        public Task Start(Guid userId, InitialGameData data)
         {
             if (data == null)
             {
@@ -155,16 +174,26 @@ namespace Conreign.Server.Gameplay
             }
             if (_state.IsStarted)
             {
-                throw new InvalidOperationException("Expected game to be not started.");
+                return Task.CompletedTask;
             }
             _state.IsEnded = false;
             _state.IsStarted = true;
             _state.Map = data.Map;
+            var members = data.ClientConnectionIds.ToDictionary(
+                x => x.Key,
+                x => new HubMemberState
+                {
+                    ConnectionIds = x.Value,
+                    Type = HubMemberType.Client
+                });
+            foreach (var player in data.Players.Where(x => x.Type == PlayerType.Bot))
+            {
+                members[player.UserId] = new HubMemberState {Type = HubMemberType.Server};
+            }
             _state.Hub = new HubState
             {
                 Id = _state.RoomId,
-                Members = data.HubMembers
-                    .ToDictionary(x => x.Key, x => new HubMemberState {ConnectionIds = x.Value}),
+                Members = members,
                 JoinOrder = data.HubJoinOrder
             };
             _state.Players = data.Players;
@@ -173,6 +202,7 @@ namespace Conreign.Server.Gameplay
             _state.Turn = 0;
             _map = new Map(_state.Map);
             _hub = new Hub(_state.Hub, _topic);
+            NotifyEverybody(new GameStarted());
             return Task.CompletedTask;
         }
 
@@ -213,6 +243,21 @@ namespace Conreign.Server.Gameplay
             }
             _state.Turn += 1;
             return false;
+        }
+
+        private void LaunchFleetInternal(Guid userId, FleetData fleet)
+        {
+            var state = _state.PlayerStates.GetOrCreateDefault(userId, () => new PlayerGameState());
+            state.WaitingFleets.Add(fleet);
+            var planet = _map[fleet.From];
+            planet.Ships -= fleet.Ships;
+        }
+
+        private Task EndTurnInternal(Guid userId)
+        {
+            var state = _state.PlayerStates.GetOrCreateDefault(userId);
+            state.TurnStatus = TurnStatus.Ended;
+            return _hub.NotifyEverybody(new TurnEnded(_state.RoomId, userId));
         }
 
         private PresenceStatus GetPresenceStatus(Guid userId)

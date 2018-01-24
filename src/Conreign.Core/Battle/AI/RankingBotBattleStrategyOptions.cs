@@ -1,9 +1,12 @@
 ﻿using System;
 
-namespace Conreign.LoadTest.Core.Battle
+namespace Conreign.Core.Battle.AI
 {
     public class RankingBotBattleStrategyOptions
     {
+        public static readonly RankingBotBattleStrategyOptions Default =
+            new RankingBotBattleStrategyOptions(0.8, 0.2, 1);
+
         public RankingBotBattleStrategyOptions(double visionFactor, double riskFactor, double clevernessFactor)
         {
             if (visionFactor <= 0 || visionFactor > 1)

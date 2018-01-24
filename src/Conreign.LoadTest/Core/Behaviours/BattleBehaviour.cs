@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Conreign.Contracts.Gameplay.Data;
 using Conreign.Contracts.Gameplay.Events;
 using Conreign.Core;
-using Conreign.LoadTest.Core.Battle;
+using Conreign.Core.Battle.AI;
 using Serilog;
 
 namespace Conreign.LoadTest.Core.Behaviours
@@ -76,7 +76,7 @@ namespace Conreign.LoadTest.Core.Behaviours
             {
                 throw new InvalidOperationException("Expected to be authenticated already.");
             }
-            var map = new ReadOnlyMap(new Map(_map));
+            var map = new BotMap(new Map(_map));
             var fleets = _strategy.ChooseFleetsToLaunch(context.UserId.Value, map);
             var tasks = fleets.Select(x => context.Player.LaunchFleet(x));
             await Task.WhenAll(tasks);

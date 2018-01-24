@@ -8,6 +8,7 @@ using Conreign.Server.Contracts.Communication;
 using Conreign.Server.Contracts.Communication.Events;
 using Conreign.Server.Contracts.Gameplay;
 using Conreign.Server.Gameplay.Validators;
+using Conreign.Server.Presence;
 
 namespace Conreign.Server.Gameplay
 {
@@ -77,9 +78,10 @@ namespace Conreign.Server.Gameplay
         public async Task StartGame()
         {
             var lobby = EnsureIsInLobby();
-            await lobby.StartGame(_state.UserId);
+            var gameData = await lobby.InitializeGame(_state.UserId);
             _state.RoomMode = RoomMode.Game;
-            await Room.NotifyEverybody(new GameStarted());
+            var game = EnsureIsInGame();
+            await game.Start(_state.UserId, gameData);
         }
 
         public Task LaunchFleet(FleetData fleet)

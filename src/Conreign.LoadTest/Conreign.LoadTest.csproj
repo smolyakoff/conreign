@@ -42,12 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\Battle\IBotBattleStrategy.cs" />
-    <Compile Include="Core\Battle\NaiveBotBattleStrategy.cs" />
-    <Compile Include="Core\Battle\RankingBotBattleStrategy.cs" />
-    <Compile Include="Core\Battle\RankingBotBattleStrategyOptions.cs" />
-    <Compile Include="Core\Battle\ReadOnlyMap.cs" />
-    <Compile Include="Core\Battle\ReadOnlyPlanetData.cs" />
+    <Compile Include="Core\NaiveBotBattleStrategy.cs" />
     <Compile Include="Core\Behaviours\BattleBehaviour.cs" />
     <Compile Include="Core\Behaviours\DiagnosticsBehaviour.cs" />
     <Compile Include="Core\Behaviours\DispatcherBehaviour.cs" />
@@ -73,7 +68,6 @@
     <Compile Include="Core\IBotNotification%271.cs" />
     <Compile Include="Core\LoadTestBotFactory.cs" />
     <Compile Include="Core\LoadTestBotOptions.cs" />
-    <Compile Include="Core\PropertyComparer%272.cs" />
     <Compile Include="LoadTestRunner.cs" />
     <Compile Include="LoadTestOptions.cs" />
     <Compile Include="Program.cs" />

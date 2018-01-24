@@ -10,7 +10,7 @@ using Orleans.Streams;
 
 namespace Conreign.Server.Communication
 {
-    public class Topic : IBroadcastTopic
+    public class BroadcastTopic : IBroadcastTopic
     {
         private readonly Dictionary<Guid, IAsyncStream<IServerEvent>> _childrenStreams;
         private readonly Dictionary<Guid, IAsyncStream<IClientEvent>> _clientStreams;
@@ -18,7 +18,7 @@ namespace Conreign.Server.Communication
         private readonly IAsyncStream<IServerEvent> _parentStream;
         private readonly IStreamProvider _provider;
 
-        public Topic(IStreamProvider provider, string id)
+        public BroadcastTopic(IStreamProvider provider, string id)
         {
             if (provider == null)
             {
@@ -63,14 +63,14 @@ namespace Conreign.Server.Communication
             await Task.WhenAll(clientTasks);
         }
 
-        public static Topic Room(IStreamProvider provider, string roomId)
+        public static BroadcastTopic Room(IStreamProvider provider, string roomId)
         {
-            return new Topic(provider, TopicIds.Room(roomId));
+            return new BroadcastTopic(provider, TopicIds.Room(roomId));
         }
 
-        public static Topic Player(IStreamProvider provider, Guid userId, string roomId)
+        public static BroadcastTopic Player(IStreamProvider provider, Guid userId, string roomId)
         {
-            return new Topic(provider, TopicIds.Player(userId, roomId));
+            return new BroadcastTopic(provider, TopicIds.Player(userId, roomId));
         }
 
         public Task<StreamSubscriptionHandle<IServerEvent>> EnsureIsSubscribedOnce<T>(T handler)

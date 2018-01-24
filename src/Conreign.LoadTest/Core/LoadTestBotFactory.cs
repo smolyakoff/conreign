@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Conreign.Client.Contracts;
-using Conreign.LoadTest.Core.Battle;
 using Conreign.LoadTest.Core.Behaviours;
 
 namespace Conreign.LoadTest.Core

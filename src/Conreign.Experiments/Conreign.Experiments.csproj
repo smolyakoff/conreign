@@ -72,6 +72,10 @@
       <Project>{00409622-346B-4926-B745-E5F595BD3BB7}</Project>
       <Name>Conreign.Contracts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Conreign.Core\Conreign.Core.csproj">
+      <Project>{56e6c647-cd9f-4432-9d2e-d0c00e79850b}</Project>
+      <Name>Conreign.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Conreign.LoadTest\Conreign.LoadTest.csproj">
       <Project>{434AFA37-5C10-42CA-922F-F9772FDC8574}</Project>
       <Name>Conreign.LoadTest</Name>
