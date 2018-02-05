@@ -50,8 +50,7 @@
     <Compile Include="Gameplay\LobbyGrainOptions.cs" />
     <Compile Include="Gameplay\Validators\GameOptionsValidator.cs" />
     <Compile Include="Presence\ConnectionState.cs" />
-    <Compile Include="Presence\HubMemberState.cs" />
-    <Compile Include="Presence\HubMemberType.cs" />
+    <Compile Include="Presence\IReadOnlySet%271.cs" />
     <Compile Include="Properties\orleans.codegen.cs" />
     <Compile Include="Utility\CancellationTokenExtensions.cs" />
     <Compile Include="Gameplay\Validators\CancelFleetValidator.cs" />

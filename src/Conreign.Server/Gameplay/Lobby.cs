@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -90,9 +91,8 @@ namespace Conreign.Server.Gameplay
             var validator = new GameOptionsValidator(_playerListEditor.HumansCount);
             validator.EnsureIsValid(options);
 
-           var (botsAdded, botsRemoved) = _playerListEditor.AdjustBotCount(options.BotsCount);
-            _hub.EnsureServerMembersConnected(_playerListEditor.BotIds.ToHashSet());
-           var mapSize = new MapSize(options.MapWidth, options.MapHeight);
+            var (botsAdded, botsRemoved) = _playerListEditor.AdjustBotCount(options.BotsCount);
+            var mapSize = new MapSize(options.MapWidth, options.MapHeight);
            _mapEditor.GenerateMap(
                mapSize,
                _playerListEditor.PlayerIds.ToHashSet(), 
@@ -132,9 +132,7 @@ namespace Conreign.Server.Gameplay
                 userId,
                 _state.Map,
                 _state.Players,
-                _state.Hub.Members
-                    .Where(x => x.Value.Type == HubMemberType.Client)
-                    .ToDictionary(x => x.Key, x => x.Value.ConnectionIds),
+                _state.Hub.Members,
                 _state.Hub.JoinOrder
             );
             return Task.FromResult(data);
@@ -177,14 +175,13 @@ namespace Conreign.Server.Gameplay
 
         private void Initialize()
         {
-            _hub = new Hub(_state.Hub, _topic);
             _mapEditor = new MapEditor(
                 _state.Map,
                 new UniformRandomPlanetGenerator(UniformRandomPlanetGeneratorOptions.PlayerPlanetDefaults),
                 new UniformRandomPlanetGenerator(UniformRandomPlanetGeneratorOptions.NeutralPlanetDefaults));
             _playerListEditor = new PlayerListEditor(_state.Players);
             _playerListEditor.AdjustBotCount(GameOptionsData.DefaultBotsCount);
-            _hub.EnsureServerMembersConnected(_playerListEditor.BotIds.ToHashSet());
+            _hub = new Hub(_state.Hub, _topic, new BotUserIdSet(_playerListEditor));
             _mapEditor.GenerateMap(
                 _playerListEditor.PlayerIds.ToHashSet(), 
                 GameOptionsData.DefaultNeutralPlayersCount);
@@ -206,6 +203,31 @@ namespace Conreign.Server.Gameplay
             }
             var message = $"Game {_state.RoomId} is already in progress.";
             throw UserException.Create(GameplayError.GameIsAlreadyInProgress, message);
+        }
+
+        private class BotUserIdSet : IReadOnlySet<Guid>
+        {
+            private readonly PlayerListEditor _playerListEditor;
+
+            public BotUserIdSet(PlayerListEditor playerListEditor)
+            {
+                _playerListEditor = playerListEditor;
+            }
+
+            public bool Contains(Guid userId)
+            {
+                return _playerListEditor.ContainsBotWithUserId(userId);
+            }
+
+            public IEnumerator<Guid> GetEnumerator()
+            {
+                return _playerListEditor.BotIds.GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
         }
     }
 }

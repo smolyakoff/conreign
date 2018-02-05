@@ -8,7 +8,6 @@ using Conreign.Server.Contracts.Communication;
 using Conreign.Server.Contracts.Communication.Events;
 using Conreign.Server.Contracts.Gameplay;
 using Conreign.Server.Gameplay.Validators;
-using Conreign.Server.Presence;
 
 namespace Conreign.Server.Gameplay
 {

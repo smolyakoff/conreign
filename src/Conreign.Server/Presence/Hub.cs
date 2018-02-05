@@ -7,6 +7,7 @@ using Conreign.Contracts.Presence;
 using Conreign.Contracts.Presence.Events;
 using Conreign.Core.Utility;
 using Conreign.Server.Contracts.Communication;
+using Conreign.Server.Contracts.Presence;
 using Conreign.Server.Utility;
 
 namespace Conreign.Server.Presence
@@ -16,29 +17,28 @@ namespace Conreign.Server.Presence
         private readonly HubState _state;
         private readonly ITimeProvider _timeProvider;
         private readonly IBroadcastTopic _topic;
+        private readonly IReadOnlySet<Guid> _serverUserIds;
 
-        public Hub(HubState state, IBroadcastTopic topic)
-            : this(state, topic, new SystemTimeProvider())
+        public Hub(HubState state, IBroadcastTopic topic, IReadOnlySet<Guid> serverUserIds)
+            : this(state, topic, serverUserIds, new SystemTimeProvider())
         {
         }
 
-        public Hub(HubState state, IBroadcastTopic topic, ITimeProvider timeProvider)
+        public Hub(
+            HubState state, 
+            IBroadcastTopic topic, 
+            IReadOnlySet<Guid> serverUserIds,
+            ITimeProvider timeProvider)
         {
             _state = state ?? throw new ArgumentNullException(nameof(state));
             _topic = topic ?? throw new ArgumentNullException(nameof(topic));
+            _serverUserIds = serverUserIds ?? throw new ArgumentNullException(nameof(serverUserIds));
             _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
         }
 
-        private IEnumerable<Guid> ClientUserIds => _state.Members
-            .Select(x => x.Key)
-            .Where(IsClientUserId);
-
-        private IEnumerable<Guid> ServerUserIds => _state.Members
-            .Select(x => x.Key)
-            .Where(IsServerUserId);
-
-        private IEnumerable<HubMemberState> ClientMembers => _state.Members.Values
-            .Where(x => x.Type == HubMemberType.Client);
+        private IEnumerable<Guid> ClientUserIds => _state.Members.Select(x => x.Key);
+        private IEnumerable<Guid> UserIds => ClientUserIds.Concat(_serverUserIds);
+        private IEnumerable<HubMemberState> ClientMembers => _state.Members.Values;
 
         public Guid? LeaderUserId
         {
@@ -74,32 +74,11 @@ namespace Conreign.Server.Presence
             }
         }
 
-        public void EnsureServerMembersConnected(HashSet<Guid> userIdsToBeConnected)
-        {
-            if (userIdsToBeConnected == null)
-            {
-                throw new ArgumentNullException(nameof(userIdsToBeConnected));
-            }
-            var existingUserIds = ServerUserIds.ToHashSet();
-            var userIdsToConnect = new HashSet<Guid>(userIdsToBeConnected);
-            userIdsToConnect.ExceptWith(existingUserIds);
-            var userIdsToDisconnect = new HashSet<Guid>(existingUserIds);
-            userIdsToDisconnect.ExceptWith(userIdsToBeConnected);
-            foreach (var userId in userIdsToConnect)
-            {
-                _state.Members[userId] = new HubMemberState {Type = HubMemberType.Server};
-            }
-            foreach (var userId in userIdsToDisconnect)
-            {
-                _state.Members.Remove(userId);
-            }
-        }
-
         public async Task Connect(Guid userId, Guid connectionId)
         {
             var events = WithLeaderCheck(() =>
             {
-                var member = GetOrCreateClient(userId);
+                var member = GetOrCreateClientMember(userId);
                 var added = member.ConnectionIds.Add(connectionId);
                 if (!added)
                 {
@@ -120,7 +99,7 @@ namespace Conreign.Server.Presence
             }
             var events = WithLeaderCheck(() =>
             {
-                var member = GetOrCreateClient(userId);
+                var member = GetOrCreateClientMember(userId);
                 var removed = member.ConnectionIds.Remove(connectionId);
                 if (!removed)
                 {
@@ -147,8 +126,7 @@ namespace Conreign.Server.Presence
             {
                 return;
             }
-            var targetUserIds = _state.Members
-                .Select(x => x.Key)
+            var targetUserIds = UserIds
                 .Where(userIds.Contains)
                 .ToHashSet();
             var targetConnectionIds = _state.Members
@@ -173,7 +151,7 @@ namespace Conreign.Server.Presence
             {
                 return;
             }
-            var ids = _state.Members.Select(x => x.Key).ToHashSet();
+            var ids = UserIds.ToHashSet();
             var serverEvents = events.OfType<IServerEvent>().ToArray();
             if (serverEvents.Length > 0)
             {
@@ -196,9 +174,12 @@ namespace Conreign.Server.Presence
 
         public bool IsOnline(Guid userId)
         {
+            if (_serverUserIds.Contains(userId))
+            {
+                return true;
+            }
             var exists = _state.Members.TryGetValue(userId, out HubMemberState member);
-            return exists &&
-                   (member.Type == HubMemberType.Server || member.ConnectionIds.Count > 0);
+            return exists && member.ConnectionIds.Count > 0;
         }
 
         public IEnumerable<IClientEvent> GetEvents(Guid userId)
@@ -208,26 +189,14 @@ namespace Conreign.Server.Presence
                 .Select(x => x.Event);
         }
 
-        private HubMemberState GetOrCreateClient(Guid userId)
+        private HubMemberState GetOrCreateClientMember(Guid userId)
         {
-            var member = _state.Members.GetOrCreateDefault(userId);
-            if (member.Type != HubMemberType.Client)
+            if (_serverUserIds.Contains(userId))
             {
-                throw new InvalidOperationException($"Expected user with id '{userId}' to be a client member.");
+                throw new InvalidOperationException($"Expected user '{userId}' to be a client hub member.");
             }
+            var member = _state.Members.GetOrCreateDefault(userId);
             return member;
-        }
-
-        private bool IsClientUserId(Guid userId)
-        {
-            return _state.Members.ContainsKey(userId) && 
-                _state.Members[userId].Type == HubMemberType.Client;
-        }
-
-        private bool IsServerUserId(Guid userId)
-        {
-            return _state.Members.ContainsKey(userId) &&
-                   _state.Members[userId].Type == HubMemberType.Server;
         }
 
         private IEnumerable<IClientEvent> Join(Guid userId)

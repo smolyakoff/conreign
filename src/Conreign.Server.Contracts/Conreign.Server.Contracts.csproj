@@ -62,6 +62,7 @@
     <Compile Include="Gameplay\IPlayerGrain.cs" />
     <Compile Include="Gameplay\IRoom.cs" />
     <Compile Include="Gameplay\IUserGrain.cs" />
+    <Compile Include="Presence\HubMemberState.cs" />
     <Compile Include="Presence\IConnectable.cs" />
     <Compile Include="Presence\IConnection.cs" />
     <Compile Include="Presence\IConnectionGrain.cs" />

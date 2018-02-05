@@ -35,6 +35,11 @@ namespace Conreign.Core.Editor
             return _state.Exists(x => x.UserId == userId);
         }
 
+        public bool ContainsBotWithUserId(Guid userId)
+        {
+            return _state.Exists(x => x.Type == PlayerType.Bot && x.UserId == userId);
+        }
+
         public PlayerData AddHuman(Guid userId)
         {
             if (ContainsPlayerWithUserId(userId))
