@@ -1,9 +1,11 @@
 ﻿using System;
 using Conreign.Contracts.Communication;
+using Orleans.Concurrency;
 
 namespace Conreign.Contracts.Presence.Events
 {
     [Serializable]
+    [Immutable]
     public class LeaderChanged : IClientEvent, IPresenceEvent
     {
         public LeaderChanged(string hubId, Guid? userId)
@@ -12,9 +14,8 @@ namespace Conreign.Contracts.Presence.Events
             UserId = userId;
         }
 
-        public Guid? UserId { get; set; }
-        public DateTime Timestamp { get; }
-
-        public string HubId { get; set; }
+        public DateTime Timestamp { get; } = DateTime.UtcNow;
+        public Guid? UserId { get; }
+        public string HubId { get; }
     }
 }

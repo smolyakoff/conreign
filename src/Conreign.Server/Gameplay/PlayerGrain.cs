@@ -7,12 +7,10 @@ using Conreign.Server.Contracts.Communication;
 using Conreign.Server.Contracts.Communication.Events;
 using Conreign.Server.Contracts.Gameplay;
 using Orleans;
-using Orleans.Concurrency;
 using Orleans.Streams;
 
 namespace Conreign.Server.Gameplay
 {
-    [Reentrant]
     public class PlayerGrain : Grain<PlayerState>, IPlayerGrain
     {
         private Player _player;

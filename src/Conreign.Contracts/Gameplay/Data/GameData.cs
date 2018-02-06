@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using Conreign.Contracts.Communication;
 using Conreign.Contracts.Presence;
-using Orleans.Concurrency;
 
 namespace Conreign.Contracts.Gameplay.Data
 {
     [Serializable]
-    [Immutable]
     public class GameData : IRoomData
     {
         public HashSet<Guid> DeadPlayers = new HashSet<Guid>();

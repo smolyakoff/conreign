@@ -1,12 +1,10 @@
 ﻿using System;
 using Conreign.Contracts.Communication;
 using Conreign.Contracts.Gameplay.Data;
-using Orleans.Concurrency;
 
 namespace Conreign.Contracts.Gameplay.Events
 {
     [Serializable]
-    [Immutable]
     public class PlayerUpdated : IClientEvent, IRoomEvent
     {
         public PlayerUpdated(string roomId, PlayerData player)

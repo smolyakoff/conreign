@@ -70,8 +70,7 @@ namespace Conreign.Server.Gameplay
                 Map = _state.Map,
                 MovingFleets = playerState.MovingFleets,
                 WaitingFleets = playerState.WaitingFleets,
-                PresenceStatuses = _state.Players
-                    .ToDictionary(x => x.UserId, x => GetPresenceStatus(x.UserId)),
+                PresenceStatuses = GetPresenceStatuses(),
                 TurnStatuses = _state.Players
                     .ToDictionary(x => x.UserId, x => _state.PlayerStates[x.UserId].TurnStatus),
                 DeadPlayers = _state.PlayerStates
@@ -84,9 +83,11 @@ namespace Conreign.Server.Gameplay
             return Task.FromResult<IRoomData>(data);
         }
 
-        public Task<MapData> GetMap()
+        private Dictionary<Guid, PresenceStatus> GetPresenceStatuses()
         {
-            return Task.FromResult(_state.Map);
+            return _state.Players.ToDictionary(
+                x => x.UserId, 
+                x => _hub.GetPresenceStatus(x.UserId));
         }
 
         public Task LaunchFleet(Guid userId, FleetData fleet)
@@ -177,6 +178,7 @@ namespace Conreign.Server.Gameplay
             {
                 return Task.CompletedTask;
             }
+
             _state.IsEnded = false;
             _state.IsStarted = true;
             _state.Map = data.Map;
@@ -192,8 +194,16 @@ namespace Conreign.Server.Gameplay
             _state.Turn = 0;
             _hub = new Hub(_state.Hub, _topic, new BotUserIdSet(_state));
             _map = new Map(_state.Map);
-            NotifyEverybody(new GameStarted());
-            return Task.CompletedTask;
+            if (_hub.LeaderUserId == null)
+            {
+                throw new InvalidOperationException($"Expected {nameof(_hub.LeaderUserId)} to be not null.");
+            }
+            var gameStarted = new GameStarted(
+                _state.Players,
+                GetPresenceStatuses(),
+                _state.Map,
+                _hub.LeaderUserId.Value);
+            return _hub.NotifyEverybody(gameStarted);
         }
 
         public async Task<bool> CalculateTurn()
@@ -248,11 +258,6 @@ namespace Conreign.Server.Gameplay
             var state = _state.PlayerStates.GetOrCreateDefault(userId);
             state.TurnStatus = TurnStatus.Ended;
             return _hub.NotifyEverybody(new TurnEnded(_state.RoomId, userId));
-        }
-
-        private PresenceStatus GetPresenceStatus(Guid userId)
-        {
-            return _hub.IsOnline(userId) ? PresenceStatus.Online : PresenceStatus.Offline;
         }
 
         private Task MarkDeadPlayers()

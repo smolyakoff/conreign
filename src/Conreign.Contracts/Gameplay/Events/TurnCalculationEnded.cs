@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using Conreign.Contracts.Communication;
 using Conreign.Contracts.Gameplay.Data;
-using Orleans.Concurrency;
 
 namespace Conreign.Contracts.Gameplay.Events
 {
     [Serializable]
-    [Immutable]
     public class TurnCalculationEnded : IRoomEvent, IClientEvent, IServerEvent
     {
         public TurnCalculationEnded(string roomId, int turn, MapData map, List<MovingFleetData> movingFleets)

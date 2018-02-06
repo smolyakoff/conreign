@@ -19,13 +19,11 @@ namespace Conreign.Server.Gameplay
             _state = state ?? throw new ArgumentNullException(nameof(state));
             _game = game ?? throw new ArgumentNullException(nameof(game));
             _battleStrategy = battleStrategy ?? throw new ArgumentNullException(nameof(battleStrategy));
-            _map = new BotMap(_state.Map);
         }
 
         public async Task Handle(GameStarted @event)
         {
-            _state.Map = await _game.GetMap();
-            _map = new BotMap(_state.Map);
+            _map = new BotMap(@event.Map);
             await Think();
         }
 

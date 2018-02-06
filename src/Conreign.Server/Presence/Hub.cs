@@ -182,6 +182,11 @@ namespace Conreign.Server.Presence
             return exists && member.ConnectionIds.Count > 0;
         }
 
+        public PresenceStatus GetPresenceStatus(Guid userId)
+        {
+            return IsOnline(userId) ? PresenceStatus.Online : PresenceStatus.Offline;
+        }
+
         public IEnumerable<IClientEvent> GetEvents(Guid userId)
         {
             return _state.Events

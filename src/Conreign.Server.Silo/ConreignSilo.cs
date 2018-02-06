@@ -34,7 +34,10 @@ namespace Conreign.Server.Silo
             config.Globals.DataConnectionString = Configuration.SystemStorageConnectionString;
             config.Globals.ReminderServiceType = Configuration.RemindersStorageType;
             config.Globals.DataConnectionStringForReminders = Configuration.SystemStorageConnectionString;
-            config.AddSimpleMessageStreamProvider(StreamConstants.ProviderName);
+            config.AddSimpleMessageStreamProvider(
+                StreamConstants.ProviderName, 
+                fireAndForgetDelivery: true,
+                optimizeForImmutableData: false);
             config.AddMemoryStorageProvider("PubSubStore");
             switch (Configuration.DataStorageType)
             {

@@ -10,13 +10,10 @@ using Conreign.Server.Communication;
 using Conreign.Server.Contracts.Communication;
 using Conreign.Server.Contracts.Gameplay;
 using Orleans;
-using Orleans.Concurrency;
 using Serilog;
 
 namespace Conreign.Server.Gameplay
 {
-    // TODO: No re-entrant
-    [Reentrant]
     public class GameGrain : Grain<GameState>, IGameGrain
     {
         private readonly GameGrainOptions _options;
@@ -29,11 +26,6 @@ namespace Conreign.Server.Gameplay
         {
             _logger = logger.ForContext(GetType());
             _options = options ?? throw new ArgumentNullException(nameof(options));
-        }
-
-        public Task<MapData> GetMap()
-        {
-            return _game.GetMap();
         }
 
         public async Task Start(Guid userId, InitialGameData data)

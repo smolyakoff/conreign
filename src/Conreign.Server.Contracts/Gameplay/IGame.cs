@@ -7,7 +7,6 @@ namespace Conreign.Server.Contracts.Gameplay
 {
     public interface IGame : IRoom
     {
-        Task<MapData> GetMap();
         Task Start(Guid userId, InitialGameData data);
         Task LaunchFleet(Guid userId, FleetData fleet);
         Task EndTurn(Guid userId, List<FleetData> fleets);
