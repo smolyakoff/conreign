@@ -6,7 +6,7 @@ using Conreign.Contracts.Gameplay.Data;
 
 namespace Conreign.Client.SignalR.Proxies
 {
-    internal class PlayerProxy : IPlayer
+    internal class PlayerProxy : IPlayerClient
     {
         private readonly SignalRSender _context;
         private readonly string _roomId;

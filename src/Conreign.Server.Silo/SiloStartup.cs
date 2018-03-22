@@ -12,7 +12,7 @@ namespace Conreign.Server.Silo
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton(Log.Logger);
-            services.AddSingleton(new GameGrainOptions());
+            services.AddSingleton(new GameOptions());
             services.AddSingleton(new LobbyGrainOptions());
             return services.BuildServiceProvider();
         }

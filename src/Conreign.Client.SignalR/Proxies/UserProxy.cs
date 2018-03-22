@@ -5,7 +5,7 @@ using Conreign.Contracts.Gameplay;
 
 namespace Conreign.Client.SignalR.Proxies
 {
-    internal class UserProxy : IUser
+    internal class UserProxy : IUserClient
     {
         private readonly SignalRSender _context;
 
@@ -14,7 +14,7 @@ namespace Conreign.Client.SignalR.Proxies
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public async Task<IPlayer> JoinRoom(string roomId, Guid connectionId)
+        public async Task<IPlayerClient> JoinRoom(string roomId, Guid connectionId)
         {
             var command = new JoinRoomCommand {RoomId = roomId};
             await _context.Send(command);

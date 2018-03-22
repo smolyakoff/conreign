@@ -20,7 +20,7 @@ using Conreign.Server.Presence;
 
 namespace Conreign.Server.Gameplay
 {
-    public class Lobby : ILobby, IEventHandler<GameEnded>
+    public class Lobby : ILobby
     {
         private readonly LobbyState _state;
         private readonly IBroadcastTopic _topic;
@@ -51,21 +51,6 @@ namespace Conreign.Server.Gameplay
             return Task.CompletedTask;
         }
 
-        public Task Notify(ISet<Guid> userIds, params IEvent[] events)
-        {
-            return _hub.Notify(userIds, events);
-        }
-
-        public Task NotifyEverybody(params IEvent[] @event)
-        {
-            return _hub.NotifyEverybody(@event);
-        }
-
-        public Task NotifyEverybodyExcept(ISet<Guid> userIds, params IEvent[] events)
-        {
-            return _hub.NotifyEverybodyExcept(userIds, events);
-        }
-
         public Task<IRoomData> GetState(Guid userId)
         {
             EnsureUserIsOnline(userId);
@@ -81,6 +66,18 @@ namespace Conreign.Server.Gameplay
                 LeaderUserId = _hub.LeaderUserId
             };
             return Task.FromResult<IRoomData>(state);
+        }
+
+        public Task SendMessage(Guid userId, TextMessageData textMessage)
+        {
+            EnsureUserIsOnline(userId);
+            if (textMessage == null)
+            {
+                throw new ArgumentNullException(nameof(textMessage));
+            }
+            textMessage.EnsureIsValid<TextMessageData, TextMessageValidator>();
+            var @event = new ChatMessageReceived(_state.RoomId, userId, textMessage);
+            return _hub.NotifyEverybody(@event);
         }
 
         public async Task UpdateGameOptions(Guid userId, GameOptionsData options)

@@ -12,7 +12,7 @@ namespace Conreign.Server.Gameplay
     [StatelessWorker]
     public class UserGrain : Grain<Guid>, IUserGrain
     {
-        public async Task<IPlayer> JoinRoom(string roomId, Guid connectionId)
+        public async Task<IPlayerClient> JoinRoom(string roomId, Guid connectionId)
         {
             var userId = this.GetPrimaryKey();
             var connection = GrainFactory.GetGrain<IConnectionGrain>(connectionId);

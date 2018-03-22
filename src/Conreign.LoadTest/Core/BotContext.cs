@@ -31,8 +31,8 @@ namespace Conreign.LoadTest.Core
         public string BotId { get; }
         public IClientConnection Connection { get; }
         public Guid? UserId { get; set; }
-        public IUser User { get; set; }
-        public IPlayer Player { get; set; }
+        public IUserClient User { get; set; }
+        public IPlayerClient Player { get; set; }
         public ILogger Logger { get; set; }
 
         public void Notify(IBotEvent @event)

@@ -14,7 +14,7 @@ namespace Conreign.Client.Handler
 
         public Metadata Metadata { get; }
         public Guid? UserId { get; set; }
-        public IUser User { get; set; }
+        public IUserClient User { get; set; }
         public IClientConnection Connection { get; }
     }
 }

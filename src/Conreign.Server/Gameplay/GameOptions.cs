@@ -2,7 +2,7 @@
 
 namespace Conreign.Server.Gameplay
 {
-    public class GameGrainOptions
+    public class GameOptions
     {
         public int TurnLengthInTicks { get; set; } = 12;
         public TimeSpan TickInterval { get; set; } = TimeSpan.FromSeconds(5);

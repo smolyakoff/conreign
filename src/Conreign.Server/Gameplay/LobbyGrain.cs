@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Conreign.Contracts.Communication;
 using Conreign.Contracts.Gameplay.Data;
@@ -33,19 +31,9 @@ namespace Conreign.Server.Gameplay
             return _lobby.GetState(userId);
         }
 
-        public Task Notify(ISet<Guid> userIds, params IEvent[] @event)
+        public Task SendMessage(Guid userId, TextMessageData textMessage)
         {
-            return _lobby.Notify(userIds, @event);
-        }
-
-        public Task NotifyEverybody(params IEvent[] @event)
-        {
-            return _lobby.NotifyEverybody(@event);
-        }
-
-        public Task NotifyEverybodyExcept(ISet<Guid> userIds, params IEvent[] events)
-        {
-            return _lobby.NotifyEverybodyExcept(userIds, events);
+            return _lobby.SendMessage(userId, textMessage);
         }
 
         public Task Connect(Guid userId, Guid connectionId)

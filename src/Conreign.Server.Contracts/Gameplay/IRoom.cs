@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Conreign.Contracts.Gameplay.Data;
-using Conreign.Server.Contracts.Communication;
+using Conreign.Server.Contracts.Presence;
 
 namespace Conreign.Server.Contracts.Gameplay
 {
-    public interface IRoom : IHub
+    public interface IRoom : IConnectable
     {
         Task<IRoomData> GetState(Guid userId);
+        Task SendMessage(Guid userId, TextMessageData textMessage);
     }
 }

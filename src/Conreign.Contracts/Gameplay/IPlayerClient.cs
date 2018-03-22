@@ -3,7 +3,7 @@ using Conreign.Contracts.Gameplay.Data;
 
 namespace Conreign.Contracts.Gameplay
 {
-    public interface IPlayer
+    public interface IPlayerClient
     {
         Task UpdateOptions(PlayerOptionsData options);
         Task UpdateGameOptions(GameOptionsData options);

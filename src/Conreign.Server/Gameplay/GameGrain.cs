@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Conreign.Contracts.Communication;
 using Conreign.Contracts.Gameplay.Data;
-using Conreign.Contracts.Gameplay.Events;
 using Conreign.Core.Battle;
 using Conreign.Server.Communication;
 using Conreign.Server.Contracts.Communication;
@@ -16,13 +14,13 @@ namespace Conreign.Server.Gameplay
 {
     public class GameGrain : Grain<GameState>, IGameGrain
     {
-        private readonly GameGrainOptions _options;
+        private readonly GameOptions _options;
         private Game _game;
         private int _tick;
         private IDisposable _timer;
         private ILogger _logger;
 
-        public GameGrain(ILogger logger, GameGrainOptions options)
+        public GameGrain(ILogger logger, GameOptions options)
         {
             _logger = logger.ForContext(GetType());
             _options = options ?? throw new ArgumentNullException(nameof(options));
@@ -49,6 +47,11 @@ namespace Conreign.Server.Gameplay
             return _game.GetState(userId);
         }
 
+        public Task SendMessage(Guid userId, TextMessageData textMessage)
+        {
+            return _game.SendMessage(userId, textMessage);
+        }
+
         public Task LaunchFleet(Guid userId, FleetData fleet)
         {
             return _game.LaunchFleet(userId, fleet);
@@ -69,23 +72,8 @@ namespace Conreign.Server.Gameplay
             await _game.EndTurn(userId);
             if (!_game.IsOnlinePlayersThinking)
             {
-                await CalculateTurnInternal();
+                await CalculateTurn();
             }
-        }
-
-        public Task Notify(ISet<Guid> userIds, params IEvent[] events)
-        {
-            return _game.Notify(userIds, events);
-        }
-
-        public Task NotifyEverybody(params IEvent[] events)
-        {
-            return _game.NotifyEverybody(events);
-        }
-
-        public Task NotifyEverybodyExcept(ISet<Guid> userIds, params IEvent[] events)
-        {
-            return _game.NotifyEverybodyExcept(userIds, events);
         }
 
         public Task Connect(Guid userId, Guid connectionId)
@@ -103,7 +91,7 @@ namespace Conreign.Server.Gameplay
             State.RoomId = this.GetPrimaryKeyString();
             var topic = BroadcastTopic.Room(GetStreamProvider(StreamConstants.ProviderName), this.GetPrimaryKeyString());
             _logger = _logger.ForContext(nameof(State.RoomId), State.RoomId);
-            _game = new Game(State, topic, new CoinBattleStrategy());
+            _game = new Game(State, _options, topic, new CoinBattleStrategy());
             return base.OnActivateAsync();
         }
 
@@ -111,51 +99,48 @@ namespace Conreign.Server.Gameplay
         {
             if (_timer == null)
             {
+                _logger.Warning($"{nameof(_timer)} is null in {nameof(Tick)} method.");
                 return;
             }
-            _tick++;
-            if (_tick == _options.TurnLengthInTicks)
+            _tick = await _game.ProcessTick(_tick);
+            if (_tick == 0)
             {
-                await CalculateTurnInternal();
-            }
-            else
-            {
-                await _game.NotifyEverybody(new GameTicked(State.RoomId, _tick));
+                await CalculateTurn();
             }
         }
 
-        private async Task CalculateTurnInternal()
+        private async Task CalculateTurn()
         {
             StopTimer();
-            var isEnded = await _game.CalculateTurn();
-            var isInactive = _game.EveryoneOfflinePeriod > _options.MaxInactivityPeriod;
-            if (isEnded)
+            var outcome = await _game.CalculateTurn();
+            switch (outcome)
             {
-                _logger.Information("Game ended in {TurnCount} turns.", _game.Turn + 1);
+                case GameStalledTurnOutcome stalled:
+                    _logger.Information(
+                        "Going to deactivate game due to inactivity. Inactivity period was {InactivityPeriod}.",
+                        stalled.InactivityPeriod);
+                    break;
+                case GameEndedTurnOutcome ended:
+                    _logger.Information("Game ended in {TurnCount} turns.", ended.TurnsCount);
+                    break;
             }
-            if (isInactive)
+            if (outcome is TurnCompletedTurnOutcome)
             {
-                _logger.Information(
-                    "Going to deactivate game due to inactivity. Inactivity period was {InactivityPeriod}.",
-                    _game.EveryoneOfflinePeriod);
-            }
-            if (isEnded || isInactive)
-            {
-                await ClearStateAsync();
-                DeactivateOnIdle();
+                await WriteStateAsync();
+                ScheduleTimer();
                 return;
             }
-            await WriteStateAsync();
-            ScheduleTimer();
+            await ClearStateAsync();
+            DeactivateOnIdle();
         }
 
         private void ScheduleTimer()
         {
             _timer = RegisterTimer(
                 Tick,
-                null,
-                _options.TickInterval,
-                _options.TickInterval);
+                state: null,
+                dueTime: _options.TickInterval,
+                period: _options.TickInterval);
         }
 
         private void StopTimer()

@@ -1,21 +1,13 @@
 using System;
 using System.Threading.Tasks;
-using Conreign.Contracts.Gameplay;
 using Conreign.Contracts.Gameplay.Data;
 using Conreign.Contracts.Gameplay.Events;
-using Conreign.Core.Utility;
-using Conreign.Server.Contracts.Communication;
 using Conreign.Server.Contracts.Communication.Events;
 using Conreign.Server.Contracts.Gameplay;
-using Conreign.Server.Gameplay.Validators;
 
 namespace Conreign.Server.Gameplay
 {
-    public class Player : IPlayer,
-        IEventHandler<GameStarted>,
-        IEventHandler<GameEnded>,
-        IEventHandler<Connected>,
-        IEventHandler<Disconnected>
+    public class Player : IPlayer
     {
         private readonly PlayerState _state;
         private readonly Func<IRoom> _roomProvider;
@@ -103,13 +95,7 @@ namespace Conreign.Server.Gameplay
 
         public Task SendMessage(TextMessageData textMessage)
         {
-            if (textMessage == null)
-            {
-                throw new ArgumentNullException(nameof(textMessage));
-            }
-            textMessage.EnsureIsValid<TextMessageData, TextMessageValidator>();
-            var @event = new ChatMessageReceived(_state.RoomId, _state.UserId, textMessage);
-            return Room.NotifyEverybody(@event);
+            return Room.SendMessage(_state.UserId, textMessage);
         }
 
         public async Task<IRoomData> GetState()
@@ -120,8 +106,7 @@ namespace Conreign.Server.Gameplay
 
         private ILobby EnsureIsInLobby()
         {
-            var lobby = Room as ILobby;
-            if (lobby == null)
+            if (!(Room is ILobby lobby))
             {
                 throw new InvalidOperationException("Player should be in lobby to perform this action.");
             }
@@ -130,8 +115,7 @@ namespace Conreign.Server.Gameplay
 
         private IGame EnsureIsInGame()
         {
-            var game = Room as IGame;
-            if (game == null)
+            if (!(Room is IGame game))
             {
                 throw new InvalidOperationException("Player should be in game to perform this action.");
             }

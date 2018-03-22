@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Conreign.Contracts.Communication;
 using Conreign.Contracts.Errors;
 using Conreign.Contracts.Gameplay;
 using Conreign.Contracts.Gameplay.Data;
@@ -24,13 +23,15 @@ namespace Conreign.Server.Gameplay
     {
         private readonly IBattleStrategy _battleStrategy;
         private readonly GameState _state;
+        private readonly GameOptions _options;
         private readonly IBroadcastTopic _topic;
         private Hub _hub;
         private Map _map;
 
-        public Game(GameState state, IBroadcastTopic topic, IBattleStrategy battleStrategy)
+        public Game(GameState state, GameOptions options, IBroadcastTopic topic, IBattleStrategy battleStrategy)
         {
             _state = state ?? throw new ArgumentNullException(nameof(state));
+            _options = options ?? throw new ArgumentNullException(nameof(options));
             _topic = topic ?? throw new ArgumentNullException(nameof(topic));
             _hub = new Hub(_state.Hub, topic, new EmptyReadOnlySet<Guid>());
             _map = new Map(_state.Map);
@@ -44,7 +45,8 @@ namespace Conreign.Server.Gameplay
 
         public int Turn => _state.Turn;
 
-        public TimeSpan EveryoneOfflinePeriod => _hub.EveryoneOfflinePeriod;
+        private bool IsInactive => EveryoneOfflinePeriod >= _options.MaxInactivityPeriod;
+        private TimeSpan EveryoneOfflinePeriod => _hub.EveryoneOfflinePeriod;
 
         public Task Connect(Guid userId, Guid connectionId)
         {
@@ -81,6 +83,18 @@ namespace Conreign.Server.Gameplay
                 TurnStatus = playerState.TurnStatus
             };
             return Task.FromResult<IRoomData>(data);
+        }
+
+        public Task SendMessage(Guid userId, TextMessageData textMessage)
+        {
+            EnsureUserIsOnline(userId);
+            if (textMessage == null)
+            {
+                throw new ArgumentNullException(nameof(textMessage));
+            }
+            textMessage.EnsureIsValid<TextMessageData, TextMessageValidator>();
+            var @event = new ChatMessageReceived(_state.RoomId, userId, textMessage);
+            return _hub.NotifyEverybody(@event);
         }
 
         private Dictionary<Guid, PresenceStatus> GetPresenceStatuses()
@@ -153,21 +167,6 @@ namespace Conreign.Server.Gameplay
             return EndTurnInternal(userId);
         }
 
-        public Task Notify(ISet<Guid> userIds, params IEvent[] events)
-        {
-            return _hub.Notify(userIds, events);
-        }
-
-        public Task NotifyEverybody(params IEvent[] events)
-        {
-            return _hub.NotifyEverybody(events);
-        }
-
-        public Task NotifyEverybodyExcept(ISet<Guid> userIds, params IEvent[] events)
-        {
-            return _hub.NotifyEverybodyExcept(userIds, events);
-        }
-
         public Task Start(Guid userId, InitialGameData data)
         {
             if (data == null)
@@ -206,11 +205,27 @@ namespace Conreign.Server.Gameplay
             return _hub.NotifyEverybody(gameStarted);
         }
 
-        public async Task<bool> CalculateTurn()
+        public async Task<int> ProcessTick(int tick)
+        {
+            if (tick < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(tick));
+            }
+            var nextTick = (tick + 1) % _options.TurnLengthInTicks;
+            if (nextTick == 0)
+            {
+                return nextTick;
+            }
+            var ticked = new GameTicked(_state.RoomId, nextTick);
+            await _hub.NotifyEverybody(ticked);
+            return nextTick;
+        }
+
+        public async Task<IGameTurnOutcome> CalculateTurn()
         {
             EnsureGameIsInProgress();
 
-            await NotifyEverybody(new TurnCalculationStarted(_state.RoomId, _state.Turn));
+            await _hub.NotifyEverybody(new TurnCalculationStarted(_state.RoomId, _state.Turn));
             CalculateResources();
             var activePlayers = _state.PlayerStates
                 .Where(x => x.Value.Statistics.DeathTurn == null)
@@ -224,7 +239,7 @@ namespace Conreign.Server.Gameplay
                 playerState.TurnStatus = TurnStatus.Thinking;
             }
             await MarkDeadPlayers();
-            await CheckGameEnd();
+            var isEnded = await CheckGameEnd();
             var tasks = _state.PlayerStates
                 .Select(x =>
                 {
@@ -233,16 +248,20 @@ namespace Conreign.Server.Gameplay
                         _state.Turn,
                         _state.Map,
                         x.Value.MovingFleets);
-                    return this.Notify(x.Key, turnCalculationEnded);
+                    return _hub.Notify(x.Key, turnCalculationEnded);
                 })
                 .ToList();
             await Task.WhenAll(tasks);
-            if (_state.IsEnded)
-            {
-                return true;
-            }
             _state.Turn += 1;
-            return false;
+            if (isEnded)
+            {
+                return new GameEndedTurnOutcome(_state.Turn);
+            }
+            if (IsInactive)
+            {
+                return new GameStalledTurnOutcome(EveryoneOfflinePeriod);
+            }
+            return new TurnCompletedTurnOutcome();
         }
 
         private void LaunchFleetInternal(Guid userId, FleetData fleet)
@@ -273,24 +292,25 @@ namespace Conreign.Server.Gameplay
                 _state.PlayerStates[@event.UserId].TurnStatus = TurnStatus.Ended;
                 _state.PlayerStates[@event.UserId].Statistics.DeathTurn = _state.Turn;
             }
-            return this.NotifyEverybody(events);
+            return _hub.NotifyEverybody(events);
         }
 
-        private Task CheckGameEnd()
+        private async Task<bool> CheckGameEnd()
         {
             var alivePlayerCount = _state.PlayerStates
                 .Select(x => x.Value)
                 .Count(x => x.Statistics.DeathTurn == null);
             if (alivePlayerCount > 1)
             {
-                return Task.CompletedTask;
+                return false;
             }
             _state.IsEnded = true;
             _state.IsStarted = false;
             var @event = new GameEnded(
                 _state.RoomId,
                 _state.PlayerStates.ToDictionary(x => x.Key, x => x.Value.Statistics));
-            return NotifyEverybody(@event);
+            await _hub.NotifyEverybody(@event);
+            return true;
         }
 
         private bool PlayerShouldDie(Guid userId)
@@ -388,7 +408,7 @@ namespace Conreign.Server.Gameplay
                     defenderStats.BattlesWon += 1;
                 }
             }
-            await NotifyEverybody(attackEnded);
+            await _hub.NotifyEverybody(attackEnded);
         }
 
         private void CalculateResources()

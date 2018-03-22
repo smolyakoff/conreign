@@ -5,7 +5,7 @@ namespace Conreign.Client.Contracts
 {
     public class LoginResult
     {
-        public LoginResult(IUser user, Guid userId, string accessToken)
+        public LoginResult(IUserClient user, Guid userId, string accessToken)
         {
             if (user == null)
             {
@@ -20,7 +20,7 @@ namespace Conreign.Client.Contracts
             AccessToken = accessToken;
         }
 
-        public IUser User { get; }
+        public IUserClient User { get; }
         public Guid UserId { get; }
         public string AccessToken { get; }
     }

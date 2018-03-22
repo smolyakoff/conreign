@@ -2,12 +2,11 @@
 using System.Threading.Tasks;
 using Conreign.Contracts.Gameplay.Events;
 using Conreign.Core.Battle.AI;
-using Conreign.Server.Contracts.Communication;
 using Conreign.Server.Contracts.Gameplay;
 
 namespace Conreign.Server.Gameplay
 {
-    public class Bot : IEventHandler<GameStarted>, IEventHandler<TurnCalculationEnded>, IEventHandler<PlayerDead>
+    public class Bot
     {
         private readonly IGame _game;
         private readonly IBotBattleStrategy _battleStrategy;
