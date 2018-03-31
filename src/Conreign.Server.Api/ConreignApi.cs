@@ -28,7 +28,10 @@ namespace Conreign.Server.Api
             config.DeploymentId = Configuration.ClusterId;
             config.GatewayProvider = Configuration.SystemStorageType;
             config.DataConnectionString = Configuration.SystemStorageConnectionString;
-            config.AddSimpleMessageStreamProvider(StreamConstants.ProviderName);
+            config.AddSimpleMessageStreamProvider(
+                StreamConstants.ProviderName, 
+                fireAndForgetDelivery: true,
+                optimizeForImmutableData: false);
             return config;
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Conreign.Contracts.Communication;
 using Conreign.Contracts.Gameplay.Events;
 using Conreign.Core.Battle.AI;
@@ -7,6 +8,7 @@ using Conreign.Server.Contracts.Communication;
 using Conreign.Server.Contracts.Gameplay;
 using Orleans;
 using Orleans.Streams;
+using Serilog;
 
 namespace Conreign.Server.Gameplay
 {
@@ -14,6 +16,12 @@ namespace Conreign.Server.Gameplay
     {
         private Bot _bot;
         private StreamSubscriptionHandle<IServerEvent> _subscription;
+        private ILogger _logger;
+
+        public BotGrain(ILogger logger)
+        {
+            _logger = logger.ForContext(GetType());
+        }
 
         public override async Task OnActivateAsync()
         {
@@ -24,6 +32,7 @@ namespace Conreign.Server.Gameplay
             var provider = GetStreamProvider(StreamConstants.ProviderName);
             var stream = provider.GetServerStream(TopicIds.Player(State.UserId, State.RoomId));
             _subscription = await this.EnsureIsSubscribedOnce(stream);
+            _logger = _logger.ForContext(nameof(State.RoomId), State.RoomId);
         }
 
         public override Task OnDeactivateAsync()
@@ -42,9 +51,16 @@ namespace Conreign.Server.Gameplay
             return _bot.Handle(@event);
         }
 
-        public Task Handle(TurnCalculationEnded @event)
+        public async Task Handle(TurnCalculationEnded @event)
         {
-            return _bot.Handle(@event);
+            try
+            {
+                await _bot.Handle(@event);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Failed to handle {typeof(TurnCalculationEnded).Name} event. {ex.Message}", ex);
+            }
         }
 
         public Task Handle(PlayerDead @event)

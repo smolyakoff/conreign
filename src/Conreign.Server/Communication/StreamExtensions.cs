@@ -33,10 +33,16 @@ namespace Conreign.Server.Communication
             var observer = new EventObserver<T, TEvent>(handler, eventTypes);
             if (handles.Count > 0)
             {
-                await handles[0].ResumeAsync(observer);
-                return handles[0];
+                for (var i = 0; i < handles.Count; i++)
+                {
+                    if (i == handles.Count - 1)
+                    {
+                        await handles[i].ResumeAsync(observer);
+                        return handles[i];
+                    }
+                    await handles[i].UnsubscribeAsync();
+                }
             }
-            // Filter event types on subscription level
             var handle = await stream.SubscribeAsync(observer);
             return handle;
         }

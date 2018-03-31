@@ -30,7 +30,7 @@ namespace Conreign.Server.Gameplay
         {
             var map = EnsureMapIsInitialized();
             map.UpdatePlanets(@event.Map.Planets.Values);
-            return Think();
+            return @event.IsGameEnded ? Task.CompletedTask : Think();
         }
 
         public Task Handle(PlayerDead @event)

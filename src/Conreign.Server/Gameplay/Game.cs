@@ -247,12 +247,12 @@ namespace Conreign.Server.Gameplay
                         _state.RoomId,
                         _state.Turn,
                         _state.Map,
-                        x.Value.MovingFleets);
+                        x.Value.MovingFleets,
+                        isEnded);
                     return _hub.Notify(x.Key, turnCalculationEnded);
                 })
                 .ToList();
             await Task.WhenAll(tasks);
-            _state.Turn += 1;
             if (isEnded)
             {
                 return new GameEndedTurnOutcome(_state.Turn);
@@ -261,6 +261,7 @@ namespace Conreign.Server.Gameplay
             {
                 return new GameStalledTurnOutcome(EveryoneOfflinePeriod);
             }
+            _state.Turn += 1;
             return new TurnCompletedTurnOutcome();
         }
 

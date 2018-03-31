@@ -29,6 +29,7 @@ namespace Conreign.Server.Silo
             var config = Configuration.LivenessStorageType == GlobalConfiguration.LivenessProviderType.MembershipTableGrain
                 ? ClusterConfiguration.LocalhostPrimarySilo()
                 : new ClusterConfiguration();
+            config.Globals.ResponseTimeout = TimeSpan.FromSeconds(30);
             config.Globals.DeploymentId = Configuration.ClusterId;
             config.Globals.LivenessType = Configuration.LivenessStorageType;
             config.Globals.DataConnectionString = Configuration.SystemStorageConnectionString;

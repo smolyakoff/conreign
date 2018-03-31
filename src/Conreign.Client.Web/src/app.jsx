@@ -14,7 +14,7 @@ export default function createApplication(config) {
   } = config;
 
   const history = createBrowserHistory({
-    basename: window.location.pathname,
+    // basename: window.location.pathname,
   });
   const storage = window.localStorage;
   const userStore = new ValueStore(storage, { key: userStorageKey });
