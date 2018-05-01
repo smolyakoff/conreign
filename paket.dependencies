@@ -65,3 +65,4 @@ group Test
 source https://nuget.org/api/v2
 nuget Moq
 nuget xunit
+nuget FluentAssertions

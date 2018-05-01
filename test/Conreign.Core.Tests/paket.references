@@ -1,3 +1,4 @@
 group Test
 xunit
 Moq
+FluentAssertions

@@ -8,7 +8,7 @@ namespace Conreign.Core.Editor
 {
     public static class Sequences
     {
-        private static readonly List<string> CoolNicknames = new List<string>
+        private static readonly List<string> Nicknames = new List<string>
         {
             "Aspect",
             "Kraken",
@@ -735,7 +735,10 @@ namespace Conreign.Core.Editor
             get
             {
                 foreach (var color in PopularColors.Shuffle())
+                {
                     yield return $"#{color:x6}";
+                }
+
                 var random = new Random();
                 var used = new HashSet<int>(PopularColors);
                 while (used.Count < 0xffffff + 1)
@@ -743,7 +746,7 @@ namespace Conreign.Core.Editor
                     int next;
                     do
                     {
-                        next = random.Next(0, 0xffffff + 1);
+                        next = random.Next(minValue: 0, maxValue: 0xffffff + 1);
                     } while (used.Contains(next));
 
                     used.Add(next);
@@ -752,7 +755,8 @@ namespace Conreign.Core.Editor
             }
         }
 
-        public static IEnumerable<string> Colors => Enumerable.Range(0, 0xffffff + 1).Select(x => $"#{x:x6}");
+        public static IEnumerable<string> Colors =>
+            Enumerable.Range(start: 0, count: 0xffffff + 1).Select(x => $"#{x:x6}");
 
         public static IEnumerable<string> PlanetNames
         {
@@ -790,7 +794,7 @@ namespace Conreign.Core.Editor
             }
         }
 
-        public static IEnumerable<string> Nicknames => CoolNicknames
+        public static IEnumerable<string> RandomNicknames => Nicknames
             .Shuffle()
             .Select(x => x.ToLower(CultureInfo.InvariantCulture));
     }

@@ -77,9 +77,7 @@ namespace Conreign.Core.Editor
                 }
                 return (new List<PlayerData>(0), botsToRemove);
             }
-            var botsToAdd = Enumerable.Range(0, difference)
-                .Select(_ => GenerateBot())
-                .ToList();
+            var botsToAdd = GenerateBots(difference);
             _state.AddRange(botsToAdd);
             return (botsToAdd, new List<PlayerData>(0));
         }
@@ -121,38 +119,53 @@ namespace Conreign.Core.Editor
 
         private PlayerData GenerateHuman(Guid userId)
         {
-            return GeneratePlayer(userId, PlayerType.Human);
-        }
-
-        private PlayerData GenerateBot()
-        {
-            return GeneratePlayer(Guid.NewGuid(), PlayerType.Bot);
-        }
-
-        private PlayerData GeneratePlayer(Guid userId, PlayerType type)
-        {
             var player = new PlayerData
             {
                 UserId = userId,
-                Color = GenerateColor(),
-                Nickname = GenerateNickname(),
-                Type = type
+                Color = GenerateUniqueColors(1)[0],
+                Nickname = GenerateUniqueNicknames(1)[0],
+                Type = PlayerType.Human,
             };
             return player;
         }
 
-        private string GenerateNickname()
+        private List<PlayerData> GenerateBots(int count)
         {
-            var existingNicknames = _state.Select(x => x.Nickname).ToHashSet();
-            var nickname = Sequences.Nicknames.FirstOrDefault(x => !existingNicknames.Contains(x));
-            return nickname;
+            var nicknames = GenerateUniqueNicknames(count);
+            var colors = GenerateUniqueColors(count);
+            var players = new List<PlayerData>();
+            for (var i = 0; i < count; i++)
+            {
+                var player = new PlayerData
+                {
+                    UserId = Guid.NewGuid(),
+                    Nickname = nicknames[i],
+                    Color = colors[i],
+                    Type = PlayerType.Bot,
+                };
+                players.Add(player);
+            }
+
+            return players;
         }
 
-        private string GenerateColor()
+        private List<string> GenerateUniqueNicknames(int count)
         {
+            var existingNicknames = _state.Select(x => x.Nickname).ToHashSet();
+            return Sequences.RandomNicknames
+                .Where(x => !existingNicknames.Contains(x))
+                .Take(count)
+                .ToList();
+        }
+
+        private List<string> GenerateUniqueColors(int count)
+        {
+            var existingColors = _state.Select(x => x.Color).ToHashSet();
             return Sequences
                 .RandomWithPopularFirstColors
-                .FirstOrDefault(c => _state.All(p => p.Color != c));
+                .Where(color => !existingColors.Contains(color))
+                .Take(count)
+                .ToList();
         }
 
         private void EnsurePlayerExists(Guid userId)
