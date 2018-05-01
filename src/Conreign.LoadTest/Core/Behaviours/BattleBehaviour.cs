@@ -76,7 +76,7 @@ namespace Conreign.LoadTest.Core.Behaviours
             {
                 throw new InvalidOperationException("Expected to be authenticated already.");
             }
-            var map = new BotMap(new Map(_map));
+            var map = new BotMap(_map);
             var fleets = _strategy.ChooseFleetsToLaunch(context.UserId.Value, map);
             var tasks = fleets.Select(x => context.Player.LaunchFleet(x));
             await Task.WhenAll(tasks);

@@ -1,6 +1,7 @@
+using System;
 using System.Threading.Tasks;
-using Conreign.Server.Communication;
-using Conreign.Server.Contracts.Communication;
+using Conreign.Contracts.Gameplay;
+using Conreign.Server.Contracts.Gameplay;
 using Conreign.Server.Contracts.Presence;
 using Orleans;
 
@@ -8,30 +9,45 @@ namespace Conreign.Server.Presence
 {
     public class ConnectionGrain : Grain<ConnectionState>, IConnectionGrain
     {
-        private Connection _connection;
+        private Guid ConnectionId => this.GetPrimaryKey();
 
-        public Task Connect(string topicId)
+        public async Task<IPlayerClient> Bind(Guid userId, string roomId)
         {
-            return _connection.Connect(topicId);
+            if (userId == Guid.Empty)
+            {
+                throw new ArgumentException(nameof(userId));
+            }
+            if (string.IsNullOrEmpty(roomId))
+            {
+                throw new ArgumentNullException(nameof(roomId));
+            }
+            if (State.RoomId != roomId || State.UserId != userId)
+            {
+                await EnsureIsDisconnected();
+            }
+            var player = GrainFactory.GetGrain<IPlayerGrain>(userId, roomId, null);
+            await player.Connect(ConnectionId);
+            State.RoomId = roomId;
+            State.UserId = userId;
+            return player;
         }
 
         public async Task Disconnect()
         {
-            await _connection.Disconnect();
+            await EnsureIsDisconnected();
             DeactivateOnIdle();
         }
 
-        public Task<ITopic> Create(string id)
+        private async Task EnsureIsDisconnected()
         {
-            var topic = new BroadcastTopic(GetStreamProvider(StreamConstants.ProviderName), id);
-            return Task.FromResult((ITopic) topic);
-        }
-
-        public override async Task OnActivateAsync()
-        {
-            State.ConnectionId = this.GetPrimaryKey();
-            _connection = new Connection(State, this);
-            await base.OnActivateAsync();
+            if (State.RoomId == null)
+            {
+                return;
+            }
+            var player = GrainFactory.GetGrain<IPlayerGrain>(State.UserId, State.RoomId, null);
+            await player.Disconnect(ConnectionId);
+            State.UserId = Guid.Empty;
+            State.RoomId = null;
         }
     }
 }

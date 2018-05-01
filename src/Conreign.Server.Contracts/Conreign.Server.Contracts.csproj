@@ -43,8 +43,6 @@
     <Compile Include="Auth\IAuthGrain.cs" />
     <Compile Include="Auth\IAuthService.cs" />
     <Compile Include="Communication\EventExtensions.cs" />
-    <Compile Include="Communication\Events\Connected.cs" />
-    <Compile Include="Communication\Events\Disconnected.cs" />
     <Compile Include="Communication\IEventHandler%271.cs" />
     <Compile Include="Communication\IEventHandler.cs" />
     <Compile Include="Communication\IHub.cs" />
@@ -65,7 +63,6 @@
     <Compile Include="Gameplay\IUserGrain.cs" />
     <Compile Include="Presence\HubMemberState.cs" />
     <Compile Include="Presence\IConnectable.cs" />
-    <Compile Include="Presence\IConnection.cs" />
     <Compile Include="Presence\IConnectionGrain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

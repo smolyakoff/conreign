@@ -1,10 +1,10 @@
+using System;
 using System.Threading.Tasks;
 using Conreign.Contracts.Communication;
 using Conreign.Contracts.Gameplay.Data;
 using Conreign.Contracts.Gameplay.Events;
 using Conreign.Server.Communication;
 using Conreign.Server.Contracts.Communication;
-using Conreign.Server.Contracts.Communication.Events;
 using Conreign.Server.Contracts.Gameplay;
 using Orleans;
 using Orleans.Streams;
@@ -74,21 +74,6 @@ namespace Conreign.Server.Gameplay
             return _player.Handle(@event);
         }
 
-        public async Task Handle(Connected @event)
-        {
-            await _player.Handle(@event);
-        }
-
-        public async Task Handle(Disconnected @event)
-        {
-            await _player.Handle(@event);
-        }
-
-        public Task EnsureIsListening()
-        {
-            return Task.CompletedTask;
-        }
-
         public async Task Handle(GameEnded @event)
         {
             await _player.Handle(@event);
@@ -101,7 +86,7 @@ namespace Conreign.Server.Gameplay
             var provider = GetStreamProvider(StreamConstants.ProviderName);
             var stream = provider.GetServerStream(TopicIds.Player(State.UserId, State.RoomId));
             _player = new Player(State, () => Room);
-            _subscription = await this.EnsureIsSubscribedOnce(stream);;
+            _subscription = await this.EnsureIsSubscribedOnce(stream);
         }
 
         public override Task OnDeactivateAsync()
@@ -114,6 +99,16 @@ namespace Conreign.Server.Gameplay
             State.UserId = this.GetPrimaryKey(out string roomId);
             State.RoomId = roomId;
             State.RoomMode = RoomMode.Lobby;
+        }
+
+        public Task Connect(Guid connectionId)
+        {
+            return _player.Connect(connectionId);
+        }
+
+        public Task Disconnect(Guid connectionId)
+        {
+            return _player.Disconnect(connectionId);
         }
     }
 }

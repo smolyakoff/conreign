@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Conreign.Contracts.Communication;
 using Conreign.Contracts.Errors;
 using Conreign.Contracts.Gameplay;
 using Conreign.Contracts.Gameplay.Data;

@@ -1,10 +1,13 @@
-﻿using Conreign.Contracts.Presence;
-using Conreign.Server.Contracts.Communication;
+﻿using System;
+using System.Threading.Tasks;
+using Conreign.Contracts.Gameplay;
 using Orleans;
 
 namespace Conreign.Server.Contracts.Presence
 {
-    public interface IConnectionGrain : IGrainWithGuidKey, IConnection, ITopicFactory
+    public interface IConnectionGrain : IGrainWithGuidKey
     {
+        Task<IPlayerClient> Bind(Guid userId, string roomId);
+        Task Disconnect();
     }
 }

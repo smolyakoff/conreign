@@ -4,7 +4,7 @@ namespace Conreign.Server.Presence
 {
     public class ConnectionState
     {
-        public Guid ConnectionId { get; set; }
-        public string TopicId { get; set; }
+        public Guid UserId { get; set; }
+        public string RoomId { get; set; }
     }
 }

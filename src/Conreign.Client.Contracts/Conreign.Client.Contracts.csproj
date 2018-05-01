@@ -42,7 +42,6 @@
     <Compile Include="IClientHandler.cs" />
     <Compile Include="LoginResult.cs" />
     <Compile Include="MessageEnvelope.cs" />
-    <Compile Include="Messages\AuthenticateCommand.cs" />
     <Compile Include="Messages\CancelFleetCommand.cs" />
     <Compile Include="Messages\EndTurnCommand.cs" />
     <Compile Include="Messages\GetRoomStateCommand.cs" />

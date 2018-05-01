@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using Conreign.Contracts.Gameplay.Data;
 using Conreign.Contracts.Gameplay.Events;
-using Conreign.Server.Contracts.Communication.Events;
 using Conreign.Server.Contracts.Gameplay;
 
 namespace Conreign.Server.Gameplay
@@ -32,14 +31,14 @@ namespace Conreign.Server.Gameplay
 
         private IRoom Room => _roomProvider();
 
-        public Task Handle(Connected @event)
+        public Task Connect(Guid connectionId)
         {
-            return Room.Connect(_state.UserId, @event.ConnectionId);
+            return Room.Connect(_state.UserId, connectionId);
         }
 
-        public Task Handle(Disconnected @event)
+        public Task Disconnect(Guid connectionId)
         {
-            return Room.Disconnect(_state.UserId, @event.ConnectionId);
+            return Room.Disconnect(_state.UserId, connectionId);
         }
 
         public Task Handle(GameEnded @event)
