@@ -5,6 +5,7 @@ using Conreign.Contracts.Gameplay.Data;
 namespace Conreign.Contracts.Gameplay.Events
 {
     [Serializable]
+    [Obsolete("Use PlayerListChanged instead.")]
     public class PlayerJoined : IClientEvent, IRoomEvent
     {
         public PlayerJoined(string roomId, PlayerData player)

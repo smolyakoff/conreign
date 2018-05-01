@@ -51,7 +51,7 @@ namespace Conreign.Core.Editor
             return player;
         }
 
-        public (IEnumerable<PlayerData> BotsAdded, IEnumerable<PlayerData> BotsRemoved) AdjustBotCount(int desiredBotsCount)
+        public (List<PlayerData> BotsAdded, List<PlayerData> BotsRemoved) AdjustBotCount(int desiredBotsCount)
         {
             if (desiredBotsCount < 0)
             {
@@ -62,7 +62,7 @@ namespace Conreign.Core.Editor
             }
             if (BotsCount == desiredBotsCount)
             {
-                return (Enumerable.Empty<PlayerData>(), Enumerable.Empty<PlayerData>());
+                return (new List<PlayerData>(0), new List<PlayerData>(0));
             }
             var difference = Math.Abs(desiredBotsCount - BotsCount);
             if (BotsCount > desiredBotsCount)
@@ -75,13 +75,13 @@ namespace Conreign.Core.Editor
                 {
                     _state.Remove(bot);
                 }
-                return (Enumerable.Empty<PlayerData>(), botsToRemove);
+                return (new List<PlayerData>(0), botsToRemove);
             }
             var botsToAdd = Enumerable.Range(0, difference)
                 .Select(_ => GenerateBot())
                 .ToList();
             _state.AddRange(botsToAdd);
-            return (botsToAdd, Enumerable.Empty<PlayerData>());
+            return (botsToAdd, new List<PlayerData>(0));
         }
 
         public bool UpdateHumanOptions(Guid userId, PlayerOptionsData options)

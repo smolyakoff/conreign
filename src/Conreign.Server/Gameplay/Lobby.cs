@@ -93,8 +93,12 @@ namespace Conreign.Server.Gameplay
                mapSize,
                _playerListEditor.PlayerIds.ToHashSet(), 
                options.NeutralPlanetsCount);
+            var playerListChanged = new PlayerListChanged(
+                _state.RoomId,
+                botsAdded,
+                botsRemoved.Select(x => x.UserId).ToList());
             var mapUpdated = new MapUpdated(_state.RoomId, _state.Map);
-            await _hub.NotifyEverybody(mapUpdated);
+            await _hub.NotifyEverybody(playerListChanged, mapUpdated);
         }
 
         public async Task UpdatePlayerOptions(Guid userId, PlayerOptionsData options)
