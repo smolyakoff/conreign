@@ -74,7 +74,7 @@ namespace Conreign.Server.Gameplay
         public override async Task OnActivateAsync()
         {
             InitializeState();
-            var topic = BroadcastTopic.Room(GetStreamProvider(StreamConstants.ProviderName), this.GetPrimaryKeyString());
+            var topic = Topic.Room(GetStreamProvider(StreamConstants.ProviderName), this.GetPrimaryKeyString());
             _logger = _logger.ForContext(nameof(State.RoomId), State.RoomId);
             _logger.Information("Lobby is activated.", State.RoomId);
             _lobby = new Lobby(State, topic);

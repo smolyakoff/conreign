@@ -24,11 +24,11 @@ namespace Conreign.Server.Gameplay
         private readonly IBattleStrategy _battleStrategy;
         private readonly GameState _state;
         private readonly GameOptions _options;
-        private readonly IBroadcastTopic _topic;
+        private readonly ITopic _topic;
         private Hub _hub;
         private Map _map;
 
-        public Game(GameState state, GameOptions options, IBroadcastTopic topic, IBattleStrategy battleStrategy)
+        public Game(GameState state, GameOptions options, ITopic topic, IBattleStrategy battleStrategy)
         {
             _state = state ?? throw new ArgumentNullException(nameof(state));
             _options = options ?? throw new ArgumentNullException(nameof(options));

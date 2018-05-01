@@ -10,7 +10,7 @@ using Orleans.Streams;
 
 namespace Conreign.Server.Communication
 {
-    public class BroadcastTopic : IBroadcastTopic
+    public class Topic : ITopic
     {
         private readonly Dictionary<Guid, IAsyncStream<IServerEvent>> _childrenStreams;
         private readonly Dictionary<Guid, IAsyncStream<IClientEvent>> _clientStreams;
@@ -18,24 +18,20 @@ namespace Conreign.Server.Communication
         private readonly IAsyncStream<IServerEvent> _parentStream;
         private readonly IStreamProvider _provider;
 
-        public BroadcastTopic(IStreamProvider provider, string id)
+        public Topic(IStreamProvider provider, string id)
         {
-            if (provider == null)
-            {
-                throw new ArgumentNullException(nameof(provider));
-            }
             if (string.IsNullOrEmpty(id))
             {
                 throw new ArgumentException("Id cannot be null or empty.", nameof(id));
             }
-            _provider = provider;
+            _provider = provider ?? throw new ArgumentNullException(nameof(provider));
             _id = id;
             _parentStream = provider.GetStream<IServerEvent>(default(Guid), id);
             _childrenStreams = new Dictionary<Guid, IAsyncStream<IServerEvent>>();
             _clientStreams = new Dictionary<Guid, IAsyncStream<IClientEvent>>();
         }
 
-        public async Task Send(params IServerEvent[] events)
+        public async Task NotifyServer(params IServerEvent[] events)
         {
             if (events == null)
             {
@@ -45,7 +41,7 @@ namespace Conreign.Server.Communication
                 await _parentStream.OnNextAsync(@event);
         }
 
-        public async Task Broadcast(ISet<Guid> userIds, ISet<Guid> connectionIds, params IEvent[] events)
+        public async Task NotifyServerAndClients(ISet<Guid> userIds, ISet<Guid> connectionIds, params IEvent[] events)
         {
             var serverEvents = events.OfType<IServerEvent>();
             var clientEvents = events.OfType<IClientEvent>();
@@ -63,14 +59,14 @@ namespace Conreign.Server.Communication
             await Task.WhenAll(clientTasks);
         }
 
-        public static BroadcastTopic Room(IStreamProvider provider, string roomId)
+        public static Topic Room(IStreamProvider provider, string roomId)
         {
-            return new BroadcastTopic(provider, TopicIds.Room(roomId));
+            return new Topic(provider, TopicIds.Room(roomId));
         }
 
-        public static BroadcastTopic Player(IStreamProvider provider, Guid userId, string roomId)
+        public static Topic Player(IStreamProvider provider, Guid userId, string roomId)
         {
-            return new BroadcastTopic(provider, TopicIds.Player(userId, roomId));
+            return new Topic(provider, TopicIds.Player(userId, roomId));
         }
 
         public Task<StreamSubscriptionHandle<IServerEvent>> EnsureIsSubscribedOnce<T>(T handler)

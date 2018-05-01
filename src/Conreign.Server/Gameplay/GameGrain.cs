@@ -89,7 +89,7 @@ namespace Conreign.Server.Gameplay
         public override Task OnActivateAsync()
         {
             State.RoomId = this.GetPrimaryKeyString();
-            var topic = BroadcastTopic.Room(GetStreamProvider(StreamConstants.ProviderName), this.GetPrimaryKeyString());
+            var topic = Topic.Room(GetStreamProvider(StreamConstants.ProviderName), this.GetPrimaryKeyString());
             _logger = _logger.ForContext(nameof(State.RoomId), State.RoomId);
             _game = new Game(State, _options, topic, new CoinBattleStrategy());
             return base.OnActivateAsync();

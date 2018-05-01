@@ -16,17 +16,17 @@ namespace Conreign.Server.Presence
     {
         private readonly HubState _state;
         private readonly ITimeProvider _timeProvider;
-        private readonly IBroadcastTopic _topic;
+        private readonly ITopic _topic;
         private readonly IReadOnlySet<Guid> _serverUserIds;
 
-        public Hub(HubState state, IBroadcastTopic topic, IReadOnlySet<Guid> serverUserIds)
+        public Hub(HubState state, ITopic topic, IReadOnlySet<Guid> serverUserIds)
             : this(state, topic, serverUserIds, new SystemTimeProvider())
         {
         }
 
         public Hub(
             HubState state, 
-            IBroadcastTopic topic, 
+            ITopic topic, 
             IReadOnlySet<Guid> serverUserIds,
             ITimeProvider timeProvider)
         {
@@ -133,7 +133,7 @@ namespace Conreign.Server.Presence
                 .Where(x => userIds.Contains(x.Key))
                 .SelectMany(x => x.Value.ConnectionIds)
                 .ToHashSet();
-            await _topic.Broadcast(targetUserIds, targetConnectionIds, events);
+            await _topic.NotifyServerAndClients(targetUserIds, targetConnectionIds, events);
             var states = events
                 .OfType<IClientEvent>()
                 .Where(e => e.IsPersistent())
@@ -155,7 +155,7 @@ namespace Conreign.Server.Presence
             var serverEvents = events.OfType<IServerEvent>().ToArray();
             if (serverEvents.Length > 0)
             {
-                await _topic.Send(serverEvents);
+                await _topic.NotifyServer(serverEvents);
             }
             await Notify(ids, events);
         }

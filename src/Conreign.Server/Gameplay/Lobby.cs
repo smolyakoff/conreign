@@ -22,12 +22,12 @@ namespace Conreign.Server.Gameplay
     public class Lobby : ILobby
     {
         private readonly LobbyState _state;
-        private readonly IBroadcastTopic _topic;
+        private readonly ITopic _topic;
         private Hub _hub;
         private MapEditor _mapEditor;
         private PlayerListEditor _playerListEditor;
 
-        public Lobby(LobbyState state, IBroadcastTopic topic)
+        public Lobby(LobbyState state, ITopic topic)
         {
             if (state == null)
             {

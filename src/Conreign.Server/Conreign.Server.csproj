@@ -40,7 +40,7 @@
     <Compile Include="Auth\JwtTokenPayload.cs" />
     <Compile Include="Communication\EventExtensions.cs" />
     <Compile Include="Communication\EventObserver%272.cs" />
-    <Compile Include="Communication\BroadcastTopic.cs" />
+    <Compile Include="Communication\Topic.cs" />
     <Compile Include="Communication\TopicIds.cs" />
     <Compile Include="Communication\StreamExtensions.cs" />
     <Compile Include="Gameplay\Bot.cs" />
