@@ -38,6 +38,10 @@ const FIELDS = keyBy([
     name: 'neutralPlanetsCount',
     label: 'Neutral Planets',
   },
+  {
+    name: 'botsCount',
+    label: 'Bots Count',
+  },
 ], f => f.name);
 
 

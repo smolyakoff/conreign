@@ -1,5 +1,5 @@
 import { combineEpics } from 'redux-observable';
-import { values, pick, mapValues, keys } from 'lodash';
+import { values, pick, mapValues, keys, omit, keyBy } from 'lodash';
 import {
   createSucceededAsyncActionType,
   mapEventNameToActionType,
@@ -7,12 +7,14 @@ import {
 } from '../../framework';
 import {
   PLAYER_JOINED,
+  PLAYER_LIST_CHANGED,
   PLAYER_UPDATED,
   UPDATE_GAME_OPTIONS,
   UPDATE_PLAYER_OPTIONS,
   START_GAME,
   GET_ROOM_STATE,
   GAME_STARTED,
+  PlayerType,
   PresenceStatus,
   RoomMode,
   TurnStatus,
@@ -25,6 +27,7 @@ const SET_PLAYER_OPTIONS_VISIBILITY = 'SET_PLAYER_OPTIONS_VISIBILITY';
 const HANDLE_PLAYER_UPDATED = mapEventNameToActionType(PLAYER_UPDATED);
 const HANDLE_PLAYER_JOINED = mapEventNameToActionType(PLAYER_JOINED);
 const HANDLE_GAME_STARTED = mapEventNameToActionType(GAME_STARTED);
+const HANDLE_PLAYER_LIST_CHANGED = mapEventNameToActionType(PLAYER_LIST_CHANGED);
 const UPDATE_PLAYER_OPTIONS_SUCCEEDED = createSucceededAsyncActionType(UPDATE_PLAYER_OPTIONS);
 const GET_ROOM_STATE_SUCCEEDED = createSucceededAsyncActionType(GET_ROOM_STATE);
 
@@ -92,7 +95,7 @@ function reducer(state, action) {
   }
   switch (action.type) {
     case GET_ROOM_STATE_SUCCEEDED: {
-      const map = action.payload.map;
+      const { map, players } = action.payload;
       return {
         ...state,
         gameOptions: {
@@ -101,6 +104,7 @@ function reducer(state, action) {
           neutralPlanetsCount: values(map.planets)
             .filter(planet => !planet.ownerId)
             .length,
+          botsCount: values(players).filter(player => player.type === PlayerType.Bot).length,
         },
         events: initializeEvents(state),
       };
@@ -115,6 +119,20 @@ function reducer(state, action) {
         ...state,
         playerOptions: action.payload.options,
       };
+    case HANDLE_PLAYER_LIST_CHANGED: {
+      const { playersLeft, playersJoined } = action.payload;
+      const joinedPlayersWithStatus = playersJoined.map(player => ({
+        ...player,
+        status: PresenceStatus.Online,
+      }));
+      return {
+        ...state,
+        players: {
+          ...omit(state.players, playersLeft),
+          ...keyBy(joinedPlayersWithStatus, player => player.userId),
+        },
+      };
+    }
     case HANDLE_PLAYER_JOINED: {
       const { player } = action.payload;
       return {

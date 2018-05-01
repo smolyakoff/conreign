@@ -1,5 +1,6 @@
 export const CHAT_MESSAGE_RECEIVED = 'ChatMessageReceived';
 export const PLAYER_JOINED = 'PlayerJoined';
+export const PLAYER_LIST_CHANGED = 'PlayerListChanged';
 export const PLAYER_UPDATED = 'PlayerUpdated';
 export const LEADER_CHANGED = 'LeaderChanged';
 export const MAP_UPDATED = 'MapUpdated';

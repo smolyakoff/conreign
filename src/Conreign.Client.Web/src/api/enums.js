@@ -8,6 +8,11 @@ export const PresenceStatus = {
   Offline: 1,
 };
 
+export const PlayerType = {
+  Human: 0,
+  Bot: 1,
+};
+
 export const TurnStatus = {
   Thinking: 0,
   Ended: 1,
