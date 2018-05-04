@@ -1,13 +1,14 @@
 import PropTypes from 'prop-types';
 import { values } from 'lodash';
 
-import { PresenceStatus } from './../api';
+import { PresenceStatus, PlayerType } from './../api';
 
 export const PLAYER = {
   userId: PropTypes.string.isRequired,
   color: PropTypes.string.isRequired,
   nickname: PropTypes.string,
   status: PropTypes.oneOf(values(PresenceStatus)).isRequired,
+  type: PropTypes.oneOf(values(PlayerType)).isRequired,
 };
 
 export const PLAYER_SHAPE = PropTypes.shape(PLAYER);

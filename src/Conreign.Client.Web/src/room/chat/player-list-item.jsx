@@ -13,18 +13,21 @@ import {
   VerticalAlignment,
 } from './../../theme';
 import PlayerIcon from './player-icon';
-import { TurnStatus } from './../../api';
+import { TurnStatus, PlayerType } from './../../api';
 import { PLAYER_WITH_OPTIONAL_STATS } from './player-schema';
 
 export default function PlayerListItem({
   nickname,
   status,
+  type,
   color,
   turnStatus,
   isCurrent,
   planetsCount,
 }) {
-  const className = turnStatus === TurnStatus.Ended ? 'u-bg-success-light' : null;
+  const className = (turnStatus === TurnStatus.Ended && type === PlayerType.Human)
+    ? 'u-bg-success-light'
+    : null;
   return (
     <Box
       type={BoxType.Window}
@@ -39,6 +42,7 @@ export default function PlayerListItem({
           <PlayerIcon
             color={color}
             status={status}
+            type={type}
           />
         </GridCell>
         <GridCell>

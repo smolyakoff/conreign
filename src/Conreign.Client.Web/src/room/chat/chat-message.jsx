@@ -35,8 +35,7 @@ export default function ChatMessage({
             ? (
               <PlayerIcon
                 className="u-mt-small"
-                color={sender.color}
-                status={sender.status}
+                {...sender}
               />
             )
             : (

@@ -1,6 +1,9 @@
 @import "../../theme/_variables";
 
 .c-player-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
   width: 2em;
   height: 2em;
@@ -18,5 +21,9 @@
     &--online {
       background-color: $color-success;
     }
+  }
+
+  &__ai-label {
+    letter-spacing: $spacing-tiny;
   }
 }
