@@ -3,7 +3,6 @@ import { values, pick, mapValues, keys, omit, keyBy } from 'lodash';
 import {
   createSucceededAsyncActionType,
   mapEventNameToActionType,
-  getEventNameFromAction,
 } from '../../framework';
 import {
   PLAYER_JOINED,
@@ -19,7 +18,10 @@ import {
   RoomMode,
   TurnStatus,
 } from '../../api';
+import { composeReducers } from '../../util';
+import createEventReducer from '../event-reducer';
 import { createWelcomeMessageEvent } from './welcome-message-event';
+
 
 const CHANGE_GAME_OPTIONS = 'CHANGE_GAME_OPTIONS';
 const CHANGE_PLAYER_OPTIONS = 'CHANGE_PLAYER_OPTIONS';
@@ -53,6 +55,8 @@ export function changePlayerOptions(payload) {
     payload,
   };
 }
+
+const selectPlayerByUserId = (state, userId) => state.players[userId];
 
 function updateGameOptionsEpic(action$, store, { apiDispatcher }) {
   return action$
@@ -89,7 +93,7 @@ function initializeEvents(room) {
   ];
 }
 
-function reducer(state, action) {
+function lobbyReducer(state, action) {
   if (state.mode !== RoomMode.Lobby) {
     return state;
   }
@@ -144,18 +148,11 @@ function reducer(state, action) {
             status: PresenceStatus.Online,
           },
         },
-        events: [
-          ...state.events,
-          {
-            type: action.meta.$event,
-            payload: action.payload,
-          },
-        ],
       };
     }
     case HANDLE_PLAYER_UPDATED: {
-      const { player: currentPlayer, timestamp } = action.payload;
-      const previousPlayer = state.players[currentPlayer.userId];
+      const { player: currentPlayer } = action.payload;
+      const previousPlayer = selectPlayerByUserId(state, currentPlayer.userId);
       return {
         ...state,
         players: {
@@ -165,17 +162,6 @@ function reducer(state, action) {
             ...currentPlayer,
           },
         },
-        events: [
-          ...state.events,
-          {
-            type: getEventNameFromAction(action),
-            payload: {
-              timestamp,
-              previousPlayer,
-              currentPlayer,
-            },
-          },
-        ],
       };
     }
     case UPDATE_PLAYER_OPTIONS_SUCCEEDED:
@@ -211,6 +197,23 @@ function reducer(state, action) {
       return state;
   }
 }
+
+const lobbyEventReducer = createEventReducer({
+  [PLAYER_JOINED]: null,
+  [PLAYER_UPDATED]: (payload, state) => {
+    const { player: currentPlayer } = payload;
+    const previousPlayer = selectPlayerByUserId(state, currentPlayer.userId);
+    return {
+      currentPlayer,
+      previousPlayer,
+    };
+  },
+});
+
+const reducer = composeReducers(
+  lobbyEventReducer,
+  lobbyReducer,
+);
 
 export {
   updateGameOptions,

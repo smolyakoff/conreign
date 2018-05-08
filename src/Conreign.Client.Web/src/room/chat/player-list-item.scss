@@ -1,0 +1,16 @@
+@import "./../../theme/variables";
+
+.c-player-list-item {
+  &--player-type-human {
+    &.c-player-list-item--turn-status-ended {
+      background-color: map_get($colors, 'success');
+    }
+  }
+
+  &--dead {
+    opacity: 0.5;
+    .c-player-list-item__nickname {
+      text-decoration: line-through;
+    }
+  }
+}

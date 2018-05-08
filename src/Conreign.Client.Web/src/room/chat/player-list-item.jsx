@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { isNumber } from 'lodash';
+import bem from 'bem-cn';
 
 import {
   Grid,
@@ -11,10 +12,15 @@ import {
   Text,
   TextEmphasize,
   VerticalAlignment,
+  mapEnumValueToModifierValue,
 } from './../../theme';
 import PlayerIcon from './player-icon';
 import { TurnStatus, PlayerType } from './../../api';
 import { PLAYER_WITH_OPTIONAL_STATS } from './player-schema';
+import './player-list-item.scss';
+
+const block = bem('c-player-list-item');
+const nicknameElement = block('nickname');
 
 export default function PlayerListItem({
   nickname,
@@ -22,16 +28,19 @@ export default function PlayerListItem({
   type,
   color,
   turnStatus,
+  isDead,
   isCurrent,
   planetsCount,
 }) {
-  const className = (turnStatus === TurnStatus.Ended && type === PlayerType.Human)
-    ? 'u-bg-success-light'
-    : null;
+  const modifiers = {
+    'player-type': mapEnumValueToModifierValue(type, PlayerType),
+    'turn-status': mapEnumValueToModifierValue(turnStatus, TurnStatus),
+    dead: isDead,
+  };
   return (
     <Box
+      className={block(modifiers)()}
       type={BoxType.Window}
-      className={className}
       themeSize={ThemeSize.Small}
     >
       <Grid
@@ -46,7 +55,10 @@ export default function PlayerListItem({
           />
         </GridCell>
         <GridCell>
-          <Text emphasize={isCurrent ? TextEmphasize.Loud : null}>
+          <Text
+            className={nicknameElement()}
+            emphasize={isCurrent ? TextEmphasize.Loud : null}
+          >
             {nickname}
           </Text>
         </GridCell>
@@ -64,10 +76,12 @@ export default function PlayerListItem({
 
 PlayerListItem.propTypes = {
   ...PLAYER_WITH_OPTIONAL_STATS,
+  isDead: PropTypes.bool,
   isCurrent: PropTypes.bool.isRequired,
 };
 
 PlayerListItem.defaultProps = {
+  isDead: false,
   turnStatus: null,
   planetsCount: null,
 };

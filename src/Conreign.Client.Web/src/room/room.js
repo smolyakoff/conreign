@@ -22,12 +22,12 @@ import {
 } from './map';
 import lobby from './lobby';
 import game from './game';
+import createEventReducer from './event-reducer';
 import { composeReducers } from './../util';
 
 const HANDLE_MAP_UPDATED = mapEventNameToActionType(MAP_UPDATED);
 const HANDLE_USER_STATUS_CHANGED = mapEventNameToActionType(USER_STATUS_CHANGED);
 const HANDLE_LEADER_CHANGED = mapEventNameToActionType(LEADER_CHANGED);
-const HANDLE_CHAT_MESSAGE_RECEIVED = mapEventNameToActionType(CHAT_MESSAGE_RECEIVED);
 const GET_ROOM_STATE_SUCCEEDED = createSucceededAsyncActionType(GET_ROOM_STATE);
 
 function initializeRoomState(room) {
@@ -81,7 +81,10 @@ function roomReducer(state = {}, action) {
   }
   switch (action.type) {
     case GET_ROOM_STATE_SUCCEEDED:
-      return action.payload;
+      return {
+        ...state,
+        ...action.payload,
+      };
     case SET_MAP_SELECTION:
       return {
         ...state,
@@ -125,21 +128,18 @@ function roomReducer(state = {}, action) {
         leaderUserId: event.userId,
       };
     }
-    case HANDLE_CHAT_MESSAGE_RECEIVED:
-      return {
-        ...state,
-        events: [...state.events, {
-          type: CHAT_MESSAGE_RECEIVED,
-          payload: action.payload,
-        }],
-      };
     default:
       return state;
   }
 }
 
+const roomEventReducer = createEventReducer({
+  [CHAT_MESSAGE_RECEIVED]: null,
+});
+
 const reducer = composeReducers(
   roomReducer,
+  roomEventReducer,
   lobby.reducer,
   game.reducer,
 );

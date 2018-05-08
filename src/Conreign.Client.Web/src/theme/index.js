@@ -7,3 +7,4 @@ bem.setup({
 });
 
 export * from './controls';
+export { default as mapEnumValueToModifierValue } from './map-enum-value-to-modifier-value';

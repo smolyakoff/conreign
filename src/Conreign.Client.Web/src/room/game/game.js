@@ -20,6 +20,7 @@ import {
   TURN_CALCULATION_STARTED,
   TURN_CALCULATION_ENDED,
   ATTACK_HAPPENED,
+  PLAYER_DEAD,
   LAUNCH_FLEET,
   CANCEL_FLEET,
   END_TURN,
@@ -28,14 +29,14 @@ import {
 } from './../../api';
 import {
   mapEventNameToActionType,
-  getEventNameFromAction,
   createAsyncActionTypes,
   getOriginalPayload,
   getAsyncOperationCorrelationId,
   createSucceededAsyncActionType,
   AsyncOperationState,
 } from './../../framework';
-import { count } from './../../util';
+import createEventReducer from '../event-reducer';
+import { count, composeReducers } from './../../util';
 import { getDistance, SET_MAP_SELECTION } from './../map';
 
 const AVERAGE_SERVER_TICK_INTERVAL = 5000;
@@ -47,9 +48,9 @@ const HANDLE_GAME_STARTED = mapEventNameToActionType(GAME_STARTED);
 const HANDLE_GAME_TICKED = mapEventNameToActionType(GAME_TICKED);
 const HANDLE_TURN_CALCULATION_STARTED = mapEventNameToActionType(TURN_CALCULATION_STARTED);
 const HANDLE_TURN_CALCULATION_ENDED = mapEventNameToActionType(TURN_CALCULATION_ENDED);
-const HANDLE_ATTACK_HAPPENED = mapEventNameToActionType(ATTACK_HAPPENED);
 const HANDLE_TURN_ENDED = mapEventNameToActionType(TURN_ENDED);
 const HANDLE_GAME_ENDED = mapEventNameToActionType(GAME_ENDED);
+const HANDLE_PLAYER_DEAD = mapEventNameToActionType(PLAYER_DEAD);
 const SET_TURN_TIMER_SECONDS = 'SET_TURN_TIMER_SECONDS';
 const CHANGE_FLEET = 'CHANGE_FLEET';
 const SELECT_FLEET = 'SELECT_FLEET';
@@ -73,7 +74,7 @@ export function selectFleet(payload) {
   };
 }
 
-function reducer(state, action) {
+function gameReducer(state, action) {
   if (state.mode !== RoomMode.Game) {
     return state;
   }
@@ -195,30 +196,11 @@ function reducer(state, action) {
         isCalculating: false,
       };
     }
-    case HANDLE_ATTACK_HAPPENED: {
-      const {
-        timestamp,
-        outcome,
-        attackerUserId,
-        defenderUserId,
-        planetName,
-      } = payload;
-      const planet = find(state.map.planets, p => p.name === planetName);
+    case HANDLE_PLAYER_DEAD: {
+      const { userId } = payload;
       return {
         ...state,
-        events: [
-          ...state.events,
-          {
-            type: getEventNameFromAction(action),
-            payload: {
-              timestamp,
-              outcome,
-              planet,
-              attacker: state.players[attackerUserId],
-              defender: defenderUserId ? state.players[defenderUserId] : null,
-            },
-          },
-        ],
+        deadPlayers: [...state.deadPlayers, userId],
       };
     }
     case SET_TURN_TIMER_SECONDS:
@@ -358,6 +340,26 @@ const selectPlanets = state => state.map.planets;
 const selectDeadPlayerIds = state => state.deadPlayers;
 const selectTurnStatuses = state => state.turnStatuses;
 const selectPlayerStatistics = state => state.playerStatistics;
+const selectPlanetByName = (state, planetName) =>
+  find(selectPlanets(state), p => p.name === planetName);
+const selectPlayerByUserId = (state, userId) => selectPlayers(state)[userId];
+
+const gameEventReducer = createEventReducer({
+  [ATTACK_HAPPENED]: (payload, state) => {
+    const {
+      attackerUserId,
+      defenderUserId,
+      planetName,
+    } = payload;
+    const planet = selectPlanetByName(state, planetName);
+    return {
+      planet,
+      attacker: selectPlayerByUserId(state, attackerUserId),
+      defender: defenderUserId ? selectPlayerByUserId(state, defenderUserId) : null,
+    };
+  },
+  [PLAYER_DEAD]: ({ userId }, state) => ({ player: selectPlayerByUserId(state, userId) }),
+});
 
 const selectWaitingFleetsWithDetails = createSelector(
   selectWaitingFleets,
@@ -458,6 +460,11 @@ export const selectExtendedPlayerStatistics = createSelector(
 );
 
 export { launchFleet, cancelFleet, endTurn } from './../../api';
+
+const reducer = composeReducers(
+  gameEventReducer,
+  gameReducer,
+);
 
 export default {
   reducer,

@@ -1,3 +1,5 @@
+import { get, isString } from 'lodash';
+
 import mapEventNameToActionType from './map-event-name-to-action-type';
 
 export function createEventAction(event) {
@@ -11,6 +13,11 @@ export function createEventAction(event) {
   };
 }
 
-export function getEventNameFromAction(action) {
+export function isEventAction(action) {
+  const eventName = get(action, 'meta.$event');
+  return isString(eventName);
+}
+
+export function getEventTypeFromAction(action) {
   return action.meta.$event;
 }
