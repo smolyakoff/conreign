@@ -28,9 +28,13 @@ namespace Conreign.Server.Gameplay
 
         public Task Handle(TurnCalculationEnded @event)
         {
+            if (_state.IsDead || @event.IsGameEnded)
+            {
+                return Task.CompletedTask;
+            }
             var map = EnsureMapIsInitialized();
             map.UpdatePlanets(@event.Map.Planets.Values);
-            return @event.IsGameEnded ? Task.CompletedTask : Think();
+            return Think();
         }
 
         public Task Handle(PlayerDead @event)
@@ -44,10 +48,6 @@ namespace Conreign.Server.Gameplay
 
         private Task Think()
         {
-            if (_state.IsDead)
-            {
-                return Task.CompletedTask;
-            }
             var map = EnsureMapIsInitialized();
             var fleets = _battleStrategy.ChooseFleetsToLaunch(_state.UserId, map);
             return _game.EndTurn(_state.UserId, fleets);
