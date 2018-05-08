@@ -330,7 +330,7 @@ namespace Conreign.Server.Gameplay
             var attackEnded = new AttackHappened(
                 _state.RoomId,
                 attackerUserId: attackerPlanet.OwnerId.Value,
-                defenderUserId: defenderPlanet.OwnerId,
+                defenderUserId: previousDefenderOwnerId,
                 planetName: defenderPlanet.Name,
                 outcome: attackOutcome);
             if (previousDefenderOwnerId != null)
