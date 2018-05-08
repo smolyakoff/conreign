@@ -71,7 +71,7 @@ export function resetMapSelection(previousSelection, previousMap, currentMap) {
 }
 
 export function ensureMapSelection(mapSelection, planets, currentUser) {
-  if (isNumber(mapSelection.start)) {
+  if (isNumber(mapSelection.start) && planets[mapSelection.start]) {
     return mapSelection;
   }
   const currentUserPlanetPosition = findKey(
