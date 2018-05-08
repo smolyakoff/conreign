@@ -10,8 +10,8 @@ import {
 } from './../errors';
 
 const NOTIFICATION_RENDERERS = {
-  SystemErrorNotification,
-  ValidationErrorNotification,
+  [SystemErrorNotification.displayName]: SystemErrorNotification,
+  [ValidationErrorNotification.displayName]: ValidationErrorNotification,
 };
 
 export default function AppLayout({ route }) {

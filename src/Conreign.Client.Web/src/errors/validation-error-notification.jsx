@@ -36,3 +36,6 @@ ValidationErrorNotification.propTypes = {
     failures: PropTypes.arrayOf(VALIDATION_ERROR_SHAPE).isRequired,
   }).isRequired,
 };
+
+// Display name is used in notification area to select corresponding component
+ValidationErrorNotification.displayName = 'ValidationErrorNotification';

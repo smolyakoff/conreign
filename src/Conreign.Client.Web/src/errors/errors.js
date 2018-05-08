@@ -64,11 +64,11 @@ const chooseErrorNotificationRenderer = cond([
       category: UserErrorCategory.Validation,
       code: ValidationErrorCode.BadInput,
     }),
-    () => ValidationErrorNotification.name,
+    () => ValidationErrorNotification.displayName,
   ],
   [
     () => true,
-    () => SystemErrorNotification.name,
+    () => SystemErrorNotification.displayName,
   ],
 ]);
 

@@ -25,3 +25,6 @@ SystemErrorNotification.propTypes = {
   name: PropTypes.string.isRequired,
   message: PropTypes.string.isRequired,
 };
+
+// Display name is used in notification area to select corresponding component
+SystemErrorNotification.displayName = 'SystemErrorNotification';
