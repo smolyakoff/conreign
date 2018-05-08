@@ -10,6 +10,7 @@ namespace Conreign.Contracts.Gameplay.Data
         public const int DefaultMapHeight = 8;
         public const int MinumumMapSize = 4;
         public const int MaximumMapSize = 20;
+        public const int MaximumBotsCount = 10;
 
         public int MapWidth { get; set; } = DefaultMapWidth;
         public int MapHeight { get; set; } = DefaultMapHeight;

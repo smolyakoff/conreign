@@ -22,16 +22,18 @@ namespace Conreign.Server.Gameplay.Validators
                 .GreaterThanOrEqualTo(GameOptionsData.MinumumMapSize)
                 .LessThanOrEqualTo(GameOptionsData.MaximumMapSize);
             RuleFor(x => x.NeutralPlanetsCount)
-                .GreaterThanOrEqualTo(0)
-                .Must(FitTheMapSize)
-                .WithMessage("Neutral planets count should fit the map size.");
-            RuleFor(x => x.BotsCount)
                 .GreaterThanOrEqualTo(0);
+            RuleFor(x => x.BotsCount)
+                .LessThanOrEqualTo(GameOptionsData.MaximumBotsCount)
+                .GreaterThanOrEqualTo(0);
+            RuleFor(x => x)
+                .Must(FitTheMapSize)
+                .WithMessage("Too many bots or neutral planets.");
         }
 
-        private bool FitTheMapSize(GameOptionsData data, int neutralPlanetsCount)
+        private bool FitTheMapSize(GameOptionsData data)
         {
-            var totalPlanets = neutralPlanetsCount + data.BotsCount + _humansCount;
+            var totalPlanets = data.NeutralPlanetsCount + data.BotsCount + _humansCount;
             return totalPlanets < data.MapWidth * data.MapHeight;
         }
     }

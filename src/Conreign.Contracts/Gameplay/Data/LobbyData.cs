@@ -15,5 +15,8 @@ namespace Conreign.Contracts.Gameplay.Data
         public Dictionary<Guid, PresenceStatus> PresenceStatuses { get; set; } = new Dictionary<Guid, PresenceStatus>();
         public MapData Map { get; set; } = new MapData();
         public Guid? LeaderUserId { get; set; }
+        public int MinimumMapSize => GameOptionsData.MinumumMapSize;
+        public int MaximumMapSize => GameOptionsData.MaximumMapSize;
+        public int MaximumBotsCount => GameOptionsData.MaximumBotsCount;
     }
 }

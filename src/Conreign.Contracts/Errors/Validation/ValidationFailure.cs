@@ -9,10 +9,6 @@ namespace Conreign.Contracts.Errors.Validation
     {
         public ValidationFailure(string key, string rule, string message)
         {
-            if (string.IsNullOrEmpty(key))
-            {
-                throw new ArgumentException("Key cannot be null or empty.", nameof(key));
-            }
             if (string.IsNullOrEmpty(rule))
             {
                 throw new ArgumentException("Rule cannot be null or empty.", nameof(rule));
@@ -32,7 +28,7 @@ namespace Conreign.Contracts.Errors.Validation
 
         public override string ToString()
         {
-            return $"{Key} ({Rule}): {Message}";
+            return $"{Key ?? "$"} ({Rule}): {Message}";
         }
     }
 }
