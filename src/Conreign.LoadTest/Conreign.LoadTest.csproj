@@ -42,9 +42,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Common\TaskCompleted.cs">
-      <Link>Core\TaskCompleted.cs</Link>
-    </Compile>
     <Compile Include="Core\Battle\IBotBattleStrategy.cs" />
     <Compile Include="Core\Battle\NaiveBotBattleStrategy.cs" />
     <Compile Include="Core\Battle\RankingBotBattleStrategy.cs" />

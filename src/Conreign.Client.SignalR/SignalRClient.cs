@@ -33,7 +33,7 @@ namespace Conreign.Client.SignalR
         {
             return _connections.GetOrAdd(connectionId, async id =>
             {
-                var hubConnection = new HubConnection(_options.ConnectionUri)
+                var hubConnection = new HubConnection(_options.ConnectionUri + "/$/api")
                 {
                     TraceLevel = TraceLevels.All,
                     TraceWriter = new SerilogTextWriter(),
