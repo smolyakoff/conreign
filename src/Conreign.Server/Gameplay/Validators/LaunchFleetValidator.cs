@@ -16,7 +16,6 @@ namespace Conreign.Server.Gameplay.Validators
             _map = map ?? throw new ArgumentNullException(nameof(map));
 
             RuleFor(x => x.From)
-                .NotEmpty()
                 .Must(Exist)
                 .Must(BelongToSender);
             RuleFor(x => x.To)
