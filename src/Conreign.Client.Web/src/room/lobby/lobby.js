@@ -1,5 +1,7 @@
 import { combineEpics } from 'redux-observable';
-import { values, pick, mapValues, keys, omit, keyBy } from 'lodash';
+import { values, pick, mapValues, omit, keyBy } from 'lodash';
+import { createSelector } from 'reselect';
+
 import {
   createSucceededAsyncActionType,
   mapEventNameToActionType,
@@ -18,7 +20,7 @@ import {
   RoomMode,
   TurnStatus,
 } from '../../api';
-import { composeReducers } from '../../util';
+import { composeReducers, count } from '../../util';
 import createEventReducer from '../event-reducer';
 import { createWelcomeMessageEvent } from './welcome-message-event';
 
@@ -56,7 +58,13 @@ export function changePlayerOptions(payload) {
   };
 }
 
+const selectPlayersMap = state => state.players;
+const selectPlayers = createSelector(selectPlayersMap, values);
 const selectPlayerByUserId = (state, userId) => state.players[userId];
+const selectHumanPlayersCount = createSelector(
+  selectPlayers,
+  players => count(players, player => player.type === PlayerType.Human),
+);
 
 function updateGameOptionsEpic(action$, store, { apiDispatcher }) {
   return action$
@@ -83,8 +91,8 @@ const epic = combineEpics(
 );
 
 function initializeEvents(room) {
-  const { players, events, roomId } = room;
-  if (keys(players).length !== 1) {
+  const { events, roomId } = room;
+  if (selectHumanPlayersCount(room) > 1) {
     return events;
   }
   return [
