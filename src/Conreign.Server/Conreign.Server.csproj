@@ -49,6 +49,7 @@
     <Compile Include="Gameplay\GameEndedTurnOutcome.cs" />
     <Compile Include="Gameplay\GameOptions.cs" />
     <Compile Include="Gameplay\GameStalledTurnOutcome.cs" />
+    <Compile Include="Gameplay\GameStatus.cs" />
     <Compile Include="Gameplay\IGameTurnOutcome.cs" />
     <Compile Include="Gameplay\LobbyGrainOptions.cs" />
     <Compile Include="Gameplay\TurnCompletedTurnOutcome.cs" />

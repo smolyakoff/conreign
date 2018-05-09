@@ -44,7 +44,6 @@ namespace Conreign.Server.Gameplay
             .Any(p => p.TurnStatus == TurnStatus.Thinking);
 
         public int Turn => _state.Turn;
-
         private bool IsInactive => EveryoneOfflinePeriod >= _options.MaxInactivityPeriod;
         private TimeSpan EveryoneOfflinePeriod => _hub.EveryoneOfflinePeriod;
 
@@ -173,13 +172,12 @@ namespace Conreign.Server.Gameplay
             {
                 throw new ArgumentNullException(nameof(data));
             }
-            if (_state.IsStarted)
+            if (_state.Status == GameStatus.Started)
             {
                 return Task.CompletedTask;
             }
 
-            _state.IsEnded = false;
-            _state.IsStarted = true;
+            _state.Status = GameStatus.Started;
             _state.Map = data.Map;
             _state.Hub = new HubState
             {
@@ -305,8 +303,7 @@ namespace Conreign.Server.Gameplay
             {
                 return false;
             }
-            _state.IsEnded = true;
-            _state.IsStarted = false;
+            _state.Status = GameStatus.Ended;
             var @event = new GameEnded(
                 _state.RoomId,
                 _state.PlayerStates.ToDictionary(x => x.Key, x => x.Value.Statistics));
@@ -437,9 +434,9 @@ namespace Conreign.Server.Gameplay
 
         private void EnsureGameIsInProgress()
         {
-            if (_state.IsEnded)
+            if (_state.Status != GameStatus.Started)
             {
-                throw new InvalidOperationException("Game has already ended.");
+                throw new InvalidOperationException($"Game is ${_state.Status}.");
             }
         }
 
