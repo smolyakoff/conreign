@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,8 +11,8 @@ using Conreign.Core;
 using Conreign.Core.Battle;
 using Conreign.Core.Utility;
 using Conreign.Server.Communication;
-using Conreign.Server.Contracts.Communication;
 using Conreign.Server.Contracts.Gameplay;
+using Conreign.Server.Contracts.Presence;
 using Conreign.Server.Gameplay.Validators;
 using Conreign.Server.Presence;
 
@@ -22,18 +21,16 @@ namespace Conreign.Server.Gameplay
     public class Game : IGame
     {
         private readonly IBattleStrategy _battleStrategy;
-        private readonly GameState _state;
+        private readonly IGameState _state;
         private readonly GameOptions _options;
-        private readonly ITopic _topic;
-        private Hub _hub;
+        private readonly IHub _hub;
         private Map _map;
 
-        public Game(GameState state, GameOptions options, ITopic topic, IBattleStrategy battleStrategy)
+        public Game(IGameState state, GameOptions options, IHub hub, IBattleStrategy battleStrategy)
         {
             _state = state ?? throw new ArgumentNullException(nameof(state));
             _options = options ?? throw new ArgumentNullException(nameof(options));
-            _topic = topic ?? throw new ArgumentNullException(nameof(topic));
-            _hub = new Hub(_state.Hub, topic, new EmptyReadOnlySet<Guid>());
+            _hub = hub;
             _map = new Map(_state.Map);
             _battleStrategy = battleStrategy ?? throw new ArgumentNullException(nameof(battleStrategy));
         }
@@ -179,17 +176,11 @@ namespace Conreign.Server.Gameplay
 
             _state.Status = GameStatus.Started;
             _state.Map = data.Map;
-            _state.Hub = new HubState
-            {
-                Id = _state.RoomId,
-                Members = data.HubMembers,
-                JoinOrder = data.HubJoinOrder
-            };
+            _hub.Reset(data.HubMembers, data.HubJoinOrder);
             _state.Players = data.Players;
             _state.PlayerStates = data.Players
                 .ToDictionary(x => x.UserId, x => new PlayerGameState());
             _state.Turn = 0;
-            _hub = new Hub(_state.Hub, _topic, new BotUserIdSet(_state));
             _map = new Map(_state.Map);
             if (_hub.LeaderUserId == null)
             {
@@ -454,52 +445,6 @@ namespace Conreign.Server.Gameplay
             if (state.TurnStatus == TurnStatus.Ended)
             {
                 throw UserException.Create(GameplayError.TurnIsAlreadyEnded, "You have already ended your turn.");
-            }
-        }
-
-        private class EmptyReadOnlySet<T> : IReadOnlySet<T>
-        {
-            public bool Contains(T userId)
-            {
-                return false;
-            }
-
-            public IEnumerator<T> GetEnumerator()
-            {
-                return Enumerable.Empty<T>().GetEnumerator();
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
-        }
-
-        private class BotUserIdSet : IReadOnlySet<Guid>
-        {
-            private readonly HashSet<Guid> _botUserIds;
-
-            public BotUserIdSet(GameState state)
-            {
-                _botUserIds = state.Players
-                    .Where(x => x.Type == PlayerType.Bot)
-                    .Select(x => x.UserId)
-                    .ToHashSet();
-            }
-
-            public bool Contains(Guid userId)
-            {
-                return _botUserIds.Contains(userId);
-            }
-
-            public IEnumerator<Guid> GetEnumerator()
-            {
-                return _botUserIds.GetEnumerator();
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
             }
         }
     }

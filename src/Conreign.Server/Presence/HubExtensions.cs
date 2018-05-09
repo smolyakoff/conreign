@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Conreign.Contracts.Communication;
-using Conreign.Server.Contracts.Communication;
+using Conreign.Contracts.Presence;
+using Conreign.Server.Contracts.Presence;
 
 namespace Conreign.Server.Presence
 {
@@ -46,6 +47,19 @@ namespace Conreign.Server.Presence
                 throw new ArgumentNullException(nameof(events));
             }
             return hub.NotifyEverybodyExcept(new HashSet<Guid> {userId}, events);
+        }
+
+        public static bool IsOnline(this IHub hub, Guid userId)
+        {
+            if (hub == null)
+            {
+                throw new ArgumentNullException(nameof(hub));
+            }
+            if (userId == Guid.Empty)
+            {
+                throw new ArgumentException("User id should not be empty.", nameof(userId));
+            }
+            return hub.GetPresenceStatus(userId) == PresenceStatus.Online;
         }
     }
 }

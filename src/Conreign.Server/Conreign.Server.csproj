@@ -46,10 +46,12 @@
     <Compile Include="Gameplay\Bot.cs" />
     <Compile Include="Gameplay\BotGrain.cs" />
     <Compile Include="Gameplay\BotState.cs" />
+    <Compile Include="Gameplay\GameBotUserIdSet.cs" />
     <Compile Include="Gameplay\GameEndedTurnOutcome.cs" />
     <Compile Include="Gameplay\GameOptions.cs" />
     <Compile Include="Gameplay\GameStalledTurnOutcome.cs" />
     <Compile Include="Gameplay\GameStatus.cs" />
+    <Compile Include="Gameplay\IGameState.cs" />
     <Compile Include="Gameplay\IGameTurnOutcome.cs" />
     <Compile Include="Gameplay\LobbyGrainOptions.cs" />
     <Compile Include="Gameplay\TurnCompletedTurnOutcome.cs" />

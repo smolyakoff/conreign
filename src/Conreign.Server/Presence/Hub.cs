@@ -46,8 +46,7 @@ namespace Conreign.Server.Presence
             {
                 return ClientUserIds
                     .OrderBy(x => _state.JoinOrder.IndexOf(x))
-                    .Where(IsOnline)
-                    .FirstOrDefault();
+                    .FirstOrDefault(this.IsOnline);
             }
         }
 
@@ -72,6 +71,15 @@ namespace Conreign.Server.Presence
                     .FirstOrDefault();
                 return now - (lastDisconnectionTime ?? _state.CreatedAt);
             }
+        }
+
+        // TODO: Consider something like memento pattern instead
+        public void Reset(Dictionary<Guid, HubMemberState> members, List<Guid> joinOrder)
+        {
+            _state.CreatedAt = _timeProvider.UtcNow;
+            _state.Events = new List<EventState>();
+            _state.Members = members;
+            _state.JoinOrder = joinOrder;
         }
 
         public async Task Connect(Guid userId, Guid connectionId)
@@ -171,20 +179,16 @@ namespace Conreign.Server.Presence
             return Notify(ids, events);
         }
 
-
-        public bool IsOnline(Guid userId)
+        public PresenceStatus GetPresenceStatus(Guid userId)
         {
             if (_serverUserIds.Contains(userId))
             {
-                return true;
+                return PresenceStatus.Online;
             }
-            var exists = _state.Members.TryGetValue(userId, out HubMemberState member);
-            return exists && member.ConnectionIds.Count > 0;
-        }
-
-        public PresenceStatus GetPresenceStatus(Guid userId)
-        {
-            return IsOnline(userId) ? PresenceStatus.Online : PresenceStatus.Offline;
+            var exists = _state.Members.TryGetValue(userId, out var member);
+            return exists && member.ConnectionIds.Count > 0 
+                ? PresenceStatus.Online 
+                : PresenceStatus.Offline;
         }
 
         public IEnumerable<IClientEvent> GetEvents(Guid userId)

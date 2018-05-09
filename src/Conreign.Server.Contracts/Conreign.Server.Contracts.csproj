@@ -45,7 +45,7 @@
     <Compile Include="Communication\EventExtensions.cs" />
     <Compile Include="Communication\IEventHandler%271.cs" />
     <Compile Include="Communication\IEventHandler.cs" />
-    <Compile Include="Communication\IHub.cs" />
+    <Compile Include="Presence\IHub.cs" />
     <Compile Include="Communication\ITopic.cs" />
     <Compile Include="Communication\StreamConstants.cs" />
     <Compile Include="Gameplay\IBot.cs" />

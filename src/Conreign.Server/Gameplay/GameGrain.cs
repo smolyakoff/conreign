@@ -7,13 +7,14 @@ using Conreign.Core.Battle;
 using Conreign.Server.Communication;
 using Conreign.Server.Contracts.Communication;
 using Conreign.Server.Contracts.Gameplay;
+using Conreign.Server.Presence;
 using Orleans;
 using Serilog;
 
 namespace Conreign.Server.Gameplay
 {
     public class GameGrain : Grain<GameState>, IGameGrain
-    {
+    { 
         private readonly GameOptions _options;
         private Game _game;
         private int _tick;
@@ -91,7 +92,9 @@ namespace Conreign.Server.Gameplay
             State.RoomId = this.GetPrimaryKeyString();
             var topic = Topic.Room(GetStreamProvider(StreamConstants.ProviderName), this.GetPrimaryKeyString());
             _logger = _logger.ForContext(nameof(State.RoomId), State.RoomId);
-            _game = new Game(State, _options, topic, new CoinBattleStrategy());
+            var battleStrategy = new CoinBattleStrategy();
+            var hub = new Hub(State.Hub, topic, new GameBotUserIdSet(State));
+            _game = new Game(State, _options, hub, battleStrategy);
             return base.OnActivateAsync();
         }
 
