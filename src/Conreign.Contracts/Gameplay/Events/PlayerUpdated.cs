@@ -5,17 +5,15 @@ using Conreign.Contracts.Gameplay.Data;
 namespace Conreign.Contracts.Gameplay.Events
 {
     [Serializable]
-    public class PlayerUpdated : IClientEvent, IRoomEvent
+    public class PlayerUpdated : IClientEvent
     {
-        public PlayerUpdated(string roomId, PlayerData player)
+        public PlayerUpdated(PlayerData player)
         {
-            RoomId = roomId;
             Player = player;
             Timestamp = DateTime.UtcNow;
         }
 
         public PlayerData Player { get; }
         public DateTime Timestamp { get; }
-        public string RoomId { get; }
     }
 }

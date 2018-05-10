@@ -8,18 +8,15 @@ namespace Conreign.Contracts.Gameplay.Events
 {
     [Serializable]
     [Immutable]
-    public class GameEnded : IClientEvent, IServerEvent, IRoomEvent
+    public class GameEnded : IClientEvent, IServerEvent
     {
-        public GameEnded(string roomId, Dictionary<Guid, GameStatisticsData> statistics)
+        public GameEnded(Dictionary<Guid, GameStatisticsData> statistics)
         {
-            RoomId = roomId;
             Statistics = statistics;
             Timestamp = DateTime.UtcNow;
         }
 
         public Dictionary<Guid, GameStatisticsData> Statistics { get; }
         public DateTime Timestamp { get; }
-
-        public string RoomId { get; }
     }
 }

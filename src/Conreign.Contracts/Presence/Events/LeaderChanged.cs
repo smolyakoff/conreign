@@ -6,16 +6,14 @@ namespace Conreign.Contracts.Presence.Events
 {
     [Serializable]
     [Immutable]
-    public class LeaderChanged : IClientEvent, IPresenceEvent
+    public class LeaderChanged : IClientEvent
     {
-        public LeaderChanged(string hubId, Guid? userId)
+        public LeaderChanged(Guid? userId)
         {
-            HubId = hubId;
             UserId = userId;
         }
 
         public DateTime Timestamp { get; } = DateTime.UtcNow;
         public Guid? UserId { get; }
-        public string HubId { get; }
     }
 }

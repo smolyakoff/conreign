@@ -61,7 +61,6 @@ namespace Conreign.Server.Gameplay
             var playerState = _state.PlayerStates.GetOrCreateDefault(userId);
             var data = new GameData
             {
-                RoomId = _state.RoomId,
                 Players = _state.Players,
                 Events = _hub.GetEvents(userId).Select(x => x.ToEnvelope()).ToList(),
                 LeaderUserId = _hub.LeaderUserId,
@@ -89,7 +88,7 @@ namespace Conreign.Server.Gameplay
                 throw new ArgumentNullException(nameof(textMessage));
             }
             textMessage.EnsureIsValid<TextMessageData, TextMessageValidator>();
-            var @event = new ChatMessageReceived(_state.RoomId, userId, textMessage);
+            var @event = new ChatMessageReceived(userId, textMessage);
             return _hub.NotifyEverybody(@event);
         }
 
@@ -205,7 +204,7 @@ namespace Conreign.Server.Gameplay
             {
                 return nextTick;
             }
-            var ticked = new GameTicked(_state.RoomId, nextTick);
+            var ticked = new GameTicked(nextTick);
             await _hub.NotifyEverybody(ticked);
             return nextTick;
         }
@@ -214,7 +213,7 @@ namespace Conreign.Server.Gameplay
         {
             EnsureGameIsInProgress();
 
-            await _hub.NotifyEverybody(new TurnCalculationStarted(_state.RoomId, _state.Turn));
+            await _hub.NotifyEverybody(new TurnCalculationStarted(_state.Turn));
             CalculateResources();
             var activePlayers = _state.PlayerStates
                 .Where(x => x.Value.Statistics.DeathTurn == null)
@@ -233,7 +232,6 @@ namespace Conreign.Server.Gameplay
                 .Select(x =>
                 {
                     var turnCalculationEnded = new TurnCalculationEnded(
-                        _state.RoomId,
                         _state.Turn,
                         _state.Map,
                         x.Value.MovingFleets,
@@ -266,7 +264,7 @@ namespace Conreign.Server.Gameplay
         {
             var state = _state.PlayerStates.GetOrCreateDefault(userId);
             state.TurnStatus = TurnStatus.Ended;
-            return _hub.NotifyEverybody(new TurnEnded(_state.RoomId, userId));
+            return _hub.NotifyEverybody(new TurnEnded(userId));
         }
 
         private Task MarkDeadPlayers()
@@ -275,7 +273,7 @@ namespace Conreign.Server.Gameplay
                 .Where(x => _state.PlayerStates[x.UserId].Statistics.DeathTurn == null)
                 .Select(x => x.UserId)
                 .Where(PlayerShouldDie)
-                .Select(x => new PlayerDead(_state.RoomId, x))
+                .Select(x => new PlayerDead(x))
                 .ToList();
             foreach (var @event in events)
             {
@@ -296,7 +294,6 @@ namespace Conreign.Server.Gameplay
             }
             _state.Status = GameStatus.Ended;
             var @event = new GameEnded(
-                _state.RoomId,
                 _state.PlayerStates.ToDictionary(x => x.Key, x => x.Value.Statistics));
             await _hub.NotifyEverybody(@event);
             return true;
@@ -342,7 +339,6 @@ namespace Conreign.Server.Gameplay
             {
                 defenderPlanet.Ships += fleet.Ships;
                 var reinforcementsArrived = new ReinforcementsArrived(
-                    _state.RoomId,
                     defenderPlanet.Name,
                     defenderPlanet.OwnerId.Value,
                     fleet.Ships);
@@ -378,7 +374,6 @@ namespace Conreign.Server.Gameplay
             }
             var attackOutcome = battleOutcome.AttackerShips > 0 ? AttackOutcome.Win : AttackOutcome.Defeat;
             var attackEnded = new AttackHappened(
-                _state.RoomId,
                 attackerUserId: attackerUserId,
                 defenderUserId: previousDefenderOwnerId,
                 planetName: defenderPlanet.Name,

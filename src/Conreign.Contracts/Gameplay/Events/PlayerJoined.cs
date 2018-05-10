@@ -6,17 +6,15 @@ namespace Conreign.Contracts.Gameplay.Events
 {
     [Serializable]
     [Obsolete("Use PlayerListChanged instead.")]
-    public class PlayerJoined : IClientEvent, IRoomEvent
+    public class PlayerJoined : IClientEvent
     {
-        public PlayerJoined(string roomId, PlayerData player)
+        public PlayerJoined(PlayerData player)
         {
-            RoomId = roomId;
             Player = player;
             Timestamp = DateTime.UtcNow;
         }
 
         public PlayerData Player { get; }
         public DateTime Timestamp { get; }
-        public string RoomId { get; }
     }
 }

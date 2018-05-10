@@ -29,15 +29,7 @@ namespace Conreign.Server.Gameplay
 
         public Lobby(LobbyState state, ITopic topic)
         {
-            if (state == null)
-            {
-                throw new ArgumentNullException(nameof(state));
-            }
-            if (string.IsNullOrEmpty(state.RoomId))
-            {
-                throw new ArgumentException("Room id should be initialized", nameof(state));
-            }
-            _state = state;
+            _state = state ?? throw new ArgumentNullException(nameof(state));
             _topic = topic ?? throw new ArgumentNullException(nameof(topic));
             Initialize();
         }
@@ -55,7 +47,6 @@ namespace Conreign.Server.Gameplay
             EnsureUserIsOnline(userId);
             var state = new LobbyData
             {
-                RoomId = _state.RoomId,
                 Events = _hub.GetEvents(userId).Select(x => x.ToEnvelope()).ToList(),
                 Players = _state.Players,
                 PresenceStatuses = _state.Players
@@ -75,7 +66,7 @@ namespace Conreign.Server.Gameplay
                 throw new ArgumentNullException(nameof(textMessage));
             }
             textMessage.EnsureIsValid<TextMessageData, TextMessageValidator>();
-            var @event = new ChatMessageReceived(_state.RoomId, userId, textMessage);
+            var @event = new ChatMessageReceived(userId, textMessage);
             return _hub.NotifyEverybody(@event);
         }
 
@@ -94,10 +85,9 @@ namespace Conreign.Server.Gameplay
                _playerListEditor.PlayerIds.ToHashSet(), 
                options.NeutralPlanetsCount);
             var playerListChanged = new PlayerListChanged(
-                _state.RoomId,
                 botsAdded,
                 botsRemoved.Select(x => x.UserId).ToList());
-            var mapUpdated = new MapUpdated(_state.RoomId, _state.Map);
+            var mapUpdated = new MapUpdated(_state.Map);
             await _hub.NotifyEverybody(playerListChanged, mapUpdated);
         }
 
@@ -111,7 +101,7 @@ namespace Conreign.Server.Gameplay
             {
                 return;
             }
-            var playerUpdated = new PlayerUpdated(_state.RoomId, _playerListEditor[userId]);
+            var playerUpdated = new PlayerUpdated(_playerListEditor[userId]);
             await _hub.NotifyEverybody(playerUpdated);
         }
 
@@ -152,8 +142,8 @@ namespace Conreign.Server.Gameplay
                         "No free map cells available.");
                 }
                 var player = _playerListEditor.AddHuman(userId);
-                var playerJoined = new PlayerJoined(_state.RoomId, player);
-                var mapUpdated = new MapUpdated(_state.RoomId, _state.Map);
+                var playerJoined = new PlayerJoined(player);
+                var mapUpdated = new MapUpdated(_state.Map);
                 await _hub.NotifyEverybodyExcept(userId, playerJoined, mapUpdated);
             }
             await _hub.Connect(userId, connectionId);
@@ -168,7 +158,7 @@ namespace Conreign.Server.Gameplay
         {
             _state.IsGameStarted = false;
             _state.Map = new MapData();
-            _state.Hub = new HubState {Id = _state.RoomId};
+            _state.Hub = new HubState();
             _state.Players = new List<PlayerData>();
             Initialize();
         }
@@ -191,7 +181,7 @@ namespace Conreign.Server.Gameplay
         {
             if (!_hub.IsOnline(userId))
             {
-                throw new InvalidOperationException($"User {userId} is not online at {_state.RoomId}.");
+                throw new InvalidOperationException($"User {userId} is not online.");
             }
         }
 
@@ -201,7 +191,7 @@ namespace Conreign.Server.Gameplay
             {
                 return;
             }
-            var message = $"Game {_state.RoomId} is already in progress.";
+            const string message = "Game is already in progress.";
             throw UserException.Create(GameplayError.GameIsAlreadyInProgress, message);
         }
 

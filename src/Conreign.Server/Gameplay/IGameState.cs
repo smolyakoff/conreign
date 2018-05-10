@@ -9,7 +9,6 @@ namespace Conreign.Server.Gameplay
         MapData Map { get; set; }
         List<PlayerData> Players { get; set; }
         Dictionary<Guid, PlayerGameState> PlayerStates { get; set; }
-        string RoomId { get; set; }
         GameStatus Status { get; set; }
         int Turn { get; set; }
     }

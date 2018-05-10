@@ -14,12 +14,14 @@ using Serilog;
 namespace Conreign.Server.Gameplay
 {
     public class GameGrain : Grain<GameState>, IGameGrain
-    { 
+    {
         private readonly GameOptions _options;
+        private ILogger _logger;
         private Game _game;
         private int _tick;
         private IDisposable _timer;
-        private ILogger _logger;
+
+        private string RoomId => this.GetPrimaryKeyString();
 
         public GameGrain(ILogger logger, GameOptions options)
         {
@@ -31,7 +33,7 @@ namespace Conreign.Server.Gameplay
         {
             var botGrains = data.Players
                 .Where(x => x.Type == PlayerType.Bot)
-                .Select(x => GrainFactory.GetGrain<IBotGrain>(x.UserId, State.RoomId, null));
+                .Select(x => GrainFactory.GetGrain<IBotGrain>(x.UserId, RoomId, null));
             await Task.WhenAll(botGrains.Select(x => x.EnsureIsListening()));
             await _game.Start(userId, data);
             await WriteStateAsync();
@@ -43,9 +45,11 @@ namespace Conreign.Server.Gameplay
             ScheduleTimer();
         }
 
-        public Task<IRoomData> GetState(Guid userId)
+        public async Task<IRoomData> GetState(Guid userId)
         {
-            return _game.GetState(userId);
+            var state = await _game.GetState(userId);
+            state.RoomId = RoomId;
+            return state;
         }
 
         public Task SendMessage(Guid userId, TextMessageData textMessage)
@@ -89,9 +93,12 @@ namespace Conreign.Server.Gameplay
 
         public override Task OnActivateAsync()
         {
-            State.RoomId = this.GetPrimaryKeyString();
+            /*
+             * It's not possible to initialize the logger in constructor as Orleans throws an exception
+             * when primary key is accessed before grain activation
+             */
+            _logger = _logger.ForContext(nameof(RoomId), RoomId);
             var topic = Topic.Room(GetStreamProvider(StreamConstants.ProviderName), this.GetPrimaryKeyString());
-            _logger = _logger.ForContext(nameof(State.RoomId), State.RoomId);
             var battleStrategy = new CoinBattleStrategy();
             var hub = new Hub(State.Hub, topic, new GameBotUserIdSet(State));
             _game = new Game(State, _options, hub, battleStrategy);
@@ -105,6 +112,7 @@ namespace Conreign.Server.Gameplay
                 _logger.Warning($"{nameof(_timer)} is null in {nameof(Tick)} method.");
                 return;
             }
+
             _tick = await _game.ProcessTick(_tick);
             if (_tick == 0)
             {
@@ -127,12 +135,14 @@ namespace Conreign.Server.Gameplay
                     _logger.Information("Game ended in {TurnCount} turns.", ended.TurnsCount);
                     break;
             }
+
             if (outcome is TurnCompletedTurnOutcome)
             {
                 await WriteStateAsync();
                 ScheduleTimer();
                 return;
             }
+
             await ClearStateAsync();
             DeactivateOnIdle();
         }

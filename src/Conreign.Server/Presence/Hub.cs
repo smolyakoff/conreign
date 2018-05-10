@@ -217,7 +217,6 @@ namespace Conreign.Server.Presence
             else
             {
                 var statusChanged = new UserStatusChanged(
-                    _state.Id,
                     userId,
                     PresenceStatus.Online
                 );
@@ -228,7 +227,6 @@ namespace Conreign.Server.Presence
         private IEnumerable<IClientEvent> Leave(Guid userId)
         {
             var statusChanged = new UserStatusChanged(
-                _state.Id,
                 userId,
                 PresenceStatus.Offline
             );
@@ -247,7 +245,7 @@ namespace Conreign.Server.Presence
             {
                 yield break;
             }
-            var leaderChanged = new LeaderChanged(_state.Id, currentLeader);
+            var leaderChanged = new LeaderChanged(currentLeader);
             yield return leaderChanged;
         }
     }

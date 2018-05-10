@@ -6,11 +6,10 @@ namespace Conreign.Contracts.Presence.Events
 {
     [Serializable]
     [Immutable]
-    public class UserStatusChanged : IClientEvent, IPresenceEvent
+    public class UserStatusChanged : IClientEvent
     {
-        public UserStatusChanged(string hubId, Guid userId, PresenceStatus status)
+        public UserStatusChanged(Guid userId, PresenceStatus status)
         {
-            HubId = hubId;
             UserId = userId;
             Status = status;
             Timestamp = DateTime.UtcNow;
@@ -19,6 +18,5 @@ namespace Conreign.Contracts.Presence.Events
         public PresenceStatus Status { get; }
         public Guid UserId { get; }
         public DateTime Timestamp { get; }
-        public string HubId { get; }
     }
 }

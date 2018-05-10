@@ -7,7 +7,8 @@ namespace Conreign.Contracts.Gameplay.Data
 {
     public interface IRoomData
     {
-        string RoomId { get; }
+        // TODO: Setter looks ugly here, do something with it
+        string RoomId { get; set; }
         RoomMode Mode { get; }
         List<EventEnvelope> Events { get; }
         List<PlayerData> Players { get; }

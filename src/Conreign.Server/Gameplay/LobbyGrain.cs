@@ -20,15 +20,19 @@ namespace Conreign.Server.Gameplay
         private ILogger _logger;
         private IDisposable _inactivityTimer;
 
+        private string RoomId => this.GetPrimaryKeyString();
+
         public LobbyGrain(ILogger logger, LobbyGrainOptions options)
         {
             _logger = logger.ForContext(GetType()) ?? throw new ArgumentNullException(nameof(logger));
             _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
-        public Task<IRoomData> GetState(Guid userId)
+        public async Task<IRoomData> GetState(Guid userId)
         {
-            return _lobby.GetState(userId);
+            var state = await _lobby.GetState(userId);
+            state.RoomId = RoomId;
+            return state;
         }
 
         public Task SendMessage(Guid userId, TextMessageData textMessage)
@@ -72,16 +76,19 @@ namespace Conreign.Server.Gameplay
 
         public override async Task OnActivateAsync()
         {
-            InitializeState();
-            var topic = Topic.Room(GetStreamProvider(StreamConstants.ProviderName), this.GetPrimaryKeyString());
-            _logger = _logger.ForContext(nameof(State.RoomId), State.RoomId);
-            _logger.Information("Lobby is activated.", State.RoomId);
+            /*
+             * It's not possible to initialize the logger in constructor as Orleans throws an exception
+             * when primary key is accessed before grain activation
+             */
+            _logger = _logger.ForContext(nameof(RoomId), RoomId);
+            var topic = Topic.Room(GetStreamProvider(StreamConstants.ProviderName), RoomId);
+            _logger.Information("Lobby [{RoomId}] is activated.");
             _lobby = new Lobby(State, topic);
             _subscription = await topic.EnsureIsSubscribedOnce(this);
             var inactivityTimerInterval = TimeSpan.FromTicks(_options.MaxInactivityPeriod.Ticks / 2);
             _inactivityTimer = RegisterTimer(
-                EnsureSomeoneIsOnline, 
-                null, 
+                EnsureSomeoneIsOnline,
+                null,
                 inactivityTimerInterval,
                 inactivityTimerInterval);
             await base.OnActivateAsync();
@@ -100,19 +107,14 @@ namespace Conreign.Server.Gameplay
             if (_lobby.EveryoneOfflinePeriod > _options.MaxInactivityPeriod)
             {
                 _logger.Information(
-                    "Going to deactivate lobby due to inactivity. Inactivity period was {InactivityPeriod}.", 
+                    "Going to deactivate lobby due to inactivity. Inactivity period was {InactivityPeriod}.",
                     _lobby.EveryoneOfflinePeriod);
                 _inactivityTimer?.Dispose();
                 _inactivityTimer = null;
                 DeactivateOnIdle();
             }
-            return Task.CompletedTask;
-        }
 
-        private void InitializeState()
-        {
-            State.RoomId = this.GetPrimaryKeyString();
-            State.Hub.Id = State.RoomId;
+            return Task.CompletedTask;
         }
     }
 }

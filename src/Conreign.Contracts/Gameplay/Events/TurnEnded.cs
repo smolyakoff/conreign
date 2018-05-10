@@ -6,18 +6,15 @@ namespace Conreign.Contracts.Gameplay.Events
 {
     [Serializable]
     [Immutable]
-    public class TurnEnded : IClientEvent, IRoomEvent
+    public class TurnEnded : IClientEvent
     {
-        public TurnEnded(string roomId, Guid userId)
+        public TurnEnded(Guid userId)
         {
-            RoomId = roomId;
             UserId = userId;
             Timestamp = DateTime.UtcNow;
         }
 
         public Guid UserId { get; }
         public DateTime Timestamp { get; }
-
-        public string RoomId { get; }
     }
 }

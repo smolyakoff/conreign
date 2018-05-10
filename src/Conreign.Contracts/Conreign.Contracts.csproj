@@ -51,9 +51,7 @@
     <Compile Include="Errors\UserExceptionExtensions.cs" />
     <Compile Include="Gameplay\Data\IPlanetData.cs" />
     <Compile Include="Gameplay\Data\PlayerType.cs" />
-    <Compile Include="Gameplay\Events\IRoomEvent.cs" />
     <Compile Include="Gameplay\Events\PlayerListChanged.cs" />
-    <Compile Include="Presence\Events\IPresenceEvent.cs" />
     <Compile Include="Errors\Validation\ValidationErrorDetails.cs" />
     <Compile Include="Errors\Validation\ValidationFailure.cs" />
     <Compile Include="Communication\IClientEvent.cs" />

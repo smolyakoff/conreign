@@ -7,11 +7,10 @@ namespace Conreign.Contracts.Gameplay.Events
     [Serializable]
     [Immutable]
     [Private]
-    public class ReinforcementsArrived : IClientEvent, IRoomEvent
+    public class ReinforcementsArrived : IClientEvent
     {
-        public ReinforcementsArrived(string roomId, string planetName, Guid ownerId, int ships)
+        public ReinforcementsArrived(string planetName, Guid ownerId, int ships)
         {
-            RoomId = roomId;
             PlanetName = planetName;
             OwnerId = ownerId;
             Ships = ships;
@@ -22,6 +21,5 @@ namespace Conreign.Contracts.Gameplay.Events
         public Guid OwnerId { get; }
         public int Ships { get; }
         public DateTime Timestamp { get; }
-        public string RoomId { get; }
     }
 }
