@@ -319,7 +319,7 @@ namespace Conreign.Server.Gameplay
             if (battleOutcome.AttackerShips > 0)
             {
                 attackerStats.BattlesWon += 1;
-                defenderPlanet.OwnerId = attackerPlanet.OwnerId;
+                defenderPlanet.OwnerId = movingFleet.OwnerUserId;
                 defenderPlanet.Ships = battleOutcome.AttackerShips;
             }
             else
