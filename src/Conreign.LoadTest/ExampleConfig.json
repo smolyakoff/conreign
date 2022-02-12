@@ -1,8 +1,0 @@
-﻿{
-  "ConnectionUri": "http://localhost:3000",
-  "MinimumLogLevel": "Information",
-  "BotOptions": {
-    "RoomsCount": 10,
-    "PlayerPerRoomCount": 5
-  }
-}

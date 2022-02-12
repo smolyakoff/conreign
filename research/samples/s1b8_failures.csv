@@ -1,7 +1,0 @@
-Timestamp,InstanceId,Level,Message
-636164823870036754,"loadtest__s1b8_a__1",Warning,[SignalRClient:"5aeb8ee4-9392-4cd5-85f4-aea8d0607bac":"89976e6b-33cd-46e8-a943-bf0a60581a8b"] "Game loadtest__s1b8_a__1:conreign-load-test-5 is already in progress."
-636164823870336689,"loadtest__s1b8_a__1",Error,[Bot:"loadtest__s1b8_a__1:conreign-load-test-5_bot-7":b7edcbab-f6b1-4174-b2cf-811ea3606160] Failed to handle "BotAuthenticated": "Game loadtest__s1b8_a__1:conreign-load-test-5 is already in progress."
-636164823871411892,"loadtest__s1b8_a__1",Error,[BotFarm:"loadtest__s1b8_a__1"] Bot stopped with an error: "Game loadtest__s1b8_a__1:conreign-load-test-5 is already in progress.".
-636164823875968640,"loadtest__s1b8_a__5",Warning,[SignalRClient:"9f6a007c-7672-4463-8a2a-98492ee4e1c1":"ecd42724-bce9-4948-8287-fa904d480981"] "Game loadtest__s1b8_a__5:conreign-load-test-5 is already in progress."
-636164823876264862,"loadtest__s1b8_a__5",Error,[Bot:"loadtest__s1b8_a__5:conreign-load-test-5_bot-7":158b9135-6759-49dd-9aea-a428c4d96b58] Failed to handle "BotAuthenticated": "Game loadtest__s1b8_a__5:conreign-load-test-5 is already in progress."
-636164823876990584,"loadtest__s1b8_a__5",Error,[BotFarm:"loadtest__s1b8_a__5"] Bot stopped with an error: "Game loadtest__s1b8_a__5:conreign-load-test-5 is already in progress.".
