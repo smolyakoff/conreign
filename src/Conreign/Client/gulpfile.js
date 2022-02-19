@@ -37,12 +37,17 @@ function runWebpackServer(configFactory) {
   const options = _.extend({}, vars, {task: TASK.RUN});
   const config = configFactory(options);
   const compiler = webpack(config);
-  const server = new WebpackDevServer(compiler, {
+  const devServerOptions = {
+    port: vars.devServerPort,
     compress: true,
     hot: vars.compilationMode === COMPILATION_MODE.DEBUG,
-    publicPath: '/',
-    contentBase: PATHS.BUILD,
-    stats: vars.traceLevel,
+    static: {
+      directory: PATHS.BUILD,
+    },
+    client: {
+      // TODO: Configure properly
+      overlay: false
+    },
     historyApiFallback: true,
     proxy: {
       '/$/api': {
@@ -50,9 +55,11 @@ function runWebpackServer(configFactory) {
         ws: true,
       },
     },
+  };
+  const server = new WebpackDevServer(devServerOptions, compiler);
+  return server.start().then(() => {
+    log(`Webpack dev server is listening on ${vars.devServerPort}.`)
   });
-  server.listen(vars.devServerPort);
-  log(`Webpack dev server is listening on ${vars.devServerPort}.`);
 }
 
 

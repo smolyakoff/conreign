@@ -1,7 +1,7 @@
 /* eslint-disable global-require,import/no-extraneous-dependencies */
-import 'babel-polyfill';
-import 'jquery';
-import 'ms-signalr-client';
+import 'core-js';
+import 'regenerator-runtime/runtime';
+import '@microsoft/signalr';
 import 'rxjs/Rx';
 import 'react';
 import 'react-transition-group';

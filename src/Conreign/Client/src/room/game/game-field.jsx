@@ -224,7 +224,7 @@ function generateMapCells(planets, players, movingFleets, waitingFleets) {
     const owner = planet.ownerId ? players[planet.ownerId] : null;
     const color = owner ? owner.color : null;
     const cellFleets = [
-      ...movingFleets[position],
+      ...(movingFleets[position] || []),
       ...waitingFleets.filter(x => x.from.name === planet.name),
     ].filter(x => x);
     const fleetShips = sumBy(cellFleets, fleet => fleet.ships);

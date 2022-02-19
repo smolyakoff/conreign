@@ -1,44 +1,27 @@
 // eslint-disable-next-line
-import $ from 'expose-loader?jQuery!expose-loader?$!jquery';
-import 'ms-signalr-client';
+import { HubConnectionBuilder, HubConnectionState } from '@microsoft/signalr'
 import Rx from 'rxjs/Rx';
 import { once, fromPairs, map, startCase } from 'lodash';
 
 import mapError from './map-error';
 
-const signalRConnectionState = $.signalR.connectionState;
-
 export const ApiClientState = fromPairs(
-  map(signalRConnectionState, (v, k) => [startCase(k), k.toUpperCase()]),
+  map(HubConnectionState, (v, k) => [startCase(k), k.toUpperCase()]),
 );
-
-const connectionStateCodeMapping = {
-  [signalRConnectionState.disconnected]: ApiClientState.Disconnected,
-  [signalRConnectionState.connecting]: ApiClientState.Connecting,
-  [signalRConnectionState.connected]: ApiClientState.Connected,
-  [signalRConnectionState.reconnecting]: ApiClientState.Reconnecting,
-};
-
-const SERVER_HUB_NAME = 'GameHub';
 
 function apiClient(accessTokenProvider, options) {
   const { baseUrl } = options;
   let connection = null;
-  let state = ApiClientState.Disconnected;
-  let hub = null;
   const events = new Rx.Subject();
 
-  function onStateChanged({ newState }) {
-    state = connectionStateCodeMapping[newState];
-  }
-
   function connect() {
-    connection = $.hubConnection(baseUrl, { useDefaultPath: false });
-    hub = connection.createHubProxy(SERVER_HUB_NAME);
-    hub.on('OnNext', events.next.bind(events));
-    hub.on('OnError', events.error.bind(events));
-    hub.on('OnComplete', events.complete.bind(events));
-    connection.stateChanged(onStateChanged);
+    const connectionBuilder = new HubConnectionBuilder()
+      .withAutomaticReconnect()
+      .withUrl(baseUrl);
+    connection = connectionBuilder.build();
+    connection.on('OnNext', events.next.bind(events));
+    connection.on('OnError', events.error.bind(events));
+    connection.on('OnComplete', events.complete.bind(events));
     return Rx.Observable.fromPromise(connection.start());
   }
 
@@ -54,7 +37,7 @@ function apiClient(accessTokenProvider, options) {
       },
     };
     return connectOnce()
-      .mergeMap(() => hub.invoke('send', packet))
+      .mergeMap(() => connection.invoke('send', packet))
       .map(response => ({
         ...response,
         meta: {
@@ -70,7 +53,7 @@ function apiClient(accessTokenProvider, options) {
 
   return {
     get state() {
-      return state;
+      return connection.state;
     },
     get events() {
       return events;

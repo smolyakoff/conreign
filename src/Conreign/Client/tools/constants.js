@@ -28,13 +28,10 @@ const SIZE_LIMITS = {
   maxAssetSize: 1000000, // 1MB
 };
 
-const SUPPORTED_BROWSERS = '> 5%';
-
 module.exports = {
   COMPILATION_MODE,
   TRACE_LEVEL,
   PATHS,
   TASK,
-  SIZE_LIMITS,
-  SUPPORTED_BROWSERS,
+  SIZE_LIMITS
 };

@@ -1,15 +1,14 @@
 {
   "presets": [
-    ["env", {
+    ["@babel/preset-env", {
       "loose": true,
-      "targets": {
-        "browsers": "> 1%"
-      },
       "modules": false,
-      "useBuiltIns": true
+      "useBuiltIns": "entry",
+      "corejs": {
+        "version": "3.21"
+      }
     }],
-    "react",
-    "stage-2"
+    "@babel/preset-react"
   ],
   "sourceMaps": true,
   "plugins": [

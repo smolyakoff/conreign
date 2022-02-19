@@ -3,30 +3,28 @@ const path = require('path');
 const _ = require('lodash');
 const {
   DllReferencePlugin,
-  HotModuleReplacementPlugin,
-  NamedModulesPlugin,
   DefinePlugin,
-  LoaderOptionsPlugin,
-  optimize,
 } = require('webpack');
-const webpackMerge = require('webpack-merge');
+const { merge: webpackMerge } = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const AddAssetToHtmlPlugin = require('add-asset-html-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
-const CopyPlugin = require('copy-webpack-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
 
-const { UglifyJsPlugin } = optimize;
-const { PATHS, TASK, COMPILATION_MODE, SIZE_LIMITS } = require('./constants');
+const {PATHS, TASK, COMPILATION_MODE, SIZE_LIMITS} = require('./constants');
 
 function createConfiguration(options) {
-  const { compilationMode, task } = options;
+  const {compilationMode, task} = options;
   // eslint-disable-next-line global-require
   const conreignLibAssets = require('./../build/conreign-lib.assets.json');
+  console.log(conreignLibAssets);
   let config = {
+    mode: compilationMode === COMPILATION_MODE.DEBUG ? 'development' : 'production',
     entry: {
       app: [
-        'babel-polyfill',
+        'core-js',
+        'regenerator-runtime/runtime',
         path.join(PATHS.SRC, 'index.jsx'),
       ],
     },
@@ -44,16 +42,6 @@ function createConfiguration(options) {
         },
         {
           test: /\.jsx?$/,
-          enforce: 'pre',
-          loader: 'eslint-loader',
-          include: PATHS.SRC,
-          options: {
-            failOnWarning: task === TASK.BUILD,
-            failOnError: task === TASK.BUILD,
-          },
-        },
-        {
-          test: /\.jsx?$/,
           loader: 'babel-loader',
           include: PATHS.SRC,
           options: {
@@ -62,14 +50,14 @@ function createConfiguration(options) {
         },
         {
           test: /\.scss$/,
-          loader: ExtractTextPlugin.extract({
-            fallback: 'style-loader',
-            use: [
-              'css-loader?importLoaders=1',
-              'postcss-loader',
-              'sass-loader',
-            ],
-          }),
+          use: [
+            task === TASK.RUN
+              ? 'style-loader'
+              : MiniCssExtractPlugin.loader,
+            'css-loader',
+            'sass-loader',
+            'postcss-loader'
+          ],
         },
         {
           test: /\.svg$/,
@@ -81,6 +69,11 @@ function createConfiguration(options) {
       extensions: ['.js', '.jsx', '.json'],
     },
     plugins: [
+      new ESLintPlugin({
+        context: PATHS.SRC,
+        failOnWarning: task === TASK.BUILD,
+        failOnError: task === TASK.BUILD,
+      }),
       new DllReferencePlugin({
         context: PATHS.ROOT,
         // eslint-disable-next-line global-require
@@ -91,12 +84,11 @@ function createConfiguration(options) {
         favicon: path.join(PATHS.SRC, 'favicon.ico'),
       }),
       new AddAssetToHtmlPlugin({
-        filepath: path.join(PATHS.BUILD, conreignLibAssets.lib.js),
+        filepath: path.join(PATHS.BUILD, conreignLibAssets.lib.js.replace(/^auto\//, '')),
         includeSourcemap: false,
       }),
-      new ExtractTextPlugin({
+      new MiniCssExtractPlugin({
         filename: 'conreign-[name].[contenthash].css',
-        disable: options.task === TASK.RUN,
       }),
       new DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify(
@@ -106,16 +98,13 @@ function createConfiguration(options) {
         TASK: JSON.stringify(options.task),
         BUILD_CONFIG: JSON.stringify(options),
       }),
-      new LodashModuleReplacementPlugin({
-        collections: true,
-        deburring: true,
-        unicode: true,
-        paths: true,
-        currying: true,
-      }),
-      new CopyPlugin([{
-        from: path.join(PATHS.SRC, 'web.config'),
-      }]),
+      // new LodashModuleReplacementPlugin({
+      //   collections: true,
+      //   deburring: true,
+      //   unicode: true,
+      //   paths: true,
+      //   currying: true,
+      // }),
     ],
     performance: _.extend({}, SIZE_LIMITS, {
       hints: options.compilationMode === COMPILATION_MODE.RELEASE ? 'warning' : false,
@@ -130,24 +119,7 @@ function createConfiguration(options) {
           `webpack-dev-server/client?http://localhost:${options.devServerPort}`,
           'webpack/hot/only-dev-server',
         ],
-      },
-      plugins: [
-        new HotModuleReplacementPlugin(),
-        new NamedModulesPlugin(),
-      ],
-    });
-  }
-
-  if (compilationMode === COMPILATION_MODE.RELEASE) {
-    config = webpackMerge(config, {
-      plugins: [
-        new UglifyJsPlugin({
-          sourceMap: true,
-        }),
-        new LoaderOptionsPlugin({
-          minimize: true,
-        }),
-      ],
+      }
     });
   }
 
