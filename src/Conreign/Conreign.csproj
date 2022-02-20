@@ -36,10 +36,9 @@
         </PackageReference>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="Polly" Version="7.2.3" />
-        <PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
+        <PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
         <PackageReference Include="SerilogMetrics" Version="2.1.0" />
-        <PackageReference Include="System.Reactive" Version="5.0.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -49,39 +48,6 @@
         <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
         <None Remove="Client\build\**" />
         <Content Remove="Client\build\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Orleans_CodeGenInputs Remove="Server\Grains\Gameplay\Game.cs" />
-      <Orleans_CodeGenInputs Remove="Server\Grains\Gameplay\GameGrain.cs" />
-      <Orleans_CodeGenInputs Remove="Server\Grains\Gameplay\GameGrainOptions.cs" />
-      <Orleans_CodeGenInputs Remove="Server\Grains\Gameplay\GameState.cs" />
-      <Orleans_CodeGenInputs Remove="Server\Grains\Gameplay\Lobby.cs" />
-      <Orleans_CodeGenInputs Remove="Server\Grains\Gameplay\LobbyGrain.cs" />
-      <Orleans_CodeGenInputs Remove="Server\Grains\Gameplay\LobbyGrainOptions.cs" />
-      <Orleans_CodeGenInputs Remove="Server\Grains\Gameplay\LobbyState.cs" />
-      <Orleans_CodeGenInputs Remove="Server\Grains\Gameplay\Player.cs" />
-      <Orleans_CodeGenInputs Remove="Server\Grains\Gameplay\PlayerGameState.cs" />
-      <Orleans_CodeGenInputs Remove="Server\Grains\Gameplay\PlayerGrain.cs" />
-      <Orleans_CodeGenInputs Remove="Server\Grains\Gameplay\PlayerState.cs" />
-      <Orleans_CodeGenInputs Remove="Server\Grains\Gameplay\UserGrain.cs" />
-      <Orleans_CodeGenInputs Remove="Server\Grains\Gameplay\Validators\CancelFleetValidator.cs" />
-      <Orleans_CodeGenInputs Remove="Server\Grains\Gameplay\Validators\LaunchFleetValidator.cs" />
-      <Orleans_CodeGenInputs Remove="Server\Grains\Gameplay\Validators\TextMessageValidator.cs" />
-      <Orleans_CodeGenInputs Remove="Server\Grains\Communication\EventExtensions.cs" />
-      <Orleans_CodeGenInputs Remove="Server\Grains\Communication\EventObserver'2.cs" />
-      <Orleans_CodeGenInputs Remove="Server\Grains\Communication\StreamExtensions.cs" />
-      <Orleans_CodeGenInputs Remove="Server\Grains\Communication\Topic.cs" />
-      <Orleans_CodeGenInputs Remove="Server\Grains\Communication\TopicIds.cs" />
-      <Orleans_CodeGenInputs Remove="Server\Grains\Auth\AuthGrain.cs" />
-      <Orleans_CodeGenInputs Remove="Server\Grains\Auth\AuthOptions.cs" />
-      <Orleans_CodeGenInputs Remove="Server\Grains\Auth\AuthService.cs" />
-      <Orleans_CodeGenInputs Remove="Server\Grains\Auth\JwtTokenPayload.cs" />
-      <Orleans_CodeGenInputs Remove="Server\Grains\Auth\Serialization\SecondsSinceEpochConverter.cs" />
-    </ItemGroup>
-    
-    <ItemGroup>
-        <None Remove="Client/build"/>
     </ItemGroup>
 
     <Target Name="RestoreClientDependencies" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

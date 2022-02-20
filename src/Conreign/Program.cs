@@ -37,7 +37,9 @@ services.AddSingleton<GameGrainOptions>();
 services.AddSingleton<GameHubCountersCollection>();
 
 var app = appBuilder.Build();
+app.UseStaticFiles();
 app.UseRouting();
 app.UseEndpoints(routes => { routes.MapHub<GameHub>("/$/api"); });
+app.MapFallbackToFile("index.html");
 
 app.Run();

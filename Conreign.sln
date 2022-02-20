@@ -2,6 +2,15 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Conreign", "src\Conreign\Conreign.csproj", "{D19E58C8-88CA-41D5-9E9A-E91CB03EC489}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Code", "Code", "{B2CF0160-1094-453C-92EB-9BD92671B219}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{8C8877E7-F510-44ED-A8AD-7BCF1F119007}"
+	ProjectSection(SolutionItems) = preProject
+		Dockerfile = Dockerfile
+		.dockerignore = .dockerignore
+		.gitignore = .gitignore
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +21,8 @@ Global
 		{D19E58C8-88CA-41D5-9E9A-E91CB03EC489}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D19E58C8-88CA-41D5-9E9A-E91CB03EC489}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D19E58C8-88CA-41D5-9E9A-E91CB03EC489}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D19E58C8-88CA-41D5-9E9A-E91CB03EC489} = {B2CF0160-1094-453C-92EB-9BD92671B219}
 	EndGlobalSection
 EndGlobal
