@@ -1,0 +1,21 @@
+{
+  "extends": "airbnb",
+  "parser": "@babel/eslint-parser",
+  "env": {
+    "browser": true
+  },
+  "globals": {
+    "COMPILATION_MODE": true,
+    "TASK": true,
+    "BUILD_CONFIG": true
+  },
+  "rules": {
+    "linebreak-style": 0,
+    "no-underscore-dangle": 0,
+    "no-param-reassign": 0,
+    "no-confusing-arrow": 0,
+    "import/no-extraneous-dependencies": ["error", {
+      "devDependencies": ["tools/**/*.js", "gulpfile.js", "postcss.config.js"]
+    }]
+  }
+}

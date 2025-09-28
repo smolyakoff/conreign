@@ -1,8 +1,0 @@
-System.ComponentModel.TypeConverter copy_local: true
-Microsoft.Extensions.Configuration.Binder
-Microsoft.Extensions.Configuration.CommandLine
-Microsoft.Extensions.Configuration.Json
-Humanizer
-Serilog.Sinks.Literate
-Serilog.Sinks.File
-Azure.Batch

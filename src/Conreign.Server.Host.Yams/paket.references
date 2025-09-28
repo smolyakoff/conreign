@@ -1,7 +1,0 @@
-Microsoft.Extensions.Configuration.Binder
-Microsoft.Extensions.Configuration.Json
-Topshelf
-Etg.Yams
-Serilog
-Serilog.Sinks.RollingFile
-SerilogTraceListener

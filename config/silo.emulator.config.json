@@ -1,5 +1,0 @@
-{
-  "LivenessStorageType": "AzureTable",
-  "RemindersStorageType": "AzureTable",
-  "SystemStorageConnectionString": "UseDevelopmentStorage=true"
-}

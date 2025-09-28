@@ -1,4 +1,0 @@
-{
-  "SystemStorageType": "AzureTable",
-  "SystemStorageConnectionString": "UseDevelopmentStorage=true"
-}

@@ -1,9 +1,0 @@
-Index was outside the bounds of the array.
-   at Orleans.CodeGenerator.GrainReferenceGenerator.GenerateInvokeMethods(Type grainType, Action`1 onEncounteredType)
-   at Orleans.CodeGenerator.GrainReferenceGenerator.GenerateClass(Type grainType, Action`1 onEncounteredType)
-   at Orleans.CodeGenerator.RoslynCodeGenerator.GenerateForAssemblies(List`1 assemblies, Boolean runtime)
-   at Orleans.CodeGenerator.RoslynCodeGenerator.GenerateSourceForAssembly(Assembly input)
-   at Orleans.CodeGeneration.GrainClientGenerator.CreateGrainClient(CodeGenOptions options)
-   at Orleans.CodeGeneration.GrainClientGenerator.CreateGrainClient(CodeGenOptions options)
-   at Orleans.CodeGeneration.GrainClientGenerator.CreateGrainClientAssembly(CodeGenOptions options)
-   at Orleans.CodeGeneration.GrainClientGenerator.RunMain(String[] args)

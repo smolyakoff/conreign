@@ -1,0 +1,25 @@
+{
+  "presets": [
+    ["@babel/preset-env", {
+      "loose": true,
+      "modules": false,
+      "useBuiltIns": "entry",
+      "corejs": {
+        "version": "3.21"
+      }
+    }],
+    "@babel/preset-react"
+  ],
+  "sourceMaps": true,
+  "plugins": [
+    "lodash",
+    "recharts"
+  ],
+  "env": {
+    "development": {
+      "plugins": [
+        "react-hot-loader/babel"
+      ]
+    }
+  }
+}

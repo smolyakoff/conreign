@@ -1,4 +1,0 @@
-Timestamp,InstanceId,Level,Message
-636164792063555071,"loadtest__s2b8_a__3",Warning,[SignalRClient:"68b7c57a-799b-45c6-b4bd-7423c2e4e3c1":"c0795a98-e665-4c5f-9c57-a8061e6acb4d"] "Game loadtest__s2b8_a__3:conreign-load-test-7 is already in progress."
-636164792063856395,"loadtest__s2b8_a__3",Error,[Bot:"loadtest__s2b8_a__3:conreign-load-test-7_bot-7":2b7d379d-6b65-472f-a3f8-c3cd7774a76c] Failed to handle "BotAuthenticated": "Game loadtest__s2b8_a__3:conreign-load-test-7 is already in progress."
-636164792065455751,"loadtest__s2b8_a__3",Error,[BotFarm:"loadtest__s2b8_a__3"] Bot stopped with an error: "Game loadtest__s2b8_a__3:conreign-load-test-7 is already in progress.".

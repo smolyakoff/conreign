@@ -1,0 +1,98 @@
+﻿using Conreign.Server.Contracts.Server.Communication;
+using Conreign.Server.Contracts.Shared.Communication;
+using Conreign.Server.Core.Utility;
+using Orleans;
+using Orleans.Streams;
+
+namespace Conreign.Server.Core.Communication;
+
+public class Topic : IUserTopic
+{
+    private readonly Dictionary<Guid, IAsyncStream<IServerEvent>> _childrenStreams;
+    private readonly Dictionary<string, IAsyncStream<IClientEvent>> _clientStreams;
+    private readonly string _id;
+    private readonly IAsyncStream<IServerEvent> _parentStream;
+    private readonly IStreamProvider _provider;
+
+    public Topic(IStreamProvider provider, string id)
+    {
+        if (provider == null)
+        {
+            throw new ArgumentNullException(nameof(provider));
+        }
+
+        if (string.IsNullOrEmpty(id))
+        {
+            throw new ArgumentException("Id cannot be null or empty.", nameof(id));
+        }
+
+        _provider = provider;
+        _id = id;
+        _parentStream = provider.GetStream<IServerEvent>(default, id);
+        _childrenStreams = new Dictionary<Guid, IAsyncStream<IServerEvent>>();
+        _clientStreams = new Dictionary<string, IAsyncStream<IClientEvent>>();
+    }
+
+    public async Task Send(params IServerEvent[] events)
+    {
+        if (events == null)
+        {
+            throw new ArgumentNullException(nameof(events));
+        }
+
+        foreach (var @event in events)
+        {
+            await _parentStream.OnNextAsync(@event);
+        }
+    }
+
+    public async Task Broadcast(ISet<Guid> userIds, ISet<string> connectionIds, params IEvent[] events)
+    {
+        var serverEvents = events.OfType<IServerEvent>();
+        var clientEvents = events.OfType<IClientEvent>();
+        var serverStreams = userIds
+            .Select(id => _childrenStreams.GetOrCreateDefault(id, () => CreateUserStream(id)));
+        var serverTasks = serverEvents
+            .SelectMany(@event => serverStreams.Select(s => s.OnNextAsync(@event)))
+            .ToList();
+        await Task.WhenAll(serverTasks);
+        var clientStreams = connectionIds
+            .Select(id => _clientStreams.GetOrCreateDefault(id, () => CreateClientStream(id)));
+        var clientTasks = clientEvents
+            .SelectMany(@event => clientStreams.Select(s => s.OnNextAsync(@event)))
+            .ToList();
+        await Task.WhenAll(clientTasks);
+    }
+
+    public static Topic Room(IStreamProvider provider, string roomId)
+    {
+        return new Topic(provider, TopicIds.Room(roomId));
+    }
+
+    public static Topic Player(IStreamProvider provider, Guid userId, string roomId)
+    {
+        return new Topic(provider, TopicIds.Player(userId, roomId));
+    }
+
+    public Task<StreamSubscriptionHandle<IServerEvent>> EnsureIsSubscribedOnce<T>(T handler)
+        where T : Grain, IEventHandler
+    {
+        if (handler == null)
+        {
+            throw new ArgumentNullException(nameof(handler));
+        }
+
+        return handler.EnsureIsSubscribedOnce(_parentStream);
+    }
+
+    private IAsyncStream<IServerEvent> CreateUserStream(Guid userId)
+    {
+        var id = string.Concat(_id, "/", userId);
+        return _provider.GetStream<IServerEvent>(Guid.Empty, id);
+    }
+
+    private IAsyncStream<IClientEvent> CreateClientStream(string connectionId)
+    {
+        return _provider.GetStream<IClientEvent>(Guid.Empty, StreamConstants.GetClientNamespace(connectionId));
+    }
+}

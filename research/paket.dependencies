@@ -1,7 +1,0 @@
-source https://nuget.org/api/v2
-
-nuget Deedle
-nuget DotNetZip
-nuget FSharp.Collections.ParallelSeq
-nuget FsLab
-nuget FSharp.Data
