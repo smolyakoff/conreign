@@ -1,4 +1,4 @@
-﻿# [Conreign](https://conreign.smolyakov.club)
+﻿# [Conreign](https://conreign.smolyakov.uk)
 
 Conreign is a multiplayer turn-based strategy game. The gameplay was highly inspired by
 [Konquest](https://www.kde.org/applications/games/konquest).
@@ -6,7 +6,7 @@ Conreign is a multiplayer turn-based strategy game. The gameplay was highly insp
 The main goal is to conquer all other player's planets on a rectangle map
 by sending fleets from one planet to another.
 
-**Try playing [here](https://conreign.smolyakov.club).** Use **[github](https://conreign.smolyakov.club/github)** room when in doubt 🙂.
+**Try playing [here](https://conreign.smolyakov.uk).** Use **[github](https://conreign.smolyakov.uk/github)** room when in doubt 🙂.
 
 ## Technologies Used
 
