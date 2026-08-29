@@ -1,0 +1,16 @@
+services:
+  conreign:
+    build:
+      context: ..
+      dockerfile: tools/Dockerfile
+    image: conreign:local
+    restart: unless-stopped
+    x-machines: [oracle]
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    x-ports:
+      - conreign-oracle.vps.smolyakov.uk:80/https
